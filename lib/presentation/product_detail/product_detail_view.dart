@@ -169,7 +169,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final otherProducts = ProductItem.sampleProducts
         .where((p) => p.id != widget.product.id && !categoryMatches.contains(p))
         .toList();
-    final similarProducts = [...categoryMatches, ...otherProducts].take(4).toList();
+    final similarProducts = [...categoryMatches, ...otherProducts].take(6).toList();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -3540,21 +3540,36 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         const SizedBox(height: 14),
         LayoutBuilder(
           builder: (context, constraints) {
-            int crossAxisCount = 4;
-            double childAspectRatio = 0.74;
+            int crossAxisCount = 6;
+            double childAspectRatio = 0.78;
             double crossAxisSpacing = 16;
             double mainAxisSpacing = 16;
 
             if (constraints.maxWidth < 600) {
               crossAxisCount = 2;
-              childAspectRatio = 0.60;
+              childAspectRatio = 0.68;
               crossAxisSpacing = 8;
               mainAxisSpacing = 8;
-            } else if (constraints.maxWidth < 900) {
+            } else if (constraints.maxWidth < 850) {
               crossAxisCount = 3;
-              childAspectRatio = 0.70;
+              childAspectRatio = 0.72;
+              crossAxisSpacing = 10;
+              mainAxisSpacing = 10;
+            } else if (constraints.maxWidth < 1180) {
+              crossAxisCount = 4;
+              childAspectRatio = 0.74;
               crossAxisSpacing = 12;
               mainAxisSpacing = 12;
+            } else if (constraints.maxWidth < 1520) {
+              crossAxisCount = 5;
+              childAspectRatio = 0.76;
+              crossAxisSpacing = 14;
+              mainAxisSpacing = 14;
+            } else {
+              crossAxisCount = 6;
+              childAspectRatio = 0.78;
+              crossAxisSpacing = 16;
+              mainAxisSpacing = 16;
             }
 
             return GridView.builder(
@@ -3579,10 +3594,38 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ),
                     );
                   },
-                  onAddToCart: (product, variant) {
-                    _scaffoldKey.currentState?.openEndDrawer();
+                  onAddToCart: (p, v) {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Added ${p.title} (${v.label}) to cart',
+                                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        action: SnackBarAction(
+                          label: 'VIEW CART',
+                          textColor: Colors.white,
+                          onPressed: () {
+                            _scaffoldKey.currentState?.openEndDrawer();
+                          },
+                        ),
+                        backgroundColor: AppColors.primaryGreen,
+                        duration: const Duration(seconds: 3),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    );
                   },
-                  onBuyNow: (product, variant) {
+                  onBuyNow: (p, v) {
                     _scaffoldKey.currentState?.openEndDrawer();
                   },
                 );

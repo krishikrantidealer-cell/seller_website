@@ -90,19 +90,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           builder: (context, _) {
                             final auth = AuthController.instance;
                             if (auth.isLoggedIn) {
-                              return InkWell(
-                                onTap: () => showAuthModal(context),
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.lightGreen,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.primaryGreen, width: 1.5),
-                                  ),
-                                  child: const Icon(Icons.person_rounded, color: AppColors.primaryDarkGreen, size: 20),
-                                ),
-                              );
+                              return _buildProfileDropdown(context, auth, isMobile: true);
                             }
                             return IconButton(
                               icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 24),
@@ -326,60 +314,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                         builder: (context, _) {
                           final auth = AuthController.instance;
                           if (auth.isLoggedIn) {
-                            return InkWell(
-                              onTap: () => showAuthModal(context),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                                decoration: BoxDecoration(
-                                  color: AppColors.lightGreen.withValues(alpha: 0.35),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppColors.primaryGreen, width: 1.2),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.primaryGreen,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.person_rounded, color: Colors.white, size: 14),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              auth.currentUser?.name ?? 'My Account',
-                                              style: GoogleFonts.poppins(
-                                                color: AppColors.primaryDarkGreen,
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 2),
-                                            const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: AppColors.primaryDarkGreen),
-                                          ],
-                                        ),
-                                        Text(
-                                          auth.currentUser?.formattedPhone ?? '',
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.textSecondary,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+                            return _buildProfileDropdown(context, auth, isMobile: false);
                           }
 
                           return OutlinedButton.icon(
@@ -488,6 +423,150 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 fontSize: 13,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileDropdown(BuildContext context, AuthController auth, {required bool isMobile}) {
+    final phoneDisplay = auth.currentUser?.formattedPhone ?? '';
+
+    final dropdownItems = <PopupMenuEntry<String>>[
+      PopupMenuItem<String>(
+        enabled: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Signed in as',
+              style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              phoneDisplay,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryDarkGreen,
+              ),
+            ),
+            const Divider(height: 16),
+          ],
+        ),
+      ),
+      PopupMenuItem<String>(
+        value: 'orders',
+        child: Row(
+          children: [
+            const Icon(Icons.local_shipping_outlined, size: 18, color: AppColors.textPrimary),
+            const SizedBox(width: 10),
+            Text('Track Orders', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
+          ],
+        ),
+      ),
+      PopupMenuItem<String>(
+        value: 'cart',
+        child: Row(
+          children: [
+            const Icon(Icons.shopping_cart_outlined, size: 18, color: AppColors.textPrimary),
+            const SizedBox(width: 10),
+            Text('My Cart', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
+          ],
+        ),
+      ),
+      PopupMenuItem<String>(
+        value: 'helpline',
+        child: Row(
+          children: [
+            const Icon(Icons.support_agent_outlined, size: 18, color: AppColors.textPrimary),
+            const SizedBox(width: 10),
+            Text('Krishi Helpline', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
+          ],
+        ),
+      ),
+      const PopupMenuDivider(),
+      PopupMenuItem<String>(
+        value: 'logout',
+        child: Row(
+          children: [
+            const Icon(Icons.logout_rounded, size: 18, color: AppColors.primaryCrimson),
+            const SizedBox(width: 10),
+            Text('Sign Out', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primaryCrimson)),
+          ],
+        ),
+      ),
+    ];
+
+    void handleSelect(String value) {
+      if (value == 'cart') {
+        widget.onCartTap?.call();
+      } else if (value == 'logout') {
+        auth.logout();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Logged out successfully'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+
+    if (isMobile) {
+      return PopupMenuButton<String>(
+        tooltip: 'Account Menu',
+        offset: const Offset(0, 42),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        onSelected: handleSelect,
+        itemBuilder: (context) => dropdownItems,
+        child: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: AppColors.lightGreen,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+          ),
+          child: const Icon(Icons.person_rounded, color: AppColors.primaryDarkGreen, size: 20),
+        ),
+      );
+    }
+
+    return PopupMenuButton<String>(
+      tooltip: 'Account Menu',
+      offset: const Offset(0, 48),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      onSelected: handleSelect,
+      itemBuilder: (context) => dropdownItems,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: AppColors.lightGreen.withValues(alpha: 0.35),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.primaryGreen, width: 1.2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: AppColors.primaryGreen,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_rounded, color: Colors.white, size: 14),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              phoneDisplay,
+              style: GoogleFonts.poppins(
+                color: AppColors.primaryDarkGreen,
+                fontWeight: FontWeight.w700,
+                fontSize: 12.5,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppColors.primaryDarkGreen),
           ],
         ),
       ),

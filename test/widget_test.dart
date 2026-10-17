@@ -92,22 +92,21 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
-    // Verify User is logged in and header shows logged in user
-    expect(find.text('Kisan Farmer'), findsWidgets);
+    // Verify User is logged in with phone number and no dummy name is shown
+    expect(find.text('Kisan Farmer'), findsNothing);
     expect(find.textContaining('98765 43210'), findsWidgets);
 
-    // Tap the account button again to open Profile View
-    final loggedInAccount = find.text('Kisan Farmer').first;
+    // Tap the account button to open the dropdown menu
+    final loggedInAccount = find.textContaining('98765 43210').first;
     await tester.tap(loggedInAccount);
     await tester.pumpAndSettle();
 
-    // Verify Account Profile menu is visible with Logout button
-    expect(find.text('Track My Orders'), findsOneWidget);
-    final logoutBtn = find.widgetWithText(OutlinedButton, 'Sign Out / Logout');
-    expect(logoutBtn, findsOneWidget);
+    // Verify Dropdown menu is visible with Track Orders and Sign Out
+    expect(find.text('Track Orders'), findsOneWidget);
+    expect(find.text('Sign Out'), findsOneWidget);
 
-    // Tap Logout
-    await tester.tap(logoutBtn);
+    // Tap Sign Out from dropdown
+    await tester.tap(find.text('Sign Out'));
     await tester.pumpAndSettle();
 
     // Verify user is logged out back to Login / My Account

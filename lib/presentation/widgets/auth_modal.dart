@@ -770,7 +770,9 @@ class _AccountProfileView extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            user?.name ?? 'Kisan Farmer',
+                            user?.name?.isNotEmpty == true
+                                ? user!.name!
+                                : (user?.formattedPhone ?? 'Farmer Account'),
                             style: GoogleFonts.poppins(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,

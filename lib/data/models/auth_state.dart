@@ -3,14 +3,14 @@ import 'package:flutter/foundation.dart';
 /// User representation for authenticated farmers/customers
 class UserModel {
   final String phoneNumber;
-  final String name;
+  final String? name;
   final String? email;
   final String location;
   final String memberSince;
 
   const UserModel({
     required this.phoneNumber,
-    this.name = 'Kisan Mitra',
+    this.name,
     this.email,
     this.location = 'Karnal, Haryana',
     this.memberSince = 'Oct 2026',
@@ -82,7 +82,6 @@ class AuthController extends ChangeNotifier {
     final phone = _pendingPhone ?? '9876543210';
     _currentUser = UserModel(
       phoneNumber: phone,
-      name: 'Kisan Farmer',
       location: 'Punjab & Haryana Agricultural Belt',
     );
     _pendingPhone = null;
