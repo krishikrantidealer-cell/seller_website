@@ -177,20 +177,27 @@ class _CropDoctorModalState extends State<CropDoctorModal> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isCompact = screenWidth < 600;
+
     final activeCrop = _crops[_selectedCropIndex];
     final activeProblem = activeCrop.problems[_selectedProblemIndex];
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       backgroundColor: Colors.white,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(horizontal: isCompact ? 12 : 24, vertical: isCompact ? 16 : 24),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 860, maxHeight: 720),
+        constraints: BoxConstraints(
+          maxWidth: 860,
+          maxHeight: screenHeight * 0.90,
+        ),
         child: Column(
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+              padding: EdgeInsets.symmetric(horizontal: isCompact ? 14 : 24, vertical: isCompact ? 12 : 18),
               decoration: const BoxDecoration(
                 color: AppColors.forestDark,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -203,10 +210,10 @@ class _CropDoctorModalState extends State<CropDoctorModal> {
                       color: AppColors.primaryGreen,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.psychology_alt_outlined, color: Colors.white, size: 24),
+                    child: const Icon(Icons.psychology_alt_outlined, color: Colors.white, size: 22),
                   ),
-                  const SizedBox(width: 14),
-                  const Expanded(
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -214,7 +221,7 @@ class _CropDoctorModalState extends State<CropDoctorModal> {
                           'EBS Agri Doctor & Crop Diagnostic',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 18,
+                            fontSize: isCompact ? 15 : 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -222,7 +229,7 @@ class _CropDoctorModalState extends State<CropDoctorModal> {
                           'फसल डॉक्टर — अपनी फसल चुनें, रोग पहचानें एवं सही वैज्ञानिक दवा पाएं',
                           style: TextStyle(
                             color: AppColors.harvestAmberLight,
-                            fontSize: 12,
+                            fontSize: isCompact ? 10.5 : 12,
                           ),
                         ),
                       ],
@@ -389,19 +396,24 @@ class _CropDoctorModalState extends State<CropDoctorModal> {
                             ],
                           ),
                           const SizedBox(height: 14),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              context.read<CatalogBloc>().add(SearchTechnicalOrBrand(activeProblem.targetSearchQuery));
-                              Navigator.of(context).pop();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryGreen,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            ),
-                            icon: const Icon(Icons.shopping_basket_outlined, size: 18),
-                            label: Text(
-                              'View "${activeProblem.targetSearchQuery}" in Catalog (स्टोर में देखें)',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                          SizedBox(
+                            width: isCompact ? double.infinity : null,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                context.read<CatalogBloc>().add(SearchTechnicalOrBrand(activeProblem.targetSearchQuery));
+                                Navigator.of(context).pop();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryGreen,
+                                padding: EdgeInsets.symmetric(horizontal: isCompact ? 14 : 20, vertical: 12),
+                              ),
+                              icon: const Icon(Icons.shopping_basket_outlined, size: 18),
+                              label: Text(
+                                isCompact
+                                    ? 'View Products (स्टोर में देखें)'
+                                    : 'View "${activeProblem.targetSearchQuery}" in Catalog (स्टोर में देखें)',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ],

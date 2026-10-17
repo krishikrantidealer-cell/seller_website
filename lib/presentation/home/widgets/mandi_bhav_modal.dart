@@ -108,17 +108,29 @@ class MandiBhavModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final isCompact = size.width < 600;
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       backgroundColor: Colors.white,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 12 : 16,
+        vertical: isCompact ? 16 : 24,
+      ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 780, maxHeight: 680),
+        constraints: BoxConstraints(
+          maxWidth: 780,
+          maxHeight: size.height * 0.90,
+        ),
         child: Column(
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: EdgeInsets.symmetric(
+                horizontal: isCompact ? 16 : 24,
+                vertical: isCompact ? 12 : 16,
+              ),
               decoration: const BoxDecoration(
                 color: AppColors.forestDark,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -133,8 +145,8 @@ class MandiBhavModal extends StatelessWidget {
                     ),
                     child: const Icon(Icons.trending_up_rounded, color: Colors.white, size: 22),
                   ),
-                  const SizedBox(width: 14),
-                  const Expanded(
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -142,16 +154,19 @@ class MandiBhavModal extends StatelessWidget {
                           'Daily APMC Mandi Bhav (दैनिक मंडी भाव)',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 17,
+                            fontSize: isCompact ? 15 : 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
+                        const SizedBox(height: 2),
+                        const Text(
                           'प्रमुख कृषि उपज मंडी समितियों (APMC) के ताजा व आधिकारिक दैनिक भाव',
                           style: TextStyle(
                             color: AppColors.harvestAmberLight,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -268,32 +283,60 @@ class MandiBhavModal extends StatelessWidget {
 
             // Footer Assistance
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(isCompact ? 12 : 16),
               decoration: const BoxDecoration(
                 color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
               ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline_rounded, color: AppColors.textSecondary, size: 18),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text(
-                      'मंडी व फसल से जुड़ी सलाह हेतु हमारे कृषि विशेषज्ञ से संपर्क करें: 1800-203-1425',
-                      style: TextStyle(fontSize: 12, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+              child: isCompact
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.info_outline_rounded, color: AppColors.textSecondary, size: 16),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'कृषि विशेषज्ञ सलाह: 1800-203-1425',
+                                style: TextStyle(fontSize: 12, color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: () {},
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          icon: const Icon(Icons.phone, size: 14),
+                          label: const Text('Call Helpline (टोल फ्री)', style: TextStyle(fontSize: 12)),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        const Icon(Icons.info_outline_rounded, color: AppColors.textSecondary, size: 18),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'मंडी व फसल से जुड़ी सलाह हेतु हमारे कृषि विशेषज्ञ से संपर्क करें: 1800-203-1425',
+                            style: TextStyle(fontSize: 12, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: () {},
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          icon: const Icon(Icons.phone, size: 14),
+                          label: const Text('Call Helpline', style: TextStyle(fontSize: 12)),
+                        ),
+                      ],
                     ),
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    icon: const Icon(Icons.phone, size: 14),
-                    label: const Text('Call Helpline', style: TextStyle(fontSize: 12)),
-                  ),
-                ],
-              ),
             ),
           ],
         ),

@@ -42,6 +42,10 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 640;
+    final imageHeight = isCompact ? 130.0 : 175.0;
+
     return BlocBuilder<CatalogBloc, CatalogState>(
       builder: (context, catalogState) {
         final currentVariant = catalogState.getSelectedVariant(product);
@@ -50,7 +54,7 @@ class ProductCard extends StatelessWidget {
         return Card(
           elevation: 1.5,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             side: const BorderSide(color: AppColors.border, width: 1),
           ),
           clipBehavior: Clip.antiAlias,
@@ -62,7 +66,7 @@ class ProductCard extends StatelessWidget {
                 children: [
                   SafeNetworkImage(
                     imageUrl: product.imageUrl,
-                    height: 180,
+                    height: imageHeight,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
@@ -155,7 +159,7 @@ class ProductCard extends StatelessWidget {
               // Product Info Area
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(isCompact ? 9 : 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -164,8 +168,8 @@ class ProductCard extends StatelessWidget {
                         children: [
                           Text(
                             product.brand.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 10,
+                            style: TextStyle(
+                              fontSize: isCompact ? 9 : 10,
                               fontWeight: FontWeight.bold,
                               color: AppColors.harvestAmber,
                               letterSpacing: 0.3,
@@ -207,8 +211,8 @@ class ProductCard extends StatelessWidget {
                         product.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 13.5,
+                        style: TextStyle(
+                          fontSize: isCompact ? 12.5 : 13.5,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                           height: 1.2,
@@ -220,8 +224,8 @@ class ProductCard extends StatelessWidget {
                         product.hindiTitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 11.5,
+                        style: TextStyle(
+                          fontSize: isCompact ? 10.5 : 11.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryGreen,
                         ),
@@ -296,7 +300,7 @@ class ProductCard extends StatelessWidget {
                                 },
                                 borderRadius: BorderRadius.circular(6),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 6 : 8, vertical: isCompact ? 3 : 4),
                                   decoration: BoxDecoration(
                                     color: isSel ? AppColors.primaryGreen : AppColors.surfaceVariant,
                                     borderRadius: BorderRadius.circular(6),
@@ -308,7 +312,7 @@ class ProductCard extends StatelessWidget {
                                   child: Text(
                                     v.label,
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: isCompact ? 10 : 11,
                                       fontWeight: isSel ? FontWeight.bold : FontWeight.w500,
                                       color: isSel ? Colors.white : AppColors.textPrimary,
                                     ),
@@ -335,18 +339,18 @@ class ProductCard extends StatelessWidget {
                                   children: [
                                     Text(
                                       '₹${currentVariant.sellingPrice.toStringAsFixed(0)}',
-                                      style: const TextStyle(
-                                        fontSize: 17,
+                                      style: TextStyle(
+                                        fontSize: isCompact ? 15 : 17,
                                         fontWeight: FontWeight.w800,
                                         color: AppColors.forestDark,
                                       ),
                                     ),
-                                    const SizedBox(width: 5),
+                                    const SizedBox(width: 4),
                                     if (currentVariant.mrp > currentVariant.sellingPrice)
                                       Text(
                                         '₹${currentVariant.mrp.toStringAsFixed(0)}',
-                                        style: const TextStyle(
-                                          fontSize: 11,
+                                        style: TextStyle(
+                                          fontSize: isCompact ? 10 : 11,
                                           color: AppColors.textMuted,
                                           decoration: TextDecoration.lineThrough,
                                         ),
@@ -356,10 +360,10 @@ class ProductCard extends StatelessWidget {
                                 if (currentVariant.savings > 0)
                                   Text(
                                     'बचत: ₹${currentVariant.savings.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      fontSize: 10,
+                                    style: TextStyle(
+                                      fontSize: isCompact ? 9 : 10,
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF16A34A),
+                                      color: const Color(0xFF16A34A),
                                     ),
                                   ),
                               ],
@@ -391,14 +395,14 @@ class ProductCard extends StatelessWidget {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryGreen,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: EdgeInsets.symmetric(horizontal: isCompact ? 8 : 12, vertical: isCompact ? 6 : 8),
                               visualDensity: VisualDensity.compact,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                             ),
-                            icon: const Icon(Icons.add_shopping_cart_rounded, size: 15),
-                            label: const Text(
+                            icon: Icon(Icons.add_shopping_cart_rounded, size: isCompact ? 13 : 15),
+                            label: Text(
                               'Add',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: isCompact ? 11 : 12),
                             ),
                           ),
                         ],

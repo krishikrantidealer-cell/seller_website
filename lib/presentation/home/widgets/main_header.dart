@@ -11,8 +11,13 @@ import 'dosage_calculator_modal.dart';
 
 class MainHeader extends StatefulWidget {
   final VoidCallback onOpenCart;
+  final VoidCallback? onOpenDrawer;
 
-  const MainHeader({super.key, required this.onOpenCart});
+  const MainHeader({
+    super.key,
+    required this.onOpenCart,
+    this.onOpenDrawer,
+  });
 
   @override
   State<MainHeader> createState() => _MainHeaderState();
@@ -31,6 +36,7 @@ class _MainHeaderState extends State<MainHeader> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 1024;
+    final isMobile = screenWidth < 640;
     final showDeliveryTag = screenWidth >= 1180;
     final showCartText = screenWidth >= 640;
 
@@ -40,8 +46,8 @@ class _MainHeaderState extends State<MainHeader> {
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth < 600 ? 12 : 24,
-        vertical: 12,
+        horizontal: isMobile ? 12 : 24,
+        vertical: isMobile ? 8 : 12,
       ),
       child: Center(
         child: ConstrainedBox(
@@ -51,53 +57,74 @@ class _MainHeaderState extends State<MainHeader> {
             children: [
               Row(
                 children: [
+                  // Mobile Drawer Hamburger Button
+                  if (!isDesktop && widget.onOpenDrawer != null) ...[
+                    IconButton(
+                      icon: const Icon(Icons.menu_rounded, color: AppColors.forestDark, size: 26),
+                      onPressed: widget.onOpenDrawer,
+                      tooltip: 'Open Menu',
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+
                   // Logo
-                  InkWell(
-                    onTap: () {
-                      _searchController.clear();
-                      context.read<CatalogBloc>().add(const SearchTechnicalOrBrand(''));
-                      context.read<CatalogBloc>().add(const SelectCategory('all'));
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          AppConstants.logoPath,
-                          height: 48,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            Icons.eco_rounded,
-                            size: 38,
-                            color: AppColors.primaryGreen,
+                  Expanded(
+                    flex: isDesktop ? 0 : 1,
+                    child: InkWell(
+                      onTap: () {
+                        _searchController.clear();
+                        context.read<CatalogBloc>().add(const SearchTechnicalOrBrand(''));
+                        context.read<CatalogBloc>().add(const SelectCategory('all'));
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            AppConstants.logoPath,
+                            height: isMobile ? 38 : 48,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) => Icon(
+                              Icons.eco_rounded,
+                              size: isMobile ? 32 : 38,
+                              color: AppColors.primaryGreen,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'EBS BioCrop Science',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primaryGreen,
-                                letterSpacing: -0.5,
-                              ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'EBS BioCrop Science',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 14.5 : 17,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.primaryGreen,
+                                    letterSpacing: -0.4,
+                                  ),
+                                ),
+                                Text(
+                                  'Essential Bio Crop Science',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 8.5 : 9.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.brandRed,
+                                    letterSpacing: 0.2,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Essential Bio Crop Science',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.brandRed,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -108,8 +135,9 @@ class _MainHeaderState extends State<MainHeader> {
                       child: _buildSearchBar(context, isDesktop),
                     ),
                     const SizedBox(width: 20),
-                  ] else
-                    const Spacer(),
+                  ] else ...[
+                    const SizedBox(width: 8),
+                  ],
 
                   // Actions: Free Delivery Tag + Crop Doctor + Calc + Cart
                   if (showDeliveryTag) ...[

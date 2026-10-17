@@ -7,6 +7,7 @@ import '../../../logic/catalog/catalog_event.dart';
 import '../../../logic/catalog/catalog_state.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/category_navigation_strip.dart';
+import '../widgets/farmer_drawer.dart';
 import '../widgets/farmer_quick_bar.dart';
 import '../widgets/hero_banner.dart';
 import '../widgets/main_header.dart';
@@ -32,20 +33,31 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = screenWidth < 640;
+    final isSmallMobile = screenWidth < 380;
 
     // Responsive columns calculation
-    final int crossAxisCount = screenWidth > 1200
+    final int crossAxisCount = screenWidth >= 1200
         ? 4
-        : screenWidth > 900
+        : screenWidth >= 900
             ? 3
-            : screenWidth > 600
-                ? 2
-                : 1;
+            : 2;
+
+    final double childAspectRatio = screenWidth >= 1200
+        ? 0.62
+        : screenWidth >= 900
+            ? 0.62
+            : screenWidth >= 640
+                ? 0.60
+                : isSmallMobile
+                    ? 0.46
+                    : 0.50;
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      drawer: const FarmerDrawer(),
       endDrawer: const CartDrawer(),
       bottomNavigationBar: const FarmerQuickBar(),
       body: CustomScrollView(
@@ -57,6 +69,7 @@ class _HomeViewState extends State<HomeView> {
           SliverToBoxAdapter(
             child: MainHeader(
               onOpenCart: () => _scaffoldKey.currentState?.openEndDrawer(),
+              onOpenDrawer: () => _scaffoldKey.currentState?.openDrawer(),
             ),
           ),
 
@@ -104,7 +117,7 @@ class _HomeViewState extends State<HomeView> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1280),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: 16),
                   child: BlocBuilder<CatalogBloc, CatalogState>(
                     builder: (context, state) {
                       return Column(
@@ -198,9 +211,9 @@ class _HomeViewState extends State<HomeView> {
                               physics: const NeverScrollableScrollPhysics(),
                               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: screenWidth > 600 ? 0.60 : 0.58,
+                                crossAxisSpacing: isMobile ? 10 : 16,
+                                mainAxisSpacing: isMobile ? 10 : 16,
+                                childAspectRatio: childAspectRatio,
                               ),
                               itemCount: state.filteredProducts.length,
                               itemBuilder: (context, index) {

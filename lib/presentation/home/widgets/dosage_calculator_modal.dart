@@ -22,6 +22,10 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isCompact = screenWidth < 600;
+
     final double waterVolume = _sprayMethod == 'battery' ? _acreage * 150 : _acreage * 200;
     final int pumpCount = _sprayMethod == 'battery' ? (_acreage * 10).round() : 0;
     final double dosageAmount = _productType == 'liquid' ? _acreage * 60 : _acreage * 100;
@@ -30,15 +34,18 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       backgroundColor: Colors.white,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(horizontal: isCompact ? 12 : 24, vertical: isCompact ? 16 : 24),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720),
+        constraints: BoxConstraints(
+          maxWidth: 720,
+          maxHeight: screenHeight * 0.90,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: EdgeInsets.symmetric(horizontal: isCompact ? 14 : 24, vertical: isCompact ? 12 : 16),
               decoration: const BoxDecoration(
                 color: AppColors.forestDark,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -53,8 +60,8 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                     ),
                     child: const Icon(Icons.calculate_outlined, color: Colors.white, size: 22),
                   ),
-                  const SizedBox(width: 14),
-                  const Expanded(
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -62,7 +69,7 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                           'EBS Smart Acreage & Spray Calculator',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 17,
+                            fontSize: isCompact ? 15 : 17,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -70,7 +77,7 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                           'खेत व दवा कैलकुलेटर — एकड़ अनुसार सही पानी और दवा की सटीक मात्रा',
                           style: TextStyle(
                             color: AppColors.harvestAmberLight,
-                            fontSize: 12,
+                            fontSize: isCompact ? 10.5 : 12,
                           ),
                         ),
                       ],
@@ -153,78 +160,25 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: 8),
-                    Row(
+                    Flex(
+                      direction: isCompact ? Axis.vertical : Axis.horizontal,
                       children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () => setState(() => _sprayMethod = 'battery'),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: _sprayMethod == 'battery' ? AppColors.paleGreen : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: _sprayMethod == 'battery' ? AppColors.primaryGreen : AppColors.border,
-                                  width: _sprayMethod == 'battery' ? 2 : 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.battery_charging_full_rounded,
-                                    color: _sprayMethod == 'battery' ? AppColors.primaryGreen : Colors.grey,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('16L Battery Pump', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                        Text('10-12 टंकियां प्रति एकड़', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        _buildEquipmentCard(
+                          isCompact: isCompact,
+                          title: '16L Battery Pump',
+                          subtitle: '10-12 टंकियां प्रति एकड़ (150L)',
+                          icon: Icons.battery_charging_full_rounded,
+                          isSelected: _sprayMethod == 'battery',
+                          onTap: () => setState(() => _sprayMethod = 'battery'),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () => setState(() => _sprayMethod = 'tractor'),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: _sprayMethod == 'tractor' ? AppColors.paleGreen : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: _sprayMethod == 'tractor' ? AppColors.primaryGreen : AppColors.border,
-                                  width: _sprayMethod == 'tractor' ? 2 : 1,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.agriculture_rounded,
-                                    color: _sprayMethod == 'tractor' ? AppColors.primaryGreen : Colors.grey,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Tractor Boom Sprayer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                        Text('200 लीटर पानी प्रति एकड़', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        SizedBox(width: isCompact ? 0 : 12, height: isCompact ? 8 : 0),
+                        _buildEquipmentCard(
+                          isCompact: isCompact,
+                          title: 'Tractor Boom Sprayer',
+                          subtitle: '200 लीटर पानी प्रति एकड़ (Boom)',
+                          icon: Icons.agriculture_rounded,
+                          isSelected: _sprayMethod == 'tractor',
+                          onTap: () => setState(() => _sprayMethod = 'tractor'),
                         ),
                       ],
                     ),
@@ -239,7 +193,9 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
                     ),
                     const SizedBox(height: 8),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
                         ChoiceChip(
                           label: const Text('Liquid Spray (तरल दवा - ml)'),
@@ -248,10 +204,10 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                           labelStyle: TextStyle(
                             color: _productType == 'liquid' ? Colors.white : AppColors.textPrimary,
                             fontWeight: FontWeight.w600,
+                            fontSize: 12,
                           ),
                           onSelected: (_) => setState(() => _productType = 'liquid'),
                         ),
-                        const SizedBox(width: 12),
                         ChoiceChip(
                           label: const Text('Powder / Granules (पाउडर/दानेदार - gm)'),
                           selected: _productType == 'powder',
@@ -259,6 +215,7 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                           labelStyle: TextStyle(
                             color: _productType == 'powder' ? Colors.white : AppColors.textPrimary,
                             fontWeight: FontWeight.w600,
+                            fontSize: 12,
                           ),
                           onSelected: (_) => setState(() => _productType = 'powder'),
                         ),
@@ -269,7 +226,7 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
 
                     // Computed Results Box
                     Container(
-                      padding: const EdgeInsets.all(18),
+                      padding: EdgeInsets.all(isCompact ? 14 : 18),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(12),
@@ -282,25 +239,28 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
                             children: [
                               Icon(Icons.verified_rounded, color: AppColors.primaryGreen, size: 20),
                               SizedBox(width: 8),
-                              Text(
-                                'Scientific Calculation Summary (गणना परिणाम):',
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.forestDark),
+                              Expanded(
+                                child: Text(
+                                  'Scientific Calculation Summary (गणना परिणाम):',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: AppColors.forestDark),
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
-                          Row(
+                          const SizedBox(height: 12),
+                          Flex(
+                            direction: isCompact ? Axis.vertical : Axis.horizontal,
                             children: [
-                              _buildResultTile('कुल पानी (Water)', '${waterVolume.toStringAsFixed(0)} Litres'),
+                              _buildResultTile('कुल पानी (Water)', '${waterVolume.toStringAsFixed(0)} Litres', isCompact),
                               if (_sprayMethod == 'battery')
-                                _buildResultTile('कुल टंकियां (16L Tanks)', '$pumpCount Tanks'),
-                              _buildResultTile('दवा की मात्रा (Medicine)', '${dosageAmount.toStringAsFixed(0)} $unit'),
+                                _buildResultTile('कुल टंकियां (16L Tanks)', '$pumpCount Tanks', isCompact),
+                              _buildResultTile('दवा की मात्रा (Medicine)', '${dosageAmount.toStringAsFixed(0)} $unit', isCompact),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
                           const Text(
                             '💡 कृषक सुझाव: दवा को पहले 2-3 लीटर पानी में अलग से घोलें (मास्टर घोल), फिर पूरी टंकी में मिलाकर स्प्रे करें।',
-                            style: TextStyle(fontSize: 12, color: AppColors.primaryGreen, fontWeight: FontWeight.w500),
+                            style: TextStyle(fontSize: 11.5, color: AppColors.primaryGreen, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
@@ -315,25 +275,74 @@ class _DosageCalculatorModalState extends State<DosageCalculatorModal> {
     );
   }
 
-  Widget _buildResultTile(String label, String value) {
-    return Expanded(
+  Widget _buildEquipmentCard({
+    required bool isCompact,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final content = InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? AppColors.paleGreen : Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryGreen : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-            const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.forestDark)),
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primaryGreen : Colors.grey,
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
+
+    return isCompact ? SizedBox(width: double.infinity, child: content) : Expanded(child: content);
+  }
+
+  Widget _buildResultTile(String label, String value, bool isCompact) {
+    final tile = Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: isCompact ? 0 : 4,
+        vertical: isCompact ? 4 : 0,
+      ),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+          const SizedBox(height: 4),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.forestDark)),
+        ],
+      ),
+    );
+
+    return isCompact ? SizedBox(width: double.infinity, child: tile) : Expanded(child: tile);
   }
 }
