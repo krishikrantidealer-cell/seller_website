@@ -143,223 +143,9 @@ class _HomeViewState extends State<HomeView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Active Category / Subcategory Filter Badge
-                          if (_selectedCategory != 'all' || _selectedSubcategory != null)
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 14),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: AppColors.softRose,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.3)),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.filter_list_rounded, size: 16, color: AppColors.primaryCrimson),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Filtering: ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryCrimson,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedCategory = 'all';
-                                        _selectedSubcategory = null;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryCrimson,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Reset',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 3),
-                                          const Icon(Icons.close, size: 12, color: Colors.white),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                          // Section Title, Product Count & View All Action
-                          isMobile
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Best Sellers',
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w800,
-                                                color: AppColors.textPrimary,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.lightGreen,
-                                                borderRadius: BorderRadius.circular(12),
-                                                border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                                              ),
-                                              child: Text(
-                                                '${filtered.length} Products',
-                                                style: GoogleFonts.poppins(
-                                                  color: AppColors.primaryDarkGreen,
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        OutlinedButton.icon(
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedCategory = 'all';
-                                              _selectedSubcategory = null;
-                                              _searchFilter = '';
-                                            });
-                                          },
-                                          icon: const Icon(Icons.grid_view_rounded, size: 15, color: AppColors.primaryGreen),
-                                          label: Text(
-                                            'View All',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.primaryGreen,
-                                            ),
-                                          ),
-                                          style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                            backgroundColor: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      _selectedCategory == 'all'
-                                          ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery'
-                                          : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                                      style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
-                                    ),
-                                  ],
-                                )
-                              : Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  'Best Sellers',
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 26,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: AppColors.textPrimary,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 14),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.lightGreen,
-                                                    borderRadius: BorderRadius.circular(14),
-                                                    border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                                                  ),
-                                                  child: Text(
-                                                    '${filtered.length} Products',
-                                                    style: GoogleFonts.poppins(
-                                                      color: AppColors.primaryDarkGreen,
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              _selectedCategory == 'all'
-                                                  ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery'
-                                                  : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                                              style: GoogleFonts.poppins(fontSize: 13.5, color: AppColors.textSecondary),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 32),
-                                      OutlinedButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedCategory = 'all';
-                                            _selectedSubcategory = null;
-                                            _searchFilter = '';
-                                          });
-                                        },
-                                        icon: const Icon(Icons.grid_view_rounded, size: 18, color: AppColors.primaryGreen),
-                                        label: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                                          child: Text(
-                                            'View All Products',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.primaryGreen,
-                                            ),
-                                          ),
-                                        ),
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                                          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          backgroundColor: Colors.white,
-                                          elevation: 0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                          SizedBox(height: isMobile ? 12 : 20),
+                          // Modern Best Sellers Section Header
+                          _buildBestSellersHeader(filtered, isMobile),
+                          SizedBox(height: isMobile ? 14 : 22),
 
                           // Product Grid
                           if (filtered.isEmpty)
@@ -472,6 +258,424 @@ class _HomeViewState extends State<HomeView> {
 
             // Integrated Footer with Trust Badges
             const WebFooter(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBestSellersHeader(List<ProductItem> filtered, bool isMobile) {
+    final bool isFiltered = _selectedCategory != 'all' || _selectedSubcategory != null || _searchFilter.isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(isMobile ? 16 : 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Eyebrow Tag + Live Product Count Indicator
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Eyebrow Badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.softRose,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.local_fire_department_rounded, size: 14, color: AppColors.primaryCrimson),
+                    const SizedBox(width: 5),
+                    Text(
+                      'TOP RATED BY GROWERS',
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 9.5 : 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8,
+                        color: AppColors.primaryCrimson,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Live Counter Pill
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 4 : 5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '${filtered.length} Products Available',
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 11 : 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryDarkGreen,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // Main Title & Subtitle + View All Action
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryGreen,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Best Sellers',
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _selectedCategory == 'all'
+                      ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science • 100% Genuine Lab Tested'
+                      : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _selectedCategory = 'all';
+                            _selectedSubcategory = null;
+                            _searchFilter = '';
+                          });
+                        },
+                        icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.primaryGreen),
+                        label: Text(
+                          'View All Products',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          backgroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    if (isFiltered) ...[
+                      const SizedBox(width: 10),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _selectedCategory = 'all';
+                            _selectedSubcategory = null;
+                            _searchFilter = '';
+                          });
+                        },
+                        icon: const Icon(Icons.refresh_rounded, size: 15, color: Colors.white),
+                        label: Text(
+                          'Clear',
+                          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryCrimson,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            )
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 5,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Best Sellers',
+                            style: GoogleFonts.poppins(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _selectedCategory == 'all'
+                            ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science • 100% Genuine Lab Tested with Nationwide Delivery'
+                            : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13.5,
+                          color: AppColors.textSecondary,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 24),
+                if (isFiltered)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _selectedCategory = 'all';
+                          _selectedSubcategory = null;
+                          _searchFilter = '';
+                        });
+                      },
+                      icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.primaryCrimson),
+                      label: Text(
+                        'Clear Filters',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryCrimson,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.primaryCrimson.withValues(alpha: 0.5)),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: AppColors.softRose,
+                      ),
+                    ),
+                  ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _selectedCategory = 'all';
+                      _selectedSubcategory = null;
+                      _searchFilter = '';
+                    });
+                  },
+                  icon: const Icon(Icons.grid_view_rounded, size: 18, color: AppColors.primaryGreen),
+                  label: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      'View All Products',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                  ),
+                ),
+              ],
+            ),
+
+          if (_selectedSubcategory != null) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  'Filtered by:',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.softRose,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _selectedSubcategory!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryCrimson,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedSubcategory = null;
+                          });
+                        },
+                        child: const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryCrimson),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          const SizedBox(height: 16),
+          const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+          const SizedBox(height: 14),
+
+          // Horizontal Quick-Filter Category Pills
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildQuickFilterPill(
+                  label: 'All Products',
+                  categoryId: 'all',
+                  isSelected: _selectedCategory == 'all',
+                ),
+                ...CategoryItem.sampleCategories.map((cat) {
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: _buildQuickFilterPill(
+                      label: cat.name,
+                      categoryId: cat.id,
+                      iconEmoji: cat.icon,
+                      isSelected: _selectedCategory == cat.id,
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickFilterPill({
+    required String label,
+    required String categoryId,
+    String? iconEmoji,
+    required bool isSelected,
+  }) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedCategory = categoryId;
+          _selectedSubcategory = null;
+        });
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryGreen : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (iconEmoji != null) ...[
+              Text(iconEmoji, style: const TextStyle(fontSize: 13)),
+              const SizedBox(width: 6),
+            ] else if (isSelected) ...[
+              const Icon(Icons.check_circle_rounded, size: 14, color: Colors.white),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
           ],
         ),
       ),
