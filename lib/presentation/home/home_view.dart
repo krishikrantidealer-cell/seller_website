@@ -207,25 +207,48 @@ class _HomeViewState extends State<HomeView> {
                           // Section Title & Filters
                           Wrap(
                             alignment: WrapAlignment.spaceBetween,
-                            runSpacing: 10,
+                            runSpacing: 12,
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Best Sellers',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: isMobile ? 20 : 24,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.lightGreen,
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                                        ),
+                                        child: Text(
+                                          '${filtered.length} Products',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.primaryDarkGreen,
+                                            fontSize: isMobile ? 11 : 12.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
                                   Text(
                                     _selectedCategory == 'all'
-                                        ? 'EBS Essential BioCrop Science Best Sellers'
-                                        : '${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' - $_selectedSubcategory' : ''}',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: isMobile ? 18 : 22,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery',
+                                        ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery'
+                                        : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
                                     style: GoogleFonts.poppins(
                                       fontSize: isMobile ? 11.5 : 13,
                                       color: AppColors.textSecondary,
@@ -233,12 +256,33 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                 ],
                               ),
-                              Text(
-                                'Showing ${filtered.length} products',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.textMuted,
-                                  fontSize: isMobile ? 11 : 13,
-                                  fontWeight: FontWeight.w500,
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedCategory = 'all';
+                                    _selectedSubcategory = null;
+                                    _searchFilter = '';
+                                  });
+                                },
+                                icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.primaryGreen),
+                                label: Text(
+                                  'View All',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isMobile ? 12 : 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primaryGreen,
+                                  ),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isMobile ? 12 : 18,
+                                    vertical: isMobile ? 8 : 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  backgroundColor: Colors.white,
                                 ),
                               ),
                             ],

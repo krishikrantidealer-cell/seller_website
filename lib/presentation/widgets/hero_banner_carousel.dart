@@ -160,11 +160,15 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                 bottom: 14,
                 left: 0,
                 right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    _banners.length,
-                    (index) {
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        _banners.length,
+                        (index) {
                       final isSelected = _currentIndex == index;
                       return GestureDetector(
                         onTap: () {
@@ -203,9 +207,11 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        );
+        ],
+      ),
+    );
       },
     );
   }
