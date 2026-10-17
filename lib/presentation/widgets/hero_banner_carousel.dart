@@ -17,7 +17,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
 
   final List<BannerData> _banners = [
     const BannerData(
-      title: 'EBS BioCrop Nutrition & Protection',
+      title: 'EBS Essential BioCrop Nutrition & Protection',
       subtitle: 'Up to 40% OFF on Certified Bio-Fertilizers & Crop Care Essentials',
       tag: 'EBS SPECIAL OFFER',
       buttonText: 'Shop BioCrop Essentials',
@@ -26,7 +26,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
     ),
     const BannerData(
       title: 'Guaranteed Authentic Agricultural Inputs',
-      subtitle: 'Direct from EBS BioCrop Science Labs with Nationwide Delivery',
+      subtitle: 'Direct from EBS Essential BioCrop Science Labs with Nationwide Delivery',
       tag: 'FAST & SECURE DISPATCH',
       buttonText: 'Explore Crop Nutrition',
       gradient: [Color(0xFFA61E22), Color(0xFF801417)],

@@ -225,7 +225,7 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Certified agricultural bio-inputs directly from EBS BioCrop Science with nationwide delivery',
+                                    'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery',
                                     style: GoogleFonts.poppins(
                                       fontSize: isMobile ? 11.5 : 13,
                                       color: AppColors.textSecondary,

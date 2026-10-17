@@ -1,11 +1,11 @@
 {
-    "name": "EBS BioCrop Seller Website",
-    "short_name": "Seller Portal",
+    "name": "EBS Essential BioCrop Science Seller Website",
+    "short_name": "EBS BioCrop",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0F766E",
-    "theme_color": "#0F766E",
-    "description": "EBS BioCrop Seller Web Application",
+    "background_color": "#2F7D32",
+    "theme_color": "#2F7D32",
+    "description": "EBS Essential BioCrop Science Web Application",
     "orientation": "any",
     "prefer_related_applications": false,
     "icons": [

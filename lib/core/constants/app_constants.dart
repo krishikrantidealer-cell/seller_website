@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'EBS BioCrop Science';
+  static const String appName = 'EBS Essential BioCrop Science';
   static const String appTagline = 'Pioneering Agricultural Excellence & Crop Nutrition';
   static const String helplineNumber = '1800-203-1425';
   static const String orderCallNumber = '1800-203-1425';

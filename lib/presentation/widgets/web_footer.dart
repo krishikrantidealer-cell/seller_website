@@ -66,7 +66,7 @@ class WebFooter extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
-                    '© 2026 EBS BioCrop Science. All rights reserved.',
+                    '© 2026 EBS Essential BioCrop Science. All rights reserved.',
                     style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
                   ),
                   Wrap(
@@ -115,7 +115,7 @@ class WebFooter extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: 'BioCrop Science',
+                      text: 'Essential BioCrop Science',
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -187,7 +187,7 @@ class WebFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _columnTitle('Quick Links'),
-        _footerLink('About EBS BioCrop Science'),
+        _footerLink('About EBS Essential BioCrop Science'),
         _footerLink('Track Your Order'),
         _footerLink('Seller & Distributor Hub'),
         _footerLink('Agronomist Consultation'),

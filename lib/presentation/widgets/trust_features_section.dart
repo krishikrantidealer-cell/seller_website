@@ -18,7 +18,7 @@ class TrustFeaturesSection extends StatelessWidget {
             iconColor: AppColors.primaryCrimson,
             iconBgColor: AppColors.softRose,
             title: 'Guaranteed Authentic Value',
-            subtitle: 'Direct from EBS BioCrop Science',
+            subtitle: 'Direct from EBS Essential BioCrop Science',
           ),
           _featureData(
             icon: Icons.local_shipping_rounded,

@@ -366,12 +366,12 @@ class _MainNavHeaderState extends State<MainNavHeader> {
               ],
             ),
             Text(
-              'SCIENCE & INNOVATION',
+              'ESSENTIAL BIO CROP SCIENCE',
               style: GoogleFonts.poppins(
-                fontSize: isCompact ? 7.5 : 9,
+                fontSize: isCompact ? 7.2 : 8.8,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryCrimson,
-                letterSpacing: 1.2,
+                letterSpacing: 0.8,
               ),
             ),
           ],
