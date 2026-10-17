@@ -76,7 +76,10 @@ class _ProductCardState extends State<ProductCard> {
                           children: [
                             Center(
                               child: Padding(
-                                padding: EdgeInsets.all(isCompact ? 8 : 12),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isCompact ? 6 : 10,
+                                  vertical: isCompact ? 4 : 8,
+                                ),
                                 child: Image.network(
                                   widget.product.imageUrl,
                                   fit: BoxFit.contain,
@@ -147,7 +150,10 @@ class _ProductCardState extends State<ProductCard> {
 
                     // Content details
                     Padding(
-                      padding: EdgeInsets.all(isCompact ? 8 : 12),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isCompact ? 8 : 12,
+                        vertical: isCompact ? 6 : 8,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -241,11 +247,7 @@ class _ProductCardState extends State<ProductCard> {
                               ),
                             ],
                           ),
-                          SizedBox(height: isCompact ? 4 : 8),
-
-
-
-                          SizedBox(height: isCompact ? 6 : 10),
+                          SizedBox(height: isCompact ? 4 : 6),
 
                           // Pricing
                           Row(

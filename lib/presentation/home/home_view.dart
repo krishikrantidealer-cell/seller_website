@@ -402,33 +402,33 @@ class _HomeViewState extends State<HomeView> {
                             Builder(
                               builder: (context) {
                                 int crossAxisCount = 5;
-                                double childAspectRatio = 0.70;
+                                double childAspectRatio = 0.76;
                                 double crossAxisSpacing = 14;
                                 double mainAxisSpacing = 14;
 
                                 if (constraints.maxWidth < 600) {
                                   crossAxisCount = 2;
-                                  childAspectRatio = 0.62;
+                                  childAspectRatio = 0.68;
                                   crossAxisSpacing = 8;
                                   mainAxisSpacing = 8;
                                 } else if (constraints.maxWidth < 850) {
                                   crossAxisCount = 3;
-                                  childAspectRatio = 0.65;
+                                  childAspectRatio = 0.72;
                                   crossAxisSpacing = 10;
                                   mainAxisSpacing = 10;
                                 } else if (constraints.maxWidth < 1180) {
                                   crossAxisCount = 4;
-                                  childAspectRatio = 0.68;
+                                  childAspectRatio = 0.74;
                                   crossAxisSpacing = 12;
                                   mainAxisSpacing = 12;
                                 } else if (constraints.maxWidth < 1520) {
                                   crossAxisCount = 5;
-                                  childAspectRatio = 0.70;
+                                  childAspectRatio = 0.76;
                                   crossAxisSpacing = 14;
                                   mainAxisSpacing = 14;
                                 } else {
                                   crossAxisCount = 6;
-                                  childAspectRatio = 0.72;
+                                  childAspectRatio = 0.78;
                                   crossAxisSpacing = 16;
                                   mainAxisSpacing = 16;
                                 }

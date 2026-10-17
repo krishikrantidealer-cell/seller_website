@@ -14,87 +14,69 @@ class WebFooter extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: AppColors.footerBackground,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Integrated Trust Badges Strip (Tier 1)
-          _buildTrustBadgesSection(context),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1680),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: isMobile ? 24 : 36,
+              bottom: isMobile ? 20 : 28,
+              left: isMobile ? 16 : 24,
+              right: isMobile ? 16 : 24,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Integrated Trust Badges (Top tier of footer)
+                _buildTrustBadgesSection(context),
 
-          // Main Footer Columns (Tier 2)
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1680),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: isMobile ? 28 : 44,
-                  bottom: 24,
-                  left: isMobile ? 12 : 24,
-                  right: isMobile ? 12 : 24,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isWide = constraints.maxWidth >= 900;
-                        if (!isWide) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _brandColumn(),
-                              const SizedBox(height: 32),
-                              _categoriesColumn(),
-                              const SizedBox(height: 32),
-                              _quickLinksColumn(),
-                              const SizedBox(height: 32),
-                              _supportColumn(),
-                            ],
-                          );
-                        }
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 3, child: _brandColumn()),
-                            const SizedBox(width: 48),
-                            Expanded(flex: 2, child: _categoriesColumn()),
-                            const SizedBox(width: 48),
-                            Expanded(flex: 2, child: _quickLinksColumn()),
-                            const SizedBox(width: 48),
-                            Expanded(flex: 3, child: _supportColumn()),
-                          ],
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 44),
-                    const Divider(color: Color(0xFF374151), height: 1),
-                    const SizedBox(height: 24),
-                    // Bottom Copyright (Tier 3)
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      runSpacing: 12,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                const SizedBox(height: 32),
+                const Divider(color: Color(0xFF2E2A28), height: 1),
+                const SizedBox(height: 36),
+
+                // Main Footer Columns
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth >= 900;
+                    if (!isWide) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _brandColumn(),
+                          const SizedBox(height: 32),
+                          _categoriesColumn(),
+                          const SizedBox(height: 32),
+                          _quickLinksColumn(),
+                          const SizedBox(height: 32),
+                          _supportColumn(),
+                        ],
+                      );
+                    }
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '© 2026 EBS Essential BioCrop Science. All rights reserved.',
-                          style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
-                        ),
-                        Wrap(
-                          spacing: 16,
-                          runSpacing: 8,
-                          children: [
-                            _footerLink('Privacy Policy'),
-                            _footerLink('Terms & Conditions'),
-                            _footerLink('Refund & Cancellation'),
-                          ],
-                        ),
+                        Expanded(flex: 3, child: _brandColumn()),
+                        const SizedBox(width: 48),
+                        Expanded(flex: 2, child: _categoriesColumn()),
+                        const SizedBox(width: 48),
+                        Expanded(flex: 2, child: _quickLinksColumn()),
+                        const SizedBox(width: 48),
+                        Expanded(flex: 3, child: _supportColumn()),
                       ],
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
+
+                const SizedBox(height: 40),
+                const Divider(color: Color(0xFF2E2A28), height: 1),
+                const SizedBox(height: 24),
+
+                // Bottom Copyright & Legal Links with proper spacing
+                _buildBottomLegalRow(context),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -103,7 +85,6 @@ class WebFooter extends StatelessWidget {
   Widget _buildTrustBadgesSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 650;
         final isCompactRow = constraints.maxWidth < 1000;
 
         final badges = [
@@ -137,45 +118,28 @@ class WebFooter extends StatelessWidget {
           ),
         ];
 
-        return Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Color(0xFF24201E),
-            border: Border(
-              top: BorderSide(color: Color(0xFF383330), width: 1),
-              bottom: BorderSide(color: Color(0xFF2E2A28), width: 1),
+        if (isCompactRow) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                for (int i = 0; i < badges.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 12),
+                  _buildBadgeCard(badges[i], width: 280),
+                ],
+              ],
             ),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 8 : 24,
-            vertical: isMobile ? 12 : 18,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1680),
-              child: isCompactRow
-                  ? SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Row(
-                        children: [
-                          for (int i = 0; i < badges.length; i++) ...[
-                            if (i > 0) const SizedBox(width: 12),
-                            _buildBadgeCard(badges[i], width: 260),
-                          ],
-                        ],
-                      ),
-                    )
-                  : Row(
-                      children: [
-                        for (int i = 0; i < badges.length; i++) ...[
-                          if (i > 0) const SizedBox(width: 14),
-                          Expanded(child: _buildBadgeCard(badges[i])),
-                        ],
-                      ],
-                    ),
-            ),
-          ),
+          );
+        }
+
+        return Row(
+          children: [
+            for (int i = 0; i < badges.length; i++) ...[
+              if (i > 0) const SizedBox(width: 16),
+              Expanded(child: _buildBadgeCard(badges[i])),
+            ],
+          ],
         );
       },
     );
@@ -184,17 +148,17 @@ class WebFooter extends StatelessWidget {
   Widget _buildBadgeCard(_TrustBadgeItem item, {double? width}) {
     return Container(
       width: width,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1917),
+        color: const Color(0xFF24201E),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF383330)),
+        border: Border.all(color: const Color(0xFF332D29)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(9),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: item.iconBgColor,
               borderRadius: BorderRadius.circular(8),
@@ -210,7 +174,7 @@ class WebFooter extends StatelessWidget {
                 Text(
                   item.title,
                   style: GoogleFonts.poppins(
-                    fontSize: 12.5,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -229,6 +193,33 @@ class WebFooter extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomLegalRow(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 24,
+        runSpacing: 12,
+        children: [
+          Text(
+            '© 2026 EBS Essential BioCrop Science. All rights reserved.',
+            style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
+          ),
+          Wrap(
+            spacing: 20,
+            runSpacing: 8,
+            children: [
+              _footerLink('Privacy Policy'),
+              _footerLink('Terms & Conditions'),
+              _footerLink('Refund & Cancellation'),
+            ],
           ),
         ],
       ),
