@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/constants/app_constants.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
+import 'logic/cart/cart_bloc.dart';
+import 'logic/catalog/catalog_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,26 +16,16 @@ class SellerWebsiteApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Seller Website | EBS BioCrop',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F766E),
-          brightness: Brightness.light,
-        ),
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text(
-            'Seller Website',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CatalogBloc>(create: (_) => CatalogBloc()),
+        BlocProvider<CartBloc>(create: (_) => CartBloc()),
+      ],
+      child: MaterialApp.router(
+        title: '${AppConstants.appName} — Essential Bio Crop Science',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        routerConfig: AppRouter.router,
       ),
     );
   }
