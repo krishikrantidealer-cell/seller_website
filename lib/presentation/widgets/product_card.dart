@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/models/cart_state.dart';
+import 'product_variants_modal.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductItem product;
@@ -37,7 +38,9 @@ class _ProductCardState extends State<ProductCard> {
       animation: CartController.instance,
       builder: (context, _) {
         final cart = CartController.instance;
+        final variants = widget.product.variants.isNotEmpty ? widget.product.variants : [widget.product.defaultVariant];
         final currentQty = cart.getQuantity(widget.product.id, _selectedVariant.id);
+        final totalProductQty = variants.fold<int>(0, (sum, v) => sum + cart.getQuantity(widget.product.id, v.id));
         final discount = _selectedVariant.discountPercent;
 
         return LayoutBuilder(
@@ -52,8 +55,8 @@ class _ProductCardState extends State<ProductCard> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: currentQty > 0 ? AppColors.primaryGreen : AppColors.border,
-                    width: currentQty > 0 ? 1.5 : 1.0,
+                    color: totalProductQty > 0 ? AppColors.primaryGreen : AppColors.border,
+                    width: totalProductQty > 0 ? 1.5 : 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -116,7 +119,7 @@ class _ProductCardState extends State<ProductCard> {
                                 ),
                               ),
                             // Added to cart indicator pill
-                            if (currentQty > 0)
+                            if (totalProductQty > 0)
                               Positioned(
                                 top: 8,
                                 right: 8,
@@ -132,7 +135,7 @@ class _ProductCardState extends State<ProductCard> {
                                       Icon(Icons.shopping_bag_rounded, size: isCompact ? 10 : 12, color: Colors.white),
                                       const SizedBox(width: 4),
                                       Text(
-                                        isCompact ? '$currentQty' : '$currentQty in cart',
+                                        isCompact ? '$totalProductQty' : '$totalProductQty in cart',
                                         style: GoogleFonts.poppins(
                                           color: Colors.white,
                                           fontSize: isCompact ? 9 : 10,
@@ -249,6 +252,37 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                           SizedBox(height: isCompact ? 4 : 6),
 
+                          // Pack Size selector chip / label (tap opens variants popup)
+                          InkWell(
+                            onTap: () => _openVariantsModal(context),
+                            borderRadius: BorderRadius.circular(4),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _selectedVariant.label,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isCompact ? 10 : 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryDarkGreen,
+                                    ),
+                                  ),
+                                  if (widget.product.variants.length > 1) ...[
+                                    const SizedBox(width: 2),
+                                    const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      size: 14,
+                                      color: AppColors.primaryGreen,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: isCompact ? 2 : 4),
+
                           // Pricing
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -276,7 +310,7 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                           SizedBox(height: isCompact ? 6 : 10),
 
-                          // REA AgriBegri Action: Quantity Stepper if In-Cart, Dual Buttons if Not
+                          // Action Buttons (Add to Cart / Stepper)
                           if (currentQty > 0)
                             _buildQuantityStepper(cart, isCompact: isCompact)
                           else
@@ -294,11 +328,22 @@ class _ProductCardState extends State<ProductCard> {
     );
   }
 
+  void _openVariantsModal(BuildContext context) {
+    showProductVariantsModal(
+      context: context,
+      product: widget.product,
+      initialSelectedVariant: _selectedVariant,
+      onViewCart: () {
+        widget.onAddToCart?.call(widget.product, _selectedVariant);
+      },
+    );
+  }
+
   Widget _buildQuantityStepper(CartController cart, {bool isCompact = false}) {
     final itemKey = '${widget.product.id}_${_selectedVariant.id}';
     final qty = cart.getQuantity(widget.product.id, _selectedVariant.id);
     final buttonHeight = isCompact ? 32.0 : 38.0;
-    final btnWidth = isCompact ? 32.0 : 38.0;
+    final btnWidth = isCompact ? 30.0 : 36.0;
 
     return Container(
       height: buttonHeight,
@@ -325,19 +370,26 @@ class _ProductCardState extends State<ProductCard> {
               ),
             ),
           ),
-          Row(
-            children: [
-              Icon(Icons.check_circle_rounded, size: isCompact ? 12 : 14, color: AppColors.primaryGreen),
-              const SizedBox(width: 4),
-              Text(
-                'Qty: $qty',
-                style: GoogleFonts.poppins(
-                  fontSize: isCompact ? 11 : 12,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primaryDarkGreen,
+          InkWell(
+            onTap: () => _openVariantsModal(context),
+            child: Row(
+              children: [
+                Icon(Icons.check_circle_rounded, size: isCompact ? 12 : 14, color: AppColors.primaryGreen),
+                const SizedBox(width: 4),
+                Text(
+                  'Qty: $qty',
+                  style: GoogleFonts.poppins(
+                    fontSize: isCompact ? 11 : 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryDarkGreen,
+                  ),
                 ),
-              ),
-            ],
+                if (widget.product.variants.length > 1) ...[
+                  const SizedBox(width: 2),
+                  const Icon(Icons.arrow_drop_down_rounded, size: 16, color: AppColors.primaryDarkGreen),
+                ],
+              ],
+            ),
           ),
           InkWell(
             onTap: () => cart.increment(itemKey),
@@ -368,10 +420,7 @@ class _ProductCardState extends State<ProductCard> {
             child: SizedBox(
               height: btnHeight,
               child: ElevatedButton(
-                onPressed: () {
-                  cart.addItem(widget.product, _selectedVariant);
-                  widget.onAddToCart?.call(widget.product, _selectedVariant);
-                },
+                onPressed: () => _openVariantsModal(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
@@ -394,10 +443,7 @@ class _ProductCardState extends State<ProductCard> {
             child: SizedBox(
               height: btnHeight,
               child: ElevatedButton(
-                onPressed: () {
-                  cart.addItem(widget.product, _selectedVariant);
-                  widget.onBuyNow?.call(widget.product, _selectedVariant);
-                },
+                onPressed: () => _openVariantsModal(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryCrimson,
                   foregroundColor: Colors.white,
@@ -421,16 +467,13 @@ class _ProductCardState extends State<ProductCard> {
 
     return Row(
       children: [
-        // Add to Cart Button
+        // Add to Cart Button (Opens Variants Popup)
         Expanded(
           flex: 5,
           child: SizedBox(
             height: btnHeight,
             child: ElevatedButton.icon(
-              onPressed: () {
-                cart.addItem(widget.product, _selectedVariant);
-                widget.onAddToCart?.call(widget.product, _selectedVariant);
-              },
+              onPressed: () => _openVariantsModal(context),
               icon: const Icon(Icons.add_shopping_cart_rounded, size: 15),
               label: Text(
                 'Add to Cart',
@@ -450,16 +493,13 @@ class _ProductCardState extends State<ProductCard> {
           ),
         ),
         const SizedBox(width: 6),
-        // Buy Now Button
+        // Buy Now Button (Opens Variants Popup)
         Expanded(
           flex: 4,
           child: SizedBox(
             height: btnHeight,
             child: ElevatedButton.icon(
-              onPressed: () {
-                cart.addItem(widget.product, _selectedVariant);
-                widget.onBuyNow?.call(widget.product, _selectedVariant);
-              },
+              onPressed: () => _openVariantsModal(context),
               icon: const Icon(Icons.bolt_rounded, size: 15),
               label: Text(
                 'Buy Now',

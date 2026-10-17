@@ -21,13 +21,22 @@ void main() {
     expect(addToCartBtn, findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Buy Now'), findsWidgets);
 
-    // Scroll to and tap Add to Cart
+    // Scroll to and tap Add to Cart to open variants modal
     await tester.ensureVisible(addToCartBtn);
     await tester.pumpAndSettle();
     await tester.tap(addToCartBtn);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    // Verify button transforms into quantity stepper
-    expect(find.text('Qty: 1'), findsOneWidget);
+    // Verify variants modal opens with pack size options
+    expect(find.textContaining('Select Pack Size'), findsWidgets);
+    final addVariantBtn = find.widgetWithText(ElevatedButton, 'Add').first;
+    expect(addVariantBtn, findsOneWidget);
+
+    // Tap Add on the first variant
+    await tester.tap(addVariantBtn);
+    await tester.pumpAndSettle();
+
+    // Verify in-cart indicator or stepper reflects the added item
+    expect(find.text('Qty: 1'), findsWidgets);
   });
 }
