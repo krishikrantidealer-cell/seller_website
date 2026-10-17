@@ -11,7 +11,8 @@ class HeroBannerCarousel extends StatefulWidget {
 }
 
 class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
-  final PageController _pageController = PageController();
+  static const int _initialPage = 3000;
+  late final PageController _pageController;
   int _currentIndex = 0;
   Timer? _timer;
 
@@ -45,11 +46,12 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _initialPage);
+    _currentIndex = _initialPage % _banners.length;
+
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (_pageController.hasClients) {
-        final next = (_currentIndex + 1) % _banners.length;
-        _pageController.animateToPage(
-          next,
+        _pageController.nextPage(
           duration: const Duration(milliseconds: 600),
           curve: Curves.easeInOutCubic,
         );
@@ -81,13 +83,18 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
           height: bannerHeight,
           child: Stack(
             children: [
-              // Full-width edge-to-edge PageView
+              // Full-width edge-to-edge PageView with continuous infinite looping
               PageView.builder(
                 controller: _pageController,
-                onPageChanged: (idx) => setState(() => _currentIndex = idx),
-                itemCount: _banners.length,
+                onPageChanged: (idx) {
+                  final realIndex = (idx % _banners.length + _banners.length) % _banners.length;
+                  if (_currentIndex != realIndex) {
+                    setState(() => _currentIndex = realIndex);
+                  }
+                },
                 itemBuilder: (context, index) {
-                  final banner = _banners[index];
+                  final realIndex = (index % _banners.length + _banners.length) % _banners.length;
+                  final banner = _banners[realIndex];
                   return _buildBannerCard(banner, isMobile: isMobile, isTablet: isTablet);
                 },
               ),
@@ -161,11 +168,16 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                       final isSelected = _currentIndex == index;
                       return GestureDetector(
                         onTap: () {
-                          _pageController.animateToPage(
-                            index,
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeInOutCubic,
-                          );
+                          if (_pageController.hasClients) {
+                            final currentVirtual = _pageController.page?.round() ?? _initialPage;
+                            final currentReal = (currentVirtual % _banners.length + _banners.length) % _banners.length;
+                            final diff = index - currentReal;
+                            _pageController.animateToPage(
+                              currentVirtual + diff,
+                              duration: const Duration(milliseconds: 350),
+                              curve: Curves.easeInOutCubic,
+                            );
+                          }
                         },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 250),
