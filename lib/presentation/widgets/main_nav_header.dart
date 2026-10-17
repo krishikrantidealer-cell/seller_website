@@ -71,7 +71,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             suffixIcon: Container(
                               margin: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryBlue,
+                                color: AppColors.primaryCrimson,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: IconButton(
@@ -197,22 +197,35 @@ class _MainNavHeaderState extends State<MainNavHeader> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'AgriBegri',
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: AppColors.primaryGreen,
-                letterSpacing: -0.5,
-              ),
+            Row(
+              children: [
+                Text(
+                  'EBS ',
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryCrimson,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                Text(
+                  'BioCrop',
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryGreen,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
             ),
             Text(
-              'KRISHI KRANTI',
+              'SCIENCE & INNOVATION',
               style: GoogleFonts.poppins(
                 fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryBlue,
-                letterSpacing: 1.2,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primaryCrimson,
+                letterSpacing: 1.4,
               ),
             ),
           ],

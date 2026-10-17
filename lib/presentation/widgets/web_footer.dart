@@ -58,7 +58,7 @@ class WebFooter extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
-                    '© 2026 AgriBegri — Krishi Kranti Organics. All rights reserved.',
+                    '© 2026 EBS BioCrop Science. All rights reserved.',
                     style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
                   ),
                   Wrap(
@@ -94,19 +94,35 @@ class WebFooter extends StatelessWidget {
               child: const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 10),
-            Text(
-              'AgriBegri',
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+            Expanded(
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'EBS ',
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryCrimson,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'BioCrop Science',
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 14),
         Text(
-          "India's largest online agriculture marketplace delivering 6,500+ agricultural products directly to farmers with free expert advisory.",
+          'Pioneering agricultural biotechnology, advanced crop nutrition, certified organic inputs, and science-backed farming solutions delivered nationwide.',
           style: GoogleFonts.poppins(
             color: const Color(0xFF9CA3AF),
             fontSize: 13,
@@ -163,11 +179,11 @@ class WebFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _columnTitle('Quick Links'),
-        _footerLink('About AgriBegri'),
+        _footerLink('About EBS BioCrop Science'),
         _footerLink('Track Your Order'),
-        _footerLink('Sell with Us (Seller Portal)'),
-        _footerLink('Agro Expert Consultation'),
-        _footerLink('Mobile App Download'),
+        _footerLink('Seller & Distributor Hub'),
+        _footerLink('Agronomist Consultation'),
+        _footerLink('Research & Formulations'),
       ],
     );
   }
@@ -176,7 +192,7 @@ class WebFooter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _columnTitle('Farmer Support & Helpline'),
+        _columnTitle('Farmer & Dealer Support'),
         Row(
           children: [
             const Icon(Icons.support_agent_rounded, color: AppColors.primaryGreen, size: 24),
@@ -202,7 +218,7 @@ class WebFooter extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          'Email Support: support@agribegri.com',
+          'Email Support: support@ebsbiocrop.com',
           style: GoogleFonts.poppins(color: const Color(0xFF9CA3AF), fontSize: 13),
         ),
       ],

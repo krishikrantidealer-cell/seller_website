@@ -13,7 +13,7 @@ class SellerWebsiteApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AgriBegri | EBS BioCrop Agriculture E-Commerce',
+      title: 'EBS BioCrop Science | Agriculture E-Commerce',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const HomeView(),

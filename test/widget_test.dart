@@ -13,7 +13,7 @@ void main() {
     await tester.pumpWidget(const SellerWebsiteApp());
     await tester.pump();
 
-    expect(find.text('AgriBegri'), findsWidgets);
+    expect(find.text('BioCrop'), findsWidgets);
     expect(find.text('Track Order'), findsOneWidget);
   });
 }

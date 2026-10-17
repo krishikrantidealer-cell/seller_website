@@ -25,26 +25,34 @@ class TrustFeaturesSection extends StatelessWidget {
                 children: [
                   _featureCard(
                     icon: Icons.price_check_rounded,
-                    title: 'Guaranteed Lowest Prices',
-                    subtitle: 'Direct from authorized manufacturers',
+                    iconColor: AppColors.primaryCrimson,
+                    iconBgColor: AppColors.softRose,
+                    title: 'Guaranteed Authentic Value',
+                    subtitle: 'Direct from EBS BioCrop Science',
                     width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
                   ),
                   _featureCard(
                     icon: Icons.local_shipping_rounded,
-                    title: 'FREE India Wide Shipping',
+                    iconColor: AppColors.primaryGreen,
+                    iconBgColor: AppColors.lightGreen,
+                    title: 'FREE Pan-India Shipping',
                     subtitle: 'Reliable doorstep parcel dispatch',
                     width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
                   ),
                   _featureCard(
                     icon: Icons.shield_rounded,
-                    title: 'SAFE SHOPPING Guarantee',
+                    iconColor: AppColors.primaryCrimson,
+                    iconBgColor: AppColors.softRose,
+                    title: 'CERTIFIED Lab Quality',
                     subtitle: '100% genuine agri-inputs verified',
                     width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
                   ),
                   _featureCard(
                     icon: Icons.assignment_return_rounded,
-                    title: 'EASY Returns & Support',
-                    subtitle: 'Hassle-free replacement policy',
+                    iconColor: AppColors.primaryGreen,
+                    iconBgColor: AppColors.lightGreen,
+                    title: 'EASY Returns & Advisory',
+                    subtitle: 'Agronomist consultation included',
                     width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
                   ),
                 ],
@@ -58,6 +66,8 @@ class TrustFeaturesSection extends StatelessWidget {
 
   Widget _featureCard({
     required IconData icon,
+    required Color iconColor,
+    required Color iconBgColor,
     required String title,
     required String subtitle,
     required double width,
@@ -66,7 +76,7 @@ class TrustFeaturesSection extends StatelessWidget {
       width: width,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.background,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
@@ -75,10 +85,10 @@ class TrustFeaturesSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.lightGreen,
+              color: iconBgColor,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppColors.primaryGreen, size: 28),
+            child: Icon(icon, color: iconColor, size: 28),
           ),
           const SizedBox(width: 14),
           Expanded(

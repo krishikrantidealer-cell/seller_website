@@ -11,7 +11,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryGreen,
         primary: AppColors.primaryGreen,
-        secondary: AppColors.primaryBlue,
+        secondary: AppColors.primaryCrimson,
         surface: AppColors.surface,
       ),
       scaffoldBackgroundColor: AppColors.background,
@@ -38,7 +38,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(

@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // AgriBegri Core Brand Colors
-  static const Color primaryGreen = Color(0xFF63AC39);
-  static const Color primaryDarkGreen = Color(0xFF4C8A29);
-  static const Color lightGreen = Color(0xFFEBF7E5);
-  static const Color primaryBlue = Color(0xFF036DBB);
-  static const Color primaryDarkBlue = Color(0xFF025AA3);
+  // EBS BioCrop Science Core Brand Colors (from official swatch)
+  static const Color primaryGreen = Color(0xFF2F7D32);      // Rich Forest/Agro Green
+  static const Color primaryDarkGreen = Color(0xFF1B5E20);  // Dark Green Accent
+  static const Color lightGreen = Color(0xFFE8F5E9);        // Light Green Tint
+
+  static const Color primaryCrimson = Color(0xFFA61E22);    // Brand Crimson Red
+  static const Color primaryDarkCrimson = Color(0xFF801417);
+  static const Color softRose = Color(0xFFF8E8E8);          // Brand Soft Rose/Container
+  static const Color warmBackground = Color(0xFFFFF8F6);    // Warm Off-White Surface
 
   // Surface & Neutral Colors
-  static const Color background = Color(0xFFF8FAFC);
+  static const Color background = Color(0xFFFFF8F6);
   static const Color surface = Colors.white;
   static const Color surfaceDark = Color(0xFF1E293B);
-  static const Color footerBackground = Color(0xFF1F2937);
+  static const Color footerBackground = Color(0xFF1C1917);
 
   // Typography Colors
-  static const Color textPrimary = Color(0xFF0F172A);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color textMuted = Color(0xFF94A3B8);
+  static const Color textPrimary = Color(0xFF1C1917);
+  static const Color textSecondary = Color(0xFF57534E);
+  static const Color textMuted = Color(0xFF78716C);
 
   // Badges & Accents
-  static const Color discountRed = Color(0xFFDC2626);
+  static const Color discountRed = Color(0xFFA61E22);
   static const Color ratingAmber = Color(0xFFF59E0B);
-  static const Color border = Color(0xFFE2E8F0);
-  static const Color borderHover = Color(0xFFCBD5E1);
+  static const Color border = Color(0xFFE7D8D5);
+  static const Color borderHover = Color(0xFFD6C2BF);
 }

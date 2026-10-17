@@ -123,7 +123,7 @@ class ProductCard extends StatelessWidget {
                   Text(
                     product.technicalName,
                     style: GoogleFonts.poppins(
-                      color: AppColors.primaryBlue,
+                      color: AppColors.primaryCrimson,
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                     ),

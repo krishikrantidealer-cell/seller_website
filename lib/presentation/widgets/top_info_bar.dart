@@ -10,7 +10,7 @@ class TopInfoBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: AppColors.primaryBlue,
+      color: AppColors.primaryCrimson,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
       child: Center(
         child: ConstrainedBox(

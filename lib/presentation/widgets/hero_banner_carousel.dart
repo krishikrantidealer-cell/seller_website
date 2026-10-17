@@ -17,27 +17,27 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
 
   final List<BannerData> _banners = [
     const BannerData(
-      title: 'Kharif & Rabi Season Special',
-      subtitle: 'Up to 40% OFF on Top Crop Protection & High Yield Seeds',
-      tag: 'LIMITED TIME OFFER',
-      buttonText: 'Shop Agri Essentials',
-      gradient: [Color(0xFF0F766E), Color(0xFF134E4A)],
+      title: 'EBS BioCrop Nutrition & Protection',
+      subtitle: 'Up to 40% OFF on Certified Bio-Fertilizers & Crop Care Essentials',
+      tag: 'EBS SPECIAL OFFER',
+      buttonText: 'Shop BioCrop Essentials',
+      gradient: [Color(0xFF2F7D32), Color(0xFF1B5E20)],
       icon: Icons.agriculture_rounded,
     ),
     const BannerData(
-      title: 'Guaranteed Lowest Prices Across India',
-      subtitle: '100% Genuine Certified Fertilizers, Sprayers & Bio-Nutrients',
-      tag: 'FAST & FREE DELIVERY',
-      buttonText: 'Explore Fertilizers',
-      gradient: [Color(0xFF036DBB), Color(0xFF02447A)],
+      title: 'Guaranteed Authentic Agricultural Inputs',
+      subtitle: 'Direct from EBS BioCrop Science Labs with Nationwide Delivery',
+      tag: 'FAST & SECURE DISPATCH',
+      buttonText: 'Explore Crop Nutrition',
+      gradient: [Color(0xFFA61E22), Color(0xFF801417)],
       icon: Icons.verified_user_rounded,
     ),
     const BannerData(
-      title: 'Free Expert Advisory for Your Crops',
-      subtitle: 'Get tailored disease remedies and dosage consultation directly from agronomists',
-      tag: 'FARMER FIRST',
-      buttonText: 'Consult Agro Experts',
-      gradient: [Color(0xFF4C8A29), Color(0xFF2E5916)],
+      title: 'Free Agronomy & Crop Advisory',
+      subtitle: 'Personalized soil health, pest management, and dosage advice from science experts',
+      tag: 'EXPERT CONSULTATION',
+      buttonText: 'Consult Science Experts',
+      gradient: [Color(0xFF2F7D32), Color(0xFFA61E22)],
       icon: Icons.support_agent_rounded,
     ),
   ];
@@ -68,7 +68,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: AppColors.warmBackground,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Center(
         child: ConstrainedBox(

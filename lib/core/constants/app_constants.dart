@@ -1,6 +1,6 @@
 class AppConstants {
-  static const String appName = 'AgriBegri';
-  static const String appTagline = "India's Trusted Online Agriculture Shop";
+  static const String appName = 'EBS BioCrop Science';
+  static const String appTagline = 'Pioneering Agricultural Excellence & Crop Nutrition';
   static const String helplineNumber = '1800-203-1425';
   static const String orderCallNumber = '1800-203-1425';
   static const String sellerPortalUrl = 'https://abadmin.agribegri.com/sellerpanel/login.php';
