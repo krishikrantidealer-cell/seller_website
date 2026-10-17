@@ -1,5 +1,5 @@
 name: seller_website
-description: "EBS BioCrop — Modern Agri-Commerce Marketplace Web Application."
+description: "EBS BioCrop Agri-Commerce Web Application."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,12 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  flutter_bloc: ^9.1.1
-  bloc: ^9.2.1
-  equatable: ^3.0.0
-  google_fonts: ^9.0.0
+  google_fonts: ^6.2.1
   go_router: ^18.0.2
-  shared_preferences: ^2.5.5
   http: ^1.2.2
 
 dev_dependencies:
@@ -25,5 +21,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/

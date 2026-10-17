@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'core/constants/app_constants.dart';
-import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'logic/cart/cart_bloc.dart';
-import 'logic/catalog/catalog_bloc.dart';
-import 'logic/catalog/catalog_event.dart';
+import 'presentation/home/home_view.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,17 +12,11 @@ class SellerWebsiteApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<CatalogBloc>(create: (_) => CatalogBloc()..add(const LoadCatalog())),
-        BlocProvider<CartBloc>(create: (_) => CartBloc()),
-      ],
-      child: MaterialApp.router(
-        title: '${AppConstants.appName} — Essential Bio Crop Science',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        routerConfig: AppRouter.router,
-      ),
+    return MaterialApp(
+      title: 'AgriBegri | EBS BioCrop Agriculture E-Commerce',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      home: const HomeView(),
     );
   }
 }
