@@ -202,17 +202,17 @@ class _HomeViewState extends State<HomeView> {
                         LayoutBuilder(
                           builder: (context, constraints) {
                             int crossAxisCount = 4;
-                            double childAspectRatio = 0.67;
+                            double childAspectRatio = 0.64;
 
                             if (constraints.maxWidth < 640) {
                               crossAxisCount = 1;
-                              childAspectRatio = 0.82;
+                              childAspectRatio = 0.74;
                             } else if (constraints.maxWidth < 900) {
                               crossAxisCount = 2;
-                              childAspectRatio = 0.70;
+                              childAspectRatio = 0.68;
                             } else if (constraints.maxWidth < 1200) {
                               crossAxisCount = 3;
-                              childAspectRatio = 0.68;
+                              childAspectRatio = 0.65;
                             }
 
                             return GridView.builder(

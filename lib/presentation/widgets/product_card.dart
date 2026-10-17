@@ -64,86 +64,86 @@ class _ProductCardState extends State<ProductCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Top Image Container with Discount Badge & In-Cart Badge
-                Container(
-                  height: 180,
-                  width: double.infinity,
-                  color: AppColors.warmBackground,
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Image.network(
-                            widget.product.imageUrl,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              color: AppColors.warmBackground,
-                              child: const Icon(
-                                Icons.agriculture_rounded,
-                                size: 48,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Discount Badge
-                      if (discount > 0)
-                        Positioned(
-                          top: 10,
-                          left: 10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.discountRed,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '$discount% OFF',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      // Added to cart indicator pill
-                      if (currentQty > 0)
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGreen,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.shopping_bag_rounded, size: 12, color: Colors.white),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$currentQty in cart',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    color: AppColors.warmBackground,
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Image.network(
+                              widget.product.imageUrl,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                color: AppColors.warmBackground,
+                                child: const Icon(
+                                  Icons.agriculture_rounded,
+                                  size: 48,
+                                  color: AppColors.textMuted,
                                 ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
-                    ],
+                        // Discount Badge
+                        if (discount > 0)
+                          Positioned(
+                            top: 10,
+                            left: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.discountRed,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '$discount% OFF',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        // Added to cart indicator pill
+                        if (currentQty > 0)
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryGreen,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.shopping_bag_rounded, size: 12, color: Colors.white),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$currentQty in cart',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
 
                 // Content details
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+                Padding(
+                  padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -290,8 +290,7 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                         ],
 
-                        // Push pricing and buttons flush to bottom
-                        const Spacer(),
+                        const SizedBox(height: 10),
 
                         // Pricing
                         Row(
@@ -328,8 +327,7 @@ class _ProductCardState extends State<ProductCard> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                ],
             ),
           ),
         );
