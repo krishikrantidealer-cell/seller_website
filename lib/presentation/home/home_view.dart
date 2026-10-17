@@ -8,6 +8,7 @@ import '../widgets/category_ribbon.dart';
 import '../widgets/hero_banner_carousel.dart';
 import '../widgets/trust_features_section.dart';
 import '../widgets/product_card.dart';
+import '../widgets/cart_drawer.dart';
 import '../widgets/web_footer.dart';
 
 class HomeView extends StatefulWidget {
@@ -18,9 +19,10 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   String _selectedCategory = 'all';
   String _searchFilter = '';
-  int _cartCount = 2;
 
   final List<ProductItem> _allProducts = ProductItem.sampleProducts;
 
@@ -35,10 +37,8 @@ class _HomeViewState extends State<HomeView> {
     }).toList();
   }
 
-  void _onAddToCart(ProductItem product) {
-    setState(() {
-      _cartCount++;
-    });
+  void _onAddToCart(ProductItem product, ProductVariant variant) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -47,19 +47,30 @@ class _HomeViewState extends State<HomeView> {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Added "${product.title}" to cart',
+                'Added ${product.title} (${variant.label}) to cart',
                 style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
+        action: SnackBarAction(
+          label: 'VIEW CART',
+          textColor: Colors.white,
+          onPressed: () {
+            _scaffoldKey.currentState?.openEndDrawer();
+          },
+        ),
         backgroundColor: AppColors.primaryGreen,
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
+  }
+
+  void _onBuyNow(ProductItem product, ProductVariant variant) {
+    _scaffoldKey.currentState?.openEndDrawer();
   }
 
   @override
@@ -67,16 +78,20 @@ class _HomeViewState extends State<HomeView> {
     final filtered = _filteredProducts;
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      endDrawer: const QuickCartDrawer(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // Top Bar
             const TopInfoBar(),
 
-            // Main Header
+            // Main Header with interactive cart tap
             MainNavHeader(
-              cartItemCount: _cartCount,
+              onCartTap: () {
+                _scaffoldKey.currentState?.openEndDrawer();
+              },
               onSearch: (query) {
                 setState(() => _searchFilter = query);
               },
@@ -90,7 +105,7 @@ class _HomeViewState extends State<HomeView> {
               },
             ),
 
-            // Hero Banner Carousel
+            // Hero Promotion Carousel
             const HeroBannerCarousel(),
 
             // Value Proposition / Guarantee Badges
@@ -163,14 +178,14 @@ class _HomeViewState extends State<HomeView> {
                               const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textMuted),
                               const SizedBox(height: 12),
                               Text(
-                                'No products found matching your filter',
+                                'No agricultural products found matching your search.',
                                 style: GoogleFonts.poppins(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textPrimary,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 12),
                               OutlinedButton(
                                 onPressed: () {
                                   setState(() {
@@ -187,12 +202,17 @@ class _HomeViewState extends State<HomeView> {
                         LayoutBuilder(
                           builder: (context, constraints) {
                             int crossAxisCount = 4;
+                            double childAspectRatio = 0.55;
+
                             if (constraints.maxWidth < 640) {
                               crossAxisCount = 1;
+                              childAspectRatio = 0.72;
                             } else if (constraints.maxWidth < 900) {
                               crossAxisCount = 2;
+                              childAspectRatio = 0.58;
                             } else if (constraints.maxWidth < 1200) {
                               crossAxisCount = 3;
+                              childAspectRatio = 0.56;
                             }
 
                             return GridView.builder(
@@ -202,14 +222,15 @@ class _HomeViewState extends State<HomeView> {
                                 crossAxisCount: crossAxisCount,
                                 crossAxisSpacing: 16,
                                 mainAxisSpacing: 16,
-                                childAspectRatio: 0.68,
+                                childAspectRatio: childAspectRatio,
                               ),
                               itemCount: filtered.length,
                               itemBuilder: (context, index) {
                                 final product = filtered[index];
                                 return ProductCard(
                                   product: product,
-                                  onAddToCart: () => _onAddToCart(product),
+                                  onAddToCart: (p, v) => _onAddToCart(p, v),
+                                  onBuyNow: (p, v) => _onBuyNow(p, v),
                                 );
                               },
                             );
@@ -220,8 +241,6 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
             ),
-
-            const SizedBox(height: 32),
 
             // Footer
             const WebFooter(),

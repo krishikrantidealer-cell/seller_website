@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 
+import '../../data/models/cart_state.dart';
+
 class MainNavHeader extends StatefulWidget {
-  final int cartItemCount;
+  final int? cartItemCount;
   final ValueChanged<String>? onSearch;
+  final VoidCallback? onCartTap;
 
   const MainNavHeader({
     super.key,
-    this.cartItemCount = 2,
+    this.cartItemCount,
     this.onSearch,
+    this.onCartTap,
   });
 
   @override
@@ -124,33 +128,39 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                   const SizedBox(width: 24),
 
                   // Cart
-                  InkWell(
-                    onTap: () {},
-                    borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      child: Row(
-                        children: [
-                          Badge(
-                            label: Text(
-                              widget.cartItemCount.toString(),
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
-                            ),
-                            backgroundColor: AppColors.discountRed,
-                            child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
+                  AnimatedBuilder(
+                    animation: CartController.instance,
+                    builder: (context, _) {
+                      final count = widget.cartItemCount ?? CartController.instance.totalCount;
+                      return InkWell(
+                        onTap: widget.onCartTap,
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Row(
+                            children: [
+                              Badge(
+                                label: Text(
+                                  count.toString(),
+                                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
+                                ),
+                                backgroundColor: AppColors.primaryCrimson,
+                                child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Cart',
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Cart',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(width: 24),
 

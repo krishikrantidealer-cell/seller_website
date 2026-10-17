@@ -1,3 +1,24 @@
+class ProductVariant {
+  final String id;
+  final String label;
+  final double displayRate;
+  final double printedMrp;
+  final bool inStock;
+
+  const ProductVariant({
+    required this.id,
+    required this.label,
+    required this.displayRate,
+    required this.printedMrp,
+    this.inStock = true,
+  });
+
+  int get discountPercent {
+    if (printedMrp <= 0 || displayRate >= printedMrp) return 0;
+    return (((printedMrp - displayRate) / printedMrp) * 100).round();
+  }
+}
+
 class ProductItem {
   final String id;
   final String title;
@@ -11,6 +32,7 @@ class ProductItem {
   final String category;
   final String packSize;
   final bool isAvailable;
+  final List<ProductVariant> variants;
 
   const ProductItem({
     required this.id,
@@ -25,11 +47,22 @@ class ProductItem {
     required this.category,
     required this.packSize,
     this.isAvailable = true,
+    this.variants = const [],
   });
 
   int get discountPercent {
     if (printedMrp <= 0 || displayRate >= printedMrp) return 0;
     return (((printedMrp - displayRate) / printedMrp) * 100).round();
+  }
+
+  ProductVariant get defaultVariant {
+    if (variants.isNotEmpty) return variants.first;
+    return ProductVariant(
+      id: '${id}_def',
+      label: packSize,
+      displayRate: displayRate,
+      printedMrp: printedMrp,
+    );
   }
 
   static List<ProductItem> get sampleProducts => const [
@@ -43,6 +76,12 @@ class ProductItem {
       printedMrp: 1199,
       category: 'Insecticides',
       packSize: '250 ml',
+      variants: [
+        ProductVariant(id: 'v1_1', label: '100 ml', displayRate: 380, printedMrp: 520),
+        ProductVariant(id: 'v1_2', label: '250 ml', displayRate: 850, printedMrp: 1199),
+        ProductVariant(id: 'v1_3', label: '500 ml', displayRate: 1599, printedMrp: 2199),
+        ProductVariant(id: 'v1_4', label: '1 Ltr', displayRate: 2950, printedMrp: 4100),
+      ],
     ),
     ProductItem(
       id: 'PROD-002',
@@ -54,6 +93,11 @@ class ProductItem {
       printedMrp: 550,
       category: 'Fertilizers',
       packSize: '1 kg',
+      variants: [
+        ProductVariant(id: 'v2_1', label: '500 gm', displayRate: 230, printedMrp: 300),
+        ProductVariant(id: 'v2_2', label: '1 kg', displayRate: 420, printedMrp: 550),
+        ProductVariant(id: 'v2_3', label: '4 kg', displayRate: 1550, printedMrp: 2100),
+      ],
     ),
     ProductItem(
       id: 'PROD-003',
@@ -65,6 +109,12 @@ class ProductItem {
       printedMrp: 1800,
       category: 'Insecticides',
       packSize: '500 ml',
+      variants: [
+        ProductVariant(id: 'v3_1', label: '100 ml', displayRate: 350, printedMrp: 440),
+        ProductVariant(id: 'v3_2', label: '250 ml', displayRate: 780, printedMrp: 970),
+        ProductVariant(id: 'v3_3', label: '500 ml', displayRate: 1450, printedMrp: 1800),
+        ProductVariant(id: 'v3_4', label: '1 Ltr', displayRate: 2750, printedMrp: 3450),
+      ],
     ),
     ProductItem(
       id: 'PROD-004',
@@ -76,6 +126,11 @@ class ProductItem {
       printedMrp: 820,
       category: 'Fungicides',
       packSize: '500 g',
+      variants: [
+        ProductVariant(id: 'v4_1', label: '250 gm', displayRate: 350, printedMrp: 450),
+        ProductVariant(id: 'v4_2', label: '500 gm', displayRate: 640, printedMrp: 820),
+        ProductVariant(id: 'v4_3', label: '1 kg', displayRate: 1220, printedMrp: 1580),
+      ],
     ),
     ProductItem(
       id: 'PROD-005',
@@ -87,6 +142,12 @@ class ProductItem {
       printedMrp: 450,
       category: 'Fungicides',
       packSize: '250 g',
+      variants: [
+        ProductVariant(id: 'v5_1', label: '100 gm', displayRate: 140, printedMrp: 190),
+        ProductVariant(id: 'v5_2', label: '250 gm', displayRate: 310, printedMrp: 450),
+        ProductVariant(id: 'v5_3', label: '500 gm', displayRate: 590, printedMrp: 820),
+        ProductVariant(id: 'v5_4', label: '1 kg', displayRate: 1100, printedMrp: 1550),
+      ],
     ),
     ProductItem(
       id: 'PROD-006',
@@ -98,6 +159,11 @@ class ProductItem {
       printedMrp: 1250,
       category: 'Seeds',
       packSize: '10 g (3500 seeds)',
+      variants: [
+        ProductVariant(id: 'v6_1', label: '10 gm x 1 Qty', displayRate: 980, printedMrp: 1250),
+        ProductVariant(id: 'v6_2', label: '10 gm x 2 Qty', displayRate: 1890, printedMrp: 2500),
+        ProductVariant(id: 'v6_3', label: '10 gm x 5 Qty', displayRate: 4600, printedMrp: 6250),
+      ],
     ),
     ProductItem(
       id: 'PROD-007',
@@ -109,6 +175,10 @@ class ProductItem {
       printedMrp: 3500,
       category: 'Equipments',
       packSize: '1 Piece',
+      variants: [
+        ProductVariant(id: 'v7_1', label: '16 Litre Std', displayRate: 2399, printedMrp: 3500),
+        ProductVariant(id: 'v7_2', label: '16L + Extra Lance', displayRate: 2699, printedMrp: 3950),
+      ],
     ),
     ProductItem(
       id: 'PROD-008',
@@ -120,6 +190,11 @@ class ProductItem {
       printedMrp: 950,
       category: 'Herbicides',
       packSize: '500 ml',
+      variants: [
+        ProductVariant(id: 'v8_1', label: '250 ml', displayRate: 390, printedMrp: 510),
+        ProductVariant(id: 'v8_2', label: '500 ml', displayRate: 720, printedMrp: 950),
+        ProductVariant(id: 'v8_3', label: '1 Ltr', displayRate: 1380, printedMrp: 1820),
+      ],
     ),
   ];
 }
