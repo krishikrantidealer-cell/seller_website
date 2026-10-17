@@ -14,75 +14,223 @@ class WebFooter extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: AppColors.footerBackground,
-      padding: EdgeInsets.only(
-        top: isMobile ? 32 : 48,
-        bottom: 24,
-        left: isMobile ? 12 : 24,
-        right: isMobile ? 12 : 24,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1680),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top columns
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth >= 900;
-                  if (!isWide) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Integrated Trust Badges Strip (Tier 1)
+          _buildTrustBadgesSection(context),
+
+          // Main Footer Columns (Tier 2)
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: isMobile ? 28 : 44,
+                  bottom: 24,
+                  left: isMobile ? 12 : 24,
+                  right: isMobile ? 12 : 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isWide = constraints.maxWidth >= 900;
+                        if (!isWide) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _brandColumn(),
+                              const SizedBox(height: 32),
+                              _categoriesColumn(),
+                              const SizedBox(height: 32),
+                              _quickLinksColumn(),
+                              const SizedBox(height: 32),
+                              _supportColumn(),
+                            ],
+                          );
+                        }
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(flex: 3, child: _brandColumn()),
+                            const SizedBox(width: 48),
+                            Expanded(flex: 2, child: _categoriesColumn()),
+                            const SizedBox(width: 48),
+                            Expanded(flex: 2, child: _quickLinksColumn()),
+                            const SizedBox(width: 48),
+                            Expanded(flex: 3, child: _supportColumn()),
+                          ],
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 44),
+                    const Divider(color: Color(0xFF374151), height: 1),
+                    const SizedBox(height: 24),
+                    // Bottom Copyright (Tier 3)
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      runSpacing: 12,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        _brandColumn(),
-                        const SizedBox(height: 32),
-                        _categoriesColumn(),
-                        const SizedBox(height: 32),
-                        _supportColumn(),
+                        Text(
+                          '© 2026 EBS Essential BioCrop Science. All rights reserved.',
+                          style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
+                        ),
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 8,
+                          children: [
+                            _footerLink('Privacy Policy'),
+                            _footerLink('Terms & Conditions'),
+                            _footerLink('Refund & Cancellation'),
+                          ],
+                        ),
                       ],
-                    );
-                  }
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(flex: 3, child: _brandColumn()),
-                      const SizedBox(width: 48),
-                      Expanded(flex: 2, child: _categoriesColumn()),
-                      const SizedBox(width: 48),
-                      Expanded(flex: 2, child: _quickLinksColumn()),
-                      const SizedBox(width: 48),
-                      Expanded(flex: 3, child: _supportColumn()),
-                    ],
-                  );
-                },
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 48),
-              const Divider(color: Color(0xFF374151), height: 1),
-              const SizedBox(height: 24),
-              // Bottom Copyright
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                runSpacing: 12,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text(
-                    '© 2026 EBS Essential BioCrop Science. All rights reserved.',
-                    style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
-                  ),
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 8,
-                    children: [
-                      _footerLink('Privacy Policy'),
-                      _footerLink('Terms & Conditions'),
-                      _footerLink('Refund & Cancellation'),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  /// Integrated Trust Badges Tier inside the footer
+  Widget _buildTrustBadgesSection(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 650;
+        final isCompactRow = constraints.maxWidth < 1000;
+
+        final badges = [
+          _TrustBadgeItem(
+            icon: Icons.price_check_rounded,
+            iconColor: AppColors.primaryCrimson,
+            iconBgColor: AppColors.primaryCrimson.withValues(alpha: 0.18),
+            title: 'Guaranteed Authentic Value',
+            subtitle: 'Direct from EBS Essential BioCrop Science',
+          ),
+          _TrustBadgeItem(
+            icon: Icons.local_shipping_rounded,
+            iconColor: AppColors.primaryGreen,
+            iconBgColor: AppColors.primaryGreen.withValues(alpha: 0.18),
+            title: 'FREE Pan-India Shipping',
+            subtitle: 'Reliable doorstep parcel dispatch',
+          ),
+          _TrustBadgeItem(
+            icon: Icons.shield_rounded,
+            iconColor: AppColors.primaryCrimson,
+            iconBgColor: AppColors.primaryCrimson.withValues(alpha: 0.18),
+            title: 'CERTIFIED Lab Quality',
+            subtitle: '100% genuine agri-inputs verified',
+          ),
+          _TrustBadgeItem(
+            icon: Icons.assignment_return_rounded,
+            iconColor: AppColors.primaryGreen,
+            iconBgColor: AppColors.primaryGreen.withValues(alpha: 0.18),
+            title: 'EASY Returns & Advisory',
+            subtitle: 'Agronomist consultation included',
+          ),
+        ];
+
+        return Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: Color(0xFF24201E),
+            border: Border(
+              top: BorderSide(color: Color(0xFF383330), width: 1),
+              bottom: BorderSide(color: Color(0xFF2E2A28), width: 1),
+            ),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 8 : 24,
+            vertical: isMobile ? 12 : 18,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: isCompactRow
+                  ? SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: [
+                          for (int i = 0; i < badges.length; i++) ...[
+                            if (i > 0) const SizedBox(width: 12),
+                            _buildBadgeCard(badges[i], width: 260),
+                          ],
+                        ],
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        for (int i = 0; i < badges.length; i++) ...[
+                          if (i > 0) const SizedBox(width: 14),
+                          Expanded(child: _buildBadgeCard(badges[i])),
+                        ],
+                      ],
+                    ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBadgeCard(_TrustBadgeItem item, {double? width}) {
+    return Container(
+      width: width,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1C1917),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF383330)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: item.iconBgColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(item.icon, color: item.iconColor, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  item.title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  item.subtitle,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: const Color(0xFF9CA3AF),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -263,4 +411,20 @@ class WebFooter extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TrustBadgeItem {
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBgColor;
+  final String title;
+  final String subtitle;
+
+  const _TrustBadgeItem({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBgColor,
+    required this.title,
+    required this.subtitle,
+  });
 }

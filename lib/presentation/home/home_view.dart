@@ -6,7 +6,6 @@ import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
 import '../widgets/hero_banner_carousel.dart';
-import '../widgets/trust_features_section.dart';
 import '../widgets/product_card.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/web_footer.dart';
@@ -462,10 +461,7 @@ class _HomeViewState extends State<HomeView> {
               },
             ),
 
-            // Trust & Guarantee Badges (Footer Section)
-            const TrustFeaturesSection(),
-
-            // Footer
+            // Integrated Footer with Trust Badges
             const WebFooter(),
           ],
         ),
