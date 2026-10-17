@@ -126,9 +126,6 @@ class _HomeViewState extends State<HomeView> {
             // Hero Promotion Carousel
             const HeroBannerCarousel(),
 
-            // Value Proposition / Guarantee Badges
-            const TrustFeaturesSection(),
-
             // Main Product Catalog Section
             LayoutBuilder(
               builder: (context, constraints) {
@@ -204,89 +201,164 @@ class _HomeViewState extends State<HomeView> {
                               ),
                             ),
 
-                          // Section Title & Filters
-                          Wrap(
-                            alignment: WrapAlignment.spaceBetween,
-                            runSpacing: 12,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
+                          // Section Title, Product Count & View All Action
+                          isMobile
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Best Sellers',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.lightGreen,
+                                                borderRadius: BorderRadius.circular(12),
+                                                border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                                              ),
+                                              child: Text(
+                                                '${filtered.length} Products',
+                                                style: GoogleFonts.poppins(
+                                                  color: AppColors.primaryDarkGreen,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        OutlinedButton.icon(
+                                          onPressed: () {
+                                            setState(() {
+                                              _selectedCategory = 'all';
+                                              _selectedSubcategory = null;
+                                              _searchFilter = '';
+                                            });
+                                          },
+                                          icon: const Icon(Icons.grid_view_rounded, size: 15, color: AppColors.primaryGreen),
+                                          label: Text(
+                                            'View All',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.primaryGreen,
+                                            ),
+                                          ),
+                                          style: OutlinedButton.styleFrom(
+                                            side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                            backgroundColor: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      _selectedCategory == 'all'
+                                          ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery'
+                                          : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
+                                      style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
+                                    ),
+                                  ],
+                                )
+                              : Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        'Best Sellers',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: isMobile ? 20 : 24,
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColors.textPrimary,
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'Best Sellers',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: AppColors.textPrimary,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 14),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.lightGreen,
+                                                    borderRadius: BorderRadius.circular(14),
+                                                    border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                                                  ),
+                                                  child: Text(
+                                                    '${filtered.length} Products',
+                                                    style: GoogleFonts.poppins(
+                                                      color: AppColors.primaryDarkGreen,
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              _selectedCategory == 'all'
+                                                  ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery'
+                                                  : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
+                                              style: GoogleFonts.poppins(fontSize: 13.5, color: AppColors.textSecondary),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      const SizedBox(width: 10),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.lightGreen,
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                                        ),
-                                        child: Text(
-                                          '${filtered.length} Products',
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.primaryDarkGreen,
-                                            fontSize: isMobile ? 11 : 12.5,
-                                            fontWeight: FontWeight.w700,
+                                      const SizedBox(width: 32),
+                                      OutlinedButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedCategory = 'all';
+                                            _selectedSubcategory = null;
+                                            _searchFilter = '';
+                                          });
+                                        },
+                                        icon: const Icon(Icons.grid_view_rounded, size: 18, color: AppColors.primaryGreen),
+                                        label: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                                          child: Text(
+                                            'View All Products',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.primaryGreen,
+                                            ),
                                           ),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                                          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          backgroundColor: Colors.white,
+                                          elevation: 0,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    _selectedCategory == 'all'
-                                        ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science with nationwide delivery'
-                                        : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: isMobile ? 11.5 : 13,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedCategory = 'all';
-                                    _selectedSubcategory = null;
-                                    _searchFilter = '';
-                                  });
-                                },
-                                icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.primaryGreen),
-                                label: Text(
-                                  'View All',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: isMobile ? 12 : 13.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primaryGreen,
-                                  ),
                                 ),
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isMobile ? 12 : 18,
-                                    vertical: isMobile ? 8 : 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  backgroundColor: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
                           SizedBox(height: isMobile ? 12 : 20),
 
                           // Product Grid
@@ -389,6 +461,9 @@ class _HomeViewState extends State<HomeView> {
                 );
               },
             ),
+
+            // Trust & Guarantee Badges (Footer Section)
+            const TrustFeaturesSection(),
 
             // Footer
             const WebFooter(),
