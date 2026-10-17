@@ -29,6 +29,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   int _selectedQuantity = 1;
   int _activeTabIndex = 0;
   int _selectedImageIndex = 0;
+  final Set<int> _expandedMobileSections = {0};
 
   @override
   void initState() {
@@ -1102,25 +1103,264 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   Widget _buildTabsSection({required bool isMobile}) {
+    if (isMobile) {
+      return _buildMobileAccordionSection();
+    }
+    return _buildDesktopTabsSection();
+  }
+
+  /// Mobile Experience: Clean, Native Expandable Accordion Panels
+  Widget _buildMobileAccordionSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Title
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 3.5,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Product Information & Guidance',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 1. Overview Accordion Card (Open by default)
+        _buildAccordionCard(
+          index: 0,
+          icon: Icons.info_outline_rounded,
+          iconColor: AppColors.primaryGreen,
+          title: 'Product Overview',
+          subtitle: 'Formulation, purpose & key crop benefits',
+          content: _buildOverviewContent(isMobile: true),
+        ),
+
+        // 2. Technical Specs Accordion Card
+        _buildAccordionCard(
+          index: 1,
+          icon: Icons.science_outlined,
+          iconColor: const Color(0xFF0284C7),
+          title: 'Technical Specifications',
+          subtitle: 'Active ingredients, dosage & PHI',
+          trailingBadge: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+            ),
+            child: Text(
+              widget.product.category,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryDarkGreen,
+              ),
+            ),
+          ),
+          content: _buildTechnicalSpecsContent(isMobile: true),
+        ),
+
+        // 3. Application Guide Accordion Card
+        _buildAccordionCard(
+          index: 2,
+          icon: Icons.water_drop_outlined,
+          iconColor: const Color(0xFF0D9488),
+          title: 'Application & Dosage Guide',
+          subtitle: 'Spraying instructions & safety precautions',
+          content: _buildApplicationGuideContent(isMobile: true),
+        ),
+
+        // 4. Farmer Reviews Accordion Card
+        _buildAccordionCard(
+          index: 3,
+          icon: Icons.star_rounded,
+          iconColor: AppColors.ratingAmber,
+          title: 'Farmer Reviews (${widget.product.reviewsCount})',
+          subtitle: '${widget.product.rating} ★ verified grower feedback',
+          trailingBadge: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF3C7),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.star_rounded, size: 12, color: AppColors.ratingAmber),
+                const SizedBox(width: 3),
+                Text(
+                  '${widget.product.rating}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF92400E),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          content: _buildReviewsContent(isMobile: true),
+        ),
+      ],
+    );
+  }
+
+  /// Individual Collapsible Accordion Card for Mobile
+  Widget _buildAccordionCard({
+    required int index,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    Widget? trailingBadge,
+    required Widget content,
+  }) {
+    final isExpanded = _expandedMobileSections.contains(index);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isExpanded ? AppColors.primaryGreen.withValues(alpha: 0.35) : const Color(0xFFE2E8F0),
+          width: isExpanded ? 1.4 : 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isExpanded ? 0.04 : 0.015),
+            blurRadius: isExpanded ? 8 : 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Bar
+          InkWell(
+            onTap: () {
+              setState(() {
+                if (isExpanded) {
+                  _expandedMobileSections.remove(index);
+                } else {
+                  _expandedMobileSections.add(index);
+                }
+              });
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isExpanded ? AppColors.lightGreen : const Color(0xFFF1F5F9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 18,
+                      color: isExpanded ? AppColors.primaryGreen : iconColor,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: isExpanded ? AppColors.primaryGreen : AppColors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          subtitle,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (trailingBadge != null) ...[
+                    trailingBadge,
+                    const SizedBox(width: 8),
+                  ],
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.5 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 20,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Animated Expanded Body
+          AnimatedCrossFade(
+            firstChild: const SizedBox(width: double.infinity, height: 0),
+            secondChild: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: content,
+                ),
+              ],
+            ),
+            crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 220),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Desktop Experience: Full Width Segmented Tab Bar
+  Widget _buildDesktopTabsSection() {
     final tabItems = [
       (
         label: 'Product Overview',
-        shortLabel: 'Overview',
         icon: Icons.info_outline_rounded,
       ),
       (
         label: 'Technical Specs',
-        shortLabel: 'Specs',
         icon: Icons.science_outlined,
       ),
       (
         label: 'Application Guide',
-        shortLabel: 'Dosage & Guide',
         icon: Icons.water_drop_outlined,
       ),
       (
         label: 'Farmer Reviews (${widget.product.reviewsCount})',
-        shortLabel: 'Reviews (${widget.product.reviewsCount})',
         icon: Icons.star_rounded,
       ),
     ];
@@ -1134,100 +1374,77 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tab Header Bar
+          // Desktop Tab Header Bar
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 8 : 14,
-              vertical: isMobile ? 8 : 10,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(13)),
+              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
-            decoration: BoxDecoration(
-              color: isMobile ? const Color(0xFFF8FAFC) : Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(13)),
-              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-            ),
-            child: SingleChildScrollView(
-              controller: _tabsScrollController,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  for (int i = 0; i < tabItems.length; i++) ...[
-                    if (i > 0) SizedBox(width: isMobile ? 6 : 10),
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          _activeTabIndex = i;
-                        });
-                        if (_tabsScrollController.hasClients) {
-                          final targetOffset = (i * (isMobile ? 100.0 : 140.0)) - (isMobile ? 30.0 : 50.0);
-                          _tabsScrollController.animateTo(
-                            targetOffset.clamp(0.0, _tabsScrollController.position.maxScrollExtent),
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(isMobile ? 20 : 8),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 12 : 16,
-                          vertical: isMobile ? 7 : 10,
+            child: Row(
+              children: [
+                for (int i = 0; i < tabItems.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _activeTabIndex = i;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _activeTabIndex == i ? AppColors.primaryGreen : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _activeTabIndex == i ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
+                          width: 1,
                         ),
-                        decoration: BoxDecoration(
-                          color: _activeTabIndex == i
-                              ? AppColors.primaryGreen
-                              : (isMobile ? Colors.white : Colors.transparent),
-                          borderRadius: BorderRadius.circular(isMobile ? 20 : 8),
-                          border: Border.all(
+                        boxShadow: _activeTabIndex == i
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            tabItems[i].icon,
+                            size: 16,
                             color: _activeTabIndex == i
-                                ? AppColors.primaryGreen
-                                : const Color(0xFFE2E8F0),
-                            width: 1,
+                                ? Colors.white
+                                : (i == 3 ? AppColors.ratingAmber : AppColors.textSecondary),
                           ),
-                          boxShadow: _activeTabIndex == i
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              tabItems[i].icon,
-                              size: isMobile ? 14 : 16,
-                              color: _activeTabIndex == i
-                                  ? Colors.white
-                                  : (i == 3 ? AppColors.ratingAmber : AppColors.textSecondary),
+                          const SizedBox(width: 6),
+                          Text(
+                            tabItems[i].label,
+                            style: GoogleFonts.poppins(
+                              fontSize: 13.5,
+                              fontWeight: _activeTabIndex == i ? FontWeight.w700 : FontWeight.w500,
+                              color: _activeTabIndex == i ? Colors.white : AppColors.textPrimary,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isMobile ? tabItems[i].shortLabel : tabItems[i].label,
-                              style: GoogleFonts.poppins(
-                                fontSize: isMobile ? 12 : 13.5,
-                                fontWeight: _activeTabIndex == i ? FontWeight.w700 : FontWeight.w500,
-                                color: _activeTabIndex == i ? Colors.white : AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
 
           // Tab Body
           Padding(
-            padding: EdgeInsets.all(isMobile ? 14 : 22),
-            child: _buildActiveTabContent(isMobile: isMobile),
+            padding: const EdgeInsets.all(22),
+            child: _buildActiveTabContent(isMobile: false),
           ),
         ],
       ),
@@ -1237,133 +1454,149 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Widget _buildActiveTabContent({required bool isMobile}) {
     switch (_activeTabIndex) {
       case 0:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'About ${widget.product.title}',
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 14.5 : 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${widget.product.title} is a premium agricultural formulation manufactured by ${widget.product.vendor} and distributed directly through EBS Essential BioCrop Science. Engineered for Indian climatic and soil conditions, it provides dependable crop protection and enhanced yield vitality.',
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 12.5 : 13.5,
-                color: AppColors.textSecondary,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Key Benefits:',
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 13 : 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildBulletPoint('Rapid systemic action and extended residual efficacy in all growing seasons.', isMobile),
-            _buildBulletPoint('Safe for beneficial insects when used according to standard label recommendations.', isMobile),
-            _buildBulletPoint('100% genuine batch authenticated with EBS lab purity certification.', isMobile),
-            _buildBulletPoint('Compatible with common tank-mix combinations without phytotoxicity risks.', isMobile),
-          ],
-        );
+        return _buildOverviewContent(isMobile: isMobile);
       case 1:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Technical Specifications & Composition',
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 14.5 : 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildSpecRow('Active Ingredient', widget.product.technicalName, isMobile),
-            _buildSpecRow('Formulation Category', widget.product.category, isMobile),
-            _buildSpecRow('Manufacturer', widget.product.vendor, isMobile),
-            _buildSpecRow('Recommended Dosage', '1.5 - 2.0 ml / gm per liter of water (or 150-200 Ltr/acre)', isMobile),
-            _buildSpecRow('Target Crops', 'Cotton, Paddy, Chili, Tomato, Sugarcane, Soybean, Pulses, Fruits', isMobile),
-            _buildSpecRow('Pre-Harvest Interval (PHI)', '7 - 14 Days depending on crop stage', isMobile),
-          ],
-        );
+        return _buildTechnicalSpecsContent(isMobile: isMobile);
       case 2:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'How to Apply & Safety Guidelines',
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 14.5 : 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildBulletPoint('Spray during cool morning or late afternoon hours to maximize leaf absorption.', isMobile),
-            _buildBulletPoint('Use clean water free from mud or heavy organic sediment for tank preparation.', isMobile),
-            _buildBulletPoint('Wear protective gloves and mask while handling chemical concentrates.', isMobile),
-            _buildBulletPoint('Store in original container away from direct sunlight and children.', isMobile),
-          ],
-        );
+        return _buildApplicationGuideContent(isMobile: isMobile);
       case 3:
       default:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        return _buildReviewsContent(isMobile: isMobile);
+    }
+  }
+
+  Widget _buildOverviewContent({required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'About ${widget.product.title}',
+          style: GoogleFonts.poppins(
+            fontSize: isMobile ? 14.5 : 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${widget.product.title} is a premium agricultural formulation manufactured by ${widget.product.vendor} and distributed directly through EBS Essential BioCrop Science. Engineered for Indian climatic and soil conditions, it provides dependable crop protection and enhanced yield vitality.',
+          style: GoogleFonts.poppins(
+            fontSize: isMobile ? 12.5 : 13.5,
+            color: AppColors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Key Benefits:',
+          style: GoogleFonts.poppins(
+            fontSize: isMobile ? 13 : 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildBulletPoint('Rapid systemic action and extended residual efficacy in all growing seasons.', isMobile),
+        _buildBulletPoint('Safe for beneficial insects when used according to standard label recommendations.', isMobile),
+        _buildBulletPoint('100% genuine batch authenticated with EBS lab purity certification.', isMobile),
+        _buildBulletPoint('Compatible with common tank-mix combinations without phytotoxicity risks.', isMobile),
+      ],
+    );
+  }
+
+  Widget _buildTechnicalSpecsContent({required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Technical Specifications & Composition',
+          style: GoogleFonts.poppins(
+            fontSize: isMobile ? 14.5 : 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildSpecRow('Active Ingredient', widget.product.technicalName, isMobile),
+        _buildSpecRow('Formulation Category', widget.product.category, isMobile),
+        _buildSpecRow('Manufacturer', widget.product.vendor, isMobile),
+        _buildSpecRow('Recommended Dosage', '1.5 - 2.0 ml / gm per liter of water (or 150-200 Ltr/acre)', isMobile),
+        _buildSpecRow('Target Crops', 'Cotton, Paddy, Chili, Tomato, Sugarcane, Soybean, Pulses, Fruits', isMobile),
+        _buildSpecRow('Pre-Harvest Interval (PHI)', '7 - 14 Days depending on crop stage', isMobile),
+      ],
+    );
+  }
+
+  Widget _buildApplicationGuideContent({required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'How to Apply & Safety Guidelines',
+          style: GoogleFonts.poppins(
+            fontSize: isMobile ? 14.5 : 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildBulletPoint('Spray during cool morning or late afternoon hours to maximize leaf absorption.', isMobile),
+        _buildBulletPoint('Use clean water free from mud or heavy organic sediment for tank preparation.', isMobile),
+        _buildBulletPoint('Wear protective gloves and mask while handling chemical concentrates.', isMobile),
+        _buildBulletPoint('Store in original container away from direct sunlight and children.', isMobile),
+      ],
+    );
+  }
+
+  Widget _buildReviewsContent({required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 10,
+          runSpacing: 6,
           children: [
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 10,
-              runSpacing: 6,
+            Text(
+              '${widget.product.rating} / 5.0',
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 20 : 24,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  '${widget.product.rating} / 5.0',
-                  style: GoogleFonts.poppins(
-                    fontSize: isMobile ? 20 : 24,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    for (int i = 0; i < 5; i++)
-                      const Icon(Icons.star_rounded, size: 18, color: AppColors.ratingAmber),
-                  ],
-                ),
-                Text(
-                  '(${widget.product.reviewsCount} verified farmer reviews)',
-                  style: GoogleFonts.poppins(
-                    fontSize: isMobile ? 11.5 : 13,
-                    color: AppColors.textMuted,
-                  ),
-                ),
+                for (int i = 0; i < 5; i++)
+                  const Icon(Icons.star_rounded, size: 18, color: AppColors.ratingAmber),
               ],
             ),
-            const SizedBox(height: 16),
-            _buildReviewItem(
-              'Rajesh Patil (Farmer, Maharashtra)',
-              5,
-              'Used on my cotton field last month. Highly effective results within 48 hours. Genuine product and fast delivery from EBS.',
-              isMobile,
-            ),
-            const Divider(color: AppColors.border),
-            _buildReviewItem(
-              'Suresh Reddy (Agronomist, Andhra Pradesh)',
-              5,
-              'Good formulation purity. The pack was well-sealed and the price is lower than our local market dealer.',
-              isMobile,
+            Text(
+              '(${widget.product.reviewsCount} verified farmer reviews)',
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 11.5 : 13,
+                color: AppColors.textMuted,
+              ),
             ),
           ],
-        );
-    }
+        ),
+        const SizedBox(height: 16),
+        _buildReviewItem(
+          'Rajesh Patil (Farmer, Maharashtra)',
+          5,
+          'Used on my cotton field last month. Highly effective results within 48 hours. Genuine product and fast delivery from EBS.',
+          isMobile,
+        ),
+        const Divider(color: AppColors.border),
+        _buildReviewItem(
+          'Suresh Reddy (Agronomist, Andhra Pradesh)',
+          5,
+          'Good formulation purity. The pack was well-sealed and the price is lower than our local market dealer.',
+          isMobile,
+        ),
+      ],
+    );
   }
 
   Widget _buildBulletPoint(String text, bool isMobile) {
