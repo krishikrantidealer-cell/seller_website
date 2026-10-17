@@ -327,32 +327,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ],
                     ),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _selectedCategory = 'all';
-                          _selectedSubcategory = null;
-                          _searchFilter = '';
-                        });
-                      },
-                      icon: const Icon(Icons.grid_view_rounded, size: 13, color: AppColors.primaryGreen),
-                      label: Text(
-                        'View All',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primaryGreen, width: 1.2),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
+                    _buildViewAllButton(isMobile: true),
                   ],
                 ),
                 if (isFiltered) ...[
@@ -452,59 +427,108 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(width: 16),
                 // Right: Clear (if filtered) + View All Button
                 if (isFiltered) ...[
-                  TextButton.icon(
-                    onPressed: () {
+                  InkWell(
+                    onTap: () {
                       setState(() {
                         _selectedCategory = 'all';
                         _selectedSubcategory = null;
                         _searchFilter = '';
                       });
                     },
-                    icon: const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryCrimson),
-                    label: Text(
-                      'Clear Filter',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryCrimson,
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.softRose,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.close_rounded, size: 13, color: AppColors.primaryCrimson),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Clear Filter',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryCrimson,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                 ],
-                OutlinedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _selectedCategory = 'all';
-                      _selectedSubcategory = null;
-                      _searchFilter = '';
-                    });
-                  },
-                  icon: const Icon(Icons.grid_view_rounded, size: 14, color: AppColors.primaryGreen),
-                  label: Text(
-                    'View All Products',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.primaryGreen, width: 1.2),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    backgroundColor: Colors.white,
-                  ),
-                ),
+                _buildViewAllButton(isMobile: false),
               ],
             ),
+    );
+  }
+
+  Widget _buildViewAllButton({required bool isMobile}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _selectedCategory = 'all';
+            _selectedSubcategory = null;
+            _searchFilter = '';
+          });
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primaryGreen, AppColors.primaryDarkGreen],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 12 : 16,
+            vertical: isMobile ? 6 : 8,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                isMobile ? 'View All' : 'View All Products',
+                style: GoogleFonts.poppins(
+                  fontSize: isMobile ? 11.5 : 12.5,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: isMobile ? 11 : 13,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
