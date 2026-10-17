@@ -24,6 +24,7 @@ class ProductDetailView extends StatefulWidget {
 
 class _ProductDetailViewState extends State<ProductDetailView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _tabsScrollController = ScrollController();
   late ProductVariant _selectedVariant;
   int _selectedQuantity = 1;
   int _activeTabIndex = 0;
@@ -33,6 +34,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   void initState() {
     super.initState();
     _selectedVariant = widget.product.defaultVariant;
+  }
+
+  @override
+  void dispose() {
+    _tabsScrollController.dispose();
+    super.dispose();
   }
 
   void _onVariantSelected(ProductVariant variant) {
@@ -1095,11 +1102,27 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   Widget _buildTabsSection({required bool isMobile}) {
-    final tabs = [
-      'Product Overview',
-      'Technical Specs',
-      'Application Guide',
-      'Farmer Reviews (${widget.product.reviewsCount})',
+    final tabItems = [
+      (
+        label: 'Product Overview',
+        shortLabel: 'Overview',
+        icon: Icons.info_outline_rounded,
+      ),
+      (
+        label: 'Technical Specs',
+        shortLabel: 'Specs',
+        icon: Icons.science_outlined,
+      ),
+      (
+        label: 'Application Guide',
+        shortLabel: 'Dosage & Guide',
+        icon: Icons.water_drop_outlined,
+      ),
+      (
+        label: 'Farmer Reviews (${widget.product.reviewsCount})',
+        shortLabel: 'Reviews (${widget.product.reviewsCount})',
+        icon: Icons.star_rounded,
+      ),
     ];
 
     return Container(
@@ -1113,44 +1136,89 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         children: [
           // Tab Header Bar
           Container(
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.border)),
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 8 : 14,
+              vertical: isMobile ? 8 : 10,
+            ),
+            decoration: BoxDecoration(
+              color: isMobile ? const Color(0xFFF8FAFC) : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(13)),
+              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: SingleChildScrollView(
+              controller: _tabsScrollController,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               child: Row(
                 children: [
-                  for (int i = 0; i < tabs.length; i++)
+                  for (int i = 0; i < tabItems.length; i++) ...[
+                    if (i > 0) SizedBox(width: isMobile ? 6 : 10),
                     InkWell(
                       onTap: () {
                         setState(() {
                           _activeTabIndex = i;
                         });
+                        if (_tabsScrollController.hasClients) {
+                          final targetOffset = (i * (isMobile ? 100.0 : 140.0)) - (isMobile ? 30.0 : 50.0);
+                          _tabsScrollController.animateTo(
+                            targetOffset.clamp(0.0, _tabsScrollController.position.maxScrollExtent),
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                          );
+                        }
                       },
-                      child: Container(
+                      borderRadius: BorderRadius.circular(isMobile ? 20 : 8),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
                         padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 14 : 20,
-                          vertical: isMobile ? 12 : 16,
+                          horizontal: isMobile ? 12 : 16,
+                          vertical: isMobile ? 7 : 10,
                         ),
                         decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: _activeTabIndex == i ? AppColors.primaryGreen : Colors.transparent,
-                              width: 2.5,
-                            ),
+                          color: _activeTabIndex == i
+                              ? AppColors.primaryGreen
+                              : (isMobile ? Colors.white : Colors.transparent),
+                          borderRadius: BorderRadius.circular(isMobile ? 20 : 8),
+                          border: Border.all(
+                            color: _activeTabIndex == i
+                                ? AppColors.primaryGreen
+                                : const Color(0xFFE2E8F0),
+                            width: 1,
                           ),
+                          boxShadow: _activeTabIndex == i
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
                         ),
-                        child: Text(
-                          tabs[i],
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 12 : 13.5,
-                            fontWeight: _activeTabIndex == i ? FontWeight.w700 : FontWeight.w500,
-                            color: _activeTabIndex == i ? AppColors.primaryGreen : AppColors.textSecondary,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              tabItems[i].icon,
+                              size: isMobile ? 14 : 16,
+                              color: _activeTabIndex == i
+                                  ? Colors.white
+                                  : (i == 3 ? AppColors.ratingAmber : AppColors.textSecondary),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              isMobile ? tabItems[i].shortLabel : tabItems[i].label,
+                              style: GoogleFonts.poppins(
+                                fontSize: isMobile ? 12 : 13.5,
+                                fontWeight: _activeTabIndex == i ? FontWeight.w700 : FontWeight.w500,
+                                color: _activeTabIndex == i ? Colors.white : AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),
