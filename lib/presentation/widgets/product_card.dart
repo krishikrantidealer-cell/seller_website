@@ -141,188 +141,192 @@ class _ProductCardState extends State<ProductCard> {
                 ),
 
                 // Content details
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Category Tag & Vendor
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            widget.product.category.toUpperCase(),
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textMuted,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                            ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              widget.product.vendor,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Category Tag & Vendor
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              widget.product.category.toUpperCase(),
                               style: GoogleFonts.poppins(
-                                color: AppColors.textSecondary,
+                                color: AppColors.textMuted,
                                 fontSize: 10,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Product Title
-                      Text(
-                        widget.product.title,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                          height: 1.3,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-
-                      // Technical Name
-                      Text(
-                        widget.product.technicalName,
-                        style: GoogleFonts.poppins(
-                          color: AppColors.primaryCrimson,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Rating & Reviews
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppColors.ratingAmber.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.star_rounded, size: 14, color: AppColors.ratingAmber),
-                                const SizedBox(width: 3),
-                                Text(
-                                  widget.product.rating.toString(),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFFB45309),
-                                  ),
+                            Flexible(
+                              child: Text(
+                                widget.product.vendor,
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.textSecondary,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ],
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '(${widget.product.reviewsCount})',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
 
-                      // REA AgriBegri Pack Size / Variant Selector Pills
-                      if (widget.product.variants.isNotEmpty) ...[
+                        // Product Title
                         Text(
-                          'Select Pack Size:',
+                          widget.product.title,
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textMuted,
+                            color: AppColors.textPrimary,
+                            height: 1.3,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: widget.product.variants.map((v) {
-                              final isSelected = v.id == _selectedVariant.id;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 6),
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedVariant = v;
-                                    });
-                                  },
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? AppColors.lightGreen : Colors.white,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: isSelected ? AppColors.primaryGreen : AppColors.border,
-                                        width: isSelected ? 1.5 : 1.0,
-                                      ),
+
+                        // Technical Name
+                        Text(
+                          widget.product.technicalName,
+                          style: GoogleFonts.poppins(
+                            color: AppColors.primaryCrimson,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Rating & Reviews
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.ratingAmber.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.star_rounded, size: 14, color: AppColors.ratingAmber),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    widget.product.rating.toString(),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFB45309),
                                     ),
-                                    child: Text(
-                                      v.label,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 10,
-                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                        color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '(${widget.product.reviewsCount})',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                color: AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+
+                        // REA AgriBegri Pack Size / Variant Selector Pills
+                        if (widget.product.variants.isNotEmpty) ...[
+                          Text(
+                            'Select Pack Size:',
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: widget.product.variants.map((v) {
+                                final isSelected = v.id == _selectedVariant.id;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedVariant = v;
+                                      });
+                                    },
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: isSelected ? AppColors.lightGreen : Colors.white,
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                                          width: isSelected ? 1.5 : 1.0,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        v.label,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 10,
+                                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                          color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-
-                      // Pricing
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryGreen,
+                                );
+                              }).toList(),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
+                        ],
+
+                        // Push pricing and buttons flush to bottom
+                        const Spacer(),
+
+                        // Pricing
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
                             Text(
-                              '₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
+                              '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
                               style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: AppColors.textMuted,
-                                decoration: TextDecoration.lineThrough,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryGreen,
                               ),
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
+                            const SizedBox(width: 8),
+                            if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
+                              Text(
+                                '₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: AppColors.textMuted,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
 
-                      // REA AgriBegri Action: Quantity Stepper if In-Cart, Dual Buttons if Not
-                      if (currentQty > 0)
-                        _buildQuantityStepper(cart)
-                      else
-                        _buildDualActionButtons(cart),
-                    ],
+                        // REA AgriBegri Action: Quantity Stepper if In-Cart, Dual Buttons if Not
+                        if (currentQty > 0)
+                          _buildQuantityStepper(cart)
+                        else
+                          _buildDualActionButtons(cart),
+                      ],
+                    ),
                   ),
                 ),
               ],
