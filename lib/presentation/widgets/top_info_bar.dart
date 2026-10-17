@@ -79,7 +79,7 @@ class TopInfoBar extends StatelessWidget {
                   // Right utilities
                   Row(
                     children: [
-                      _navLink('Ask Agro Experts'),
+                      _navLink('Ask EBS Experts'),
                       const SizedBox(width: 16),
                       _navLink('Be a Partner'),
                       const SizedBox(width: 16),
