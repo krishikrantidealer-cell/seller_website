@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 
 import '../../data/models/cart_state.dart';
+import '../../data/models/auth_state.dart';
+import 'auth_modal.dart';
 
 class MainNavHeader extends StatefulWidget {
   final int? cartItemCount;
@@ -83,12 +85,33 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           },
                         ),
                         const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 24),
-                          tooltip: 'My Account',
-                          padding: const EdgeInsets.all(6),
-                          constraints: const BoxConstraints(),
-                          onPressed: () {},
+                        AnimatedBuilder(
+                          animation: AuthController.instance,
+                          builder: (context, _) {
+                            final auth = AuthController.instance;
+                            if (auth.isLoggedIn) {
+                              return InkWell(
+                                onTap: () => showAuthModal(context),
+                                borderRadius: BorderRadius.circular(20),
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightGreen,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+                                  ),
+                                  child: const Icon(Icons.person_rounded, color: AppColors.primaryDarkGreen, size: 20),
+                                ),
+                              );
+                            }
+                            return IconButton(
+                              icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 24),
+                              tooltip: 'Login / My Account',
+                              padding: const EdgeInsets.all(6),
+                              constraints: const BoxConstraints(),
+                              onPressed: () => showAuthModal(context),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -297,23 +320,86 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                       ),
                       const SizedBox(width: 24),
 
-                      // My Account
-                      OutlinedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.person_outline, size: 18, color: AppColors.primaryGreen),
-                        label: Text(
-                          'My Account',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.primaryGreen,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
+                      // My Account / Phone + OTP Login
+                      AnimatedBuilder(
+                        animation: AuthController.instance,
+                        builder: (context, _) {
+                          final auth = AuthController.instance;
+                          if (auth.isLoggedIn) {
+                            return InkWell(
+                              onTap: () => showAuthModal(context),
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                                decoration: BoxDecoration(
+                                  color: AppColors.lightGreen.withValues(alpha: 0.35),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.primaryGreen, width: 1.2),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.primaryGreen,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.person_rounded, color: Colors.white, size: 14),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              auth.currentUser?.name ?? 'My Account',
+                                              style: GoogleFonts.poppins(
+                                                color: AppColors.primaryDarkGreen,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 2),
+                                            const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: AppColors.primaryDarkGreen),
+                                          ],
+                                        ),
+                                        Text(
+                                          auth.currentUser?.formattedPhone ?? '',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+
+                          return OutlinedButton.icon(
+                            onPressed: () => showAuthModal(context),
+                            icon: const Icon(Icons.person_outline_rounded, size: 18, color: AppColors.primaryGreen),
+                            label: Text(
+                              'Login / My Account',
+                              style: GoogleFonts.poppins(
+                                color: AppColors.primaryGreen,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
