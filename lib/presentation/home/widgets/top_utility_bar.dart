@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_constants.dart';
+import 'crop_doctor_modal.dart';
+import 'mandi_bhav_modal.dart';
 
 class TopUtilityBar extends StatelessWidget {
   const TopUtilityBar({super.key});
@@ -60,11 +62,11 @@ class TopUtilityBar extends StatelessWidget {
                 const SizedBox(width: 20),
                 // APMC Mandi Bhav Link
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () => MandiBhavModal.show(context),
                   icon: const Icon(Icons.trending_up_rounded, size: 14, color: AppColors.harvestAmberLight),
                   label: const Text(
-                    'Mandi Bhav',
-                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                    'Mandi Bhav (मंडी भाव)',
+                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -75,11 +77,11 @@ class TopUtilityBar extends StatelessWidget {
                   const SizedBox(width: 12),
                   // Crop Doctor
                   TextButton.icon(
-                    onPressed: () {},
+                    onPressed: () => CropDoctorModal.show(context),
                     icon: const Icon(Icons.psychology_alt_outlined, size: 14, color: Color(0xFF86EFAC)),
                     label: const Text(
-                      'Agri Doctor Advisory',
-                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                      'Crop Doctor (फसल डॉक्टर)',
+                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 8),

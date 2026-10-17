@@ -7,6 +7,7 @@ import '../../../logic/catalog/catalog_event.dart';
 import '../../../logic/catalog/catalog_state.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/category_navigation_strip.dart';
+import '../widgets/farmer_quick_bar.dart';
 import '../widgets/hero_banner.dart';
 import '../widgets/main_header.dart';
 import '../widgets/product_card.dart';
@@ -46,6 +47,7 @@ class _HomeViewState extends State<HomeView> {
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
       endDrawer: const CartDrawer(),
+      bottomNavigationBar: const FarmerQuickBar(),
       body: CustomScrollView(
         slivers: [
           // Top Utility Bar
@@ -64,7 +66,7 @@ class _HomeViewState extends State<HomeView> {
           // Hero Promotional Banner
           const SliverToBoxAdapter(child: HeroBanner()),
 
-          // Trust Badges Strip
+          // Trust Badges Strip (Farmer-Friendly Bilingual)
           SliverToBoxAdapter(
             child: Center(
               child: ConstrainedBox(
@@ -84,10 +86,10 @@ class _HomeViewState extends State<HomeView> {
                       spacing: 20,
                       runSpacing: 14,
                       children: [
-                        _buildBadge(Icons.verified_outlined, '100% Genuine', 'Direct from manufacturer'),
-                        _buildBadge(Icons.local_shipping_outlined, 'Free Delivery', 'Across 50,000+ PIN codes'),
-                        _buildBadge(Icons.science_outlined, 'Technical Search', 'Compare active ingredients'),
-                        _buildBadge(Icons.support_agent_outlined, 'Crop Doctor', 'Free agronomist advice'),
+                        _buildBadge(Icons.verified_outlined, '100% Genuine (असली)', 'Direct GST Bill & CIBRC Certified'),
+                        _buildBadge(Icons.local_shipping_outlined, 'Free Delivery (मुफ्त डिलीवरी)', 'Across 50,000+ Rural PIN Codes'),
+                        _buildBadge(Icons.science_outlined, 'Technical Search (सटीक रसायन)', 'Compare active chemical ingredients'),
+                        _buildBadge(Icons.support_agent_outlined, 'Toll Free: 1800-203-1425', 'Free Agronomist Doctor Advisory'),
                       ],
                     ),
                   ),
@@ -198,7 +200,7 @@ class _HomeViewState extends State<HomeView> {
                                 crossAxisCount: crossAxisCount,
                                 crossAxisSpacing: 16,
                                 mainAxisSpacing: 16,
-                                childAspectRatio: 0.65,
+                                childAspectRatio: screenWidth > 600 ? 0.60 : 0.58,
                               ),
                               itemCount: state.filteredProducts.length,
                               itemBuilder: (context, index) {

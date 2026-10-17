@@ -29,8 +29,10 @@ class PackVariant extends Equatable {
 class ProductModel extends Equatable {
   final String id;
   final String title;
+  final String hindiTitle;
   final String brand;
   final String technicalName;
+  final String hindiTechnical;
   final String category;
   final String imageUrl;
   final double rating;
@@ -39,13 +41,18 @@ class ProductModel extends Equatable {
   final String suitableCrops;
   final String targetPests;
   final String dosage;
+  final String dosagePerPump;
+  final String toxicity; // GREEN, BLUE, YELLOW
+  final String cibrcReg;
   final List<PackVariant> variants;
 
   const ProductModel({
     required this.id,
     required this.title,
+    required this.hindiTitle,
     required this.brand,
     required this.technicalName,
+    required this.hindiTechnical,
     required this.category,
     required this.imageUrl,
     this.rating = 4.8,
@@ -54,6 +61,9 @@ class ProductModel extends Equatable {
     required this.suitableCrops,
     required this.targetPests,
     required this.dosage,
+    this.dosagePerPump = '6-10 ml / 15L पंप',
+    this.toxicity = 'GREEN',
+    this.cibrcReg = 'CIR-EBS/2021',
     required this.variants,
   });
 
@@ -65,8 +75,10 @@ class ProductModel extends Equatable {
   List<Object?> get props => [
         id,
         title,
+        hindiTitle,
         brand,
         technicalName,
+        hindiTechnical,
         category,
         imageUrl,
         rating,
@@ -75,6 +87,9 @@ class ProductModel extends Equatable {
         suitableCrops,
         targetPests,
         dosage,
+        dosagePerPump,
+        toxicity,
+        cibrcReg,
         variants,
       ];
 }

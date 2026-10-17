@@ -6,6 +6,8 @@ import '../../../logic/cart/cart_bloc.dart';
 import '../../../logic/cart/cart_state.dart';
 import '../../../logic/catalog/catalog_bloc.dart';
 import '../../../logic/catalog/catalog_event.dart';
+import 'crop_doctor_modal.dart';
+import 'dosage_calculator_modal.dart';
 
 class MainHeader extends StatefulWidget {
   final VoidCallback onOpenCart;
@@ -76,9 +78,9 @@ class _MainHeaderState extends State<MainHeader> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'EBS BioCrop',
+                              'EBS BioCrop Science',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.primaryGreen,
                                 letterSpacing: -0.5,
@@ -109,7 +111,7 @@ class _MainHeaderState extends State<MainHeader> {
                   ] else
                     const Spacer(),
 
-                  // Actions: Free Delivery Tag + Cart + Account
+                  // Actions: Free Delivery Tag + Crop Doctor + Calc + Cart
                   if (showDeliveryTag) ...[
                     // Free delivery guarantee
                     Container(
@@ -135,7 +137,29 @@ class _MainHeaderState extends State<MainHeader> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 10),
+                    // Crop Doctor Quick Button
+                    TextButton.icon(
+                      onPressed: () => CropDoctorModal.show(context),
+                      icon: const Icon(Icons.psychology_alt_outlined, size: 16, color: AppColors.primaryGreen),
+                      label: const Text('फसल डॉक्टर', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.paleGreen,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Dosage Calc Quick Button
+                    TextButton.icon(
+                      onPressed: () => DosageCalculatorModal.show(context),
+                      icon: const Icon(Icons.calculate_outlined, size: 16, color: AppColors.harvestAmber),
+                      label: const Text('दवा कैलकुलेटर', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.forestDark)),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.surfaceVariant,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                   ],
 
                   // Cart Button with Counter
@@ -197,9 +221,51 @@ class _MainHeaderState extends State<MainHeader> {
                 const SizedBox(height: 10),
                 _buildSearchBar(context, isDesktop),
               ],
+              const SizedBox(height: 8),
+              _buildTechnicalShortcuts(context),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTechnicalShortcuts(BuildContext context) {
+    final List<String> technicals = [
+      'Chlorantraniliprole',
+      'Bio-NPK',
+      'Emamectin Benzoate',
+      'Trichoderma Viride',
+      'Gibberellic Acid',
+      '12V Battery Sprayer',
+      'Sticky Traps',
+      'Zinc EDTA',
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          const Text(
+            'प्रमुख रसायन (Search Active Technical): ',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary),
+          ),
+          ...technicals.map((tech) => Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: ActionChip(
+                  label: Text(tech),
+                  labelStyle: const TextStyle(fontSize: 11, color: AppColors.primaryGreen, fontWeight: FontWeight.w600),
+                  backgroundColor: AppColors.paleGreen,
+                  side: BorderSide(color: AppColors.leafAccent.withValues(alpha: 0.3)),
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  onPressed: () {
+                    _searchController.text = tech;
+                    context.read<CatalogBloc>().add(SearchTechnicalOrBrand(tech));
+                  },
+                ),
+              )),
+        ],
       ),
     );
   }

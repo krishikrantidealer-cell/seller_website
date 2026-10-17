@@ -59,13 +59,26 @@ class CategoryNavigationStrip extends StatelessWidget {
                                 color: isSelected ? Colors.white : AppColors.primaryGreen,
                               ),
                               const SizedBox(width: 8),
-                              Text(
-                                cat.name,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                                  color: isSelected ? Colors.white : AppColors.textPrimary,
-                                ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    cat.name,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                      color: isSelected ? Colors.white : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  Text(
+                                    cat.hindiName,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: isSelected ? Colors.white70 : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(width: 6),
                               Container(

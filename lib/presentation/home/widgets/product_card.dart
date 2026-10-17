@@ -14,37 +14,69 @@ class ProductCard extends StatelessWidget {
 
   const ProductCard({super.key, required this.product});
 
+  Color _getToxicityColor(String toxicity) {
+    switch (toxicity.toUpperCase()) {
+      case 'GREEN':
+        return const Color(0xFF16A34A);
+      case 'BLUE':
+        return const Color(0xFF2563EB);
+      case 'YELLOW':
+        return const Color(0xFFD97706);
+      default:
+        return AppColors.primaryGreen;
+    }
+  }
+
+  String _getToxicityLabel(String toxicity) {
+    switch (toxicity.toUpperCase()) {
+      case 'GREEN':
+        return 'हरा त्रिभुज: जैविक व सुरक्षित (Green Bio)';
+      case 'BLUE':
+        return 'नीला त्रिभुज: मध्यम विषाक्त (Caution)';
+      case 'YELLOW':
+        return 'पीला त्रिभुज: विषाक्त (Toxicity Warning)';
+      default:
+        return 'CIBRC Registered';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CatalogBloc, CatalogState>(
       builder: (context, catalogState) {
         final currentVariant = catalogState.getSelectedVariant(product);
+        final toxicityColor = _getToxicityColor(product.toxicity);
 
         return Card(
+          elevation: 1.5,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: AppColors.border, width: 1),
+          ),
           clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Image with 404 Safe Fallback & Discount Pill
+              // Product Image with 404 Fallback & Badges
               Stack(
                 children: [
                   SafeNetworkImage(
                     imageUrl: product.imageUrl,
-                    height: 170,
+                    height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
-                  // Organic or Discount Badges
+                  // Badges (Top Left)
                   Positioned(
                     top: 8,
                     left: 8,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (product.isOrganic)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                            margin: const EdgeInsets.only(right: 6),
+                            margin: const EdgeInsets.only(bottom: 4),
                             decoration: BoxDecoration(
                               color: AppColors.primaryGreen,
                               borderRadius: BorderRadius.circular(4),
@@ -55,7 +87,7 @@ class ProductCard extends StatelessWidget {
                                 Icon(Icons.eco_rounded, size: 11, color: Colors.white),
                                 SizedBox(width: 3),
                                 Text(
-                                  '100% Bio',
+                                  '100% जैविक (Bio)',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
@@ -73,7 +105,7 @@ class ProductCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
-                              '${currentVariant.discountPercent}% OFF',
+                              '${currentVariant.discountPercent}% छूट (OFF)',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
@@ -84,14 +116,15 @@ class ProductCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Rating badge
+
+                  // Rating badge (Bottom Right)
                   Positioned(
                     bottom: 8,
                     right: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.92),
+                        color: Colors.white.withValues(alpha: 0.94),
                         borderRadius: BorderRadius.circular(4),
                         boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
                       ),
@@ -126,35 +159,78 @@ class ProductCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Brand Name
-                      Text(
-                        product.brand.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.harvestAmber,
-                          letterSpacing: 0.5,
-                        ),
+                      // Brand & Statutory CIBRC Triangle
+                      Row(
+                        children: [
+                          Text(
+                            product.brand.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.harvestAmber,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const Spacer(),
+                          Tooltip(
+                            message: _getToxicityLabel(product.toxicity),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: toxicityColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(3),
+                                border: Border.all(color: toxicityColor, width: 0.8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.change_history_rounded, size: 11, color: toxicityColor),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    product.toxicity,
+                                    style: TextStyle(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: toxicityColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 3),
 
-                      // Title
+                      // Title (English)
                       Text(
                         product.title,
-                        maxLines: 2,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
-                          height: 1.25,
+                          height: 1.2,
+                        ),
+                      ),
+
+                      // Title (Hindi)
+                      Text(
+                        product.hindiTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryGreen,
                         ),
                       ),
                       const SizedBox(height: 4),
 
-                      // Technical Ingredient Badge (AgriBegri Benchmark Feature)
+                      // Technical Formulation Tag
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
                         decoration: BoxDecoration(
                           color: AppColors.paleGreen,
                           borderRadius: BorderRadius.circular(4),
@@ -172,47 +248,75 @@ class ProductCard extends StatelessWidget {
                         ),
                       ),
 
+                      const SizedBox(height: 4),
+
+                      // Dosage Guidance
+                      Row(
+                        children: [
+                          const Icon(Icons.water_drop_outlined, size: 13, color: AppColors.harvestAmber),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'मात्रा: ${product.dosagePerPump}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
                       const Spacer(),
 
-                      // Pack Size Variant Selector
+                      // Pack Size Variant Selector (Pills)
                       const Text(
-                        'Select Pack Size:',
-                        style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                        'Pack Size (पैकिंग चुनें):',
+                        style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: AppColors.border),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<PackVariant>(
-                            value: currentVariant,
-                            isExpanded: true,
-                            isDense: true,
-                            icon: const Icon(Icons.arrow_drop_down, color: AppColors.primaryGreen),
-                            items: product.variants.map((PackVariant v) {
-                              return DropdownMenuItem<PackVariant>(
-                                value: v,
-                                child: Text(
-                                  '${v.label} — ₹${v.sellingPrice.toStringAsFixed(0)}',
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: product.variants.map((PackVariant v) {
+                            final isSel = v.id == currentVariant.id;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: InkWell(
+                                onTap: () {
+                                  context.read<CatalogBloc>().add(
+                                        SelectProductVariant(
+                                          productId: product.id,
+                                          variant: v,
+                                        ),
+                                      );
+                                },
+                                borderRadius: BorderRadius.circular(6),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: isSel ? AppColors.primaryGreen : AppColors.surfaceVariant,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: isSel ? AppColors.primaryGreen : AppColors.border,
+                                      width: isSel ? 1.5 : 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    v.label,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: isSel ? FontWeight.bold : FontWeight.w500,
+                                      color: isSel ? Colors.white : AppColors.textPrimary,
+                                    ),
+                                  ),
                                 ),
-                              );
-                            }).toList(),
-                            onChanged: (newVariant) {
-                              if (newVariant != null) {
-                                context.read<CatalogBloc>().add(
-                                      SelectProductVariant(
-                                        productId: product.id,
-                                        variant: newVariant,
-                                      ),
-                                    );
-                              }
-                            },
-                          ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
 
@@ -232,9 +336,9 @@ class ProductCard extends StatelessWidget {
                                     Text(
                                       '₹${currentVariant.sellingPrice.toStringAsFixed(0)}',
                                       style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryGreen,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.forestDark,
                                       ),
                                     ),
                                     const SizedBox(width: 5),
@@ -251,19 +355,19 @@ class ProductCard extends StatelessWidget {
                                 ),
                                 if (currentVariant.savings > 0)
                                   Text(
-                                    'Save ₹${currentVariant.savings.toStringAsFixed(0)}',
+                                    'बचत: ₹${currentVariant.savings.toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       fontSize: 10,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.success,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF16A34A),
                                     ),
                                   ),
                               ],
                             ),
                           ),
-                          // Add Button
-                          InkWell(
-                            onTap: () {
+                          // Add to Cart Button
+                          ElevatedButton.icon(
+                            onPressed: () {
                               context.read<CartBloc>().add(
                                     AddToCart(
                                       product: product,
@@ -285,29 +389,28 @@ class ProductCard extends StatelessWidget {
                                 ),
                               );
                             },
-                            borderRadius: BorderRadius.circular(6),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryGreen,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.add_shopping_cart_rounded, size: 15, color: Colors.white),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Add',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryGreen,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              visualDensity: VisualDensity.compact,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                             ),
+                            icon: const Icon(Icons.add_shopping_cart_rounded, size: 15),
+                            label: const Text(
+                              'Add',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      const Row(
+                        children: [
+                          Icon(Icons.check_circle_outline_rounded, size: 11, color: Color(0xFF16A34A)),
+                          SizedBox(width: 3),
+                          Text(
+                            'COD उपलब्ध | 100% असली GST बिल',
+                            style: TextStyle(fontSize: 9.5, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),

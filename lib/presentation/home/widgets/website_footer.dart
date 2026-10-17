@@ -87,7 +87,7 @@ class WebsiteFooter extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'EBS BioCrop',
+                  'EBS BioCrop Science',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
                 ),
                 Text(

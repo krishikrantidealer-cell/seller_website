@@ -131,7 +131,7 @@ class HeroBanner extends StatelessWidget {
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'AgriBegri Benchmark Promise',
+                                  'EBS BioCrop Science Trust Promise',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
