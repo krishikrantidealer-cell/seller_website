@@ -770,9 +770,7 @@ class _AccountProfileView extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            user?.name?.isNotEmpty == true
-                                ? user!.name!
-                                : (user?.formattedPhone ?? 'Farmer Account'),
+                            user?.formattedPhone ?? '',
                             style: GoogleFonts.poppins(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -801,16 +799,8 @@ class _AccountProfileView extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      user?.formattedPhone ?? '',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      user?.location ?? '',
-                      style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                      user?.location ?? 'Punjab & Haryana Agricultural Belt',
+                      style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
                     ),
                   ],
                 ),

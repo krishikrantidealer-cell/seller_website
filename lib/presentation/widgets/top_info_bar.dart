@@ -22,27 +22,32 @@ class TopInfoBar extends StatelessWidget {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.phone_in_talk_rounded, size: 13, color: Colors.white),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Call to Order: ${AppConstants.orderCallNumber}',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                    const Icon(Icons.phone_in_talk_rounded, size: 12, color: Colors.white),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Text(
+                        'Call to Order: ${AppConstants.orderCallNumber}',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(width: 1, height: 10, color: Colors.white.withValues(alpha: 0.4)),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Free Pan-India Delivery',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
+                    if (constraints.maxWidth >= 500) ...[
+                      const SizedBox(width: 8),
+                      Container(width: 1, height: 10, color: Colors.white.withValues(alpha: 0.4)),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Free Pan-India Delivery',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 );
               }

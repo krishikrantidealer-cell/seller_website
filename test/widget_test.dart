@@ -112,5 +112,71 @@ void main() {
     // Verify user is logged out back to Login / My Account
     expect(find.widgetWithText(OutlinedButton, 'Login / My Account'), findsOneWidget);
   });
+
+  testWidgets('Best Sellers View All shows only Best Seller products', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pump();
+
+    // Verify button says "View All" on desktop (not "View All Products")
+    expect(find.text('View All Products'), findsNothing);
+    final viewAllBtn = find.text('View All');
+    expect(viewAllBtn, findsOneWidget);
+
+    // Tap View All on Best Sellers section
+    await tester.tap(viewAllBtn);
+    await tester.pumpAndSettle();
+
+    // Verify CategoryDetailView opens in Best Sellers mode
+    expect(find.text('Best Sellers'), findsWidgets);
+    expect(find.textContaining('8 Best Sellers'), findsWidgets);
+    // Non-bestseller products should NOT be displayed
+    expect(find.textContaining('Nano Urea'), findsNothing);
+    expect(find.textContaining('Tata Rallis'), findsNothing);
+  });
+
+  testWidgets('Mobile view displays phone number and opens dropdown when tapped', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(400, 850);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pump();
+
+    // Tap login button
+    final loginIconBtn = find.byTooltip('Login / My Account');
+    expect(loginIconBtn, findsOneWidget);
+    await tester.tap(loginIconBtn);
+    await tester.pumpAndSettle();
+
+    // Quick test demo fill
+    await tester.tap(find.textContaining('Quick Test: Tap to fill demo number'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Get OTP via SMS'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    // Auto verify
+    await tester.tap(find.textContaining('Test Mode: Tap to auto-verify'));
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+
+    // In mobile view, the phone number should be displayed directly in header
+    expect(find.text('Kisan Farmer'), findsNothing);
+    expect(find.textContaining('98765 43210'), findsWidgets);
+
+    // Tapping the phone number opens the dropdown menu
+    await tester.tap(find.textContaining('98765 43210').first);
+    await tester.pumpAndSettle();
+
+    // Verify dropdown menu opened with Track Orders and Sign Out
+    expect(find.text('Track Orders'), findsOneWidget);
+    expect(find.text('Sign Out'), findsOneWidget);
+  });
 }
 

@@ -13,11 +13,13 @@ import '../product_detail/product_detail_view.dart';
 class CategoryDetailView extends StatefulWidget {
   final String initialCategoryId;
   final String? initialSubcategory;
+  final bool isBestSellersOnly;
 
   const CategoryDetailView({
     super.key,
     this.initialCategoryId = 'all',
     this.initialSubcategory,
+    this.isBestSellersOnly = false,
   });
 
   @override
@@ -29,6 +31,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   late String _selectedCategory;
   late String? _selectedSubcategory;
+  late bool _isBestSellersMode;
   String _searchFilter = '';
   String _sortBy = 'featured';
 
@@ -39,10 +42,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     super.initState();
     _selectedCategory = widget.initialCategoryId;
     _selectedSubcategory = widget.initialSubcategory;
+    _isBestSellersMode = widget.isBestSellersOnly;
   }
 
   List<ProductItem> get _filteredProducts {
     final list = _allProducts.where((p) {
+      final matchesBestSeller = !_isBestSellersMode || p.isBestSeller;
       final matchesCategory = _selectedCategory == 'all' ||
           p.category.toLowerCase().contains(_selectedCategory.toLowerCase());
       final matchesSubcategory = _selectedSubcategory == null ||
@@ -52,7 +57,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       final matchesSearch = _searchFilter.isEmpty ||
           p.title.toLowerCase().contains(_searchFilter.toLowerCase()) ||
           p.technicalName.toLowerCase().contains(_searchFilter.toLowerCase());
-      return matchesCategory && matchesSubcategory && matchesSearch;
+      return matchesBestSeller && matchesCategory && matchesSubcategory && matchesSearch;
     }).toList();
 
     switch (_sortBy) {
@@ -267,6 +272,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                     setState(() {
                       _selectedCategory = 'all';
                       _selectedSubcategory = null;
+                      _isBestSellersMode = false;
                     });
                   },
                   child: Text(
@@ -279,7 +285,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                   style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
                 ),
                 Text(
-                  _selectedCategory == 'all' ? 'All Products' : _getCategoryTitle(_selectedCategory),
+                  _selectedCategory == 'all'
+                      ? (_isBestSellersMode ? 'Best Sellers' : 'All Products')
+                      : _getCategoryTitle(_selectedCategory),
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -309,6 +317,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   Widget _buildHeaderCard(int count, bool isMobile) {
+    final String pageTitle = _selectedCategory == 'all'
+        ? (_isBestSellersMode ? 'Best Sellers' : 'All Products')
+        : _getCategoryTitle(_selectedCategory);
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
@@ -338,7 +350,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _selectedCategory == 'all' ? 'All Best Sellers' : _getCategoryTitle(_selectedCategory),
+                        pageTitle,
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -355,7 +367,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                         border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
                       ),
                       child: Text(
-                        '$count Products',
+                        _isBestSellersMode && _selectedCategory == 'all'
+                            ? '$count Best Sellers'
+                            : '$count Products',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -391,7 +405,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  _selectedCategory == 'all' ? 'All Best Sellers' : _getCategoryTitle(_selectedCategory),
+                  pageTitle,
                   style: GoogleFonts.poppins(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
@@ -407,7 +421,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                     border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
                   ),
                   child: Text(
-                    '$count Products Available',
+                    _isBestSellersMode && _selectedCategory == 'all'
+                        ? '$count Best Sellers Available'
+                        : '$count Products Available',
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,

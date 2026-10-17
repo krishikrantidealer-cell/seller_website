@@ -30,6 +30,7 @@ class _HomeViewState extends State<HomeView> {
 
   List<ProductItem> get _filteredProducts {
     return _allProducts.where((p) {
+      final matchesBestSeller = _selectedCategory == 'all' ? p.isBestSeller : true;
       final matchesCategory = _selectedCategory == 'all' ||
           p.category.toLowerCase().contains(_selectedCategory.toLowerCase());
       final matchesSubcategory = _selectedSubcategory == null ||
@@ -39,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
       final matchesSearch = _searchFilter.isEmpty ||
           p.title.toLowerCase().contains(_searchFilter.toLowerCase()) ||
           p.technicalName.toLowerCase().contains(_searchFilter.toLowerCase());
-      return matchesCategory && matchesSubcategory && matchesSearch;
+      return matchesBestSeller && matchesCategory && matchesSubcategory && matchesSearch;
     }).toList();
   }
 
@@ -290,46 +291,51 @@ class _HomeViewState extends State<HomeView> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 3.5,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Best Sellers',
-                          style: GoogleFonts.poppins(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDF4),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
-                          ),
-                          child: Text(
-                            '${filtered.length}',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryDarkGreen,
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 3.5,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryGreen,
+                              borderRadius: BorderRadius.circular(2),
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Best Sellers',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF0FDF4),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
+                            ),
+                            child: Text(
+                              '${filtered.length}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryDarkGreen,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     _buildViewAllButton(isMobile: true),
                   ],
                 ),
@@ -478,6 +484,7 @@ class _HomeViewState extends State<HomeView> {
         builder: (_) => CategoryDetailView(
           initialCategoryId: _selectedCategory,
           initialSubcategory: _selectedSubcategory,
+          isBestSellersOnly: _selectedCategory == 'all',
         ),
       ),
     );
@@ -513,7 +520,7 @@ class _HomeViewState extends State<HomeView> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isMobile ? 'View All' : 'View All Products',
+                'View All',
                 style: GoogleFonts.poppins(
                   fontSize: isMobile ? 11.5 : 12.5,
                   fontWeight: FontWeight.w600,

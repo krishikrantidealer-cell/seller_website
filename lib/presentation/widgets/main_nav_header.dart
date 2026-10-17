@@ -53,16 +53,21 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     // Top row: Brand logo + Quick Icons
                     Row(
                       children: [
-                        _buildLogo(isCompact: constraints.maxWidth < 420),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary, size: 22),
-                          tooltip: 'Track Order',
-                          padding: const EdgeInsets.all(8),
-                          constraints: const BoxConstraints(),
-                          onPressed: () {},
+                        _buildLogo(
+                          isCompact: constraints.maxWidth < 600,
+                          isSmallMobile: constraints.maxWidth < 420,
                         ),
-                        const SizedBox(width: 8),
+                        const Spacer(),
+                        if (constraints.maxWidth >= 500) ...[
+                          IconButton(
+                            icon: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary, size: 22),
+                            tooltip: 'Track Order',
+                            padding: const EdgeInsets.all(6),
+                            constraints: const BoxConstraints(),
+                            onPressed: () {},
+                          ),
+                          const SizedBox(width: 6),
+                        ],
                         AnimatedBuilder(
                           animation: CartController.instance,
                           builder: (context, _) {
@@ -71,20 +76,20 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               onTap: widget.onCartTap,
                               borderRadius: BorderRadius.circular(8),
                               child: Padding(
-                                padding: const EdgeInsets.all(6),
+                                padding: const EdgeInsets.all(4),
                                 child: Badge(
                                   label: Text(
                                     count.toString(),
                                     style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
                                   ),
                                   backgroundColor: AppColors.primaryCrimson,
-                                  child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
+                                  child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
                                 ),
                               ),
                             );
                           },
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         AnimatedBuilder(
                           animation: AuthController.instance,
                           builder: (context, _) {
@@ -93,9 +98,9 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               return _buildProfileDropdown(context, auth, isMobile: true);
                             }
                             return IconButton(
-                              icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 24),
+                              icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 22),
                               tooltip: 'Login / My Account',
-                              padding: const EdgeInsets.all(6),
+                              padding: const EdgeInsets.all(4),
                               constraints: const BoxConstraints(),
                               onPressed: () => showAuthModal(context),
                             );
@@ -347,19 +352,23 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     );
   }
 
-  Widget _buildLogo({bool isCompact = false}) {
+  Widget _buildLogo({bool isCompact = false, bool isSmallMobile = false}) {
+    final double titleFontSize = isSmallMobile ? 12 : (isCompact ? 15 : 22);
+    final double iconSize = isSmallMobile ? 14 : (isCompact ? 18 : 24);
+    final double iconPadding = isSmallMobile ? 3 : (isCompact ? 6 : 8);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: EdgeInsets.all(isCompact ? 6 : 8),
+          padding: EdgeInsets.all(iconPadding),
           decoration: BoxDecoration(
             color: AppColors.primaryGreen,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(isSmallMobile ? 6 : 8),
           ),
-          child: Icon(Icons.eco_rounded, color: Colors.white, size: isCompact ? 18 : 24),
+          child: Icon(Icons.eco_rounded, color: Colors.white, size: iconSize),
         ),
-        SizedBox(width: isCompact ? 6 : 10),
+        SizedBox(width: isSmallMobile ? 4 : (isCompact ? 6 : 10)),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -369,7 +378,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 Text(
                   'EBS ',
                   style: GoogleFonts.poppins(
-                    fontSize: isCompact ? 17 : 22,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryCrimson,
                     letterSpacing: -0.5,
@@ -378,7 +387,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 Text(
                   'BioCrop',
                   style: GoogleFonts.poppins(
-                    fontSize: isCompact ? 17 : 22,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryGreen,
                     letterSpacing: -0.5,
@@ -386,15 +395,16 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 ),
               ],
             ),
-            Text(
-              'ESSENTIAL BIO CROP SCIENCE',
-              style: GoogleFonts.poppins(
-                fontSize: isCompact ? 7.2 : 8.8,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primaryCrimson,
-                letterSpacing: 0.8,
+            if (!isCompact && !isSmallMobile)
+              Text(
+                'ESSENTIAL BIO CROP SCIENCE',
+                style: GoogleFonts.poppins(
+                  fontSize: 8.8,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryCrimson,
+                  letterSpacing: 0.8,
+                ),
               ),
-            ),
           ],
         ),
       ],
@@ -430,7 +440,11 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   }
 
   Widget _buildProfileDropdown(BuildContext context, AuthController auth, {required bool isMobile}) {
-    final phoneDisplay = auth.currentUser?.formattedPhone ?? '';
+    final rawPhone = auth.currentUser?.phoneNumber ?? '';
+    final shortPhone = rawPhone.length == 10
+        ? '${rawPhone.substring(0, 5)} ${rawPhone.substring(5)}'
+        : rawPhone;
+    final phoneDisplay = isMobile ? shortPhone : (auth.currentUser?.formattedPhone ?? '');
 
     final dropdownItems = <PopupMenuEntry<String>>[
       PopupMenuItem<String>(
@@ -445,7 +459,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             ),
             const SizedBox(height: 2),
             Text(
-              phoneDisplay,
+              auth.currentUser?.formattedPhone ?? phoneDisplay,
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -516,18 +530,41 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     if (isMobile) {
       return PopupMenuButton<String>(
         tooltip: 'Account Menu',
-        offset: const Offset(0, 42),
+        offset: const Offset(0, 36),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onSelected: handleSelect,
         itemBuilder: (context) => dropdownItems,
         child: Container(
-          padding: const EdgeInsets.all(5),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.lightGreen,
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.primaryGreen, width: 1.5),
+            color: AppColors.lightGreen.withValues(alpha: 0.35),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.primaryGreen, width: 1),
           ),
-          child: const Icon(Icons.person_rounded, color: AppColors.primaryDarkGreen, size: 20),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(2.5),
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryGreen,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.person_rounded, color: Colors.white, size: 10),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                phoneDisplay,
+                style: GoogleFonts.poppins(
+                  color: AppColors.primaryDarkGreen,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                ),
+              ),
+              const SizedBox(width: 2),
+              const Icon(Icons.keyboard_arrow_down_rounded, size: 12, color: AppColors.primaryDarkGreen),
+            ],
+          ),
         ),
       );
     }
