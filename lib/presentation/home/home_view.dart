@@ -222,60 +222,32 @@ class _HomeViewState extends State<HomeView> {
 
                                 final displayedProducts = filtered.take(6).toList();
 
-                                return Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    GridView.builder(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: crossAxisCount,
-                                        crossAxisSpacing: crossAxisSpacing,
-                                        mainAxisSpacing: mainAxisSpacing,
-                                        childAspectRatio: childAspectRatio,
-                                      ),
-                                      itemCount: displayedProducts.length,
-                                      itemBuilder: (context, index) {
-                                        final product = displayedProducts[index];
-                                        return ProductCard(
-                                          product: product,
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ProductDetailView(product: product),
-                                              ),
-                                            );
-                                          },
-                                          onAddToCart: (p, v) => _onAddToCart(p, v),
-                                          onBuyNow: (p, v) => _onBuyNow(p, v),
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    crossAxisSpacing: crossAxisSpacing,
+                                    mainAxisSpacing: mainAxisSpacing,
+                                    childAspectRatio: childAspectRatio,
+                                  ),
+                                  itemCount: displayedProducts.length,
+                                  itemBuilder: (context, index) {
+                                    final product = displayedProducts[index];
+                                    return ProductCard(
+                                      product: product,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ProductDetailView(product: product),
+                                          ),
                                         );
                                       },
-                                    ),
-                                    if (filtered.length > 6) ...[
-                                      const SizedBox(height: 24),
-                                      Center(
-                                        child: OutlinedButton.icon(
-                                          onPressed: () => _navigateToCategoryDetail(context),
-                                          icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryGreen),
-                                          label: Text(
-                                            'View All ${filtered.length} Products in ${_getCategoryTitle(_selectedCategory)}',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13.5,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.primaryGreen,
-                                            ),
-                                          ),
-                                          style: OutlinedButton.styleFrom(
-                                            side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 13),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                                            backgroundColor: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
+                                      onAddToCart: (p, v) => _onAddToCart(p, v),
+                                      onBuyNow: (p, v) => _onBuyNow(p, v),
+                                    );
+                                  },
                                 );
                               },
                             ),
