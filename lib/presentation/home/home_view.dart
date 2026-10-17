@@ -215,7 +215,7 @@ class _HomeViewState extends State<HomeView> {
                                 children: [
                                   Text(
                                     _selectedCategory == 'all'
-                                        ? 'Trending Agricultural Best-Sellers'
+                                        ? 'EBS Essential BioCrop Science Best Sellers'
                                         : '${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' - $_selectedSubcategory' : ''}',
                                     style: GoogleFonts.poppins(
                                       fontSize: isMobile ? 18 : 22,
