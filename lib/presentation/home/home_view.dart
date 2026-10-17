@@ -9,6 +9,7 @@ import '../widgets/hero_banner_carousel.dart';
 import '../widgets/product_card.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/web_footer.dart';
+import '../product_detail/product_detail_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -401,33 +402,33 @@ class _HomeViewState extends State<HomeView> {
                             Builder(
                               builder: (context) {
                                 int crossAxisCount = 5;
-                                double childAspectRatio = 0.63;
+                                double childAspectRatio = 0.70;
                                 double crossAxisSpacing = 14;
                                 double mainAxisSpacing = 14;
 
                                 if (constraints.maxWidth < 600) {
                                   crossAxisCount = 2;
-                                  childAspectRatio = 0.54;
+                                  childAspectRatio = 0.62;
                                   crossAxisSpacing = 8;
                                   mainAxisSpacing = 8;
                                 } else if (constraints.maxWidth < 850) {
                                   crossAxisCount = 3;
-                                  childAspectRatio = 0.58;
+                                  childAspectRatio = 0.65;
                                   crossAxisSpacing = 10;
                                   mainAxisSpacing = 10;
                                 } else if (constraints.maxWidth < 1180) {
                                   crossAxisCount = 4;
-                                  childAspectRatio = 0.62;
+                                  childAspectRatio = 0.68;
                                   crossAxisSpacing = 12;
                                   mainAxisSpacing = 12;
                                 } else if (constraints.maxWidth < 1520) {
                                   crossAxisCount = 5;
-                                  childAspectRatio = 0.63;
+                                  childAspectRatio = 0.70;
                                   crossAxisSpacing = 14;
                                   mainAxisSpacing = 14;
                                 } else {
                                   crossAxisCount = 6;
-                                  childAspectRatio = 0.64;
+                                  childAspectRatio = 0.72;
                                   crossAxisSpacing = 16;
                                   mainAxisSpacing = 16;
                                 }
@@ -446,6 +447,14 @@ class _HomeViewState extends State<HomeView> {
                                     final product = filtered[index];
                                     return ProductCard(
                                       product: product,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => ProductDetailView(product: product),
+                                          ),
+                                        );
+                                      },
                                       onAddToCart: (p, v) => _onAddToCart(p, v),
                                       onBuyNow: (p, v) => _onBuyNow(p, v),
                                     );

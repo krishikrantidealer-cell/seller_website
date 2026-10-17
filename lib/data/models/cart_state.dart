@@ -65,12 +65,12 @@ class CartController extends ChangeNotifier {
     return _items[key]?.quantity ?? 0;
   }
 
-  void addItem(ProductItem product, ProductVariant variant) {
+  void addItem(ProductItem product, ProductVariant variant, [int quantity = 1]) {
     final key = '${product.id}_${variant.id}';
     if (_items.containsKey(key)) {
-      _items[key]!.quantity++;
+      _items[key]!.quantity += quantity;
     } else {
-      _items[key] = CartItem(product: product, variant: variant, quantity: 1);
+      _items[key] = CartItem(product: product, variant: variant, quantity: quantity);
     }
     notifyListeners();
   }

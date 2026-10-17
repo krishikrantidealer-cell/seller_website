@@ -243,59 +243,7 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                           SizedBox(height: isCompact ? 4 : 8),
 
-                          // REA AgriBegri Pack Size / Variant Selector Pills
-                          if (widget.product.variants.isNotEmpty) ...[
-                            Text(
-                              'Select Pack Size:',
-                              style: GoogleFonts.poppins(
-                                fontSize: isCompact ? 8.5 : 10,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textMuted,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: widget.product.variants.map((v) {
-                                  final isSelected = v.id == _selectedVariant.id;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 4),
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedVariant = v;
-                                        });
-                                      },
-                                      borderRadius: BorderRadius.circular(4),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: isCompact ? 5 : 8,
-                                          vertical: isCompact ? 2 : 3,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: isSelected ? AppColors.lightGreen : Colors.white,
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(
-                                            color: isSelected ? AppColors.primaryGreen : AppColors.border,
-                                            width: isSelected ? 1.5 : 1.0,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          v.label,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: isCompact ? 8.5 : 10,
-                                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                            color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
+
 
                           SizedBox(height: isCompact ? 6 : 10),
 
