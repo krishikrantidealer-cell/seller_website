@@ -163,10 +163,13 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobileScreen = screenWidth < 700;
 
-    final relatedProducts = ProductItem.sampleProducts
-        .where((p) => p.id != widget.product.id && p.category == widget.product.category)
-        .take(4)
+    final categoryMatches = ProductItem.sampleProducts
+        .where((p) => p.id != widget.product.id && p.category.toLowerCase() == widget.product.category.toLowerCase())
         .toList();
+    final otherProducts = ProductItem.sampleProducts
+        .where((p) => p.id != widget.product.id && !categoryMatches.contains(p))
+        .toList();
+    final similarProducts = [...categoryMatches, ...otherProducts].take(4).toList();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -260,14 +263,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
             const SizedBox(height: 36),
 
-            // Related Products Section
-            if (relatedProducts.isNotEmpty)
+            // Similar Products Section
+            if (similarProducts.isNotEmpty)
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1680),
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: isMobileScreen ? 12 : 24),
-                    child: _buildRelatedSection(relatedProducts),
+                    child: _buildSimilarProductsSection(similarProducts, isMobileScreen),
                   ),
                 ),
               ),
@@ -3461,46 +3464,126 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildRelatedSection(List<ProductItem> relatedProducts) {
+  Widget _buildSimilarProductsSection(List<ProductItem> similarProducts, bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Other Farmers Also Bought',
-          style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+        // Professional Section Header
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 12 : 18,
+            vertical: isMobile ? 10 : 12,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 3.5,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Similar Products',
+                    style: GoogleFonts.poppins(
+                      fontSize: isMobile ? 14 : 16.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGreen,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${similarProducts.length} items',
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 10 : 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryDarkGreen,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Flexible(
+                child: Text(
+                  'Matches ${widget.product.category}',
+                  style: GoogleFonts.poppins(
+                    fontSize: isMobile ? 10.5 : 12,
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 14),
         LayoutBuilder(
           builder: (context, constraints) {
-            final isMobile = constraints.maxWidth < 650;
-            final isTablet = constraints.maxWidth < 1000;
-            final count = isMobile ? 2 : (isTablet ? 3 : 4);
+            int crossAxisCount = 4;
+            double childAspectRatio = 0.74;
+            double crossAxisSpacing = 16;
+            double mainAxisSpacing = 16;
+
+            if (constraints.maxWidth < 600) {
+              crossAxisCount = 2;
+              childAspectRatio = 0.60;
+              crossAxisSpacing = 8;
+              mainAxisSpacing = 8;
+            } else if (constraints.maxWidth < 900) {
+              crossAxisCount = 3;
+              childAspectRatio = 0.70;
+              crossAxisSpacing = 12;
+              mainAxisSpacing = 12;
+            }
 
             return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: count,
-                crossAxisSpacing: isMobile ? 8 : 14,
-                mainAxisSpacing: isMobile ? 8 : 14,
-                childAspectRatio: isMobile ? 0.68 : 0.76,
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: crossAxisSpacing,
+                mainAxisSpacing: mainAxisSpacing,
+                childAspectRatio: childAspectRatio,
               ),
-              itemCount: relatedProducts.length,
+              itemCount: similarProducts.length,
               itemBuilder: (context, index) {
-                final prod = relatedProducts[index];
+                final prod = similarProducts[index];
                 return ProductCard(
                   product: prod,
                   onTap: () {
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => ProductDetailView(product: prod),
                       ),
                     );
+                  },
+                  onAddToCart: (product, variant) {
+                    _scaffoldKey.currentState?.openEndDrawer();
+                  },
+                  onBuyNow: (product, variant) {
+                    _scaffoldKey.currentState?.openEndDrawer();
                   },
                 );
               },
