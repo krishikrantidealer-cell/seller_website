@@ -145,7 +145,7 @@ class _HomeViewState extends State<HomeView> {
                         children: [
                           // Modern Best Sellers Section Header
                           _buildBestSellersHeader(filtered, isMobile),
-                          SizedBox(height: isMobile ? 14 : 22),
+                          SizedBox(height: isMobile ? 10 : 14),
 
                           // Product Grid
                           if (filtered.isEmpty)
@@ -269,233 +269,65 @@ class _HomeViewState extends State<HomeView> {
 
     return Container(
       width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 18,
+        vertical: isMobile ? 10 : 12,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      padding: EdgeInsets.all(isMobile ? 16 : 22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Eyebrow Tag + Live Product Count Indicator
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Eyebrow Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.softRose,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.2)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.local_fire_department_rounded, size: 14, color: AppColors.primaryCrimson),
-                    const SizedBox(width: 5),
-                    Text(
-                      'TOP RATED BY GROWERS',
-                      style: GoogleFonts.poppins(
-                        fontSize: isMobile ? 9.5 : 10.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: AppColors.primaryCrimson,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Live Counter Pill
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 4 : 5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0FDF4),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryGreen,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${filtered.length} Products Available',
-                      style: GoogleFonts.poppins(
-                        fontSize: isMobile ? 11 : 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDarkGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Main Title & Subtitle + View All Action
-          if (isMobile)
-            Column(
+      child: isMobile
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 4,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryGreen,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Best Sellers',
-                      style: GoogleFonts.poppins(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _selectedCategory == 'all'
-                      ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science • 100% Genuine Lab Tested'
-                      : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _selectedCategory = 'all';
-                            _selectedSubcategory = null;
-                            _searchFilter = '';
-                          });
-                        },
-                        icon: const Icon(Icons.grid_view_rounded, size: 16, color: AppColors.primaryGreen),
-                        label: Text(
-                          'View All Products',
-                          style: GoogleFonts.poppins(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w700,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 3.5,
+                          height: 18,
+                          decoration: BoxDecoration(
                             color: AppColors.primaryGreen,
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          backgroundColor: Colors.white,
-                        ),
-                      ),
-                    ),
-                    if (isFiltered) ...[
-                      const SizedBox(width: 10),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _selectedCategory = 'all';
-                            _selectedSubcategory = null;
-                            _searchFilter = '';
-                          });
-                        },
-                        icon: const Icon(Icons.refresh_rounded, size: 15, color: Colors.white),
-                        label: Text(
-                          'Clear',
-                          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryCrimson,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-            )
-          else
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 5,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGreen,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Best Sellers',
+                          style: GoogleFonts.poppins(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Best Sellers',
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0FDF4),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
+                          ),
+                          child: Text(
+                            '${filtered.length}',
                             style: GoogleFonts.poppins(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
-                              letterSpacing: -0.5,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryDarkGreen,
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        _selectedCategory == 'all'
-                            ? 'Certified agricultural bio-inputs directly from EBS Essential BioCrop Science • 100% Genuine Lab Tested with Nationwide Delivery'
-                            : 'Showing Best Sellers in ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13.5,
-                          color: AppColors.textSecondary,
-                          height: 1.4,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 24),
-                if (isFiltered)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: OutlinedButton.icon(
+                      ],
+                    ),
+                    OutlinedButton.icon(
                       onPressed: () {
                         setState(() {
                           _selectedCategory = 'all';
@@ -503,23 +335,148 @@ class _HomeViewState extends State<HomeView> {
                           _searchFilter = '';
                         });
                       },
-                      icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.primaryCrimson),
+                      icon: const Icon(Icons.grid_view_rounded, size: 13, color: AppColors.primaryGreen),
                       label: Text(
-                        'Clear Filters',
+                        'View All',
                         style: GoogleFonts.poppins(
-                          fontSize: 13,
+                          fontSize: 11.5,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.primaryCrimson,
+                          color: AppColors.primaryGreen,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: AppColors.primaryCrimson.withValues(alpha: 0.5)),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: AppColors.softRose,
+                        side: const BorderSide(color: AppColors.primaryGreen, width: 1.2),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        backgroundColor: Colors.white,
                       ),
                     ),
+                  ],
+                ),
+                if (isFiltered) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Filtered by: ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
+                          style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedCategory = 'all';
+                            _selectedSubcategory = null;
+                            _searchFilter = '';
+                          });
+                        },
+                        child: Text(
+                          'Reset',
+                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryCrimson),
+                        ),
+                      ),
+                    ],
                   ),
+                ],
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Left: Accent Bar + Best Sellers + Count + Tagline
+                Container(
+                  width: 4,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Best Sellers',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0FDF4),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: AppColors.primaryGreen,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        '${filtered.length} Products',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryDarkGreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    isFiltered
+                        ? '• Showing ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}'
+                        : '• 100% Genuine Lab Tested EBS Bio-Inputs with Nationwide Delivery',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.5,
+                      color: AppColors.textSecondary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Right: Clear (if filtered) + View All Button
+                if (isFiltered) ...[
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _selectedCategory = 'all';
+                        _selectedSubcategory = null;
+                        _searchFilter = '';
+                      });
+                    },
+                    icon: const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryCrimson),
+                    label: Text(
+                      'Clear Filter',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryCrimson,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
                 OutlinedButton.icon(
                   onPressed: () {
                     setState(() {
@@ -528,157 +485,26 @@ class _HomeViewState extends State<HomeView> {
                       _searchFilter = '';
                     });
                   },
-                  icon: const Icon(Icons.grid_view_rounded, size: 18, color: AppColors.primaryGreen),
-                  label: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(
-                      'View All Products',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryGreen,
-                      ),
+                  icon: const Icon(Icons.grid_view_rounded, size: 14, color: AppColors.primaryGreen),
+                  label: Text(
+                    'View All Products',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryGreen,
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    side: const BorderSide(color: AppColors.primaryGreen, width: 1.2),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     backgroundColor: Colors.white,
-                    elevation: 0,
                   ),
                 ),
               ],
             ),
-
-          if (_selectedSubcategory != null) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(
-                  'Filtered by:',
-                  style: GoogleFonts.poppins(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.softRose,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _selectedSubcategory!,
-                        style: GoogleFonts.poppins(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryCrimson,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedSubcategory = null;
-                          });
-                        },
-                        child: const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryCrimson),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-
-          const SizedBox(height: 16),
-          const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
-          const SizedBox(height: 14),
-
-          // Horizontal Quick-Filter Category Pills
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildQuickFilterPill(
-                  label: 'All Products',
-                  categoryId: 'all',
-                  isSelected: _selectedCategory == 'all',
-                ),
-                ...CategoryItem.sampleCategories.map((cat) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: _buildQuickFilterPill(
-                      label: cat.name,
-                      categoryId: cat.id,
-                      iconEmoji: cat.icon,
-                      isSelected: _selectedCategory == cat.id,
-                    ),
-                  );
-                }),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickFilterPill({
-    required String label,
-    required String categoryId,
-    String? iconEmoji,
-    required bool isSelected,
-  }) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedCategory = categoryId;
-          _selectedSubcategory = null;
-        });
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryGreen : const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (iconEmoji != null) ...[
-              Text(iconEmoji, style: const TextStyle(fontSize: 13)),
-              const SizedBox(width: 6),
-            ] else if (isSelected) ...[
-              const Icon(Icons.check_circle_rounded, size: 14, color: Colors.white),
-              const SizedBox(width: 6),
-            ],
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
