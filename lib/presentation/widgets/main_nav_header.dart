@@ -32,7 +32,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
@@ -40,169 +40,305 @@ class _MainNavHeaderState extends State<MainNavHeader> {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1400),
-          child: Row(
-            children: [
-              // Brand Logo
-              _buildLogo(),
-              const SizedBox(width: 32),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = constraints.maxWidth < 900;
 
-              // Search Bar + Search by Technical Name
-              Expanded(
-                child: Row(
+              if (isMobile) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Container(
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.border),
+                    // Top row: Brand logo + Quick Icons
+                    Row(
+                      children: [
+                        _buildLogo(isCompact: constraints.maxWidth < 420),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary, size: 22),
+                          tooltip: 'Track Order',
+                          padding: const EdgeInsets.all(8),
+                          constraints: const BoxConstraints(),
+                          onPressed: () {},
                         ),
-                        child: TextField(
-                          controller: _searchController,
-                          onSubmitted: widget.onSearch,
-                          decoration: InputDecoration(
-                            hintText: 'Search for seeds, pesticides, fertilizers...',
-                            hintStyle: GoogleFonts.poppins(
-                              color: AppColors.textMuted,
-                              fontSize: 13,
-                            ),
-                            prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                            suffixIcon: Container(
-                              margin: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryCrimson,
-                                borderRadius: BorderRadius.circular(6),
+                        const SizedBox(width: 8),
+                        AnimatedBuilder(
+                          animation: CartController.instance,
+                          builder: (context, _) {
+                            final count = widget.cartItemCount ?? CartController.instance.totalCount;
+                            return InkWell(
+                              onTap: widget.onCartTap,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Badge(
+                                  label: Text(
+                                    count.toString(),
+                                    style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                  ),
+                                  backgroundColor: AppColors.primaryCrimson,
+                                  child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
+                                ),
                               ),
-                              child: IconButton(
-                                icon: const Icon(Icons.search, color: Colors.white, size: 18),
-                                onPressed: () {
-                                  widget.onSearch?.call(_searchController.text);
-                                },
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 24),
+                          tooltip: 'My Account',
+                          padding: const EdgeInsets.all(6),
+                          constraints: const BoxConstraints(),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Search row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              onSubmitted: widget.onSearch,
+                              decoration: InputDecoration(
+                                hintText: 'Search seeds, pesticides, fertilizers...',
+                                hintStyle: GoogleFonts.poppins(
+                                  color: AppColors.textMuted,
+                                  fontSize: 12,
+                                ),
+                                prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 18),
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                                suffixIcon: Container(
+                                  margin: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryCrimson,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    icon: const Icon(Icons.search, color: Colors.white, size: 16),
+                                    onPressed: () {
+                                      widget.onSearch?.call(_searchController.text);
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Search by Technical Name Button
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.science_outlined, size: 18),
-                      label: Text(
-                        'Search by Technical',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        shape: RoundedRectangleBorder(
+                        const SizedBox(width: 8),
+                        InkWell(
+                          onTap: () {},
                           borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            height: 40,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              color: AppColors.lightGreen,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.primaryGreen),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.science_outlined, size: 16, color: AppColors.primaryDarkGreen),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Technical',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryDarkGreen,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(width: 32),
+                );
+              }
 
-              // Right Navigation Actions
-              Row(
+              // Desktop Header
+              return Row(
                 children: [
-                  // Track Order
-                  _actionItem(
-                    icon: Icons.local_shipping_outlined,
-                    label: 'Track Order',
-                    onTap: () {},
-                  ),
-                  const SizedBox(width: 24),
+                  // Brand Logo
+                  _buildLogo(),
+                  const SizedBox(width: 32),
 
-                  // Cart
-                  AnimatedBuilder(
-                    animation: CartController.instance,
-                    builder: (context, _) {
-                      final count = widget.cartItemCount ?? CartController.instance.totalCount;
-                      return InkWell(
-                        onTap: widget.onCartTap,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: Row(
-                            children: [
-                              Badge(
-                                label: Text(
-                                  count.toString(),
-                                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
+                  // Search Bar + Search by Technical Name
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: TextField(
+                              controller: _searchController,
+                              onSubmitted: widget.onSearch,
+                              decoration: InputDecoration(
+                                hintText: 'Search for seeds, pesticides, fertilizers...',
+                                hintStyle: GoogleFonts.poppins(
+                                  color: AppColors.textMuted,
+                                  fontSize: 13,
                                 ),
-                                backgroundColor: AppColors.primaryCrimson,
-                                child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Cart',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                                suffixIcon: Container(
+                                  margin: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryCrimson,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.search, color: Colors.white, size: 18),
+                                    onPressed: () {
+                                      widget.onSearch?.call(_searchController.text);
+                                    },
+                                  ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      );
-                    },
+                        const SizedBox(width: 12),
+                        // Search by Technical Name Button
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.science_outlined, size: 18),
+                          label: Text(
+                            'Search by Technical',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryGreen,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(width: 24),
+                  const SizedBox(width: 32),
 
-                  // My Account
-                  OutlinedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.person_outline, size: 18, color: AppColors.primaryGreen),
-                    label: Text(
-                      'My Account',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.primaryGreen,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                  // Right Navigation Actions
+                  Row(
+                    children: [
+                      // Track Order
+                      _actionItem(
+                        icon: Icons.local_shipping_outlined,
+                        label: 'Track Order',
+                        onTap: () {},
                       ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
+                      const SizedBox(width: 24),
+
+                      // Cart
+                      AnimatedBuilder(
+                        animation: CartController.instance,
+                        builder: (context, _) {
+                          final count = widget.cartItemCount ?? CartController.instance.totalCount;
+                          return InkWell(
+                            onTap: widget.onCartTap,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              child: Row(
+                                children: [
+                                  Badge(
+                                    label: Text(
+                                      count.toString(),
+                                      style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
+                                    ),
+                                    backgroundColor: AppColors.primaryCrimson,
+                                    child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Cart',
+                                    style: GoogleFonts.poppins(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 24),
+
+                      // My Account
+                      OutlinedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.person_outline, size: 18, color: AppColors.primaryGreen),
+                        label: Text(
+                          'My Account',
+                          style: GoogleFonts.poppins(
+                            color: AppColors.primaryGreen,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildLogo({bool isCompact = false}) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(isCompact ? 6 : 8),
           decoration: BoxDecoration(
             color: AppColors.primaryGreen,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.eco_rounded, color: Colors.white, size: 24),
+          child: Icon(Icons.eco_rounded, color: Colors.white, size: isCompact ? 18 : 24),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: isCompact ? 6 : 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -212,7 +348,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 Text(
                   'EBS ',
                   style: GoogleFonts.poppins(
-                    fontSize: 22,
+                    fontSize: isCompact ? 17 : 22,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryCrimson,
                     letterSpacing: -0.5,
@@ -221,7 +357,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 Text(
                   'BioCrop',
                   style: GoogleFonts.poppins(
-                    fontSize: 22,
+                    fontSize: isCompact ? 17 : 22,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryGreen,
                     letterSpacing: -0.5,
@@ -232,10 +368,10 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             Text(
               'SCIENCE & INNOVATION',
               style: GoogleFonts.poppins(
-                fontSize: 9,
+                fontSize: isCompact ? 7.5 : 9,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryCrimson,
-                letterSpacing: 1.4,
+                letterSpacing: 1.2,
               ),
             ),
           ],

@@ -112,134 +112,150 @@ class _HomeViewState extends State<HomeView> {
             const TrustFeaturesSection(),
 
             // Main Product Catalog Section
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1400),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Section Title & Filters
-                      Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        runSpacing: 12,
-                        crossAxisAlignment: WrapCrossAlignment.center,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.maxWidth < 600;
+
+                return Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 12 : 24,
+                    vertical: isMobile ? 14 : 24,
+                  ),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1400),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          // Section Title & Filters
+                          Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            runSpacing: 10,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              Text(
-                                _selectedCategory == 'all'
-                                    ? 'Trending Agricultural Best-Sellers'
-                                    : 'Products in $_selectedCategory',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.textPrimary,
-                                ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _selectedCategory == 'all'
+                                        ? 'Trending Agricultural Best-Sellers'
+                                        : 'Products in $_selectedCategory',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isMobile ? 18 : 22,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Certified agricultural bio-inputs directly from EBS BioCrop Science with nationwide delivery',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: isMobile ? 11.5 : 13,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 2),
                               Text(
-                                'Certified agricultural bio-inputs directly from EBS BioCrop Science with nationwide delivery',
+                                'Showing ${filtered.length} products',
                                 style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
+                                  color: AppColors.textMuted,
+                                  fontSize: isMobile ? 11 : 13,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
-                          Text(
-                            'Showing ${filtered.length} products',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textMuted,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
+                          SizedBox(height: isMobile ? 12 : 20),
 
-                      // Product Grid
-                      if (filtered.isEmpty)
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(48),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.border),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textMuted),
-                              const SizedBox(height: 12),
-                              Text(
-                                'No agricultural products found matching your search.',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
+                          // Product Grid
+                          if (filtered.isEmpty)
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(isMobile ? 24 : 48),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.border),
                               ),
-                              const SizedBox(height: 12),
-                              OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedCategory = 'all';
-                                    _searchFilter = '';
-                                  });
-                                },
-                                child: const Text('Reset Filters'),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textMuted),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'No agricultural products found matching your search.',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  OutlinedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedCategory = 'all';
+                                        _searchFilter = '';
+                                      });
+                                    },
+                                    child: const Text('Reset Filters'),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        )
-                      else
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            int crossAxisCount = 4;
-                            double childAspectRatio = 0.64;
+                            )
+                          else
+                            Builder(
+                              builder: (context) {
+                                int crossAxisCount = 4;
+                                double childAspectRatio = 0.64;
+                                double crossAxisSpacing = 16;
+                                double mainAxisSpacing = 16;
 
-                            if (constraints.maxWidth < 640) {
-                              crossAxisCount = 1;
-                              childAspectRatio = 0.74;
-                            } else if (constraints.maxWidth < 900) {
-                              crossAxisCount = 2;
-                              childAspectRatio = 0.68;
-                            } else if (constraints.maxWidth < 1200) {
-                              crossAxisCount = 3;
-                              childAspectRatio = 0.65;
-                            }
+                                if (constraints.maxWidth < 600) {
+                                  crossAxisCount = 2;
+                                  childAspectRatio = 0.54;
+                                  crossAxisSpacing = 10;
+                                  mainAxisSpacing = 10;
+                                } else if (constraints.maxWidth < 900) {
+                                  crossAxisCount = 2;
+                                  childAspectRatio = 0.66;
+                                  crossAxisSpacing = 14;
+                                  mainAxisSpacing = 14;
+                                } else if (constraints.maxWidth < 1200) {
+                                  crossAxisCount = 3;
+                                  childAspectRatio = 0.65;
+                                }
 
-                            return GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: childAspectRatio,
-                              ),
-                              itemCount: filtered.length,
-                              itemBuilder: (context, index) {
-                                final product = filtered[index];
-                                return ProductCard(
-                                  product: product,
-                                  onAddToCart: (p, v) => _onAddToCart(p, v),
-                                  onBuyNow: (p, v) => _onBuyNow(p, v),
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    crossAxisSpacing: crossAxisSpacing,
+                                    mainAxisSpacing: mainAxisSpacing,
+                                    childAspectRatio: childAspectRatio,
+                                  ),
+                                  itemCount: filtered.length,
+                                  itemBuilder: (context, index) {
+                                    final product = filtered[index];
+                                    return ProductCard(
+                                      product: product,
+                                      onAddToCart: (p, v) => _onAddToCart(p, v),
+                                      onBuyNow: (p, v) => _onBuyNow(p, v),
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
-                    ],
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
 
             // Footer

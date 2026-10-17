@@ -7,20 +7,25 @@ class TrustFeaturesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1400),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isNarrow = constraints.maxWidth < 900;
-              return Wrap(
-                spacing: 24,
-                runSpacing: 16,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        final isTablet = constraints.maxWidth < 950;
+
+        return Container(
+          width: double.infinity,
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 12 : 24,
+            vertical: isMobile ? 14 : 24,
+          ),
+          margin: EdgeInsets.symmetric(vertical: isMobile ? 10 : 16),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1400),
+              child: Wrap(
+                spacing: isMobile ? 10 : 20,
+                runSpacing: isMobile ? 10 : 16,
                 alignment: WrapAlignment.spaceBetween,
                 children: [
                   _featureCard(
@@ -29,7 +34,11 @@ class TrustFeaturesSection extends StatelessWidget {
                     iconBgColor: AppColors.softRose,
                     title: 'Guaranteed Authentic Value',
                     subtitle: 'Direct from EBS BioCrop Science',
-                    width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
+                    width: isMobile
+                        ? constraints.maxWidth
+                        : isTablet
+                            ? (constraints.maxWidth - 20) / 2
+                            : (constraints.maxWidth - 60) / 4,
                   ),
                   _featureCard(
                     icon: Icons.local_shipping_rounded,
@@ -37,7 +46,11 @@ class TrustFeaturesSection extends StatelessWidget {
                     iconBgColor: AppColors.lightGreen,
                     title: 'FREE Pan-India Shipping',
                     subtitle: 'Reliable doorstep parcel dispatch',
-                    width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
+                    width: isMobile
+                        ? constraints.maxWidth
+                        : isTablet
+                            ? (constraints.maxWidth - 20) / 2
+                            : (constraints.maxWidth - 60) / 4,
                   ),
                   _featureCard(
                     icon: Icons.shield_rounded,
@@ -45,7 +58,11 @@ class TrustFeaturesSection extends StatelessWidget {
                     iconBgColor: AppColors.softRose,
                     title: 'CERTIFIED Lab Quality',
                     subtitle: '100% genuine agri-inputs verified',
-                    width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
+                    width: isMobile
+                        ? constraints.maxWidth
+                        : isTablet
+                            ? (constraints.maxWidth - 20) / 2
+                            : (constraints.maxWidth - 60) / 4,
                   ),
                   _featureCard(
                     icon: Icons.assignment_return_rounded,
@@ -53,14 +70,18 @@ class TrustFeaturesSection extends StatelessWidget {
                     iconBgColor: AppColors.lightGreen,
                     title: 'EASY Returns & Advisory',
                     subtitle: 'Agronomist consultation included',
-                    width: isNarrow ? constraints.maxWidth : (constraints.maxWidth - 72) / 4,
+                    width: isMobile
+                        ? constraints.maxWidth
+                        : isTablet
+                            ? (constraints.maxWidth - 20) / 2
+                            : (constraints.maxWidth - 60) / 4,
                   ),
                 ],
-              );
-            },
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

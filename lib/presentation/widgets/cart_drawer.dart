@@ -20,8 +20,10 @@ class QuickCartDrawer extends StatelessWidget {
       builder: (context, _) {
         final cart = CartController.instance;
 
+        final screenWidth = MediaQuery.sizeOf(context).width;
+
         return Container(
-          width: 440,
+          width: screenWidth < 500 ? screenWidth * 0.92 : 440,
           height: double.infinity,
           decoration: const BoxDecoration(
             color: Colors.white,
