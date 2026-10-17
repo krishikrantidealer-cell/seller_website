@@ -7,7 +7,9 @@ import '../../../logic/catalog/catalog_event.dart';
 import '../../../logic/catalog/catalog_state.dart';
 
 class CategoryNavigationStrip extends StatelessWidget {
-  const CategoryNavigationStrip({super.key});
+  final VoidCallback? onCategorySelected;
+
+  const CategoryNavigationStrip({super.key, this.onCategorySelected});
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class CategoryNavigationStrip extends StatelessWidget {
                       child: InkWell(
                         onTap: () {
                           context.read<CatalogBloc>().add(SelectCategory(cat.id));
+                          onCategorySelected?.call();
                         },
                         borderRadius: BorderRadius.circular(20),
                         child: AnimatedContainer(

@@ -5,6 +5,7 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'logic/cart/cart_bloc.dart';
 import 'logic/catalog/catalog_bloc.dart';
+import 'logic/catalog/catalog_event.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ class SellerWebsiteApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<CatalogBloc>(create: (_) => CatalogBloc()),
+        BlocProvider<CatalogBloc>(create: (_) => CatalogBloc()..add(const LoadCatalog())),
         BlocProvider<CartBloc>(create: (_) => CartBloc()),
       ],
       child: MaterialApp.router(

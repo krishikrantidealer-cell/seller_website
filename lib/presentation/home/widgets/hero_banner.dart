@@ -2,15 +2,23 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 
 class HeroBanner extends StatelessWidget {
-  const HeroBanner({super.key});
+  final VoidCallback? onExploreDeals;
+  final VoidCallback? onCallAgronomist;
+
+  const HeroBanner({
+    super.key,
+    this.onExploreDeals,
+    this.onCallAgronomist,
+  });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isCompact = screenWidth < 992;
+    final isMobile = screenWidth < 640;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      margin: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: 10),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -21,12 +29,12 @@ class HeroBanner extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withValues(alpha: 0.2),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: AppColors.primaryGreen.withValues(alpha: 0.18),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -35,8 +43,8 @@ class HeroBanner extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 1280),
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: isCompact ? 20 : 36,
-              vertical: isCompact ? 24 : 32,
+              horizontal: isMobile ? 16 : (isCompact ? 22 : 32),
+              vertical: isMobile ? 16 : 22,
             ),
             child: Row(
               children: [
@@ -47,64 +55,78 @@ class HeroBanner extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
                         decoration: BoxDecoration(
                           color: AppColors.harvestAmber,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
-                          'Kisan Vishwas • 100% Genuine Direct Inputs',
+                          'Kisan Vishwas • 100% Genuine Agri-Inputs (असली उत्पाद)',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 0.3,
+                            letterSpacing: 0.2,
                           ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Direct Manufacturer Sourcing for Crop Science & Nutrition',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: isCompact ? 20 : 28,
-                          fontWeight: FontWeight.w800,
-                          height: 1.2,
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Search by Technical Formulation (Active Chemical & Bio-Ingredients) and compare brands with guaranteed doorstep delivery across 50,000+ PIN codes.',
+                        'Direct Manufacturer Sourcing for Crop Science & Nutrition',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          fontSize: isCompact ? 13 : 14,
-                          height: 1.5,
+                          color: Colors.white,
+                          fontSize: isMobile ? 18 : (isCompact ? 22 : 26),
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Search by Technical Formulation (Active Ingredients) with Free Doorstep Delivery across 50,000+ PIN codes.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.92),
+                          fontSize: isMobile ? 12 : 13.5,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       Wrap(
-                        spacing: 12,
-                        runSpacing: 10,
+                        spacing: 10,
+                        runSpacing: 8,
                         children: [
                           ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: onExploreDeals,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.brandRed,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 16 : 22,
+                                vertical: isMobile ? 11 : 13,
+                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
-                            icon: const Icon(Icons.flash_on_rounded, size: 18),
-                            label: const Text('Explore Best Deals'),
+                            icon: const Icon(Icons.arrow_downward_rounded, size: 16),
+                            label: const Text(
+                              'Explore Products (उत्पाद देखें) ↓',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
                           ),
                           OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: onCallAgronomist,
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              side: const BorderSide(color: Colors.white70, width: 1.5),
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+                              side: const BorderSide(color: Colors.white70, width: 1.2),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 14 : 18,
+                                vertical: isMobile ? 11 : 13,
+                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
-                            icon: const Icon(Icons.call_outlined, size: 18),
-                            label: const Text('Call Agronomist 1800-203-1425'),
+                            icon: const Icon(Icons.call_outlined, size: 16),
+                            label: const Text(
+                              'Helpline: 1800-203-1425',
+                              style: TextStyle(fontSize: 12.5),
+                            ),
                           ),
                         ],
                       ),
@@ -116,10 +138,10 @@ class HeroBanner extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.white24, width: 1),
                       ),
                       child: Column(
@@ -127,25 +149,25 @@ class HeroBanner extends StatelessWidget {
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.verified_user_rounded, color: AppColors.harvestAmberLight, size: 22),
+                              Icon(Icons.verified_user_rounded, color: AppColors.harvestAmberLight, size: 20),
                               SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'EBS BioCrop Science Trust Promise',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const Divider(color: Colors.white24, height: 20),
-                          _buildPromiseItem(Icons.verified_outlined, 'No Counterfeits: 100% Genuine with GST Bill'),
-                          _buildPromiseItem(Icons.local_shipping_outlined, 'Zero Shipping Fees: Free Pan-India Delivery'),
-                          _buildPromiseItem(Icons.currency_rupee_rounded, 'Advance COD Protection & Lowest Price Guarantee'),
-                          _buildPromiseItem(Icons.spa_outlined, 'Residue-Free Organic & Bio-Fungicide Solutions'),
+                          const Divider(color: Colors.white24, height: 16),
+                          _buildPromiseItem(Icons.verified_outlined, '100% Genuine with Official GST Bill'),
+                          _buildPromiseItem(Icons.local_shipping_outlined, 'Zero Shipping Fees: Free Doorstep Delivery'),
+                          _buildPromiseItem(Icons.payments_outlined, 'Cash on Delivery (COD) Available'),
+                          _buildPromiseItem(Icons.spa_outlined, 'Eco-Friendly Bio & Organic Certified Formulations'),
                         ],
                       ),
                     ),
@@ -161,15 +183,15 @@ class HeroBanner extends StatelessWidget {
 
   Widget _buildPromiseItem(IconData icon, String text) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF86EFAC), size: 16),
+          Icon(icon, color: const Color(0xFF86EFAC), size: 15),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+              style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w500),
             ),
           ),
         ],

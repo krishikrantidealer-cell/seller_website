@@ -7,6 +7,7 @@ import '../../../logic/catalog/catalog_event.dart';
 import '../../../logic/catalog/catalog_state.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/category_navigation_strip.dart';
+import '../widgets/crop_doctor_modal.dart';
 import '../widgets/farmer_drawer.dart';
 import '../widgets/farmer_quick_bar.dart';
 import '../widgets/hero_banner.dart';
@@ -24,11 +25,28 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     context.read<CatalogBloc>().add(const LoadCatalog());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCatalog() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        340.0,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   @override
@@ -61,6 +79,7 @@ class _HomeViewState extends State<HomeView> {
       endDrawer: const CartDrawer(),
       bottomNavigationBar: const FarmerQuickBar(),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // Top Utility Bar
           const SliverToBoxAdapter(child: TopUtilityBar()),
@@ -74,50 +93,27 @@ class _HomeViewState extends State<HomeView> {
           ),
 
           // Categories Strip
-          const SliverToBoxAdapter(child: CategoryNavigationStrip()),
-
-          // Hero Promotional Banner
-          const SliverToBoxAdapter(child: HeroBanner()),
-
-          // Trust Badges Strip (Farmer-Friendly Bilingual)
           SliverToBoxAdapter(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1280),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceAround,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 20,
-                      runSpacing: 14,
-                      children: [
-                        _buildBadge(Icons.verified_outlined, '100% Genuine (असली)', 'Direct GST Bill & CIBRC Certified'),
-                        _buildBadge(Icons.local_shipping_outlined, 'Free Delivery (मुफ्त डिलीवरी)', 'Across 50,000+ Rural PIN Codes'),
-                        _buildBadge(Icons.science_outlined, 'Technical Search (सटीक रसायन)', 'Compare active chemical ingredients'),
-                        _buildBadge(Icons.support_agent_outlined, 'Toll Free: 1800-203-1425', 'Free Agronomist Doctor Advisory'),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            child: CategoryNavigationStrip(
+              onCategorySelected: _scrollToCatalog,
             ),
           ),
 
-          // Catalog Content Area
+          // Hero Promotional Banner
+          SliverToBoxAdapter(
+            child: HeroBanner(
+              onExploreDeals: _scrollToCatalog,
+              onCallAgronomist: () => CropDoctorModal.show(context),
+            ),
+          ),
+
+          // Catalog Content Area (Directly below Hero Banner for Immediate Product Visibility)
           SliverToBoxAdapter(
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1280),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: 16),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: 12),
                   child: BlocBuilder<CatalogBloc, CatalogState>(
                     builder: (context, state) {
                       return Column(
@@ -134,33 +130,34 @@ class _HomeViewState extends State<HomeView> {
                                       state.searchQuery.isNotEmpty
                                           ? 'Search Results for "${state.searchQuery}"'
                                           : _getCategoryTitle(state),
-                                      style: const TextStyle(
-                                        fontSize: 20,
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 17 : 20,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
+                                    const SizedBox(height: 2),
                                     Text(
-                                      'Showing ${state.filteredProducts.length} certified agricultural products',
+                                      'Showing ${state.filteredProducts.length} certified agricultural products (प्रमाणित कृषि उत्पाद)',
                                       style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                                     ),
                                   ],
                                 ),
                               ),
                               if (state.selectedCategoryId != 'all' || state.searchQuery.isNotEmpty) ...[
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 8),
                                 TextButton.icon(
                                   onPressed: () {
                                     context.read<CatalogBloc>().add(const SearchTechnicalOrBrand(''));
                                     context.read<CatalogBloc>().add(const SelectCategory('all'));
                                   },
                                   icon: const Icon(Icons.refresh_rounded, size: 16),
-                                  label: const Text('Reset Filters'),
+                                  label: const Text('Reset', style: TextStyle(fontSize: 12)),
                                 ),
                               ],
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 14),
 
                           // Product Grid or Empty State
                           if (state.status == CatalogStatus.loading)
@@ -172,7 +169,7 @@ class _HomeViewState extends State<HomeView> {
                             )
                           else if (state.filteredProducts.isEmpty)
                             Container(
-                              padding: const EdgeInsets.all(48),
+                              padding: const EdgeInsets.all(40),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -182,16 +179,16 @@ class _HomeViewState extends State<HomeView> {
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.search_off_rounded, size: 54, color: AppColors.textMuted),
+                                  const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textMuted),
                                   const SizedBox(height: 12),
                                   const Text(
                                     'No products match your criteria',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 6),
                                   const Text(
                                     'Try searching by active chemical ingredient (e.g. Chlorantraniliprole, Emamectin) or resetting your category filter.',
-                                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                    style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 16),
@@ -224,6 +221,38 @@ class _HomeViewState extends State<HomeView> {
                         ],
                       );
                     },
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Trust Badges Strip (Farmer-Friendly Bilingual — positioned below top products)
+          SliverToBoxAdapter(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1280),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceAround,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 20,
+                      runSpacing: 14,
+                      children: [
+                        _buildBadge(Icons.verified_outlined, '100% Genuine (असली)', 'Direct GST Bill & CIBRC Certified'),
+                        _buildBadge(Icons.local_shipping_outlined, 'Free Delivery (मुफ्त डिलीवरी)', 'Across 50,000+ Rural PIN Codes'),
+                        _buildBadge(Icons.science_outlined, 'Technical Search (सटीक रसायन)', 'Compare active chemical ingredients'),
+                        _buildBadge(Icons.support_agent_outlined, 'Toll Free: 1800-203-1425', 'Free Agronomist Doctor Advisory'),
+                      ],
+                    ),
                   ),
                 ),
               ),
