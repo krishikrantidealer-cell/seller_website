@@ -119,12 +119,12 @@ class _HomeViewState extends State<HomeView> {
                 return Container(
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 12 : 24,
-                    vertical: isMobile ? 14 : 24,
+                    horizontal: isMobile ? 8 : 20,
+                    vertical: isMobile ? 12 : 24,
                   ),
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1400),
+                      constraints: const BoxConstraints(maxWidth: 1680),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -209,24 +209,36 @@ class _HomeViewState extends State<HomeView> {
                           else
                             Builder(
                               builder: (context) {
-                                int crossAxisCount = 4;
-                                double childAspectRatio = 0.64;
-                                double crossAxisSpacing = 16;
-                                double mainAxisSpacing = 16;
+                                int crossAxisCount = 5;
+                                double childAspectRatio = 0.63;
+                                double crossAxisSpacing = 14;
+                                double mainAxisSpacing = 14;
 
                                 if (constraints.maxWidth < 600) {
                                   crossAxisCount = 2;
                                   childAspectRatio = 0.54;
+                                  crossAxisSpacing = 8;
+                                  mainAxisSpacing = 8;
+                                } else if (constraints.maxWidth < 850) {
+                                  crossAxisCount = 3;
+                                  childAspectRatio = 0.58;
                                   crossAxisSpacing = 10;
                                   mainAxisSpacing = 10;
-                                } else if (constraints.maxWidth < 900) {
-                                  crossAxisCount = 2;
-                                  childAspectRatio = 0.66;
+                                } else if (constraints.maxWidth < 1180) {
+                                  crossAxisCount = 4;
+                                  childAspectRatio = 0.62;
+                                  crossAxisSpacing = 12;
+                                  mainAxisSpacing = 12;
+                                } else if (constraints.maxWidth < 1520) {
+                                  crossAxisCount = 5;
+                                  childAspectRatio = 0.63;
                                   crossAxisSpacing = 14;
                                   mainAxisSpacing = 14;
-                                } else if (constraints.maxWidth < 1200) {
-                                  crossAxisCount = 3;
-                                  childAspectRatio = 0.65;
+                                } else {
+                                  crossAxisCount = 6;
+                                  childAspectRatio = 0.64;
+                                  crossAxisSpacing = 16;
+                                  mainAxisSpacing = 16;
                                 }
 
                                 return GridView.builder(

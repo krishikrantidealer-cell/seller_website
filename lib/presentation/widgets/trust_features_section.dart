@@ -16,13 +16,13 @@ class TrustFeaturesSection extends StatelessWidget {
           width: double.infinity,
           color: Colors.white,
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 12 : 24,
-            vertical: isMobile ? 14 : 24,
+            horizontal: isMobile ? 8 : 20,
+            vertical: isMobile ? 12 : 20,
           ),
-          margin: EdgeInsets.symmetric(vertical: isMobile ? 10 : 16),
+          margin: EdgeInsets.symmetric(vertical: isMobile ? 8 : 16),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1400),
+              constraints: const BoxConstraints(maxWidth: 1680),
               child: Wrap(
                 spacing: isMobile ? 10 : 20,
                 runSpacing: isMobile ? 10 : 16,

@@ -69,18 +69,18 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 650;
-        final bannerHeight = isMobile ? 200.0 : 280.0;
+        final bannerHeight = isMobile ? 200.0 : 300.0;
 
         return Container(
           width: double.infinity,
           color: AppColors.warmBackground,
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 12 : 24,
-            vertical: isMobile ? 10 : 16,
+            horizontal: isMobile ? 8 : 20,
+            vertical: isMobile ? 8 : 16,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1400),
+              constraints: const BoxConstraints(maxWidth: 1680),
               child: Column(
                 children: [
                   SizedBox(

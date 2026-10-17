@@ -17,14 +17,17 @@ class CategoryRibbon extends StatelessWidget {
   Widget build(BuildContext context) {
     final categories = CategoryItem.sampleCategories;
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = screenWidth < 600;
+
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 20),
       height: 48,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1400),
+          constraints: const BoxConstraints(maxWidth: 1680),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(

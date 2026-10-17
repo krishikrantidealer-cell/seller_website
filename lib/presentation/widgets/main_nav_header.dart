@@ -39,7 +39,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1400),
+          constraints: const BoxConstraints(maxWidth: 1680),
           child: LayoutBuilder(
             builder: (context, constraints) {
               final isMobile = constraints.maxWidth < 900;

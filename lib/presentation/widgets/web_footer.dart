@@ -8,13 +8,21 @@ class WebFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = screenWidth < 600;
+
     return Container(
       width: double.infinity,
       color: AppColors.footerBackground,
-      padding: const EdgeInsets.only(top: 48, bottom: 24, left: 24, right: 24),
+      padding: EdgeInsets.only(
+        top: isMobile ? 32 : 48,
+        bottom: 24,
+        left: isMobile ? 12 : 24,
+        right: isMobile ? 12 : 24,
+      ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1400),
+          constraints: const BoxConstraints(maxWidth: 1680),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
