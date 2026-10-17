@@ -45,12 +45,17 @@ class TrustFeaturesSection extends StatelessWidget {
 
         return Container(
           width: double.infinity,
-          color: Colors.white,
           padding: EdgeInsets.symmetric(
             horizontal: isMobile ? 8 : 20,
-            vertical: isMobile ? 10 : 16,
+            vertical: isMobile ? 12 : 20,
           ),
-          margin: EdgeInsets.symmetric(vertical: isMobile ? 8 : 14),
+          margin: EdgeInsets.only(top: isMobile ? 16 : 28, bottom: 0),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: AppColors.border, width: 1),
+            ),
+          ),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1680),

@@ -71,7 +71,7 @@ class _ProductCardState extends State<ProductCard> {
                     Expanded(
                       child: Container(
                         width: double.infinity,
-                        color: AppColors.warmBackground,
+                        color: Colors.white,
                         child: Stack(
                           children: [
                             Center(
@@ -81,7 +81,7 @@ class _ProductCardState extends State<ProductCard> {
                                   widget.product.imageUrl,
                                   fit: BoxFit.contain,
                                   errorBuilder: (context, error, stackTrace) => Container(
-                                    color: AppColors.warmBackground,
+                                    color: Colors.white,
                                     child: const Icon(
                                       Icons.agriculture_rounded,
                                       size: 48,
