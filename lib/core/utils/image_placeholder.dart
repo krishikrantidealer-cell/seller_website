@@ -58,6 +58,8 @@ class SafeNetworkImage extends StatelessWidget {
   }
 
   Widget _build404Placeholder() {
+    final isCompact = height != null && height! < 80;
+
     return Container(
       width: width,
       height: height,
@@ -66,33 +68,39 @@ class SafeNetworkImage extends StatelessWidget {
         border: Border.all(color: AppColors.border, width: 1),
       ),
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.eco_outlined,
-              size: (height != null && height! < 100) ? 24 : 36,
-              color: AppColors.primaryGreen.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.paleGreen,
-                borderRadius: BorderRadius.circular(4),
+        child: isCompact
+            ? Icon(
+                Icons.eco_outlined,
+                size: (height! * 0.45).clamp(18.0, 28.0),
+                color: AppColors.primaryGreen.withValues(alpha: 0.6),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.eco_outlined,
+                    size: (height != null && height! < 100) ? 24 : 36,
+                    color: AppColors.primaryGreen.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.paleGreen,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'EBS BioCrop',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: const Text(
-                'EBS BioCrop',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
