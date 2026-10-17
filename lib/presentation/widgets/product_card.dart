@@ -334,7 +334,11 @@ class _ProductCardState extends State<ProductCard> {
       product: widget.product,
       initialSelectedVariant: _selectedVariant,
       onViewCart: () {
-        widget.onAddToCart?.call(widget.product, _selectedVariant);
+        if (widget.onBuyNow != null) {
+          widget.onBuyNow?.call(widget.product, _selectedVariant);
+        } else {
+          Scaffold.maybeOf(context)?.openEndDrawer();
+        }
       },
     );
   }

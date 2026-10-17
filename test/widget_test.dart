@@ -38,6 +38,15 @@ void main() {
 
     // Verify in-cart indicator or stepper reflects the added item
     expect(find.text('Qty: 1'), findsWidgets);
+
+    // Tap View Cart in the variants modal
+    final viewCartBtn = find.textContaining('View Cart');
+    expect(viewCartBtn, findsWidgets);
+    await tester.tap(viewCartBtn.first);
+    await tester.pumpAndSettle();
+
+    // Verify cart sidebar (QuickCartDrawer) opened
+    expect(find.text('My Cart'), findsOneWidget);
   });
 
   testWidgets('Phone number and OTP login flow test', (WidgetTester tester) async {

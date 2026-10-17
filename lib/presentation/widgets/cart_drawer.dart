@@ -415,12 +415,16 @@ class QuickCartDrawer extends StatelessWidget {
                 children: [
                   const Icon(Icons.local_offer_rounded, size: 14, color: AppColors.primaryGreen),
                   const SizedBox(width: 8),
-                  Text(
-                    'You are saving ₹${cart.totalSavings.toStringAsFixed(0)} on this order!',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryDarkGreen,
+                  Expanded(
+                    child: Text(
+                      'You are saving ₹${cart.totalSavings.toStringAsFixed(0)} on this order!',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryDarkGreen,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

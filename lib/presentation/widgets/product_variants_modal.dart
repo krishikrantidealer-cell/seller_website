@@ -15,6 +15,18 @@ Future<void> showProductVariantsModal({
 }) async {
   final isMobile = MediaQuery.sizeOf(context).width < 650;
 
+  void handleViewCart(BuildContext modalCtx) {
+    Navigator.pop(modalCtx);
+    if (onViewCart != null) {
+      onViewCart();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        Scaffold.maybeOf(context)?.openEndDrawer();
+      }
+    });
+  }
+
   if (isMobile) {
     await showModalBottomSheet(
       context: context,
@@ -23,10 +35,7 @@ Future<void> showProductVariantsModal({
       builder: (ctx) => _ProductVariantsSheetContent(
         product: product,
         initialSelectedVariant: initialSelectedVariant,
-        onViewCart: () {
-          Navigator.pop(ctx);
-          onViewCart?.call();
-        },
+        onViewCart: () => handleViewCart(ctx),
       ),
     );
   } else {
@@ -40,10 +49,7 @@ Future<void> showProductVariantsModal({
           child: _ProductVariantsDialogContent(
             product: product,
             initialSelectedVariant: initialSelectedVariant,
-            onViewCart: () {
-              Navigator.pop(ctx);
-              onViewCart?.call();
-            },
+            onViewCart: () => handleViewCart(ctx),
           ),
         ),
       ),
