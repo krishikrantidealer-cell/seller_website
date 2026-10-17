@@ -22,6 +22,7 @@ class _HomeViewState extends State<HomeView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String _selectedCategory = 'all';
+  String? _selectedSubcategory;
   String _searchFilter = '';
 
   final List<ProductItem> _allProducts = ProductItem.sampleProducts;
@@ -30,11 +31,24 @@ class _HomeViewState extends State<HomeView> {
     return _allProducts.where((p) {
       final matchesCategory = _selectedCategory == 'all' ||
           p.category.toLowerCase().contains(_selectedCategory.toLowerCase());
+      final matchesSubcategory = _selectedSubcategory == null ||
+          p.title.toLowerCase().contains(_selectedSubcategory!.toLowerCase()) ||
+          p.technicalName.toLowerCase().contains(_selectedSubcategory!.toLowerCase()) ||
+          p.category.toLowerCase().contains(_selectedSubcategory!.toLowerCase());
       final matchesSearch = _searchFilter.isEmpty ||
           p.title.toLowerCase().contains(_searchFilter.toLowerCase()) ||
           p.technicalName.toLowerCase().contains(_searchFilter.toLowerCase());
-      return matchesCategory && matchesSearch;
+      return matchesCategory && matchesSubcategory && matchesSearch;
     }).toList();
+  }
+
+  String _getCategoryTitle(String catId) {
+    if (catId == 'all') return 'All Categories';
+    final match = CategoryItem.sampleCategories.firstWhere(
+      (c) => c.id == catId,
+      orElse: () => CategoryItem(id: catId, name: catId, icon: '🌿'),
+    );
+    return match.name;
   }
 
   void _onAddToCart(ProductItem product, ProductVariant variant) {
@@ -97,11 +111,15 @@ class _HomeViewState extends State<HomeView> {
               },
             ),
 
-            // Category Ribbon
+            // Category Ribbon with Dropdowns
             CategoryRibbon(
               selectedCategoryId: _selectedCategory,
-              onCategorySelected: (catId) {
-                setState(() => _selectedCategory = catId);
+              selectedSubcategory: _selectedSubcategory,
+              onCategorySelected: (catId, subcategory) {
+                setState(() {
+                  _selectedCategory = catId;
+                  _selectedSubcategory = subcategory;
+                });
               },
             ),
 
@@ -128,6 +146,64 @@ class _HomeViewState extends State<HomeView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Active Category / Subcategory Filter Badge
+                          if (_selectedCategory != 'all' || _selectedSubcategory != null)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 14),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: AppColors.softRose,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.primaryCrimson.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.filter_list_rounded, size: 16, color: AppColors.primaryCrimson),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Filtering: ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryCrimson,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedCategory = 'all';
+                                        _selectedSubcategory = null;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryCrimson,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'Reset',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 3),
+                                          const Icon(Icons.close, size: 12, color: Colors.white),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
                           // Section Title & Filters
                           Wrap(
                             alignment: WrapAlignment.spaceBetween,
@@ -140,7 +216,7 @@ class _HomeViewState extends State<HomeView> {
                                   Text(
                                     _selectedCategory == 'all'
                                         ? 'Trending Agricultural Best-Sellers'
-                                        : 'Products in $_selectedCategory',
+                                        : '${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' - $_selectedSubcategory' : ''}',
                                     style: GoogleFonts.poppins(
                                       fontSize: isMobile ? 18 : 22,
                                       fontWeight: FontWeight.w800,

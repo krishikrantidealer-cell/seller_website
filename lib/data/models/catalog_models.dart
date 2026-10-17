@@ -203,17 +203,104 @@ class CategoryItem {
   final String id;
   final String name;
   final String icon;
+  final List<String> subcategories;
 
-  const CategoryItem({required this.id, required this.name, required this.icon});
+  const CategoryItem({
+    required this.id,
+    required this.name,
+    required this.icon,
+    this.subcategories = const [],
+  });
 
   static List<CategoryItem> get sampleCategories => const [
-    CategoryItem(id: 'seeds', name: 'Seeds', icon: '🌱'),
-    CategoryItem(id: 'insecticides', name: 'Insecticides', icon: '🦗'),
-    CategoryItem(id: 'fungicides', name: 'Fungicides', icon: '🍄'),
-    CategoryItem(id: 'fertilizers', name: 'Fertilizers & Nutrients', icon: '🧪'),
-    CategoryItem(id: 'herbicides', name: 'Herbicides', icon: '🌿'),
-    CategoryItem(id: 'equipment', name: 'Farm Equipment', icon: '🚜'),
-    CategoryItem(id: 'irrigation', name: 'Drip & Irrigation', icon: '💧'),
-    CategoryItem(id: 'gardening', name: 'Home Gardening', icon: '🏡'),
+    CategoryItem(
+      id: 'seeds',
+      name: 'Seeds',
+      icon: '🌱',
+      subcategories: [
+        'Hybrid Vegetable Seeds',
+        'Field Crop Seeds',
+        'Flower & Kitchen Garden Seeds',
+        'Forage & Green Manure',
+      ],
+    ),
+    CategoryItem(
+      id: 'insecticides',
+      name: 'Insecticides',
+      icon: '🦗',
+      subcategories: [
+        'Bio-Insecticides',
+        'Systemic Insecticides',
+        'Caterpillar & Bollworm Control',
+        'Sucking Pest & Thrips Control',
+      ],
+    ),
+    CategoryItem(
+      id: 'fungicides',
+      name: 'Fungicides',
+      icon: '🍄',
+      subcategories: [
+        'Contact Fungicides',
+        'Systemic Fungicides',
+        'Bio-Fungicides & Trichoderma',
+        'Downy & Powdery Mildew Care',
+      ],
+    ),
+    CategoryItem(
+      id: 'fertilizers',
+      name: 'Fertilizers & Nutrients',
+      icon: '🧪',
+      subcategories: [
+        'Water Soluble NPK (19:19:19 / 0:52:34)',
+        'Chelated Micronutrients (Zinc, Boron)',
+        'Bio-fertilizers & Soil Conditioners',
+        'Organic Manure & Humic Acid',
+      ],
+    ),
+    CategoryItem(
+      id: 'herbicides',
+      name: 'Herbicides',
+      icon: '🌿',
+      subcategories: [
+        'Pre-Emergent Herbicides',
+        'Post-Emergent Herbicides',
+        'Selective Weedicides',
+        'Total Weed Killers',
+      ],
+    ),
+    CategoryItem(
+      id: 'equipment',
+      name: 'Farm Equipment',
+      icon: '🚜',
+      subcategories: [
+        'Battery Operated Sprayers (16L/18L)',
+        'Manual & Knapsack Sprayers',
+        'Brush Cutters & Power Weeders',
+        'Pruning Tools & Farm Safety Kits',
+      ],
+    ),
+    CategoryItem(
+      id: 'irrigation',
+      name: 'Drip & Irrigation',
+      icon: '💧',
+      subcategories: [
+        'Drip Lateral Pipes & Drippers',
+        'Rain Hose & Sprinkler Nozzles',
+        'Venturi Injectors & Screen Filters',
+        'Fittings & Joiners',
+      ],
+    ),
+    CategoryItem(
+      id: 'gardening',
+      name: 'Home Gardening',
+      icon: '🏡',
+      subcategories: [
+        'Enriched Potting Soil & Cocopeat',
+        'Plant Boosters & Flowering Spray',
+        'Hand Sprayers & Pruning Shears',
+        'Indoor & Balcony Plant Care',
+      ],
+    ),
   ];
 }
+

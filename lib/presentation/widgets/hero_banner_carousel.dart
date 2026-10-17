@@ -69,210 +69,287 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 650;
-        final bannerHeight = isMobile ? 200.0 : 300.0;
+        final isTablet = constraints.maxWidth < 950;
+        final bannerHeight = isMobile
+            ? 210.0
+            : isTablet
+                ? 270.0
+                : 340.0;
 
-        return Container(
+        return SizedBox(
           width: double.infinity,
-          color: AppColors.warmBackground,
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 8 : 20,
-            vertical: isMobile ? 8 : 16,
-          ),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1680),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: bannerHeight,
-                    child: Stack(
-                      children: [
-                        PageView.builder(
-                          controller: _pageController,
-                          onPageChanged: (idx) => setState(() => _currentIndex = idx),
-                          itemCount: _banners.length,
-                          itemBuilder: (context, index) {
-                            final banner = _banners[index];
-                            return _buildBannerCard(banner, isMobile: isMobile);
-                          },
-                        ),
-                        // Prev/Next Navigation Buttons (Desktop/Tablet)
-                        if (!isMobile) ...[
-                          Positioned(
-                            left: 16,
-                            top: 0,
-                            bottom: 0,
-                            child: Center(
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white.withValues(alpha: 0.85),
-                                radius: 20,
-                                child: IconButton(
-                                  icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary),
-                                  onPressed: () {
-                                    _pageController.previousPage(
-                                      duration: const Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            right: 16,
-                            top: 0,
-                            bottom: 0,
-                            child: Center(
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white.withValues(alpha: 0.85),
-                                radius: 20,
-                                child: IconButton(
-                                  icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
-                                  onPressed: () {
-                                    _pageController.nextPage(
-                                      duration: const Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Dots indicator
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      _banners.length,
-                      (index) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentIndex == index ? (isMobile ? 18 : 24) : 8,
-                        height: isMobile ? 6 : 8,
-                        decoration: BoxDecoration(
-                          color: _currentIndex == index ? AppColors.primaryGreen : AppColors.border,
-                          borderRadius: BorderRadius.circular(4),
+          height: bannerHeight,
+          child: Stack(
+            children: [
+              // Full-width edge-to-edge PageView
+              PageView.builder(
+                controller: _pageController,
+                onPageChanged: (idx) => setState(() => _currentIndex = idx),
+                itemCount: _banners.length,
+                itemBuilder: (context, index) {
+                  final banner = _banners[index];
+                  return _buildBannerCard(banner, isMobile: isMobile, isTablet: isTablet);
+                },
+              ),
+
+              // Left Chevron (Desktop / Tablet)
+              if (!isMobile)
+                Positioned(
+                  left: 20,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Material(
+                      color: Colors.white.withValues(alpha: 0.88),
+                      shape: const CircleBorder(),
+                      elevation: 4,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeInOutCubic,
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Icon(Icons.chevron_left_rounded, color: AppColors.textPrimary, size: 24),
                         ),
                       ),
                     ),
                   ),
-                ],
+                ),
+
+              // Right Chevron (Desktop / Tablet)
+              if (!isMobile)
+                Positioned(
+                  right: 20,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Material(
+                      color: Colors.white.withValues(alpha: 0.88),
+                      shape: const CircleBorder(),
+                      elevation: 4,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeInOutCubic,
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Icon(Icons.chevron_right_rounded, color: AppColors.textPrimary, size: 24),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Bottom Overlay Dots Pagination
+              Positioned(
+                bottom: 14,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _banners.length,
+                    (index) {
+                      final isSelected = _currentIndex == index;
+                      return GestureDetector(
+                        onTap: () {
+                          _pageController.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeInOutCubic,
+                          );
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: isSelected ? 26 : 8,
+                          height: 7,
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(4),
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildBannerCard(BannerData banner, {bool isMobile = false}) {
+  Widget _buildBannerCard(BannerData banner, {bool isMobile = false, bool isTablet = false}) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      width: double.infinity,
+      height: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
         gradient: LinearGradient(
           colors: banner.gradient,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: banner.gradient.first.withValues(alpha: 0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 18 : 48,
-        vertical: isMobile ? 16 : 36,
-      ),
-      child: Row(
+      child: Stack(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 8 : 12,
-                    vertical: isMobile ? 3 : 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    banner.tag,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: isMobile ? 9 : 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ),
-                SizedBox(height: isMobile ? 6 : 12),
-                Text(
-                  banner.title,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: isMobile ? 17 : 28,
-                    fontWeight: FontWeight.w800,
-                    height: 1.2,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: isMobile ? 4 : 10),
-                Text(
-                  banner.subtitle,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: isMobile ? 11 : 14,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: isMobile ? 10 : 20),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: banner.gradient.first,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isMobile ? 14 : 24,
-                      vertical: isMobile ? 8 : 14,
-                    ),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: Text(
-                    banner.buttonText,
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w700,
-                      fontSize: isMobile ? 11 : 14,
-                    ),
-                  ),
-                ),
-              ],
+          // Subtle background decorative circles for visual depth
+          Positioned(
+            right: -60,
+            top: -60,
+            child: Container(
+              width: 240,
+              height: 240,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
             ),
           ),
-          if (!isMobile) ...[
-            const SizedBox(width: 32),
-            Container(
-              padding: const EdgeInsets.all(24),
+          Positioned(
+            right: 80,
+            bottom: -80,
+            child: Container(
+              width: 200,
+              height: 200,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.04),
               ),
-              child: Icon(banner.icon, size: 96, color: Colors.white),
             ),
-          ],
+          ),
+
+          // Main Centered Content
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 20 : (isTablet ? 36 : 64),
+                  vertical: isMobile ? 18 : 28,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 8 : 12,
+                              vertical: isMobile ? 3 : 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.22),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              banner.tag,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: isMobile ? 9 : 11,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: isMobile ? 6 : 12),
+                          Text(
+                            banner.title,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: isMobile ? 17 : (isTablet ? 22 : 30),
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withValues(alpha: 0.25),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: isMobile ? 4 : 8),
+                          Text(
+                            banner.subtitle,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white.withValues(alpha: 0.95),
+                              fontSize: isMobile ? 11 : (isTablet ? 13 : 15),
+                              fontWeight: FontWeight.w400,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: isMobile ? 10 : 20),
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: banner.gradient.first,
+                              elevation: 3,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: isMobile ? 16 : 26,
+                                vertical: isMobile ? 9 : 14,
+                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: Text(
+                              banner.buttonText,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w700,
+                                fontSize: isMobile ? 11 : 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!isMobile) ...[
+                      SizedBox(width: isTablet ? 24 : 48),
+                      Container(
+                        padding: EdgeInsets.all(isTablet ? 20 : 28),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.14),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.25),
+                            width: 2,
+                          ),
+                        ),
+                        child: Icon(
+                          banner.icon,
+                          size: isTablet ? 64 : 96,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
