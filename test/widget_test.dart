@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -211,6 +212,47 @@ void main() {
 
     // Verify we are back on the home page
     expect(find.text('Best Sellers'), findsWidgets);
+  });
+
+  testWidgets('Major category hover opens categories and hovering category opens subcategories in the side', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Hover over 'Seeds' in the category ribbon
+    final seedsTab = find.text('Seeds').first;
+    expect(seedsTab, findsOneWidget);
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    await gesture.moveTo(tester.getCenter(seedsTab));
+    await tester.pumpAndSettle();
+
+    // Verify Categories list opened: "Vegetable Seeds" and "Field Crop Seeds"
+    expect(find.text('Vegetable Seeds'), findsWidgets);
+    expect(find.text('Field Crop Seeds'), findsWidgets);
+
+    // Initial default hovered category is Vegetable Seeds, so its subcategory is visible in side panel
+    expect(find.text('Hybrid Tomato Seeds'), findsOneWidget);
+
+    // Now hover over "Field Crop Seeds"
+    final fieldCrops = find.text('Field Crop Seeds').first;
+    await gesture.moveTo(tester.getCenter(fieldCrops));
+    await tester.pumpAndSettle();
+
+    // Verify subcategories in the side updated to Field Crops subcategories
+    expect(find.text('Hybrid Paddy (Rice) Seeds'), findsOneWidget);
+
+    // Click subcategory "Hybrid Paddy (Rice) Seeds"
+    await tester.tap(find.text('Hybrid Paddy (Rice) Seeds'));
+    await tester.pumpAndSettle();
+
+    // Should filter by subcategory
+    expect(find.textContaining('Paddy'), findsWidgets);
   });
 }
 

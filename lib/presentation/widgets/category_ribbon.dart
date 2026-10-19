@@ -113,6 +113,15 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     _overlayEntry = null;
     setState(() => _activeOpenTab = cat.id);
 
+    final categories = CategoryItem.sampleCategories;
+    final catIndex = categories.indexWhere((c) => c.id == cat.id);
+    double dx = 0;
+    if (catIndex >= 6) {
+      dx = -260;
+    } else if (catIndex >= 4) {
+      dx = -140;
+    }
+
     final entry = OverlayEntry(
       builder: (ctx) => Stack(
         children: [
@@ -120,7 +129,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
             child: CompositedTransformFollower(
               link: link,
               showWhenUnlinked: false,
-              offset: const Offset(0, 44),
+              offset: Offset(dx, 44),
               child: Align(
                 alignment: Alignment.topLeft,
                 child: MouseRegion(
@@ -493,19 +502,77 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                 widget.onCategorySelected?.call(cat.id, null);
               },
             ),
-            ...cat.subcategories.map(
-              (sub) => ListTile(
-                leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: AppColors.textMuted),
-                title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
-                trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
-                    ? const Icon(Icons.check, size: 18, color: AppColors.primaryCrimson)
-                    : null,
-                onTap: () {
-                  Navigator.pop(ctx);
-                  widget.onCategorySelected?.call(cat.id, sub);
-                },
+            if (cat.groups.isNotEmpty)
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: cat.groups.length,
+                  itemBuilder: (ctx, idx) {
+                    final group = cat.groups[idx];
+                    return ExpansionTile(
+                      leading: group.icon != null
+                          ? Text(group.icon!, style: const TextStyle(fontSize: 18))
+                          : null,
+                      title: Text(
+                        group.name,
+                        style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(
+                        '${group.subcategories.length} subcategories',
+                        style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                      ),
+                      children: [
+                        ListTile(
+                          dense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                          leading: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryGreen),
+                          title: Text(
+                            'View All ${group.name}',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            widget.onCategorySelected?.call(cat.id, group.name);
+                          },
+                        ),
+                        ...group.subcategories.map(
+                          (sub) => ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+                            leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 16, color: AppColors.textMuted),
+                            title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
+                            trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
+                                ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                : null,
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              widget.onCategorySelected?.call(cat.id, sub);
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              )
+            else
+              ...cat.subcategories.map(
+                (sub) => ListTile(
+                  leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: AppColors.textMuted),
+                  title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
+                  trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
+                      ? const Icon(Icons.check, size: 18, color: AppColors.primaryCrimson)
+                      : null,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    widget.onCategorySelected?.call(cat.id, sub);
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -514,7 +581,9 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
 }
 
 /// Desktop Hover Mega Menu:
-/// Left pane shows Categories; Hovering on any Category updates Right pane with its Subcategories!
+/// Left pane: Major Categories (Seeds, Insecticides, etc.)
+/// Middle pane: Categories under hovered Major Category
+/// Right pane: Subcategories of hovered Category opening in the side
 class _MegaMenuPopup extends StatefulWidget {
   final List<CategoryItem> categories;
   final String selectedCategoryId;
@@ -534,25 +603,36 @@ class _MegaMenuPopup extends StatefulWidget {
 
 class _MegaMenuPopupState extends State<_MegaMenuPopup> {
   late CategoryItem _hoveredCategory;
+  CategoryGroup? _hoveredGroup;
 
   @override
   void initState() {
     super.initState();
-    // Default hovered category to the currently selected one or the first category
     final match = widget.categories.firstWhere(
       (c) => c.id == widget.selectedCategoryId,
       orElse: () => widget.categories.first,
     );
     _hoveredCategory = match;
+    _hoveredGroup = match.groups.isNotEmpty ? match.groups.first : null;
+  }
+
+  void _onHoverCategory(CategoryItem cat) {
+    setState(() {
+      _hoveredCategory = cat;
+      _hoveredGroup = cat.groups.isNotEmpty ? cat.groups.first : null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final groups = _hoveredCategory.groups;
+    final activeGroup = _hoveredGroup ?? (groups.isNotEmpty ? groups.first : null);
+
     return Material(
       color: Colors.transparent,
       child: Container(
-        width: 680,
-        height: 420,
+        width: 720,
+        height: 430,
         margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -560,8 +640,8 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
           border: Border.all(color: AppColors.border, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 20,
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 22,
               offset: const Offset(0, 10),
             ),
           ],
@@ -570,11 +650,11 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Left Column: Category List (Hovering changes active category)
+            // Left Column: Major Categories
             Container(
-              width: 250,
+              width: 220,
               decoration: const BoxDecoration(
-                color: Color(0xFFF9FAFB),
+                color: Color(0xFFF8FAFC),
                 border: Border(right: BorderSide(color: AppColors.border, width: 1)),
               ),
               child: Column(
@@ -585,14 +665,14 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                     onTap: () => widget.onSelect('all', null),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      color: widget.selectedCategoryId == 'all' ? AppColors.softRose : Colors.transparent,
+                      color: widget.selectedCategoryId == 'all' ? AppColors.softRose : Colors.white,
                       child: Row(
                         children: [
                           const Icon(Icons.storefront_rounded, size: 18, color: AppColors.primaryCrimson),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'All Agricultural Products',
+                              'All Products',
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -607,9 +687,23 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                   ),
                   const Divider(height: 1, color: AppColors.border),
 
-                  // Categories with onHover detection
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+                    child: Text(
+                      'MAJOR CATEGORIES',
+                      style: GoogleFonts.poppins(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+
+                  // Major Categories List
                   Expanded(
                     child: ListView.builder(
+                      padding: EdgeInsets.zero,
                       itemCount: widget.categories.length,
                       itemBuilder: (ctx, idx) {
                         final cat = widget.categories[idx];
@@ -617,32 +711,30 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                         final isSelected = widget.selectedCategoryId == cat.id;
 
                         return MouseRegion(
-                          onEnter: (_) {
-                            setState(() => _hoveredCategory = cat);
-                          },
+                          onEnter: (_) => _onHoverCategory(cat),
                           child: InkWell(
                             onTap: () => widget.onSelect(cat.id, null),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                               decoration: BoxDecoration(
                                 color: isHovered
                                     ? Colors.white
                                     : (isSelected ? AppColors.lightGreen : Colors.transparent),
                                 border: isHovered
                                     ? const Border(
-                                        left: BorderSide(color: AppColors.primaryGreen, width: 4),
+                                        left: BorderSide(color: AppColors.primaryGreen, width: 3.5),
                                       )
                                     : null,
                               ),
                               child: Row(
                                 children: [
-                                  Text(cat.icon, style: const TextStyle(fontSize: 16)),
-                                  const SizedBox(width: 10),
+                                  Text(cat.icon, style: const TextStyle(fontSize: 15)),
+                                  const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       cat.name,
                                       style: GoogleFonts.poppins(
-                                        fontSize: 13,
+                                        fontSize: 12.5,
                                         fontWeight: (isHovered || isSelected)
                                             ? FontWeight.w700
                                             : FontWeight.w500,
@@ -650,6 +742,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                             ? AppColors.primaryDarkGreen
                                             : AppColors.textPrimary,
                                       ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   Icon(
@@ -669,80 +762,199 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
               ),
             ),
 
-            // Right Column: Dynamically displays the subcategories for hovered category
+            // Middle Column: Categories under hovered Major Category
+            Container(
+              width: 220,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFAFAFA),
+                border: Border(right: BorderSide(color: AppColors.border, width: 1)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // View all in hovered major category
+                  InkWell(
+                    onTap: () => widget.onSelect(_hoveredCategory.id, null),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      color: Colors.white,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'All ${_hoveredCategory.name}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryDarkGreen,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: AppColors.border),
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+                    child: Text(
+                      'CATEGORIES',
+                      style: GoogleFonts.poppins(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+
+                  // Categories list
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: groups.length,
+                      itemBuilder: (ctx, idx) {
+                        final group = groups[idx];
+                        final isHovered = activeGroup?.name == group.name;
+
+                        return MouseRegion(
+                          onEnter: (_) {
+                            setState(() => _hoveredGroup = group);
+                          },
+                          child: InkWell(
+                            onTap: () => widget.onSelect(_hoveredCategory.id, group.name),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                              decoration: BoxDecoration(
+                                color: isHovered ? Colors.white : Colors.transparent,
+                                border: isHovered
+                                    ? const Border(
+                                        left: BorderSide(color: AppColors.primaryGreen, width: 3.5),
+                                      )
+                                    : null,
+                              ),
+                              child: Row(
+                                children: [
+                                  if (group.icon != null) ...[
+                                    Text(group.icon!, style: const TextStyle(fontSize: 14)),
+                                    const SizedBox(width: 8),
+                                  ],
+                                  Expanded(
+                                    child: Text(
+                                      group.name,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
+                                        color: isHovered ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.chevron_right_rounded,
+                                    size: 15,
+                                    color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Right Column: Subcategories opening in the side
             Expanded(
               child: Container(
                 color: Colors.white,
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Subcategory Pane Header
-                    Row(
-                      children: [
-                        Text(_hoveredCategory.icon, style: const TextStyle(fontSize: 22)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _hoveredCategory.name,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.textPrimary,
+                    if (activeGroup != null) ...[
+                      Row(
+                        children: [
+                          if (activeGroup.icon != null) ...[
+                            Text(activeGroup.icon!, style: const TextStyle(fontSize: 18)),
+                            const SizedBox(width: 8),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  activeGroup.name,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                              Text(
-                                '${_hoveredCategory.subcategories.length} Specialized Subcategories',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11.5,
-                                  color: AppColors.textMuted,
+                                Text(
+                                  '${activeGroup.subcategories.length} Specialized Subcategories',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        // View All in this Category button
-                        TextButton.icon(
-                          onPressed: () => widget.onSelect(_hoveredCategory.id, null),
-                          icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-                          label: Text(
-                            'View All',
-                            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold),
+                          TextButton(
+                            onPressed: () => widget.onSelect(_hoveredCategory.id, activeGroup.name),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.primaryGreen,
+                              backgroundColor: const Color(0xFFF0FDF4),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                            ),
+                            child: Text(
+                              'View All',
+                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700),
+                            ),
                           ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.primaryGreen,
-                            backgroundColor: AppColors.lightGreen,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Divider(height: 1),
-                    const SizedBox(height: 12),
-
-                    // Grid / List of Subcategories
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: _hoveredCategory.subcategories.length,
-                        separatorBuilder: (_, _) => const SizedBox(height: 6),
-                        itemBuilder: (ctx, idx) {
-                          final sub = _hoveredCategory.subcategories[idx];
-                          final isSubSelected = widget.selectedCategoryId == _hoveredCategory.id &&
-                              widget.selectedSubcategory == sub;
-
-                          return _SubcategoryHoverItem(
-                            title: sub,
-                            isSelected: isSubSelected,
-                            onTap: () => widget.onSelect(_hoveredCategory.id, sub),
-                          );
-                        },
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      const Divider(height: 1),
+                      const SizedBox(height: 8),
+
+                      // Subcategories List
+                      Expanded(
+                        child: ListView.separated(
+                          padding: EdgeInsets.zero,
+                          itemCount: activeGroup.subcategories.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 4),
+                          itemBuilder: (ctx, idx) {
+                            final sub = activeGroup.subcategories[idx];
+                            final isSubSelected = widget.selectedCategoryId == _hoveredCategory.id &&
+                                widget.selectedSubcategory == sub;
+
+                            return _SubcategoryHoverItem(
+                              title: sub,
+                              isSelected: isSubSelected,
+                              onTap: () => widget.onSelect(_hoveredCategory.id, sub),
+                            );
+                          },
+                        ),
+                      ),
+                    ] else
+                      Center(
+                        child: Text(
+                          'No subcategories available',
+                          style: GoogleFonts.poppins(color: AppColors.textMuted),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -782,11 +994,11 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(8),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isSelected
                 ? AppColors.softRose
-                : (_isHovered ? AppColors.lightGreen : Colors.transparent),
+                : (_isHovered ? const Color(0xFFF0FDF4) : Colors.transparent),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: widget.isSelected
@@ -798,7 +1010,7 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
             children: [
               Icon(
                 Icons.subdirectory_arrow_right_rounded,
-                size: 16,
+                size: 15,
                 color: widget.isSelected
                     ? AppColors.primaryCrimson
                     : (_isHovered ? AppColors.primaryGreen : AppColors.textMuted),
@@ -808,7 +1020,7 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
                 child: Text(
                   widget.title,
                   style: GoogleFonts.poppins(
-                    fontSize: 13,
+                    fontSize: 12.5,
                     fontWeight: (widget.isSelected || _isHovered)
                         ? FontWeight.w600
                         : FontWeight.w400,
@@ -819,9 +1031,9 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
                 ),
               ),
               if (widget.isSelected)
-                const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                const Icon(Icons.check, size: 15, color: AppColors.primaryCrimson)
               else if (_isHovered)
-                const Icon(Icons.chevron_right, size: 16, color: AppColors.primaryGreen),
+                const Icon(Icons.chevron_right, size: 15, color: AppColors.primaryGreen),
             ],
           ),
         ),
@@ -830,8 +1042,10 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
   }
 }
 
-/// Desktop Hover Single Category Dropdown Popup
-class _SingleCategoryPopup extends StatelessWidget {
+/// Desktop Hover Single Major Category Dropdown Popup:
+/// Left pane: Categories under this Major Category
+/// Right pane: Subcategories of the hovered Category opening in the side
+class _SingleCategoryPopup extends StatefulWidget {
   final CategoryItem category;
   final bool isSelected;
   final String? selectedSubcategory;
@@ -845,78 +1059,298 @@ class _SingleCategoryPopup extends StatelessWidget {
   });
 
   @override
+  State<_SingleCategoryPopup> createState() => _SingleCategoryPopupState();
+}
+
+class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
+  CategoryGroup? _hoveredGroup;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.category.groups.isNotEmpty) {
+      _hoveredGroup = widget.category.groups.first;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final groups = widget.category.groups;
+    final activeGroup = _hoveredGroup ?? (groups.isNotEmpty ? groups.first : null);
+
     return Material(
       color: Colors.transparent,
       child: Container(
-        width: 320,
+        width: groups.isNotEmpty ? 540 : 320,
+        height: 380,
         margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 18,
-              offset: const Offset(0, 8),
+              color: Colors.black.withValues(alpha: 0.14),
+              blurRadius: 22,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // "All in Category" top button
-            InkWell(
-              onTap: () => onSelect(category.id, null),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                color: (isSelected && selectedSubcategory == null)
-                    ? AppColors.softRose
-                    : const Color(0xFFF9FAFB),
-                child: Row(
-                  children: [
-                    Text(category.icon, style: const TextStyle(fontSize: 16)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'All ${category.name}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: (isSelected && selectedSubcategory == null)
-                              ? AppColors.primaryCrimson
-                              : AppColors.primaryDarkGreen,
-                        ),
+        child: groups.isEmpty
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InkWell(
+                    onTap: () => widget.onSelect(widget.category.id, null),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      color: (widget.isSelected && widget.selectedSubcategory == null)
+                          ? AppColors.softRose
+                          : const Color(0xFFF9FAFB),
+                      child: Row(
+                        children: [
+                          Text(widget.category.icon, style: const TextStyle(fontSize: 16)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'All ${widget.category.name}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: (widget.isSelected && widget.selectedSubcategory == null)
+                                    ? AppColors.primaryCrimson
+                                    : AppColors.primaryDarkGreen,
+                              ),
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                        ],
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
-                  ],
-                ),
-              ),
-            ),
-            const Divider(height: 1),
+                  ),
+                  const Divider(height: 1),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      children: widget.category.subcategories.map((sub) {
+                        final isSubSelected = widget.isSelected && widget.selectedSubcategory == sub;
+                        return _SubcategoryHoverItem(
+                          title: sub,
+                          isSelected: isSubSelected,
+                          onTap: () => widget.onSelect(widget.category.id, sub),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Left Column: Categories under this Major Category
+                  Container(
+                    width: 220,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF8FAFC),
+                      border: Border(right: BorderSide(color: AppColors.border, width: 1)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // "All in [Category]" top header item
+                        InkWell(
+                          onTap: () => widget.onSelect(widget.category.id, null),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            color: (widget.isSelected && widget.selectedSubcategory == null)
+                                ? AppColors.softRose
+                                : Colors.white,
+                            child: Row(
+                              children: [
+                                Text(widget.category.icon, style: const TextStyle(fontSize: 16)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'All ${widget.category.name}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: (widget.isSelected && widget.selectedSubcategory == null)
+                                          ? AppColors.primaryCrimson
+                                          : AppColors.primaryDarkGreen,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Divider(height: 1, color: AppColors.border),
 
-            // Subcategories
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-              child: Column(
-                children: category.subcategories.map(
-                  (sub) {
-                    final isSubSelected = isSelected && selectedSubcategory == sub;
-                    return _SubcategoryHoverItem(
-                      title: sub,
-                      isSelected: isSubSelected,
-                      onTap: () => onSelect(category.id, sub),
-                    );
-                  },
-                ).toList(),
+                        // Section label
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
+                          child: Text(
+                            'CATEGORIES',
+                            style: GoogleFonts.poppins(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textMuted,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+
+                        // Categories List
+                        Expanded(
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: groups.length,
+                            itemBuilder: (ctx, idx) {
+                              final group = groups[idx];
+                              final isHovered = activeGroup?.name == group.name;
+
+                              return MouseRegion(
+                                onEnter: (_) {
+                                  setState(() => _hoveredGroup = group);
+                                },
+                                child: InkWell(
+                                  onTap: () => widget.onSelect(widget.category.id, group.name),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: isHovered ? Colors.white : Colors.transparent,
+                                      border: isHovered
+                                          ? const Border(
+                                              left: BorderSide(color: AppColors.primaryGreen, width: 3.5),
+                                            )
+                                          : null,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        if (group.icon != null) ...[
+                                          Text(group.icon!, style: const TextStyle(fontSize: 14)),
+                                          const SizedBox(width: 8),
+                                        ],
+                                        Expanded(
+                                          child: Text(
+                                            group.name,
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 12.5,
+                                              fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
+                                              color: isHovered
+                                                  ? AppColors.primaryDarkGreen
+                                                  : AppColors.textPrimary,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.chevron_right_rounded,
+                                          size: 16,
+                                          color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Right Column (Side Panel): Subcategories of the hovered Category
+                  Expanded(
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (activeGroup != null) ...[
+                            // Side Subcategory Header
+                            Row(
+                              children: [
+                                if (activeGroup.icon != null) ...[
+                                  Text(activeGroup.icon!, style: const TextStyle(fontSize: 18)),
+                                  const SizedBox(width: 8),
+                                ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        activeGroup.name,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        '${activeGroup.subcategories.length} Specialized Subcategories',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 11,
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () => widget.onSelect(widget.category.id, activeGroup.name),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.primaryGreen,
+                                    backgroundColor: const Color(0xFFF0FDF4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  ),
+                                  child: Text(
+                                    'View All',
+                                    style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            const Divider(height: 1),
+                            const SizedBox(height: 8),
+
+                            // Subcategories list
+                            Expanded(
+                              child: ListView.separated(
+                                padding: EdgeInsets.zero,
+                                itemCount: activeGroup.subcategories.length,
+                                separatorBuilder: (_, _) => const SizedBox(height: 4),
+                                itemBuilder: (ctx, idx) {
+                                  final sub = activeGroup.subcategories[idx];
+                                  final isSubSelected = widget.isSelected && widget.selectedSubcategory == sub;
+
+                                  return _SubcategoryHoverItem(
+                                    title: sub,
+                                    isSelected: isSubSelected,
+                                    onTap: () => widget.onSelect(widget.category.id, sub),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

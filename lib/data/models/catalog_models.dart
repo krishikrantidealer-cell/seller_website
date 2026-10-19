@@ -274,106 +274,355 @@ class ProductItem {
   ];
 }
 
+class CategoryGroup {
+  final String name;
+  final String? icon;
+  final List<String> subcategories;
+
+  const CategoryGroup({
+    required this.name,
+    this.icon,
+    required this.subcategories,
+  });
+}
+
 class CategoryItem {
   final String id;
   final String name;
   final String icon;
-  final List<String> subcategories;
+  final List<CategoryGroup> groups;
+  final List<String> _legacySubcategories;
 
   const CategoryItem({
     required this.id,
     required this.name,
     required this.icon,
-    this.subcategories = const [],
-  });
+    this.groups = const [],
+    List<String> subcategories = const [],
+  }) : _legacySubcategories = subcategories;
+
+  List<String> get subcategories {
+    if (groups.isNotEmpty) {
+      return groups.expand((g) => g.subcategories).toList();
+    }
+    return _legacySubcategories;
+  }
 
   static List<CategoryItem> get sampleCategories => const [
     CategoryItem(
       id: 'seeds',
       name: 'Seeds',
       icon: '🌱',
-      subcategories: [
-        'Hybrid Vegetable Seeds',
-        'Field Crop Seeds',
-        'Flower & Kitchen Garden Seeds',
-        'Forage & Green Manure',
+      groups: [
+        CategoryGroup(
+          name: 'Vegetable Seeds',
+          icon: '🥦',
+          subcategories: [
+            'Hybrid Tomato Seeds',
+            'Chilli & Pepper Seeds',
+            'Okra (Bhindi) Seeds',
+            'Brinjal (Eggplant) Seeds',
+            'Gourds (Bottle, Bitter, Ridge)',
+            'Cabbage & Cauliflower Seeds',
+            'Onion & Root Vegetable Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Field Crop Seeds',
+          icon: '🌾',
+          subcategories: [
+            'Hybrid Paddy (Rice) Seeds',
+            'High Yield Wheat Seeds',
+            'Bt Cotton Seeds',
+            'Mustard (Sarson) Seeds',
+            'Hybrid Maize & Corn Seeds',
+            'Pulse & Soybean Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fruit & Flower Seeds',
+          icon: '🌻',
+          subcategories: [
+            'Watermelon & Muskmelon Seeds',
+            'Taiwan 786 Papaya Seeds',
+            'Marigold Flower Seeds',
+            'Exotic Flower & Lawn Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Forage & Green Manure',
+          icon: '🌿',
+          subcategories: [
+            'Lucerne & Alfa Alfa Seeds',
+            'Berseem Clover Seeds',
+            'Dhaincha & Sunhemp Seeds',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'insecticides',
       name: 'Insecticides',
       icon: '🦗',
-      subcategories: [
-        'Bio-Insecticides',
-        'Systemic Insecticides',
-        'Caterpillar & Bollworm Control',
-        'Sucking Pest & Thrips Control',
+      groups: [
+        CategoryGroup(
+          name: 'Systemic Insecticides',
+          icon: '💧',
+          subcategories: [
+            'Imidacloprid (Confidor tech)',
+            'Thiamethoxam SC/WG',
+            'Acetamiprid 20% SP',
+            'Fipronil 5% SC / 0.3% GR',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Contact & Ingestion',
+          icon: '⚡',
+          subcategories: [
+            'Chlorantraniliprole (Coragen tech)',
+            'Emamectin Benzoate 5% SG',
+            'Lambda Cyhalothrin 5% EC',
+            'Profenofos 40% + Cypermethrin 4%',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bio & Organic Insecticides',
+          icon: '🍃',
+          subcategories: [
+            'Neem Oil (10000 PPM / 300 PPM)',
+            'Beauveria Bassiana Bio-Fungus',
+            'Bacillus Thuringiensis (Bt)',
+            'Sticky Traps & Pheromone Lures',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Target Pest Specialists',
+          icon: '🎯',
+          subcategories: [
+            'Whitefly & Sucking Pest Care',
+            'Stem Borer & Bollworm Killers',
+            'Mite & Thrips Specialists',
+            'Termite & Soil Insect Control',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'fungicides',
       name: 'Fungicides',
       icon: '🍄',
-      subcategories: [
-        'Contact Fungicides',
-        'Systemic Fungicides',
-        'Bio-Fungicides & Trichoderma',
-        'Downy & Powdery Mildew Care',
+      groups: [
+        CategoryGroup(
+          name: 'Systemic Fungicides',
+          icon: '🛡️',
+          subcategories: [
+            'Azoxystrobin + Difenoconazole',
+            'Tebuconazole + Trifloxystrobin',
+            'Hexaconazole 5% SC/EC',
+            'Metalaxyl + Mancozeb (Ridomil tech)',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Contact & Protective',
+          icon: '🥊',
+          subcategories: [
+            'Mancozeb 75% WP (Dithane M-45)',
+            'Copper Oxychloride 50% WP',
+            'Chlorothalonil 75% WP',
+            'Sulphur 80% WDG (Foliar/Dust)',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bio-Fungicides & Biocontrol',
+          icon: '🌿',
+          subcategories: [
+            'Trichoderma Viride / Harzianum',
+            'Pseudomonas Fluorescens',
+            'Downy & Powdery Mildew Care',
+            'Root Rot & Wilt Management',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'fertilizers',
       name: 'Fertilizers & Nutrients',
       icon: '🧪',
-      subcategories: [
-        'Water Soluble NPK (19:19:19 / 0:52:34)',
-        'Chelated Micronutrients (Zinc, Boron)',
-        'Bio-fertilizers & Soil Conditioners',
-        'Organic Manure & Humic Acid',
+      groups: [
+        CategoryGroup(
+          name: 'Water Soluble NPKs',
+          icon: '🧪',
+          subcategories: [
+            '19:19:19 Complete Balanced NPK',
+            '0:52:34 Mono Potassium Phosphate',
+            '13:0:45 Potassium Nitrate (KNO3)',
+            '12:61:0 Mono Ammonium Phosphate',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Micronutrients & Chelates',
+          icon: '🔬',
+          subcategories: [
+            'Chelated Zinc (EDTA 12%)',
+            'Disodium Octaborate (Boron 20%)',
+            'Ferrous Sulphate & Magnesium',
+            'Multi-Micronutrient Crop Mixtures',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Organic & Soil Boosters',
+          icon: '🍂',
+          subcategories: [
+            'Concentrated Humic & Fulvic Acid',
+            'Seaweed Ascophyllum Nodosum Extract',
+            'Mycorrhiza Bio-Fertilizer (VAM)',
+            'Bio-Enriched Organic Manure',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'herbicides',
       name: 'Herbicides',
       icon: '🌿',
-      subcategories: [
-        'Pre-Emergent Herbicides',
-        'Post-Emergent Herbicides',
-        'Selective Weedicides',
-        'Total Weed Killers',
+      groups: [
+        CategoryGroup(
+          name: 'Selective Crop Weedicides',
+          icon: '🌾',
+          subcategories: [
+            'Paddy Weedicides (Pretilachlor / Bispyribac)',
+            'Wheat Weedicides (Sulfosulfuron / Clodinafop)',
+            'Soybean & Cotton Weedicides',
+            'Sugarcane & Maize Weedicides',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Total & Non-Selective Killers',
+          icon: '🚫',
+          subcategories: [
+            'Glyphosate Formulations',
+            'Glufosinate Ammonium 13.5%',
+            'Paraquat Dichloride 24% SL',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Pre-Emergent Weedicides',
+          icon: '🌱',
+          subcategories: [
+            'Pendimethalin 30% EC / 38.7% CS',
+            'Atrazine 50% WP',
+            'Oxyfluorfen 23.5% EC',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'equipment',
       name: 'Farm Equipment',
       icon: '🚜',
-      subcategories: [
-        'Battery Operated Sprayers (16L/18L)',
-        'Manual & Knapsack Sprayers',
-        'Brush Cutters & Power Weeders',
-        'Pruning Tools & Farm Safety Kits',
+      groups: [
+        CategoryGroup(
+          name: 'Sprayers & Pumps',
+          icon: '🔋',
+          subcategories: [
+            '16L/18L 2-in-1 Battery Sprayers',
+            'Manual Knapsack Pressure Sprayers',
+            'High Pressure HTP & Power Sprayers',
+            'Orchard Mist Blowers & Foggers',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Power Tools & Weeders',
+          icon: '⚙️',
+          subcategories: [
+            'Brush Cutters (2-Stroke & 4-Stroke)',
+            'Mini Power Weeders & Tillers',
+            'Chainsaws & Hedge Trimmers',
+            'Earth Augers & Post Hole Diggers',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Manual Tools & Farm Safety',
+          icon: '✂️',
+          subcategories: [
+            'Pruning Shears & Secateurs',
+            'Telescopic Tree Pruners',
+            'Safety Helmets, Masks & Suits',
+            'Spray Nozzles & Brass Delivery Pipes',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'irrigation',
       name: 'Drip & Irrigation',
       icon: '💧',
-      subcategories: [
-        'Drip Lateral Pipes & Drippers',
-        'Rain Hose & Sprinkler Nozzles',
-        'Venturi Injectors & Screen Filters',
-        'Fittings & Joiners',
+      groups: [
+        CategoryGroup(
+          name: 'Drip Lateral & Emitters',
+          icon: '💧',
+          subcategories: [
+            '16mm / 12mm Inline Drip Laterals',
+            'Online Drippers (4L/8L/Adjustable)',
+            'Micro-Tubes & Arrow Drippers',
+            'Drip Joiners, Tees & End Caps',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Sprinklers & Rain Guns',
+          icon: '🌧️',
+          subcategories: [
+            'Micro & Mini Sprinkler Sets',
+            'Overhead Rain Guns & Tripods',
+            'Rain Hose Pipes & Laser Tubing',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Filtration & Fertigation',
+          icon: '🔧',
+          subcategories: [
+            'Screen & Disc Filters (2" & 2.5")',
+            'Venturi Fertilizer Injectors',
+            'Air Release & Flush Valves',
+          ],
+        ),
       ],
     ),
     CategoryItem(
       id: 'gardening',
       name: 'Home Gardening',
       icon: '🏡',
-      subcategories: [
-        'Enriched Potting Soil & Cocopeat',
-        'Plant Boosters & Flowering Spray',
-        'Hand Sprayers & Pruning Shears',
-        'Indoor & Balcony Plant Care',
+      groups: [
+        CategoryGroup(
+          name: 'Potting Mix & Soil Care',
+          icon: '🪴',
+          subcategories: [
+            'Nutrient-Enriched Potting Soil',
+            'Low EC Washed Cocopeat Bricks',
+            'Vermicompost & Cow Dung Compost',
+            'Perlite & Vermiculite Drainage Media',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Plant Care & Nutrition',
+          icon: '🌸',
+          subcategories: [
+            'Ready-to-use Flowering Sprays',
+            'Organic Neem Oil Pest Spray',
+            'Micro-Nutrient Sticks & Tablets',
+            'Liquid Bio-Enzyme Foliar Tonics',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Garden Tools & Watering',
+          icon: '🚿',
+          subcategories: [
+            '2-Liter Hand Compression Sprayers',
+            'Garden Trowels & Weeder Forks',
+            'Watering Cans & Hose Spray Guns',
+            'Balcony Planters & Grow Bags',
+          ],
+        ),
       ],
     ),
   ];
