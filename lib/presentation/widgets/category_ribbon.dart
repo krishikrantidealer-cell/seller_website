@@ -159,294 +159,262 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   @override
   Widget build(BuildContext context) {
     final categories = CategoryItem.sampleCategories;
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final isMobile = screenWidth < 768;
 
-    if (isMobile) {
-      return _buildMobileMenuBar(context, categories);
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        final isMobile = constraints.maxWidth < 768 || screenWidth < 768;
 
-    return Container(
-      width: double.infinity,
-      color: AppColors.primaryGreen,
-      height: 48,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1680),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                const SizedBox(width: 8),
+        if (isMobile) {
+          return _buildMobileMenuBar(context, categories);
+        }
 
-                // Master "ALL CATEGORIES" Tab with hover mega-menu on desktop
-                CompositedTransformTarget(
-                  link: _allCategoriesLink,
-                  child: MouseRegion(
-                    onEnter: (_) {
-                      if (!isMobile) _showMegaMenu(context, categories);
-                    },
-                    onExit: (_) {
-                      if (!isMobile) _scheduleHide();
-                    },
-                    child: InkWell(
-                      onTap: () {
-                        if (isMobile) {
-                          _openMobileMenu(context, categories);
-                        } else {
-                          if (_overlayEntry != null && _activeOpenTab == 'all') {
-                            _removeOverlay();
-                          } else {
-                            _showMegaMenu(context, categories);
-                          }
-                        }
-                      },
-                      child: Container(
-                        height: 38,
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        decoration: BoxDecoration(
-                          color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
-                              ? AppColors.primaryDarkGreen
-                              : Colors.white.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
-                                ? Colors.white
-                                : Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.grid_view_rounded, color: Colors.white, size: 16),
-                            const SizedBox(width: 8),
-                            Text(
-                              'ALL CATEGORIES',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.3,
+        return Container(
+          width: double.infinity,
+          color: AppColors.primaryGreen,
+          height: 48,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 8),
+
+                    // Master "ALL CATEGORIES" Tab with hover mega-menu on desktop
+                    CompositedTransformTarget(
+                      link: _allCategoriesLink,
+                      child: MouseRegion(
+                        onEnter: (_) {
+                          if (!isMobile) _showMegaMenu(context, categories);
+                        },
+                        onExit: (_) {
+                          if (!isMobile) _scheduleHide();
+                        },
+                        child: InkWell(
+                          onTap: () {
+                            if (isMobile) {
+                              _openMobileMenu(context, categories);
+                            } else {
+                              if (_overlayEntry != null && _activeOpenTab == 'all') {
+                                _removeOverlay();
+                              } else {
+                                _showMegaMenu(context, categories);
+                              }
+                            }
+                          },
+                          child: Container(
+                            height: 38,
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            decoration: BoxDecoration(
+                              color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
+                                  ? AppColors.primaryDarkGreen
+                                  : Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
+                                    ? Colors.white
+                                    : Colors.white.withValues(alpha: 0.2),
+                                width: 1,
                               ),
                             ),
-                            const SizedBox(width: 6),
-                            AnimatedRotation(
-                              turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
-                              duration: const Duration(milliseconds: 180),
-                              child: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 16),
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.grid_view_rounded, color: Colors.white, size: 16),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'ALL CATEGORIES',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                AnimatedRotation(
+                                  turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
+                                  duration: const Duration(milliseconds: 180),
+                                  child: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 16),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
 
-                const SizedBox(width: 6),
-                Container(
-                  height: 24,
-                  width: 1,
-                  color: Colors.white.withValues(alpha: 0.25),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                ),
-                const SizedBox(width: 6),
+                    const SizedBox(width: 6),
+                    Container(
+                      height: 24,
+                      width: 1,
+                      color: Colors.white.withValues(alpha: 0.25),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                    ),
+                    const SizedBox(width: 6),
 
-                // Individual Category Tabs with hover dropdown on desktop
-                ...categories.map(
-                  (cat) => _buildCategoryTab(context, cat, isMobile),
+                    // Individual Category Tabs with hover dropdown on desktop
+                    ...categories.map(
+                      (cat) => _buildCategoryTab(context, cat, isMobile),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
                 ),
-                const SizedBox(width: 12),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  /// Dedicated Mobile Category Menu Bar
+  /// Dedicated Mobile Category Menu Bar (clean non-scrolling full menu bar)
   Widget _buildMobileMenuBar(BuildContext context, List<CategoryItem> categories) {
     final isAllSelected = widget.selectedCategoryId == 'all';
+    final activeCat = categories.cast<CategoryItem?>().firstWhere(
+      (c) => c?.id == widget.selectedCategoryId,
+      orElse: () => null,
+    );
 
-    return Container(
-      width: double.infinity,
-      color: AppColors.primaryGreen,
-      height: 44,
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1680),
-          child: Row(
-            children: [
-              const SizedBox(width: 8),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 60) {
+          return const SizedBox.shrink();
+        }
 
-              // "Menu / Categories" Button with Hamburger icon
-              Material(
+        return Container(
+          width: double.infinity,
+          height: 44,
+          color: AppColors.primaryGreen,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: Material(
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () => _openMobileMenu(context, categories),
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(8),
                   child: Container(
                     height: 34,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: isAllSelected
-                          ? AppColors.primaryDarkGreen
-                          : Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(18),
+                          ? Colors.white.withValues(alpha: 0.15)
+                          : AppColors.primaryDarkGreen,
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: isAllSelected ? 0.8 : 0.35),
+                        color: Colors.white.withValues(alpha: isAllSelected ? 0.35 : 0.6),
                         width: 1,
                       ),
                     ),
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.menu_rounded, color: Colors.white, size: 16),
-                        const SizedBox(width: 5),
-                        Text(
-                          'All Categories',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.2,
+                        const Icon(Icons.menu_rounded, color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (activeCat != null && !isAllSelected) ...[
+                                Text(activeCat.icon, style: const TextStyle(fontSize: 14)),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    widget.selectedSubcategory != null
+                                        ? '${activeCat.name} › ${widget.selectedSubcategory}'
+                                        : activeCat.name,
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ] else ...[
+                                Flexible(
+                                  child: Text(
+                                    'All Categories',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.2,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 3),
-                        const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 14),
+                        if (!isAllSelected) ...[
+                          InkWell(
+                            onTap: () {
+                              widget.onCategorySelected?.call('all', null);
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.25),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Clear',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  const Icon(Icons.close_rounded, color: Colors.white, size: 12),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Browse',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 14),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-
-              // Divider
-              Container(
-                height: 20,
-                width: 1,
-                color: Colors.white.withValues(alpha: 0.3),
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-              ),
-
-              // Quick Horizontal Category Filter Pills
-              Expanded(
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: categories.length + 1,
-                  separatorBuilder: (context, index) => const SizedBox(width: 6),
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return _buildMobileCategoryChip(
-                        label: 'All',
-                        icon: null,
-                        isSelected: isAllSelected,
-                        onTap: () {
-                          widget.onCategorySelected?.call('all', null);
-                        },
-                      );
-                    }
-
-                    final cat = categories[index - 1];
-                    final isSelected = widget.selectedCategoryId == cat.id;
-                    final hasSubcategory = isSelected && widget.selectedSubcategory != null;
-
-                    return _buildMobileCategoryChip(
-                      label: hasSubcategory
-                          ? '${cat.name}: ${widget.selectedSubcategory}'
-                          : cat.name,
-                      icon: cat.icon,
-                      isSelected: isSelected,
-                      hasClear: hasSubcategory,
-                      onClear: () {
-                        widget.onCategorySelected?.call(cat.id, null);
-                      },
-                      onTap: () {
-                        if (isSelected) {
-                          _showMobileCategoryOptions(context, cat);
-                        } else {
-                          widget.onCategorySelected?.call(cat.id, null);
-                        }
-                      },
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMobileCategoryChip({
-    required String label,
-    String? icon,
-    required bool isSelected,
-    bool hasClear = false,
-    VoidCallback? onClear,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          height: 32,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.16),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: isSelected
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.28),
-              width: 1,
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (icon != null) ...[
-                Text(icon, style: const TextStyle(fontSize: 12)),
-                const SizedBox(width: 5),
-              ],
-              Text(
-                label,
-                style: GoogleFonts.poppins(
-                  color: isSelected ? AppColors.primaryDarkGreen : Colors.white,
-                  fontSize: 11.5,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
-              if (hasClear) ...[
-                const SizedBox(width: 4),
-                GestureDetector(
-                  onTap: onClear,
-                  child: const Icon(
-                    Icons.close_rounded,
-                    size: 14,
-                    color: AppColors.primaryCrimson,
-                  ),
-                ),
-              ] else if (isSelected) ...[
-                const SizedBox(width: 3),
-                const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 14,
-                  color: AppColors.primaryDarkGreen,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -703,125 +671,138 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   void _showMobileCategoryOptions(BuildContext context, CategoryItem cat) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      builder: (ctx) => ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.82,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Row(
-                children: [
-                  Text(cat.icon, style: const TextStyle(fontSize: 20)),
-                  const SizedBox(width: 8),
-                  Text(
-                    cat.name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryDarkGreen,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  children: [
+                    Text(cat.icon, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        cat.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryDarkGreen,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Divider(height: 1),
-            ListTile(
-              leading: const Icon(Icons.check_circle_outline, color: AppColors.primaryGreen),
-              title: Text('All in ${cat.name}', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13.5)),
-              onTap: () {
-                Navigator.pop(ctx);
-                widget.onCategorySelected?.call(cat.id, null);
-              },
-            ),
-            if (cat.groups.isNotEmpty)
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: cat.groups.length,
-                  itemBuilder: (ctx, idx) {
-                    final group = cat.groups[idx];
-                    return ExpansionTile(
-                      leading: group.icon != null
-                          ? Text(group.icon!, style: const TextStyle(fontSize: 18))
-                          : null,
-                      title: Text(
-                        group.name,
-                        style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w600),
-                      ),
-                      subtitle: Text(
-                        '${group.subcategories.length} subcategories',
-                        style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
-                      ),
-                      children: [
-                        ListTile(
-                          dense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                          leading: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryGreen),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.check_circle_outline, color: AppColors.primaryGreen),
+                title: Text('All in ${cat.name}', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  widget.onCategorySelected?.call(cat.id, null);
+                },
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: ListView(
+                  children: [
+                    if (cat.groups.isNotEmpty)
+                      ...cat.groups.map(
+                        (group) => ExpansionTile(
+                          leading: group.icon != null
+                              ? Text(group.icon!, style: const TextStyle(fontSize: 18))
+                              : null,
                           title: Text(
-                            'View All ${group.name}',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryGreen,
-                            ),
+                            group.name,
+                            style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w600),
                           ),
+                          subtitle: Text(
+                            '${group.subcategories.length} subcategories',
+                            style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                          ),
+                          children: [
+                            ListTile(
+                              dense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                              leading: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryGreen),
+                              title: Text(
+                                'View All ${group.name}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.pop(ctx);
+                                widget.onCategorySelected?.call(cat.id, group.name);
+                              },
+                            ),
+                            ...group.subcategories.map(
+                              (sub) => ListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 28),
+                                leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 16, color: AppColors.textMuted),
+                                title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
+                                trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
+                                    ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                    : null,
+                                onTap: () {
+                                  Navigator.pop(ctx);
+                                  widget.onCategorySelected?.call(cat.id, sub);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ...cat.subcategories.map(
+                        (sub) => ListTile(
+                          leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: AppColors.textMuted),
+                          title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
+                          trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
+                              ? const Icon(Icons.check, size: 18, color: AppColors.primaryCrimson)
+                              : null,
                           onTap: () {
                             Navigator.pop(ctx);
-                            widget.onCategorySelected?.call(cat.id, group.name);
+                            widget.onCategorySelected?.call(cat.id, sub);
                           },
                         ),
-                        ...group.subcategories.map(
-                          (sub) => ListTile(
-                            dense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 28),
-                            leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 16, color: AppColors.textMuted),
-                            title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
-                            trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
-                                ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
-                                : null,
-                            onTap: () {
-                              Navigator.pop(ctx);
-                              widget.onCategorySelected?.call(cat.id, sub);
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              )
-            else
-              ...cat.subcategories.map(
-                (sub) => ListTile(
-                  leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: AppColors.textMuted),
-                  title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
-                  trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
-                      ? const Icon(Icons.check, size: 18, color: AppColors.primaryCrimson)
-                      : null,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    widget.onCategorySelected?.call(cat.id, sub);
-                  },
+                      ),
+                  ],
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ),
     );

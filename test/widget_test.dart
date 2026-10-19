@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:seller_website/data/models/catalog_models.dart';
 import 'package:seller_website/main.dart';
 import 'package:seller_website/presentation/product_detail/product_detail_view.dart';
+import 'package:seller_website/presentation/widgets/category_ribbon.dart';
 import 'package:seller_website/presentation/widgets/product_card.dart';
 
 void main() {
@@ -367,8 +368,44 @@ void main() {
     await tester.tap(find.text('All in Seeds'));
     await tester.pumpAndSettle();
 
-    // Verify Seeds category is selected
+    // Verify Seeds category is selected and reflected in mobile menu bar
     expect(find.text('Seeds'), findsWidgets);
+
+    // Verify there is NO horizontal scrolling ListView in CategoryRibbon
+    final ribbonListView = find.descendant(of: find.byType(CategoryRibbon), matching: find.byType(ListView));
+    expect(ribbonListView, findsNothing);
+
+    // Verify 'Clear' button appears on the mobile menu bar and tapping it clears the filter
+    final clearBtn = find.text('Clear');
+    expect(clearBtn, findsOneWidget);
+    await tester.tap(clearBtn);
+    await tester.pumpAndSettle();
+
+    // Verify reset back to All Categories
+    expect(find.text('All Categories'), findsOneWidget);
+  });
+
+  testWidgets('CategoryRibbon renders cleanly on narrow mobile screen without overflow', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: CategoryRibbon(
+            selectedCategoryId: 'insecticides',
+            selectedSubcategory: 'Systemic Insecticides',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Insecticides'), findsOneWidget);
+    expect(find.text('Clear'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
 
