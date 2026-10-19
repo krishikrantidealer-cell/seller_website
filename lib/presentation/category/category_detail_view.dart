@@ -184,15 +184,14 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                           // Header Card with Category Title, Product Count, and Sort Dropdown
                           _buildHeaderCard(filtered.length, isMobile),
 
-                          const SizedBox(height: 12),
-
-                          // Category Switcher Pills
-                          _buildCategoryPills(isMobile),
-
-                          // Subcategories Chips Row (if category is specific)
-                          if (currentSubcategories.isNotEmpty) ...[
-                            const SizedBox(height: 10),
-                            _buildSubcategoriesRow(currentSubcategories),
+                          // Category Switcher Pills & Subcategories (only for regular category browsing, NOT in Best Sellers mode)
+                          if (!_isBestSellersMode) ...[
+                            const SizedBox(height: 12),
+                            _buildCategoryPills(isMobile),
+                            if (currentSubcategories.isNotEmpty) ...[
+                              const SizedBox(height: 10),
+                              _buildSubcategoriesRow(currentSubcategories),
+                            ],
                           ],
 
                           const SizedBox(height: 16),
@@ -267,27 +266,28 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                   '  /  ',
                   style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
                 ),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = 'all';
-                      _selectedSubcategory = null;
-                      _isBestSellersMode = false;
-                    });
-                  },
-                  child: Text(
-                    'Categories',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                if (!_isBestSellersMode) ...[
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = 'all';
+                        _selectedSubcategory = null;
+                      });
+                    },
+                    child: Text(
+                      'Categories',
+                      style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                    ),
                   ),
-                ),
+                  Text(
+                    '  /  ',
+                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
+                  ),
+                ],
                 Text(
-                  '  /  ',
-                  style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
-                ),
-                Text(
-                  _selectedCategory == 'all'
-                      ? (_isBestSellersMode ? 'Best Sellers' : 'All Products')
-                      : _getCategoryTitle(_selectedCategory),
+                  _isBestSellersMode
+                      ? 'Best Sellers'
+                      : (_selectedCategory == 'all' ? 'All Products' : _getCategoryTitle(_selectedCategory)),
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,

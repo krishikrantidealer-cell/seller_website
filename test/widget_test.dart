@@ -134,6 +134,9 @@ void main() {
     // Verify CategoryDetailView opens in Best Sellers mode
     expect(find.text('Best Sellers'), findsWidgets);
     expect(find.textContaining('8 Best Sellers'), findsWidgets);
+    // Categories filter chips should NOT be displayed in Best Sellers view
+    expect(find.text('All Products'), findsNothing);
+    expect(find.text('Insecticides'), findsNothing);
     // Non-bestseller products should NOT be displayed
     expect(find.textContaining('Nano Urea'), findsNothing);
     expect(find.textContaining('Tata Rallis'), findsNothing);
