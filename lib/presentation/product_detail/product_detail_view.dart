@@ -376,63 +376,75 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     return Container(
       width: double.infinity,
       color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 24, vertical: 10),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1680),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.of(context).pop(),
-                  borderRadius: BorderRadius.circular(4),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.arrow_back_rounded, size: 16, color: AppColors.primaryGreen),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Back',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryGreen,
+          child: SizedBox(
+            width: double.infinity,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.of(context).pop(),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF0FDF4),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.arrow_back_rounded, size: 15, color: AppColors.primaryGreen),
+                            const SizedBox(width: 5),
+                            Text(
+                              'Back',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 12),
+                    InkWell(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Home',
+                        style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
+                    const SizedBox(width: 6),
+                    Text(
+                      widget.product.category,
+                      style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
+                    const SizedBox(width: 6),
+                    Text(
+                      widget.product.title,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                const Text('•', style: TextStyle(color: AppColors.textMuted)),
-                const SizedBox(width: 10),
-                InkWell(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Text(
-                    'Home',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
-                  ),
-                ),
-                const SizedBox(width: 6),
-                const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
-                const SizedBox(width: 6),
-                Text(
-                  widget.product.category,
-                  style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
-                ),
-                const SizedBox(width: 6),
-                const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
-                const SizedBox(width: 6),
-                Text(
-                  widget.product.title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),

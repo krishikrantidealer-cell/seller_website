@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:seller_website/main.dart';
+import 'package:seller_website/presentation/widgets/product_card.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -180,6 +181,36 @@ void main() {
     // Verify dropdown menu opened with Track Orders and Sign Out
     expect(find.text('Track Orders'), findsOneWidget);
     expect(find.text('Sign Out'), findsOneWidget);
+  });
+
+  testWidgets('Product detail back button starts from the left side and navigates back', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Tap the first product card to open product detail view
+    final firstProduct = find.byType(ProductCard).first;
+    await tester.tap(firstProduct);
+    await tester.pumpAndSettle();
+
+    // Verify back button exists
+    final backBtn = find.text('Back');
+    expect(backBtn, findsOneWidget);
+
+    // On a 1440px desktop screen, the back button should start from the left (< 100px), not centered (~500px+)
+    final backBtnOffset = tester.getTopLeft(backBtn);
+    expect(backBtnOffset.dx, lessThan(100.0));
+
+    // Tap back button to navigate back to home
+    await tester.tap(backBtn);
+    await tester.pumpAndSettle();
+
+    // Verify we are back on the home page
+    expect(find.text('Best Sellers'), findsWidgets);
   });
 }
 
