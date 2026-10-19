@@ -628,3 +628,435 @@ class CategoryItem {
   ];
 }
 
+class TechnicalItem {
+  final String name;
+  final String category;
+  final String description;
+  final List<String> targetedPestsOrCrops;
+  final String formulationType;
+
+  const TechnicalItem({
+    required this.name,
+    required this.category,
+    this.description = '',
+    this.targetedPestsOrCrops = const [],
+    this.formulationType = '',
+  });
+
+  String get firstLetter {
+    if (name.isEmpty) return '#';
+    final char = name[0].toUpperCase();
+    if (RegExp(r'[A-Z]').hasMatch(char)) return char;
+    return '#';
+  }
+
+  static const List<TechnicalItem> sampleTechnicalItems = [
+    // A
+    TechnicalItem(
+      name: 'Abamectin 1.9% EC',
+      category: 'Insecticide',
+      description: 'Fermentation-derived miticide and insecticide for red spider mites, two-spotted mites, and leafminers.',
+      targetedPestsOrCrops: ['Red Spider Mites', 'Two-spotted Mite', 'Leafminer in vegetables'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Abhinav Hybrid Tomato Seeds',
+      category: 'Seeds',
+      description: 'Determinate high-yielding tomato hybrid with strong TYLCV and bacterial wilt tolerance.',
+      targetedPestsOrCrops: ['Tomato commercial cultivation', 'Bacterial wilt resistance'],
+      formulationType: 'Seed',
+    ),
+    TechnicalItem(
+      name: 'Acephate 75% SP',
+      category: 'Insecticide',
+      description: 'Systemic organophosphate insecticide effective against jassids, aphids, and bollworms in cotton and vegetables.',
+      targetedPestsOrCrops: ['Aphids', 'Jassids', 'Cotton Bollworm'],
+      formulationType: 'SP',
+    ),
+    TechnicalItem(
+      name: 'Acetamiprid 20% SP',
+      category: 'Insecticide',
+      description: 'Neonicotinoid insecticide with quick translaminar action against whiteflies, aphids, and leafhoppers.',
+      targetedPestsOrCrops: ['Whitefly', 'Aphids', 'Leafhopper in chilli & cotton'],
+      formulationType: 'SP',
+    ),
+    TechnicalItem(
+      name: 'Azoxystrobin 11% + Tebuconazole 18.3% SC',
+      category: 'Fungicide',
+      description: 'Broad-spectrum dual action systemic fungicide preventing powdery mildew, blast, and sheath blight.',
+      targetedPestsOrCrops: ['Sheath Blight', 'Powdery Mildew', 'Early Blight'],
+      formulationType: 'SC',
+    ),
+
+    // B
+    TechnicalItem(
+      name: 'Bacillus Thuringiensis (Bt) 0.5% WP',
+      category: 'Bio-Insecticide',
+      description: 'Biological microbial insecticide targeting lepidopteran larvae without harming beneficial insects.',
+      targetedPestsOrCrops: ['Diamondback Moth', 'Helicoverpa', 'Spodoptera'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Bispyribac Sodium 10% SC',
+      category: 'Herbicide',
+      description: 'Post-emergence selective herbicide for controlling major grasses, sedges, and broadleaf weeds in rice.',
+      targetedPestsOrCrops: ['Barnyard Grass', 'Echinochloa', 'Cyperus in Paddy'],
+      formulationType: 'SC',
+    ),
+    TechnicalItem(
+      name: 'Buprofezin 25% SC',
+      category: 'Insecticide',
+      description: 'Insect growth regulator inhibiting chitin synthesis in brown planthopper (BPH) and mealybugs.',
+      targetedPestsOrCrops: ['Brown Plant Hopper', 'Mealybug', 'Whitefly nymphs'],
+      formulationType: 'SC',
+    ),
+
+    // C
+    TechnicalItem(
+      name: 'Carbendazim 12% + Mancozeb 63% WP',
+      category: 'Fungicide',
+      description: 'Widely trusted contact and systemic dual fungicide for seed treatment, blast, anthracnose, and tikka disease.',
+      targetedPestsOrCrops: ['Paddy Blast', 'Groundnut Tikka', 'Chilli Anthracnose', 'Seed Treatment'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Carbendazim 50% WP',
+      category: 'Fungicide',
+      description: 'Systemic fungicide for curative and preventive management of seed-borne and soil-borne fungal pathogens.',
+      targetedPestsOrCrops: ['Loose Smut', 'Collar Rot', 'Powdery Mildew'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Cartap Hydrochloride 50% SP',
+      category: 'Insecticide',
+      description: 'Neurotoxic insecticide providing excellent control over paddy stem borer and leaf folder.',
+      targetedPestsOrCrops: ['Paddy Stem Borer', 'Leaf Folder', 'Cabbage Diamondback Moth'],
+      formulationType: 'SP',
+    ),
+    TechnicalItem(
+      name: 'Chlorantraniliprole 18.5% SC',
+      category: 'Insecticide',
+      description: 'Modern anthranilic diamide delivering exceptional, long-duration control of chewing pests with high safety margins.',
+      targetedPestsOrCrops: ['Stem Borer', 'Fruit & Shoot Borer', 'Diamondback Moth', 'Pod Borer'],
+      formulationType: 'SC',
+    ),
+    TechnicalItem(
+      name: 'Chlorpyrifos 20% EC',
+      category: 'Insecticide',
+      description: 'Trusted contact insecticide for termite management in soil and control of root grubs and foliar chewing insects.',
+      targetedPestsOrCrops: ['Termites', 'Root Grubs', 'Stem Borer'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Chlorpyrifos 50% + Cypermethrin 5% EC',
+      category: 'Insecticide',
+      description: 'Synergistic combination insecticide offering rapid knockdown and deep penetrating kill against mixed pest complexes.',
+      targetedPestsOrCrops: ['Bollworms', 'Spodoptera', 'Stem Borer', 'Sucking Pests'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Copper Oxychloride 50% WP',
+      category: 'Fungicide',
+      description: 'Broad-spectrum protective copper fungicide and bactericide preventing downy mildew, leaf spots, and canker.',
+      targetedPestsOrCrops: ['Downy Mildew', 'Citrus Canker', 'Leaf Spot', 'Late Blight'],
+      formulationType: 'WP',
+    ),
+
+    // D
+    TechnicalItem(
+      name: 'Deltamethrin 2.8% EC',
+      category: 'Insecticide',
+      description: 'Fast knockdown synthetic pyrethroid for bollworms, leaf folders, and sucking pests.',
+      targetedPestsOrCrops: ['Cotton Bollworm', 'Leaf Folder', 'Fruit Borer'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Diafenthiuron 50% WP',
+      category: 'Insecticide',
+      description: 'Unique thiourea pro-insecticide that activates inside nymphs and adults for control of resistant whiteflies and mites.',
+      targetedPestsOrCrops: ['Whitefly', 'Thrips', 'Two-spotted Mite in Chilli'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Dimethoate 30% EC',
+      category: 'Insecticide',
+      description: 'Systemic organophosphate insecticide and acaricide controlling aphids, thrips, leafminers, and spider mites.',
+      targetedPestsOrCrops: ['Aphids', 'Thrips', 'Stem Borer', 'Red Spider Mites'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Dinotefuran 20% SG',
+      category: 'Insecticide',
+      description: 'Third-generation furanicotinyl systemic insecticide with quick curative effect against brown plant hoppers in paddy.',
+      targetedPestsOrCrops: ['Brown Plant Hopper (BPH)', 'Whitebacked Plant Hopper'],
+      formulationType: 'SG',
+    ),
+
+    // E
+    TechnicalItem(
+      name: 'Emamectin Benzoate 5% SG',
+      category: 'Insecticide',
+      description: 'Naturally derived avermectin insecticide for superior stomach-action control of caterpillars and bollworms.',
+      targetedPestsOrCrops: ['Fall Armyworm', 'Bollworm', 'Pod Borer', 'Diamondback Moth'],
+      formulationType: 'SG',
+    ),
+    TechnicalItem(
+      name: 'Ethion 50% EC',
+      category: 'Insecticide',
+      description: 'Organophosphate insecticide and miticide controlling red spider mites, scale insects, and tea mosquitoes.',
+      targetedPestsOrCrops: ['Tea Red Spider Mite', 'Scales', 'Thrips in Chilli'],
+      formulationType: 'EC',
+    ),
+
+    // F
+    TechnicalItem(
+      name: 'Fipronil 5% SC',
+      category: 'Insecticide',
+      description: 'Phenylpyrazole insecticide with contact and ingestion activity against stem borer, thrips, and aphids.',
+      targetedPestsOrCrops: ['Chilli Thrips', 'Stem Borer', 'Green Leafhopper'],
+      formulationType: 'SC',
+    ),
+    TechnicalItem(
+      name: 'Flubendiamide 39.35% SC',
+      category: 'Insecticide',
+      description: 'Ryanodine receptor disruptor offering long-lasting prevention of lepidopteran chewing caterpillars.',
+      targetedPestsOrCrops: ['Diamondback Moth', 'American Bollworm', 'Tobacco Caterpillar'],
+      formulationType: 'SC',
+    ),
+
+    // G
+    TechnicalItem(
+      name: 'Gibberellic Acid 0.001% L',
+      category: 'Bio-Stimulant',
+      description: 'Naturally occurring plant growth hormone promoting cell division, fruit elongation, and higher crop yields.',
+      targetedPestsOrCrops: ['Grapes elongation', 'Cotton boll retention', 'Vegetable vegetative growth'],
+      formulationType: 'L',
+    ),
+    TechnicalItem(
+      name: 'Glyphosate 41% SL',
+      category: 'Herbicide',
+      description: 'Non-selective systemic broad-spectrum herbicide for controlling perennial and annual grasses and broadleaf weeds.',
+      targetedPestsOrCrops: ['Non-crop area weed eradication', 'Tea plantation weed management'],
+      formulationType: 'SL',
+    ),
+
+    // H
+    TechnicalItem(
+      name: 'Hexaconazole 5% SC',
+      category: 'Fungicide',
+      description: 'Broad-spectrum systemic triazole fungicide controlling powdery mildew, sheath blight, and rusts.',
+      targetedPestsOrCrops: ['Rice Sheath Blight', 'Mango Powdery Mildew', 'Apple Scab'],
+      formulationType: 'SC',
+    ),
+    TechnicalItem(
+      name: 'Hot Pepper Ananya Hybrid Seeds',
+      category: 'Seeds',
+      description: 'High-pungency dark green turning glossy red chilli hybrid with excellent virus tolerance.',
+      targetedPestsOrCrops: ['Chilli production', 'High-heat Indian markets'],
+      formulationType: 'Seed',
+    ),
+
+    // I
+    TechnicalItem(
+      name: 'Imidacloprid 17.8% SL',
+      category: 'Insecticide',
+      description: 'Systemic chloronicotinyl insecticide widely used for seed treatment and foliar spray against sucking pests.',
+      targetedPestsOrCrops: ['Aphids', 'Jassids', 'Termites', 'Whiteflies'],
+      formulationType: 'SL',
+    ),
+    TechnicalItem(
+      name: 'Imidacloprid 30.5% SC',
+      category: 'Insecticide',
+      description: 'Ultra-concentrated systemic insecticide specialized for structural termite eradication and resistant sucking bugs.',
+      targetedPestsOrCrops: ['Soil Subterranean Termites', 'Cotton Jassids', 'Chilli Aphids'],
+      formulationType: 'SC',
+    ),
+
+    // K
+    TechnicalItem(
+      name: 'Kasugamycin 3% SL',
+      category: 'Fungicide',
+      description: 'Systemic aminoglycoside antibiotic fungicide and bactericide preventing rice blast and bacterial brown spot.',
+      targetedPestsOrCrops: ['Paddy Neck Blast', 'Leaf Blast', 'Bacterial Gummosis'],
+      formulationType: 'SL',
+    ),
+    TechnicalItem(
+      name: 'Knapsack Battery Sprayer 12V 8Ah',
+      category: 'Equipment',
+      description: 'Heavy-duty 16-liter electric rechargeable agricultural sprayer with dual-speed motor and brass nozzles.',
+      targetedPestsOrCrops: ['Crop chemical spraying', 'Orchard foliar applications'],
+      formulationType: 'Tool',
+    ),
+
+    // L
+    TechnicalItem(
+      name: 'Lambda Cyhalothrin 4.9% CS',
+      category: 'Insecticide',
+      description: 'Micro-encapsulated synthetic pyrethroid giving UV-stable extended residual protection against bollworms and thrips.',
+      targetedPestsOrCrops: ['Cotton BollwormComplex', 'Stem Borer', 'Fruit Borer'],
+      formulationType: 'CS',
+    ),
+    TechnicalItem(
+      name: 'Lambda Cyhalothrin 5% EC',
+      category: 'Insecticide',
+      description: 'Fast-action pyrethroid insecticide controlling a wide range of foliar chewing and sucking insect pests.',
+      targetedPestsOrCrops: ['Thrips', 'Aphids', 'Fruit Borer', 'Leaf Folder'],
+      formulationType: 'EC',
+    ),
+
+    // M
+    TechnicalItem(
+      name: 'Mancozeb 75% WP',
+      category: 'Fungicide',
+      description: 'Multisite contact dithiocarbamate fungicide for reliable prevention of late blight, early blight, and anthracnose.',
+      targetedPestsOrCrops: ['Potato Late Blight', 'Tomato Early Blight', 'Apple Scab', 'Grape Downy Mildew'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Metalaxyl-M 4% + Mancozeb 64% WP',
+      category: 'Fungicide',
+      description: 'Superior systemic-contact combination delivering both curative inside-tissue action and outer spore protection.',
+      targetedPestsOrCrops: ['Late Blight in Potato/Tomato', 'Downy Mildew in Grapes & Cucurbits', 'Damping Off'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Metribuzin 70% WP',
+      category: 'Herbicide',
+      description: 'Selective pre and early post-emergence herbicide for sugarcane, potato, soybean, and wheat fields.',
+      targetedPestsOrCrops: ['Phalaris minor', 'Chenopodium', 'Echinochloa'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Mycorrhiza Bio Fertilizer VAM',
+      category: 'Bio Fertilizer',
+      description: 'Vesicular-Arbuscular Mycorrhizal bio-inoculant expanding root absorptive surface for phosphorus and moisture uptake.',
+      targetedPestsOrCrops: ['Root expansion', 'Drought tolerance', 'Phosphorus mobilization'],
+      formulationType: 'Granule/Powder',
+    ),
+
+    // N
+    TechnicalItem(
+      name: 'Nano Nitrogen 4% w/v',
+      category: 'Fertilizer',
+      description: 'Engineered bio-available nano-scale liquid nitrogen for rapid foliar uptake, reducing chemical urea leaching.',
+      targetedPestsOrCrops: ['Cereal crops', 'Vegetative greening', 'Photosynthetic boost'],
+      formulationType: 'Liquid',
+    ),
+    TechnicalItem(
+      name: 'Neem Oil (Azadirachtin 10000 PPM)',
+      category: 'Bio-Insecticide',
+      description: 'Organic cold-pressed pure neem extract acting as an anti-feedant, repellent, and insect growth inhibitor.',
+      targetedPestsOrCrops: ['Whiteflies', 'Mealybugs', 'Leafminers', 'Mites across organic farms'],
+      formulationType: 'EC',
+    ),
+
+    // P
+    TechnicalItem(
+      name: 'Paclobutrazol 23% SC',
+      category: 'Plant Growth Regulator',
+      description: 'Triazole plant growth regulator that curbs excessive vegetative shoots to trigger uniform flowering in mango.',
+      targetedPestsOrCrops: ['Mango flowering synchronization', 'Canopy size regulation'],
+      formulationType: 'SC',
+    ),
+    TechnicalItem(
+      name: 'Pendimethalin 30% EC',
+      category: 'Herbicide',
+      description: 'Pre-emergence dinitroaniline herbicide inhibiting root and shoot growth in germinating annual weed seeds.',
+      targetedPestsOrCrops: ['Annual grasses', 'Broadleaf weeds in Soybean, Cotton, Onion & Garlic'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Pretilachlor 50% EC',
+      category: 'Herbicide',
+      description: 'Selective pre-emergence herbicide for transplanted paddy, controlling grasses, sedges, and broadleaved weeds.',
+      targetedPestsOrCrops: ['Echinochloa crusgalli', 'Cyperus difformis in Rice'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Propiconazole 25% EC',
+      category: 'Fungicide',
+      description: 'Systemic triazole fungicide with protective, curative, and eradicative properties against leaf rust and karnal bunt.',
+      targetedPestsOrCrops: ['Wheat Yellow & Brown Rust', 'Karnal Bunt', 'Rice Sheath Blight'],
+      formulationType: 'EC',
+    ),
+
+    // Q
+    TechnicalItem(
+      name: 'Quizalofop Ethyl 5% EC',
+      category: 'Herbicide',
+      description: 'Selective systemic post-emergence herbicide controlling narrow-leaf grassy weeds in broadleaf crops.',
+      targetedPestsOrCrops: ['Echinochloa', 'Dactyloctenium', 'Digitaria in Soybean, Groundnut & Cotton'],
+      formulationType: 'EC',
+    ),
+
+    // S
+    TechnicalItem(
+      name: 'Spiromesifen 22.9% SC',
+      category: 'Insecticide',
+      description: 'Lipid biosynthesis inhibitor specialized against whiteflies, red spider mites, and yellow mites.',
+      targetedPestsOrCrops: ['Chilli Yellow Mites', 'Brinjal Red Spider Mites', 'Whitefly nymphs'],
+      formulationType: 'SC',
+    ),
+    TechnicalItem(
+      name: 'Sulfur 80% WDG',
+      category: 'Fungicide',
+      description: 'Dual-action contact fungicide, acaricide, and essential secondary plant nutrient in water-dispersible granules.',
+      targetedPestsOrCrops: ['Powdery Mildew in Grapes/Mango', 'Rust', 'Sulphur deficiency in pulses'],
+      formulationType: 'WDG',
+    ),
+
+    // T
+    TechnicalItem(
+      name: 'Tebuconazole 25.9% EC',
+      category: 'Fungicide',
+      description: 'Systemic broad-spectrum ergosterol inhibitor fungicide for blast, sheath blight, and leaf spot control.',
+      targetedPestsOrCrops: ['Paddy Sheath Blight', 'Groundnut Tikka', 'Chilli Fruit Rot'],
+      formulationType: 'EC',
+    ),
+    TechnicalItem(
+      name: 'Tebuconazole 50% + Trifloxystrobin 25% WG',
+      category: 'Fungicide',
+      description: 'Premier combination of triazole and strobilurin delivering superior mesostemic protection with plant greening benefits.',
+      targetedPestsOrCrops: ['Sheath Blight', 'Paddy Blast', 'Powdery Mildew in Grapes', 'Anthracnose'],
+      formulationType: 'WG',
+    ),
+    TechnicalItem(
+      name: 'Thiamethoxam 25% WG',
+      category: 'Insecticide',
+      description: 'Second-generation neonicotinoid with fast translaminar uptake for rapid management of sucking insect vectors.',
+      targetedPestsOrCrops: ['Aphids', 'Jassids', 'Whiteflies', 'Paddy Stem Borer', 'Thrips'],
+      formulationType: 'WG',
+    ),
+    TechnicalItem(
+      name: 'Thiophanate Methyl 70% WP',
+      category: 'Fungicide',
+      description: 'Broad-spectrum systemic curative fungicide for control of anthracnose, powdery mildew, scab, and fusarium wilt.',
+      targetedPestsOrCrops: ['Anthracnose', 'Fusarium Wilt', 'Apple Scab', 'Brown Rust'],
+      formulationType: 'WP',
+    ),
+    TechnicalItem(
+      name: 'Trichoderma Viride 1% WP',
+      category: 'Bio-Fungicide',
+      description: 'Antagonistic biocontrol fungus that parasitizes soil-borne fungal pathogens causing damping off, root rot, and collar rot.',
+      targetedPestsOrCrops: ['Root Rot', 'Collar Rot', 'Seedling Damping Off in nurseries'],
+      formulationType: 'WP',
+    ),
+
+    // Z
+    TechnicalItem(
+      name: 'Zinc Solubilizing Bio-Fertilizer (ZSB)',
+      category: 'Bio Fertilizer',
+      description: 'Beneficial bacterial strain that converts insoluble soil zinc compounds into plant-absorbable ions.',
+      targetedPestsOrCrops: ['Khaira disease in Paddy', 'Zinc deficiency correction', 'Root vigor'],
+      formulationType: 'Liquid/Carrier',
+    ),
+    TechnicalItem(
+      name: 'Zineb 75% WP',
+      category: 'Fungicide',
+      description: 'Protective organic contact fungicide with zinc supplementation for downy mildew, rust, and leaf spot.',
+      targetedPestsOrCrops: ['Downy Mildew', 'Early Blight', 'Leaf Spots'],
+      formulationType: 'WP',
+    ),
+  ];
+}
+

@@ -5,17 +5,20 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/auth_state.dart';
 import 'auth_modal.dart';
+import '../technical/technical_search_view.dart';
 
 class MainNavHeader extends StatefulWidget {
   final int? cartItemCount;
   final ValueChanged<String>? onSearch;
   final VoidCallback? onCartTap;
+  final VoidCallback? onTechnicalSearchTap;
 
   const MainNavHeader({
     super.key,
     this.cartItemCount,
     this.onSearch,
     this.onCartTap,
+    this.onTechnicalSearchTap,
   });
 
   @override
@@ -29,6 +32,17 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _openTechnicalSearch() {
+    if (widget.onTechnicalSearchTap != null) {
+      widget.onTechnicalSearchTap!();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const TechnicalSearchView()),
+      );
+    }
   }
 
   @override
@@ -155,7 +169,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                         ),
                         const SizedBox(width: 8),
                         InkWell(
-                          onTap: () {},
+                          onTap: _openTechnicalSearch,
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
                             height: 40,
@@ -241,7 +255,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                         const SizedBox(width: 12),
                         // Search by Technical Name Button
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: _openTechnicalSearch,
                           icon: const Icon(Icons.science_outlined, size: 18),
                           label: Text(
                             'Search by Technical',

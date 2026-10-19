@@ -254,5 +254,41 @@ void main() {
     // Should filter by subcategory
     expect(find.textContaining('Paddy'), findsWidgets);
   });
+
+  testWidgets('Search by Technical Name opens directory and filters by formulation', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Click 'Search by Technical' button in navigation header
+    final technicalBtn = find.text('Search by Technical');
+    expect(technicalBtn, findsOneWidget);
+    await tester.tap(technicalBtn);
+    await tester.pumpAndSettle();
+
+    // Verify Technical Search Directory View opened
+    expect(find.text('Search Products By Technical Name'), findsOneWidget);
+    expect(find.textContaining('Technical Formulations Starting With "C"'), findsOneWidget);
+
+    // Enter search for Chlorantraniliprole into directory search field
+    await tester.enterText(find.byType(TextField).last, 'Chlorantraniliprole');
+    await tester.pumpAndSettle();
+
+    // Verify formulation row appears
+    expect(find.text('Chlorantraniliprole 18.5% SC'), findsOneWidget);
+    expect(find.text('✓ 1 Products in Store'), findsOneWidget);
+
+    // Click 'View Products'
+    await tester.tap(find.text('View Products'));
+    await tester.pumpAndSettle();
+
+    // Verify redirected to products list with technical formulation active
+    expect(find.textContaining('Chlorantraniliprole 18.5% SC'), findsWidgets);
+    expect(find.text('Katyayani All in One Insecticide for Crops'), findsOneWidget);
+  });
 }
 
