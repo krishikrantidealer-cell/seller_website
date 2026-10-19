@@ -22,7 +22,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
   String _searchQuery = '';
   String _selectedCategoryFilter = 'All';
   String? _selectedLetterFilter;
-  final Set<String> _expandedLetters = {'A', 'C', 'I'}; // Default open sections
+  final Set<String> _expandedLetters = {'A'}; // Only 'A' open by default
 
   final List<TechnicalItem> _allTechnicals = TechnicalItem.sampleTechnicalItems;
 
