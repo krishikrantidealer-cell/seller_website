@@ -322,6 +322,55 @@ void main() {
     expect(find.text('Write a Review'), findsOneWidget);
     expect(find.textContaining('100% Authenticated field purchases'), findsOneWidget);
   });
+
+  testWidgets('Mobile view top bar category turns into mobile category menu bar and drawer', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Verify top bar category rendered as mobile menu bar with 'All Categories' button
+    final categoriesBtn = find.text('All Categories');
+    expect(categoriesBtn, findsOneWidget);
+
+    // Verify hamburger icon exists in the top header
+    final menuIconBtn = find.byTooltip('Categories Menu');
+    expect(menuIconBtn, findsOneWidget);
+
+    // Tap hamburger menu icon to open navigation drawer
+    await tester.tap(menuIconBtn);
+    await tester.pumpAndSettle();
+
+    // Verify drawer opened with categories
+    expect(find.text('CATEGORIES'), findsOneWidget);
+    expect(find.descendant(of: find.byType(Drawer), matching: find.text('All Products')), findsOneWidget);
+    final drawerSeeds = find.descendant(of: find.byType(Drawer), matching: find.text('Seeds'));
+    expect(drawerSeeds, findsOneWidget);
+
+    // Close drawer
+    await tester.tap(find.byTooltip('Close Menu'));
+    await tester.pumpAndSettle();
+
+    // Tap Categories menu button on the ribbon to open drawer
+    await tester.tap(categoriesBtn);
+    await tester.pumpAndSettle();
+    expect(find.text('CATEGORIES'), findsOneWidget);
+
+    // Tap 'Seeds' in the drawer
+    await tester.tap(drawerSeeds);
+    await tester.pumpAndSettle();
+
+    // Tap 'All in Seeds'
+    await tester.tap(find.text('All in Seeds'));
+    await tester.pumpAndSettle();
+
+    // Verify Seeds category is selected
+    expect(find.text('Seeds'), findsWidgets);
+  });
 }
+
 
 

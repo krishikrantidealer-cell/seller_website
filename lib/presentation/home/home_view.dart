@@ -11,6 +11,7 @@ import '../widgets/cart_drawer.dart';
 import '../widgets/web_footer.dart';
 import '../product_detail/product_detail_view.dart';
 import '../category/category_detail_view.dart';
+import '../technical/technical_search_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -96,6 +97,7 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      drawer: _buildMobileNavigationDrawer(context),
       endDrawer: const QuickCartDrawer(),
       body: Column(
         children: [
@@ -116,8 +118,11 @@ class _HomeViewState extends State<HomeView> {
                 // Top Bar
                 const TopInfoBar(),
 
-                // Main Header with interactive cart tap
+                // Main Header with interactive cart tap and mobile menu tap
                 MainNavHeader(
+                  onMenuTap: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
                   onCartTap: () {
                     _scaffoldKey.currentState?.openEndDrawer();
                   },
@@ -567,6 +572,250 @@ class _HomeViewState extends State<HomeView> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileNavigationDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Drawer Brand Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: const BoxDecoration(
+                color: AppColors.lightGreen,
+                border: Border(bottom: BorderSide(color: AppColors.border)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(Icons.eco_rounded, color: Colors.white, size: 18),
+                      ),
+                      const SizedBox(width: 8),
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'EBS ',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryCrimson,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'BioCrop',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primaryGreen,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 22),
+                    tooltip: 'Close Menu',
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+
+            // Scrollable Menu Content
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    child: Text(
+                      'CATEGORIES',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+
+                  // All Products
+                  ListTile(
+                    leading: const Icon(Icons.grid_view_rounded, color: AppColors.primaryGreen),
+                    title: Text(
+                      'All Products',
+                      style: GoogleFonts.poppins(
+                        fontWeight: _selectedCategory == 'all' ? FontWeight.w700 : FontWeight.w600,
+                        fontSize: 13.5,
+                        color: _selectedCategory == 'all' ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                      ),
+                    ),
+                    trailing: _selectedCategory == 'all'
+                        ? const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 18)
+                        : null,
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _selectedCategory = 'all';
+                        _selectedSubcategory = null;
+                      });
+                    },
+                  ),
+                  const Divider(height: 1),
+
+                  // Major Categories
+                  ...CategoryItem.sampleCategories.map((cat) {
+                    final isCatSelected = _selectedCategory == cat.id;
+                    return ExpansionTile(
+                      leading: Text(cat.icon, style: const TextStyle(fontSize: 18)),
+                      title: Text(
+                        cat.name,
+                        style: GoogleFonts.poppins(
+                          fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
+                          fontSize: 13.5,
+                          color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                        ),
+                      ),
+                      children: [
+                        ListTile(
+                          dense: true,
+                          contentPadding: const EdgeInsets.only(left: 36, right: 16),
+                          title: Text(
+                            'All in ${cat.name}',
+                            style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryGreen,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            setState(() {
+                              _selectedCategory = cat.id;
+                              _selectedSubcategory = null;
+                            });
+                          },
+                        ),
+                        if (cat.groups.isNotEmpty)
+                          ...cat.groups.map(
+                            (group) => ExpansionTile(
+                              dense: true,
+                              tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+                              leading: group.icon != null
+                                  ? Text(group.icon!, style: const TextStyle(fontSize: 15))
+                                  : null,
+                              title: Text(
+                                group.name,
+                                style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w600),
+                              ),
+                              children: group.subcategories.map(
+                                (sub) => ListTile(
+                                  dense: true,
+                                  contentPadding: const EdgeInsets.only(left: 48, right: 16),
+                                  title: Text(sub, style: GoogleFonts.poppins(fontSize: 12)),
+                                  trailing: (isCatSelected && _selectedSubcategory == sub)
+                                      ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                      : null,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      _selectedCategory = cat.id;
+                                      _selectedSubcategory = sub;
+                                    });
+                                  },
+                                ),
+                              ).toList(),
+                            ),
+                          )
+                        else
+                          ...cat.subcategories.map(
+                            (sub) => ListTile(
+                              dense: true,
+                              contentPadding: const EdgeInsets.only(left: 36, right: 16),
+                              title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
+                              trailing: (isCatSelected && _selectedSubcategory == sub)
+                                  ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                  : null,
+                              onTap: () {
+                                Navigator.pop(context);
+                                setState(() {
+                                  _selectedCategory = cat.id;
+                                  _selectedSubcategory = sub;
+                                });
+                              },
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
+
+                  const Divider(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    child: Text(
+                      'QUICK DISCOVERY',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+
+                  ListTile(
+                    leading: const Icon(Icons.science_outlined, color: AppColors.primaryDarkGreen),
+                    title: Text(
+                      'Search by Technical Name',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TechnicalSearchView()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary),
+                    title: Text(
+                      'Track Orders',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.phone_in_talk_outlined, color: AppColors.primaryGreen),
+                    title: Text(
+                      'Helpline: 1800-203-1425',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    subtitle: Text('Toll-Free Kisan Advisory', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

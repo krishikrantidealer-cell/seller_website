@@ -13,12 +13,15 @@ class MainNavHeader extends StatefulWidget {
   final VoidCallback? onCartTap;
   final VoidCallback? onTechnicalSearchTap;
 
+  final VoidCallback? onMenuTap;
+
   const MainNavHeader({
     super.key,
     this.cartItemCount,
     this.onSearch,
     this.onCartTap,
     this.onTechnicalSearchTap,
+    this.onMenuTap,
   });
 
   @override
@@ -69,9 +72,26 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
-                          child: _buildLogo(
-                            isCompact: constraints.maxWidth < 600,
-                            isSmallMobile: constraints.maxWidth < 420,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.onMenuTap != null) ...[
+                                IconButton(
+                                  icon: const Icon(Icons.menu_rounded, color: AppColors.textPrimary, size: 22),
+                                  tooltip: 'Categories Menu',
+                                  padding: const EdgeInsets.all(4),
+                                  constraints: const BoxConstraints(),
+                                  onPressed: widget.onMenuTap,
+                                ),
+                                const SizedBox(width: 6),
+                              ],
+                              Flexible(
+                                child: _buildLogo(
+                                  isCompact: constraints.maxWidth < 600,
+                                  isSmallMobile: constraints.maxWidth < 420,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 8),

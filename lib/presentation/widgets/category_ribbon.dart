@@ -162,6 +162,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < 768;
 
+    if (isMobile) {
+      return _buildMobileMenuBar(context, categories);
+    }
+
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
@@ -189,7 +193,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     child: InkWell(
                       onTap: () {
                         if (isMobile) {
-                          _showMobileCategoriesSheet(context, categories);
+                          _openMobileMenu(context, categories);
                         } else {
                           if (_overlayEntry != null && _activeOpenTab == 'all') {
                             _removeOverlay();
@@ -261,6 +265,198 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
         ),
       ),
     );
+  }
+
+  /// Dedicated Mobile Category Menu Bar
+  Widget _buildMobileMenuBar(BuildContext context, List<CategoryItem> categories) {
+    final isAllSelected = widget.selectedCategoryId == 'all';
+
+    return Container(
+      width: double.infinity,
+      color: AppColors.primaryGreen,
+      height: 44,
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1680),
+          child: Row(
+            children: [
+              const SizedBox(width: 8),
+
+              // "Menu / Categories" Button with Hamburger icon
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _openMobileMenu(context, categories),
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    height: 34,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: isAllSelected
+                          ? AppColors.primaryDarkGreen
+                          : Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: isAllSelected ? 0.8 : 0.35),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.menu_rounded, color: Colors.white, size: 16),
+                        const SizedBox(width: 5),
+                        Text(
+                          'All Categories',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 14),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Divider
+              Container(
+                height: 20,
+                width: 1,
+                color: Colors.white.withValues(alpha: 0.3),
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+              ),
+
+              // Quick Horizontal Category Filter Pills
+              Expanded(
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: categories.length + 1,
+                  separatorBuilder: (context, index) => const SizedBox(width: 6),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return _buildMobileCategoryChip(
+                        label: 'All',
+                        icon: null,
+                        isSelected: isAllSelected,
+                        onTap: () {
+                          widget.onCategorySelected?.call('all', null);
+                        },
+                      );
+                    }
+
+                    final cat = categories[index - 1];
+                    final isSelected = widget.selectedCategoryId == cat.id;
+                    final hasSubcategory = isSelected && widget.selectedSubcategory != null;
+
+                    return _buildMobileCategoryChip(
+                      label: hasSubcategory
+                          ? '${cat.name}: ${widget.selectedSubcategory}'
+                          : cat.name,
+                      icon: cat.icon,
+                      isSelected: isSelected,
+                      hasClear: hasSubcategory,
+                      onClear: () {
+                        widget.onCategorySelected?.call(cat.id, null);
+                      },
+                      onTap: () {
+                        if (isSelected) {
+                          _showMobileCategoryOptions(context, cat);
+                        } else {
+                          widget.onCategorySelected?.call(cat.id, null);
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileCategoryChip({
+    required String label,
+    String? icon,
+    required bool isSelected,
+    bool hasClear = false,
+    VoidCallback? onClear,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: isSelected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.28),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Text(icon, style: const TextStyle(fontSize: 12)),
+                const SizedBox(width: 5),
+              ],
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  color: isSelected ? AppColors.primaryDarkGreen : Colors.white,
+                  fontSize: 11.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+              if (hasClear) ...[
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: onClear,
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 14,
+                    color: AppColors.primaryCrimson,
+                  ),
+                ),
+              ] else if (isSelected) ...[
+                const SizedBox(width: 3),
+                const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  size: 14,
+                  color: AppColors.primaryDarkGreen,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openMobileMenu(BuildContext context, List<CategoryItem> categories) {
+    final scaffoldState = Scaffold.maybeOf(context);
+    if (scaffoldState != null && scaffoldState.hasDrawer) {
+      scaffoldState.openDrawer();
+    } else {
+      _showMobileCategoriesSheet(context, categories);
+    }
   }
 
   Widget _buildCategoryTab(BuildContext context, CategoryItem cat, bool isMobile) {
@@ -426,20 +622,72 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                           widget.onCategorySelected?.call(cat.id, null);
                         },
                       ),
-                      ...cat.subcategories.map(
-                        (sub) => ListTile(
-                          dense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 32),
-                          title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
-                          trailing: (isCatSelected && widget.selectedSubcategory == sub)
-                              ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
-                              : null,
-                          onTap: () {
-                            Navigator.pop(ctx);
-                            widget.onCategorySelected?.call(cat.id, sub);
-                          },
+                      if (cat.groups.isNotEmpty)
+                        ...cat.groups.map(
+                          (group) => ExpansionTile(
+                            dense: true,
+                            tilePadding: const EdgeInsets.symmetric(horizontal: 24),
+                            leading: group.icon != null
+                                ? Text(group.icon!, style: const TextStyle(fontSize: 16))
+                                : null,
+                            title: Text(
+                              group.name,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            children: [
+                              ListTile(
+                                dense: true,
+                                contentPadding: const EdgeInsets.only(left: 48, right: 16),
+                                leading: const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                                title: Text(
+                                  'All ${group.name}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryGreen,
+                                  ),
+                                ),
+                                onTap: () {
+                                  Navigator.pop(ctx);
+                                  widget.onCategorySelected?.call(cat.id, group.name);
+                                },
+                              ),
+                              ...group.subcategories.map(
+                                (sub) => ListTile(
+                                  dense: true,
+                                  contentPadding: const EdgeInsets.only(left: 48, right: 16),
+                                  title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
+                                  trailing: (isCatSelected && widget.selectedSubcategory == sub)
+                                      ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                      : null,
+                                  onTap: () {
+                                    Navigator.pop(ctx);
+                                    widget.onCategorySelected?.call(cat.id, sub);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        ...cat.subcategories.map(
+                          (sub) => ListTile(
+                            dense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 32),
+                            title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
+                            trailing: (isCatSelected && widget.selectedSubcategory == sub)
+                                ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                : null,
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              widget.onCategorySelected?.call(cat.id, sub);
+                            },
+                          ),
                         ),
-                      ),
                     ],
                   );
                 },

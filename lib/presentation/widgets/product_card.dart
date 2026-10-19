@@ -378,25 +378,31 @@ class _ProductCardState extends State<ProductCard> {
               ),
             ),
           ),
-          InkWell(
-            onTap: () => _openVariantsModal(context),
-            child: Row(
-              children: [
-                Icon(Icons.check_circle_rounded, size: isCompact ? 12 : 14, color: AppColors.primaryGreen),
-                const SizedBox(width: 4),
-                Text(
-                  'Qty: $qty',
-                  style: GoogleFonts.poppins(
-                    fontSize: isCompact ? 11 : 12,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primaryDarkGreen,
+          Flexible(
+            child: InkWell(
+              onTap: () => _openVariantsModal(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle_rounded, size: isCompact ? 12 : 14, color: AppColors.primaryGreen),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      'Qty: $qty',
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: isCompact ? 11 : 12,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryDarkGreen,
+                      ),
+                    ),
                   ),
-                ),
-                if (widget.product.variants.length > 1) ...[
-                  const SizedBox(width: 2),
-                  const Icon(Icons.arrow_drop_down_rounded, size: 16, color: AppColors.primaryDarkGreen),
+                  if (widget.product.variants.length > 1) ...[
+                    const SizedBox(width: 2),
+                    const Icon(Icons.arrow_drop_down_rounded, size: 16, color: AppColors.primaryDarkGreen),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
           InkWell(
