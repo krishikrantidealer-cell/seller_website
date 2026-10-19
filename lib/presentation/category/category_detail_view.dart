@@ -150,21 +150,43 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
       endDrawer: const QuickCartDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Top Bar
-            const TopInfoBar(),
-
-            // Main Header with search and cart tap
-            MainNavHeader(
-              onCartTap: () {
-                _scaffoldKey.currentState?.openEndDrawer();
-              },
-              onSearch: (query) {
-                setState(() => _searchFilter = query);
-              },
+      body: Column(
+        children: [
+          // Sticky Top Navigation Header with Drop Shadow
+          Container(
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x14000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
             ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top Bar
+                const TopInfoBar(),
+
+                // Main Header with search and cart tap
+                MainNavHeader(
+                  onCartTap: () {
+                    _scaffoldKey.currentState?.openEndDrawer();
+                  },
+                  onSearch: (query) {
+                    setState(() => _searchFilter = query);
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // Scrollable Content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
 
             // Main Content Area
             LayoutBuilder(
@@ -281,8 +303,11 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  ],
+),
+);
+}
 
   Widget _buildBreadcrumbBar(bool isMobile) {
     return Row(

@@ -176,25 +176,46 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       backgroundColor: const Color(0xFFF9FAFB),
       endDrawer: const QuickCartDrawer(),
       bottomNavigationBar: isMobileScreen ? _buildMobileStickyBottomBar() : null,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Top utilities bar
-            const TopInfoBar(),
-
-            // Main navigation header
-            AnimatedBuilder(
-              animation: CartController.instance,
-              builder: (context, _) {
-                return MainNavHeader(
-                  cartItemCount: CartController.instance.totalCount,
-                  onCartTap: () => _scaffoldKey.currentState?.openEndDrawer(),
-                );
-              },
+      body: Column(
+        children: [
+          // Sticky Top Navigation Header with Drop Shadow
+          Container(
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x14000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
             ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top utilities bar
+                const TopInfoBar(),
 
-            // Breadcrumbs & Back link (Responsive)
-            _buildBreadcrumbBar(context, isMobileScreen),
+                // Main navigation header
+                AnimatedBuilder(
+                  animation: CartController.instance,
+                  builder: (context, _) {
+                    return MainNavHeader(
+                      cartItemCount: CartController.instance.totalCount,
+                      onCartTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // Scrollable Product Detail Content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Breadcrumbs & Back link (Responsive)
+                  _buildBreadcrumbBar(context, isMobileScreen),
 
             // Main Product Details Section
             Center(
@@ -282,8 +303,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  ],
+),
+);
+}
 
   /// Sticky Bottom Bar for Mobile Viewports
   Widget _buildMobileStickyBottomBar() {

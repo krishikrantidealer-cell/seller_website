@@ -96,40 +96,62 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
       endDrawer: const QuickCartDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Top Bar
-            const TopInfoBar(),
-
-            // Main Nav Header
-            MainNavHeader(
-              onCartTap: () {
-                _scaffoldKey.currentState?.openEndDrawer();
-              },
-              onSearch: (q) {
-                setState(() {
-                  _searchQuery = q;
-                  _searchController.text = q;
-                });
-              },
+      body: Column(
+        children: [
+          // Sticky Top Navigation Header with Drop Shadow
+          Container(
+            decoration: const BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0x14000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
             ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top Bar
+                const TopInfoBar(),
 
-            // Category Ribbon with Multi-tier hover navigation
-            CategoryRibbon(
-              selectedCategoryId: 'all',
-              onCategorySelected: (catId, subcategory) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => CategoryDetailView(
-                      initialCategoryId: catId,
-                      initialSubcategory: subcategory,
-                    ),
-                  ),
-                );
-              },
+                // Main Nav Header
+                MainNavHeader(
+                  onCartTap: () {
+                    _scaffoldKey.currentState?.openEndDrawer();
+                  },
+                  onSearch: (q) {
+                    setState(() {
+                      _searchQuery = q;
+                      _searchController.text = q;
+                    });
+                  },
+                ),
+
+                // Category Ribbon with Multi-tier hover navigation
+                CategoryRibbon(
+                  selectedCategoryId: 'all',
+                  onCategorySelected: (catId, subcategory) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryDetailView(
+                          initialCategoryId: catId,
+                          initialSubcategory: subcategory,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
+          ),
+
+          // Scrollable Directory Content
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
 
             // Content Area
             LayoutBuilder(
@@ -245,8 +267,11 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  ],
+),
+);
+}
 
   Widget _buildBreadcrumb(BuildContext context) {
     return Row(
