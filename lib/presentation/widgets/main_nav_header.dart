@@ -6,6 +6,7 @@ import '../../data/models/cart_state.dart';
 import '../../data/models/auth_state.dart';
 import 'auth_modal.dart';
 import '../profile/farmer_profile_view.dart';
+import '../orders/my_orders_view.dart';
 import '../technical/technical_search_view.dart';
 
 class MainNavHeader extends StatefulWidget {
@@ -315,7 +316,12 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                       _actionItem(
                         icon: Icons.local_shipping_outlined,
                         label: 'Track Order',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const MyOrdersView()),
+                          );
+                        },
                       ),
                       const SizedBox(width: 24),
 
@@ -704,25 +710,9 @@ class _MainNavHeaderState extends State<MainNavHeader> {
           MaterialPageRoute(builder: (_) => const FarmerProfileView()),
         );
       } else if (value == 'orders') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.local_shipping_outlined, color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Tracking active shipments for ${auth.currentUser?.formattedPhone ?? phoneDisplay}',
-                    style: GoogleFonts.poppins(fontSize: 12.5),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.primaryDarkGreen,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            duration: const Duration(seconds: 3),
-          ),
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const MyOrdersView()),
         );
       } else if (value == 'logout') {
         auth.logout();

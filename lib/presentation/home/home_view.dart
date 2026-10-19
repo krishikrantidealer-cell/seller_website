@@ -13,6 +13,7 @@ import '../product_detail/product_detail_view.dart';
 import '../category/category_detail_view.dart';
 import '../technical/technical_search_view.dart';
 import '../profile/farmer_profile_view.dart';
+import '../orders/my_orders_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -817,6 +818,10 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     onTap: () {
                       Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MyOrdersView()),
+                      );
                     },
                   ),
                   ListTile(

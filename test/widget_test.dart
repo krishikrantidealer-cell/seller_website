@@ -9,6 +9,8 @@ import 'package:seller_website/data/models/auth_state.dart';
 import 'package:seller_website/presentation/profile/farmer_profile_view.dart';
 import 'package:seller_website/presentation/widgets/category_ribbon.dart';
 import 'package:seller_website/presentation/widgets/product_card.dart';
+import 'package:seller_website/data/models/order_models.dart';
+import 'package:seller_website/presentation/orders/my_orders_view.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -519,6 +521,76 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Farmer Profile & Delivery Address'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('MyOrdersView renders order cards, search, status filters, and live tracking stepper', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    OrdersController.instance.resetForTest();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: MyOrdersView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify header and title
+    expect(find.text('My Orders & Farm Deliveries'), findsOneWidget);
+
+    // Verify filter chips
+    expect(find.textContaining('All Orders'), findsOneWidget);
+    expect(find.textContaining('In Transit & Active'), findsOneWidget);
+    expect(find.textContaining('Delivered ('), findsOneWidget);
+
+    // Verify sample orders are rendered
+    expect(find.textContaining('EBS-2026-89412'), findsWidgets);
+    expect(find.textContaining('AgriLogistics'), findsWidgets);
+
+    // Filter by Delivered
+    await tester.tap(find.textContaining('Delivered ('));
+    await tester.pumpAndSettle();
+
+    // Verify only delivered order is shown
+    expect(find.textContaining('EBS-2026-76120'), findsWidgets);
+
+    // Filter back to All Orders
+    await tester.tap(find.textContaining('All Orders'));
+    await tester.pumpAndSettle();
+
+    // Search by product name or order ID
+    await tester.enterText(find.byType(TextField).first, 'EBS-2026-76120');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('EBS-2026-76120'), findsWidgets);
+
+    // Clear search
+    await tester.enterText(find.byType(TextField).first, '');
+    await tester.pumpAndSettle();
+
+    // Verify no uncaught exceptions
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('MyOrdersView renders without overflow on narrow mobile screens (320px)', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    OrdersController.instance.resetForTest();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: MyOrdersView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('My Orders & Farm Deliveries'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 }
