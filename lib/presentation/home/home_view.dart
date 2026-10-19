@@ -12,6 +12,7 @@ import '../widgets/web_footer.dart';
 import '../product_detail/product_detail_view.dart';
 import '../category/category_detail_view.dart';
 import '../technical/technical_search_view.dart';
+import '../profile/farmer_profile_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -779,6 +780,21 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
 
+                  ListTile(
+                    leading: const Icon(Icons.person_pin_circle_outlined, color: AppColors.primaryGreen),
+                    title: Text(
+                      'Farmer Profile & Delivery Address',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    subtitle: Text('Manage farm depot, village & crop details', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const FarmerProfileView()),
+                      );
+                    },
+                  ),
                   ListTile(
                     leading: const Icon(Icons.science_outlined, color: AppColors.primaryDarkGreen),
                     title: Text(

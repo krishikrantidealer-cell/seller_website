@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/auth_state.dart';
+import '../profile/farmer_profile_view.dart';
 
 /// Opens the responsive Phone + OTP Login modal or User Account menu
 void showAuthModal(BuildContext context) {
@@ -770,7 +771,9 @@ class _AccountProfileView extends StatelessWidget {
                       children: [
                         Flexible(
                           child: Text(
-                            user?.formattedPhone ?? '',
+                            (user?.name != null && user!.name!.trim().isNotEmpty)
+                                ? user.name!.trim()
+                                : (user?.formattedPhone ?? ''),
                             style: GoogleFonts.poppins(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -799,8 +802,12 @@ class _AccountProfileView extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      user?.location ?? 'Punjab & Haryana Agricultural Belt',
+                      (user?.villageOrTown != null && user!.villageOrTown!.trim().isNotEmpty)
+                          ? '${user.villageOrTown!.trim()}, ${((user.district != null && user.district!.isNotEmpty) ? user.district : user.state) ?? ''}'
+                          : (user?.location ?? 'Punjab & Haryana Agricultural Belt'),
                       style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -818,6 +825,30 @@ class _AccountProfileView extends StatelessWidget {
 
           // Menu Options
           _buildMenuItem(
+            icon: Icons.person_outline_rounded,
+            title: 'Farmer Profile & Farm Details',
+            subtitle: 'Name, farmer category, crops & land',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FarmerProfileView()),
+              );
+            },
+          ),
+          _buildMenuItem(
+            icon: Icons.location_on_outlined,
+            title: 'Saved Delivery Addresses',
+            subtitle: 'Village farm depots and delivery points',
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FarmerProfileView()),
+              );
+            },
+          ),
+          _buildMenuItem(
             icon: Icons.local_shipping_outlined,
             title: 'Track My Orders',
             subtitle: 'Check live dispatch & delivery status',
@@ -830,14 +861,6 @@ class _AccountProfileView extends StatelessWidget {
             icon: Icons.shopping_bag_outlined,
             title: 'My Cart & Saved Orders',
             subtitle: 'View items and scheduled re-orders',
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          _buildMenuItem(
-            icon: Icons.location_on_outlined,
-            title: 'Saved Delivery Addresses',
-            subtitle: 'Village farm depots and delivery points',
             onTap: () {
               Navigator.pop(context);
             },

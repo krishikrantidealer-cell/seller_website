@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/auth_state.dart';
 import 'auth_modal.dart';
+import '../profile/farmer_profile_view.dart';
 import '../technical/technical_search_view.dart';
 
 class MainNavHeader extends StatefulWidget {
@@ -416,22 +417,20 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'EBS ',
-                    style: GoogleFonts.poppins(
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryCrimson,
-                      letterSpacing: -0.5,
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'EBS ',
+                      style: GoogleFonts.poppins(
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryCrimson,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                  ),
-                  Flexible(
-                    child: Text(
-                      'BioCrop',
-                      overflow: TextOverflow.ellipsis,
+                    TextSpan(
+                      text: 'BioCrop',
                       style: GoogleFonts.poppins(
                         fontSize: titleFontSize,
                         fontWeight: FontWeight.w800,
@@ -439,8 +438,10 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                         letterSpacing: -0.5,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             if (!isCompact && !isSmallMobile)
               Text(
@@ -706,7 +707,10 @@ class _MainNavHeaderState extends State<MainNavHeader> {
       if (value == 'cart') {
         widget.onCartTap?.call();
       } else if (value == 'account') {
-        showAuthModal(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const FarmerProfileView()),
+        );
       } else if (value == 'orders') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

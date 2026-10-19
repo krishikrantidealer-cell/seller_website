@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:seller_website/data/models/catalog_models.dart';
 import 'package:seller_website/main.dart';
 import 'package:seller_website/presentation/product_detail/product_detail_view.dart';
+import 'package:seller_website/data/models/auth_state.dart';
+import 'package:seller_website/presentation/profile/farmer_profile_view.dart';
 import 'package:seller_website/presentation/widgets/category_ribbon.dart';
 import 'package:seller_website/presentation/widgets/product_card.dart';
 
@@ -18,7 +20,7 @@ void main() {
     await tester.pumpWidget(const SellerWebsiteApp());
     await tester.pump();
 
-    expect(find.text('BioCrop'), findsWidgets);
+    expect(find.textContaining('BioCrop'), findsWidgets);
     expect(find.text('Track Order'), findsOneWidget);
 
     // Verify Add to Cart and Buy Now buttons exist on catalog cards
@@ -405,6 +407,115 @@ void main() {
 
     expect(find.textContaining('Insecticides'), findsOneWidget);
     expect(find.text('Clear'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('FarmerProfileView allows filling personal details and farm delivery address', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // Set a verified user
+    AuthController.instance.setUserForTest(
+      const UserModel(
+        phoneNumber: '9876543210',
+        name: 'Ramesh Singh',
+      ),
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: FarmerProfileView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify sections and fields
+    expect(find.text('Farmer Profile & Delivery Address'), findsWidgets);
+    expect(find.text('Personal & Contact Details'), findsOneWidget);
+    expect(find.text('Farm Depot & Delivery Address'), findsOneWidget);
+    expect(find.text('Farm Land & Crop Cultivation (Optional)'), findsOneWidget);
+    expect(find.text('Live Parcel Dispatch Preview'), findsOneWidget);
+
+    // Verify verified phone is displayed
+    expect(find.textContaining('98765'), findsWidgets);
+
+    // Find and enter name
+    final nameField = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText?.contains('Ramesh') == true);
+    expect(nameField, findsOneWidget);
+    await tester.enterText(nameField, 'Sardar Gurpreet Singh');
+
+    // Find and enter Address Line 1
+    final address1Field = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText?.contains('Farm Depot 14') == true);
+    expect(address1Field, findsOneWidget);
+    await tester.enterText(address1Field, 'Khasra No. 42/1, GT Road Farm Depot');
+
+    // Find and enter Village
+    final villageField = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText?.contains('Nilokheri') == true);
+    expect(villageField, findsOneWidget);
+    await tester.enterText(villageField, 'Kotli Surat Malhi');
+
+    // Find and enter Taluka
+    final talukaField = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText?.contains('Karnal Tehsil') == true);
+    expect(talukaField, findsOneWidget);
+    await tester.enterText(talukaField, 'Batala');
+
+    // Find and enter District
+    final districtField = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText == 'e.g. Karnal');
+    expect(districtField, findsOneWidget);
+    await tester.enterText(districtField, 'Gurdaspur');
+
+    // Find and enter PIN
+    final pinField = find.byWidgetPredicate((w) => w is TextField && w.decoration?.hintText?.contains('132001') == true);
+    expect(pinField, findsOneWidget);
+    await tester.enterText(pinField, '143505');
+
+    await tester.pump();
+
+    // Verify live preview updates dynamically
+    expect(find.textContaining('Sardar Gurpreet Singh'), findsWidgets);
+    expect(find.textContaining('Kotli Surat Malhi'), findsWidgets);
+    expect(find.textContaining('143505'), findsWidgets);
+
+    // Tap Save button
+    final saveBtn = find.widgetWithText(ElevatedButton, 'Save Profile & Delivery Address');
+    expect(saveBtn, findsOneWidget);
+    await tester.ensureVisible(saveBtn);
+    await tester.pumpAndSettle();
+    await tester.tap(saveBtn);
+    await tester.pumpAndSettle();
+
+    // Verify updated UserModel in AuthController
+    final updated = AuthController.instance.currentUser;
+    expect(updated?.name, 'Sardar Gurpreet Singh');
+    expect(updated?.villageOrTown, 'Kotli Surat Malhi');
+    expect(updated?.talukaOrTehsil, 'Batala');
+    expect(updated?.district, 'Gurdaspur');
+    expect(updated?.pinCode, '143505');
+  });
+
+  testWidgets('FarmerProfileView renders without overflow on narrow mobile screens (320px)', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    AuthController.instance.setUserForTest(
+      const UserModel(
+        phoneNumber: '9876543210',
+        name: 'Ramesh Singh',
+      ),
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: FarmerProfileView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Farmer Profile & Delivery Address'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 }

@@ -4,16 +4,38 @@ import 'package:flutter/foundation.dart';
 class UserModel {
   final String phoneNumber;
   final String? name;
+  final String? alternatePhone;
   final String? email;
   final String location;
   final String memberSince;
+  final String? addressLine1;
+  final String? villageOrTown;
+  final String? talukaOrTehsil;
+  final String? district;
+  final String? state;
+  final String? pinCode;
+  final String addressType;
+  final String farmerType;
+  final String? primaryCrops;
+  final String? landholdingAcres;
 
   const UserModel({
     required this.phoneNumber,
     this.name,
+    this.alternatePhone,
     this.email,
     this.location = 'Karnal, Haryana',
     this.memberSince = 'Oct 2026',
+    this.addressLine1,
+    this.villageOrTown,
+    this.talukaOrTehsil,
+    this.district,
+    this.state,
+    this.pinCode,
+    this.addressType = 'Farm Depot',
+    this.farmerType = 'Individual Farmer',
+    this.primaryCrops,
+    this.landholdingAcres,
   });
 
   String get formattedPhone {
@@ -21,6 +43,57 @@ class UserModel {
       return '+91 ${phoneNumber.substring(0, 5)} ${phoneNumber.substring(5)}';
     }
     return '+91 $phoneNumber';
+  }
+
+  String get fullAddress {
+    final parts = [
+      if (addressLine1 != null && addressLine1!.trim().isNotEmpty) addressLine1!.trim(),
+      if (villageOrTown != null && villageOrTown!.trim().isNotEmpty) 'Vill: ${villageOrTown!.trim()}',
+      if (talukaOrTehsil != null && talukaOrTehsil!.trim().isNotEmpty) 'Teh: ${talukaOrTehsil!.trim()}',
+      if (district != null && district!.trim().isNotEmpty) district!.trim(),
+      if (state != null && state!.trim().isNotEmpty) state!.trim(),
+      if (pinCode != null && pinCode!.trim().isNotEmpty) 'PIN - ${pinCode!.trim()}',
+    ];
+    if (parts.isEmpty) return 'No delivery address saved yet';
+    return parts.join(', ');
+  }
+
+  UserModel copyWith({
+    String? phoneNumber,
+    String? name,
+    String? alternatePhone,
+    String? email,
+    String? location,
+    String? memberSince,
+    String? addressLine1,
+    String? villageOrTown,
+    String? talukaOrTehsil,
+    String? district,
+    String? state,
+    String? pinCode,
+    String? addressType,
+    String? farmerType,
+    String? primaryCrops,
+    String? landholdingAcres,
+  }) {
+    return UserModel(
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      name: name ?? this.name,
+      alternatePhone: alternatePhone ?? this.alternatePhone,
+      email: email ?? this.email,
+      location: location ?? this.location,
+      memberSince: memberSince ?? this.memberSince,
+      addressLine1: addressLine1 ?? this.addressLine1,
+      villageOrTown: villageOrTown ?? this.villageOrTown,
+      talukaOrTehsil: talukaOrTehsil ?? this.talukaOrTehsil,
+      district: district ?? this.district,
+      state: state ?? this.state,
+      pinCode: pinCode ?? this.pinCode,
+      addressType: addressType ?? this.addressType,
+      farmerType: farmerType ?? this.farmerType,
+      primaryCrops: primaryCrops ?? this.primaryCrops,
+      landholdingAcres: landholdingAcres ?? this.landholdingAcres,
+    );
   }
 }
 
@@ -108,6 +181,50 @@ class AuthController extends ChangeNotifier {
   void editPhoneNumber() {
     _pendingPhone = null;
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  /// Update Profile information (Name, Farm Address, Crop Details, etc.)
+  void updateProfile({
+    String? name,
+    String? alternatePhone,
+    String? email,
+    String? addressLine1,
+    String? villageOrTown,
+    String? talukaOrTehsil,
+    String? district,
+    String? state,
+    String? pinCode,
+    String? addressType,
+    String? farmerType,
+    String? primaryCrops,
+    String? landholdingAcres,
+  }) {
+    final current = _currentUser ?? const UserModel(phoneNumber: '9876543210');
+    _currentUser = current.copyWith(
+      name: name,
+      alternatePhone: alternatePhone,
+      email: email,
+      addressLine1: addressLine1,
+      villageOrTown: villageOrTown,
+      talukaOrTehsil: talukaOrTehsil,
+      district: district,
+      state: state,
+      pinCode: pinCode,
+      addressType: addressType,
+      farmerType: farmerType,
+      primaryCrops: primaryCrops,
+      landholdingAcres: landholdingAcres,
+      location: (district != null && state != null && district.isNotEmpty && state.isNotEmpty)
+          ? '$district, $state'
+          : current.location,
+    );
+    notifyListeners();
+  }
+
+  /// For testing: set user directly
+  void setUserForTest(UserModel? user) {
+    _currentUser = user;
     notifyListeners();
   }
 
