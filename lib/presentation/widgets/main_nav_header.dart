@@ -496,82 +496,268 @@ class _MainNavHeaderState extends State<MainNavHeader> {
         : rawPhone;
     final phoneDisplay = isMobile ? shortPhone : (auth.currentUser?.formattedPhone ?? '');
 
-    final dropdownItems = <PopupMenuEntry<String>>[
-      PopupMenuItem<String>(
-        enabled: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+    PopupMenuItem<String> buildMenuItem({
+      required String value,
+      required IconData icon,
+      required Color iconColor,
+      required Color iconBg,
+      required String title,
+      required String subtitle,
+      bool isDestructive = false,
+    }) {
+      return PopupMenuItem<String>(
+        value: value,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        height: 52,
+        child: Row(
           children: [
-            Text(
-              'Signed in as',
-              style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, size: 18, color: iconColor),
             ),
-            const SizedBox(height: 2),
-            Text(
-              auth.currentUser?.formattedPhone ?? phoneDisplay,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primaryDarkGreen,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: isDestructive ? AppColors.primaryCrimson : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const Divider(height: 16),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: isDestructive
+                  ? AppColors.primaryCrimson.withValues(alpha: 0.5)
+                  : Colors.grey.shade400,
+            ),
           ],
         ),
-      ),
+      );
+    }
+
+    final dropdownItems = <PopupMenuEntry<String>>[
+      // Profile Card Header
       PopupMenuItem<String>(
+        enabled: false,
+        padding: EdgeInsets.zero,
+        height: 68,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: const BoxDecoration(
+            color: Color(0xFFF0FDF4),
+            border: Border(bottom: BorderSide(color: Color(0xFFDCFCE7), width: 1)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2F7D32), Color(0xFF1B5E20)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            auth.currentUser?.formattedPhone ?? phoneDisplay,
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'VERIFIED',
+                            style: GoogleFonts.poppins(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primaryDarkGreen,
+                              letterSpacing: 0.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      auth.currentUser?.location ?? 'Verified Farmer • EBS Direct',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10.5,
+                        color: AppColors.textMuted,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      // Track Orders
+      buildMenuItem(
         value: 'orders',
-        child: Row(
-          children: [
-            const Icon(Icons.local_shipping_outlined, size: 18, color: AppColors.textPrimary),
-            const SizedBox(width: 10),
-            Text('Track Orders', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
-          ],
-        ),
+        icon: Icons.local_shipping_outlined,
+        iconColor: const Color(0xFF2563EB),
+        iconBg: const Color(0xFFEFF6FF),
+        title: 'Track Orders',
+        subtitle: 'Live parcel status & delivery',
       ),
-      PopupMenuItem<String>(
+
+      // My Cart
+      buildMenuItem(
         value: 'cart',
-        child: Row(
-          children: [
-            const Icon(Icons.shopping_cart_outlined, size: 18, color: AppColors.textPrimary),
-            const SizedBox(width: 10),
-            Text('My Cart', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
-          ],
-        ),
+        icon: Icons.shopping_bag_outlined,
+        iconColor: AppColors.primaryGreen,
+        iconBg: const Color(0xFFF0FDF4),
+        title: 'My Cart',
+        subtitle: 'Review saved items & checkout',
       ),
-      PopupMenuItem<String>(
+
+      // Farmer Profile & Saved Addresses
+      buildMenuItem(
+        value: 'account',
+        icon: Icons.badge_outlined,
+        iconColor: const Color(0xFF9333EA),
+        iconBg: const Color(0xFFFAF5FF),
+        title: 'Farmer Profile',
+        subtitle: 'Manage delivery farm depots',
+      ),
+
+      // Krishi Helpline
+      buildMenuItem(
         value: 'helpline',
-        child: Row(
-          children: [
-            const Icon(Icons.support_agent_outlined, size: 18, color: AppColors.textPrimary),
-            const SizedBox(width: 10),
-            Text('Krishi Helpline', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
-          ],
-        ),
+        icon: Icons.support_agent_rounded,
+        iconColor: const Color(0xFFD97706),
+        iconBg: const Color(0xFFFFFBEB),
+        title: 'Krishi Helpline',
+        subtitle: 'Toll-free crop advisory support',
       ),
-      const PopupMenuDivider(),
-      PopupMenuItem<String>(
+
+      const PopupMenuDivider(height: 1),
+
+      // Sign Out
+      buildMenuItem(
         value: 'logout',
-        child: Row(
-          children: [
-            const Icon(Icons.logout_rounded, size: 18, color: AppColors.primaryCrimson),
-            const SizedBox(width: 10),
-            Text('Sign Out', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primaryCrimson)),
-          ],
-        ),
+        icon: Icons.logout_rounded,
+        iconColor: AppColors.primaryCrimson,
+        iconBg: const Color(0xFFFEF2F2),
+        title: 'Sign Out',
+        subtitle: 'Switch or disconnect number',
+        isDestructive: true,
       ),
     ];
 
     void handleSelect(String value) {
       if (value == 'cart') {
         widget.onCartTap?.call();
+      } else if (value == 'account') {
+        showAuthModal(context);
+      } else if (value == 'orders') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.local_shipping_outlined, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Tracking active shipments for ${auth.currentUser?.formattedPhone ?? phoneDisplay}',
+                    style: GoogleFonts.poppins(fontSize: 12.5),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.primaryDarkGreen,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } else if (value == 'helpline') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.support_agent_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Krishi Helpline: 1800-123-BIO (Toll Free, 7 AM - 9 PM)',
+                    style: GoogleFonts.poppins(fontSize: 12.5),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.primaryGreen,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 4),
+          ),
+        );
       } else if (value == 'logout') {
         auth.logout();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Logged out successfully'),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: const Text('Signed out successfully'),
+            backgroundColor: AppColors.textPrimary,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -581,42 +767,63 @@ class _MainNavHeaderState extends State<MainNavHeader> {
       return PopupMenuButton<String>(
         tooltip: 'Account Menu',
         offset: const Offset(0, 36),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        constraints: const BoxConstraints(minWidth: 260, maxWidth: 285),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+        ),
+        elevation: 10,
+        shadowColor: Colors.black.withValues(alpha: 0.16),
+        color: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        padding: EdgeInsets.zero,
         onSelected: handleSelect,
         itemBuilder: (context) => dropdownItems,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.lightGreen.withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.primaryGreen, width: 1),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0xFFCBD5E1), width: 1.1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(2.5),
+                width: 22,
+                height: 22,
                 decoration: const BoxDecoration(
-                  color: AppColors.primaryGreen,
                   shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF2F7D32), Color(0xFF1B5E20)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-                child: const Icon(Icons.person_rounded, color: Colors.white, size: 10),
+                child: const Icon(Icons.person_rounded, color: Colors.white, size: 12),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 5),
               Flexible(
                 child: Text(
-                  phoneDisplay,
+                  shortPhone,
                   style: GoogleFonts.poppins(
-                    color: AppColors.primaryDarkGreen,
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w700,
-                    fontSize: 10,
+                    fontSize: 10.5,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 2),
-              const Icon(Icons.keyboard_arrow_down_rounded, size: 12, color: AppColors.primaryDarkGreen),
+              const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: AppColors.textSecondary),
             ],
           ),
         ),
@@ -626,38 +833,95 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     return PopupMenuButton<String>(
       tooltip: 'Account Menu',
       offset: const Offset(0, 48),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      constraints: const BoxConstraints(minWidth: 280, maxWidth: 300),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.18),
+      color: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      padding: EdgeInsets.zero,
       onSelected: handleSelect,
       itemBuilder: (context) => dropdownItems,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: AppColors.lightGreen.withValues(alpha: 0.35),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.primaryGreen, width: 1.2),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFCBD5E1), width: 1.2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: AppColors.primaryGreen,
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF2F7D32), Color(0xFF1B5E20)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.person_rounded, color: Colors.white, size: 14),
+              child: const Icon(Icons.person_rounded, color: Colors.white, size: 16),
             ),
             const SizedBox(width: 8),
-            Text(
-              phoneDisplay,
-              style: GoogleFonts.poppins(
-                color: AppColors.primaryDarkGreen,
-                fontWeight: FontWeight.w700,
-                fontSize: 12.5,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Farmer Account',
+                      style: GoogleFonts.poppins(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF22C55E),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  phoneDisplay,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 4),
-            const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: AppColors.primaryDarkGreen),
+            const SizedBox(width: 6),
+            const Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.textSecondary),
           ],
         ),
       ),
