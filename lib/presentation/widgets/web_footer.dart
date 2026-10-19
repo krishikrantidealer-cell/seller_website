@@ -344,22 +344,24 @@ class WebFooter extends StatelessWidget {
           children: [
             const Icon(Icons.support_agent_rounded, color: AppColors.primaryGreen, size: 24),
             const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppConstants.helplineNumber,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppConstants.helplineNumber,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                Text(
-                  'Mon - Sat: 9:00 AM - 7:00 PM',
-                  style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 11),
-                ),
-              ],
+                  Text(
+                    'Mon - Sat: 9:00 AM - 7:00 PM',
+                    style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 11),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -2,7 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:seller_website/data/models/catalog_models.dart';
 import 'package:seller_website/main.dart';
+import 'package:seller_website/presentation/product_detail/product_detail_view.dart';
 import 'package:seller_website/presentation/widgets/product_card.dart';
 
 void main() {
@@ -292,5 +294,34 @@ void main() {
     expect(find.textContaining('Chlorantraniliprole 18.5% SC'), findsWidgets);
     expect(find.text('Katyayani All in One Insecticide for Crops'), findsOneWidget);
   });
+
+  testWidgets('ProductDetailView renders properly on mobile view without RenderFlex overflow', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ProductDetailView(product: ProductItem.sampleProducts.first),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify product title and price rendered without overflow
+    expect(find.text(ProductItem.sampleProducts.first.title), findsWidgets);
+    expect(find.textContaining('100% Authenticated field purchases'), findsOneWidget);
+
+    // Expand Farmer Reviews mobile accordion
+    final reviewsAccordion = find.text('Farmer Reviews (3)');
+    await tester.ensureVisible(reviewsAccordion);
+    await tester.tap(reviewsAccordion);
+    await tester.pumpAndSettle();
+
+    // Verify reviews content rendered without overflow
+    expect(find.text('Write a Review'), findsOneWidget);
+    expect(find.textContaining('100% Authenticated field purchases'), findsOneWidget);
+  });
 }
+
 

@@ -66,59 +66,67 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                   children: [
                     // Top row: Brand logo + Quick Icons
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildLogo(
-                          isCompact: constraints.maxWidth < 600,
-                          isSmallMobile: constraints.maxWidth < 420,
-                        ),
-                        const Spacer(),
-                        if (constraints.maxWidth >= 500) ...[
-                          IconButton(
-                            icon: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary, size: 22),
-                            tooltip: 'Track Order',
-                            padding: const EdgeInsets.all(6),
-                            constraints: const BoxConstraints(),
-                            onPressed: () {},
+                        Flexible(
+                          child: _buildLogo(
+                            isCompact: constraints.maxWidth < 600,
+                            isSmallMobile: constraints.maxWidth < 420,
                           ),
-                          const SizedBox(width: 6),
-                        ],
-                        AnimatedBuilder(
-                          animation: CartController.instance,
-                          builder: (context, _) {
-                            final count = widget.cartItemCount ?? CartController.instance.totalCount;
-                            return InkWell(
-                              onTap: widget.onCartTap,
-                              borderRadius: BorderRadius.circular(8),
-                              child: Padding(
-                                padding: const EdgeInsets.all(4),
-                                child: Badge(
-                                  label: Text(
-                                    count.toString(),
-                                    style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
-                                  ),
-                                  backgroundColor: AppColors.primaryCrimson,
-                                  child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
-                                ),
-                              ),
-                            );
-                          },
                         ),
-                        const SizedBox(width: 6),
-                        AnimatedBuilder(
-                          animation: AuthController.instance,
-                          builder: (context, _) {
-                            final auth = AuthController.instance;
-                            if (auth.isLoggedIn) {
-                              return _buildProfileDropdown(context, auth, isMobile: true);
-                            }
-                            return IconButton(
-                              icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 22),
-                              tooltip: 'Login / My Account',
-                              padding: const EdgeInsets.all(4),
-                              constraints: const BoxConstraints(),
-                              onPressed: () => showAuthModal(context),
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (constraints.maxWidth >= 500) ...[
+                              IconButton(
+                                icon: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary, size: 22),
+                                tooltip: 'Track Order',
+                                padding: const EdgeInsets.all(6),
+                                constraints: const BoxConstraints(),
+                                onPressed: () {},
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            AnimatedBuilder(
+                              animation: CartController.instance,
+                              builder: (context, _) {
+                                final count = widget.cartItemCount ?? CartController.instance.totalCount;
+                                return InkWell(
+                                  onTap: widget.onCartTap,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: Badge(
+                                      label: Text(
+                                        count.toString(),
+                                        style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                      ),
+                                      backgroundColor: AppColors.primaryCrimson,
+                                      child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 6),
+                            AnimatedBuilder(
+                              animation: AuthController.instance,
+                              builder: (context, _) {
+                                final auth = AuthController.instance;
+                                if (auth.isLoggedIn) {
+                                  return _buildProfileDropdown(context, auth, isMobile: true);
+                                }
+                                return IconButton(
+                                  icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 22),
+                                  tooltip: 'Login / My Account',
+                                  padding: const EdgeInsets.all(4),
+                                  constraints: const BoxConstraints(),
+                                  onPressed: () => showAuthModal(context),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -383,35 +391,42 @@ class _MainNavHeaderState extends State<MainNavHeader> {
           child: Icon(Icons.eco_rounded, color: Colors.white, size: iconSize),
         ),
         SizedBox(width: isSmallMobile ? 4 : (isCompact ? 6 : 10)),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'EBS ',
-                  style: GoogleFonts.poppins(
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primaryCrimson,
-                    letterSpacing: -0.5,
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'EBS ',
+                    style: GoogleFonts.poppins(
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryCrimson,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ),
-                Text(
-                  'BioCrop',
-                  style: GoogleFonts.poppins(
-                    fontSize: titleFontSize,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primaryGreen,
-                    letterSpacing: -0.5,
+                  Flexible(
+                    child: Text(
+                      'BioCrop',
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: titleFontSize,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryGreen,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             if (!isCompact && !isSmallMobile)
               Text(
                 'ESSENTIAL BIO CROP SCIENCE',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.poppins(
                   fontSize: 8.8,
                   fontWeight: FontWeight.w700,
@@ -419,7 +434,8 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                   letterSpacing: 0.8,
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -567,12 +583,16 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 child: const Icon(Icons.person_rounded, color: Colors.white, size: 10),
               ),
               const SizedBox(width: 4),
-              Text(
-                phoneDisplay,
-                style: GoogleFonts.poppins(
-                  color: AppColors.primaryDarkGreen,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 10,
+              Flexible(
+                child: Text(
+                  phoneDisplay,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.primaryDarkGreen,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 2),

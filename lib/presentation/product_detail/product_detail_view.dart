@@ -705,12 +705,15 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 children: [
                   const Icon(Icons.storefront_rounded, size: 14, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
-                  Text(
-                    'Brand: ${widget.product.vendor}',
-                    style: GoogleFonts.poppins(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                  Flexible(
+                    child: Text(
+                      'Brand: ${widget.product.vendor}',
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -1264,12 +1267,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                'Product Information & Guidance',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+              Expanded(
+                child: Text(
+                  'Product Information & Guidance',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -1814,26 +1819,28 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              for (int i = 0; i < 5; i++)
-                                const Icon(Icons.star_rounded, size: 18, color: AppColors.ratingAmber),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Based on $_totalReviewsCount verified farmer reviews',
-                            style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 11 : 12,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textSecondary,
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                for (int i = 0; i < 5; i++)
+                                  const Icon(Icons.star_rounded, size: 18, color: AppColors.ratingAmber),
+                              ],
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 2),
+                            Text(
+                              'Based on $_totalReviewsCount verified farmer reviews',
+                              style: GoogleFonts.poppins(
+                                fontSize: isMobile ? 11 : 12,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -1863,15 +1870,18 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               const SizedBox(height: 12),
               // Verified Feedback guarantee note
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Icon(Icons.verified_rounded, size: 14, color: AppColors.primaryGreen),
                   const SizedBox(width: 5),
-                  Text(
-                    '100% Authenticated field purchases by Indian farmers & agronomists',
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryDarkGreen,
+                  Expanded(
+                    child: Text(
+                      '100% Authenticated field purchases by Indian farmers & agronomists',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryDarkGreen,
+                      ),
                     ),
                   ),
                 ],
@@ -2007,12 +2017,16 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               color: isSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
             ),
             const SizedBox(width: 5),
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 11.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+            Flexible(
+              child: Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 11.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -2256,10 +2270,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           const SizedBox(height: 16),
 
           // Section 5: Multiple Images Upload
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.photo_camera_rounded, size: 16, color: AppColors.primaryGreen),
                   const SizedBox(width: 6),
@@ -2374,10 +2392,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           const SizedBox(height: 16),
 
           // Section 6: Video Upload
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
             children: [
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.videocam_rounded, size: 16, color: AppColors.primaryCrimson),
                   const SizedBox(width: 6),
@@ -3272,19 +3294,58 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 6,
-                      runSpacing: 4,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          item.authorName,
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 12.5 : 13.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.authorName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isMobile ? 12.5 : 13.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                item.authorRole,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        // Rating Stars & Date
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                for (int i = 0; i < item.rating; i++)
+                                  const Icon(Icons.star_rounded, size: 14, color: AppColors.ratingAmber),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              item.date,
+                              style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 5),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
                         if (item.isVerified)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -3326,33 +3387,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           ),
                       ],
                     ),
-                    Text(
-                      item.authorRole,
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
                   ],
                 ),
-              ),
-              // Rating Stars & Date
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (int i = 0; i < item.rating; i++)
-                        const Icon(Icons.star_rounded, size: 14, color: AppColors.ratingAmber),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    item.date,
-                    style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
-                  ),
-                ],
               ),
             ],
           ),
@@ -3443,7 +3479,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Stack(
                       alignment: Alignment.center,
@@ -3468,25 +3503,30 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ],
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.videocam_rounded, size: 14, color: AppColors.primaryCrimson),
-                            const SizedBox(width: 4),
-                            Text(
-                              item.videoName!,
-                              style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '${item.videoDuration ?? "0:45 min"} • Verified field demonstration video',
-                          style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
-                        ),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.videocam_rounded, size: 14, color: AppColors.primaryCrimson),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  item.videoName!,
+                                  style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${item.videoDuration ?? "0:45 min"} • Verified field demonstration video',
+                            style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Icon(Icons.play_circle_outline_rounded, color: AppColors.primaryGreen, size: 18),
@@ -3516,62 +3556,122 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 3.5,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryGreen,
-                      borderRadius: BorderRadius.circular(2),
+          child: isMobile
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 3.5,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryGreen,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Similar Products',
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightGreen,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${similarProducts.length} items',
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryDarkGreen,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Similar Products',
-                    style: GoogleFonts.poppins(
-                      fontSize: isMobile ? 14 : 16.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGreen,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${similarProducts.length} items',
+                    const SizedBox(height: 4),
+                    Text(
+                      'Matches ${widget.product.category}',
                       style: GoogleFonts.poppins(
-                        fontSize: isMobile ? 10 : 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDarkGreen,
+                        fontSize: 10.5,
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 3.5,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryGreen,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Similar Products',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightGreen,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '${similarProducts.length} items',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryDarkGreen,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Flexible(
+                      child: Text(
+                        'Matches ${widget.product.category}',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Flexible(
-                child: Text(
-                  'Matches ${widget.product.category}',
-                  style: GoogleFonts.poppins(
-                    fontSize: isMobile ? 10.5 : 12,
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
         const SizedBox(height: 14),
         LayoutBuilder(

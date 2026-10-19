@@ -261,12 +261,16 @@ class _ProductCardState extends State<ProductCard> {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(
-                                    _selectedVariant.label,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: isCompact ? 10 : 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryDarkGreen,
+                                  Flexible(
+                                    child: Text(
+                                      _selectedVariant.label,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: isCompact ? 10 : 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryDarkGreen,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                   if (widget.product.variants.length > 1) ...[
