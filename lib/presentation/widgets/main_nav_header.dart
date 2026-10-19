@@ -592,7 +592,17 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
+                alignment: Alignment.center,
+                child: (auth.currentUser?.name != null && auth.currentUser!.name!.trim().isNotEmpty)
+                    ? Text(
+                        auth.currentUser!.name!.trim()[0].toUpperCase(),
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                        ),
+                      )
+                    : const Icon(Icons.person_rounded, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -604,7 +614,9 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                       children: [
                         Flexible(
                           child: Text(
-                            auth.currentUser?.formattedPhone ?? phoneDisplay,
+                            (auth.currentUser?.name != null && auth.currentUser!.name!.trim().isNotEmpty)
+                                ? auth.currentUser!.name!.trim()
+                                : (auth.currentUser?.formattedPhone ?? phoneDisplay),
                             style: GoogleFonts.poppins(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -634,7 +646,9 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      auth.currentUser?.location ?? 'Verified Farmer • EBS Direct',
+                      (auth.currentUser?.villageOrTown != null && auth.currentUser!.villageOrTown!.trim().isNotEmpty)
+                          ? '${auth.currentUser!.villageOrTown!.trim()}, ${((auth.currentUser?.district != null && auth.currentUser!.district!.isNotEmpty) ? auth.currentUser!.district : auth.currentUser?.state) ?? ''}'
+                          : (auth.currentUser?.location ?? 'Verified Farmer • EBS Direct'),
                       style: GoogleFonts.poppins(
                         fontSize: 10.5,
                         color: AppColors.textMuted,
@@ -649,6 +663,16 @@ class _MainNavHeaderState extends State<MainNavHeader> {
         ),
       ),
 
+      // Farmer Profile & Saved Addresses
+      buildMenuItem(
+        value: 'account',
+        icon: Icons.person_outline_rounded,
+        iconColor: const Color(0xFF16A34A),
+        iconBg: const Color(0xFFF0FDF4),
+        title: 'Farmer Profile',
+        subtitle: 'Name, address & crop details',
+      ),
+
       // Track Orders
       buildMenuItem(
         value: 'orders',
@@ -657,36 +681,6 @@ class _MainNavHeaderState extends State<MainNavHeader> {
         iconBg: const Color(0xFFEFF6FF),
         title: 'Track Orders',
         subtitle: 'Live parcel status & delivery',
-      ),
-
-      // My Cart
-      buildMenuItem(
-        value: 'cart',
-        icon: Icons.shopping_bag_outlined,
-        iconColor: AppColors.primaryGreen,
-        iconBg: const Color(0xFFF0FDF4),
-        title: 'My Cart',
-        subtitle: 'Review saved items & checkout',
-      ),
-
-      // Farmer Profile & Saved Addresses
-      buildMenuItem(
-        value: 'account',
-        icon: Icons.badge_outlined,
-        iconColor: const Color(0xFF9333EA),
-        iconBg: const Color(0xFFFAF5FF),
-        title: 'Farmer Profile',
-        subtitle: 'Manage delivery farm depots',
-      ),
-
-      // Krishi Helpline
-      buildMenuItem(
-        value: 'helpline',
-        icon: Icons.support_agent_rounded,
-        iconColor: const Color(0xFFD97706),
-        iconBg: const Color(0xFFFFFBEB),
-        title: 'Krishi Helpline',
-        subtitle: 'Toll-free crop advisory support',
       ),
 
       const PopupMenuDivider(height: 1),
@@ -704,9 +698,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     ];
 
     void handleSelect(String value) {
-      if (value == 'cart') {
-        widget.onCartTap?.call();
-      } else if (value == 'account') {
+      if (value == 'account') {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const FarmerProfileView()),
@@ -730,27 +722,6 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             duration: const Duration(seconds: 3),
-          ),
-        );
-      } else if (value == 'helpline') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.support_agent_rounded, color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Krishi Helpline: 1800-123-BIO (Toll Free, 7 AM - 9 PM)',
-                    style: GoogleFonts.poppins(fontSize: 12.5),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.primaryGreen,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            duration: const Duration(seconds: 4),
           ),
         );
       } else if (value == 'logout') {

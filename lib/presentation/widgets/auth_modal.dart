@@ -857,22 +857,6 @@ class _AccountProfileView extends StatelessWidget {
               // Order tracking
             },
           ),
-          _buildMenuItem(
-            icon: Icons.shopping_bag_outlined,
-            title: 'My Cart & Saved Orders',
-            subtitle: 'View items and scheduled re-orders',
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          _buildMenuItem(
-            icon: Icons.support_agent_rounded,
-            title: 'Krishi Agronomist Helpline',
-            subtitle: 'Toll-free crop advisory support',
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
 
           const SizedBox(height: 16),
           const Divider(color: Color(0xFFE2E8F0), height: 1),

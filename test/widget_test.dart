@@ -108,9 +108,12 @@ void main() {
     await tester.tap(loggedInAccount);
     await tester.pumpAndSettle();
 
-    // Verify Dropdown menu is visible with Track Orders and Sign Out
+    // Verify Dropdown menu is visible with Farmer Profile, Track Orders and Sign Out
+    expect(find.text('Farmer Profile'), findsOneWidget);
     expect(find.text('Track Orders'), findsOneWidget);
     expect(find.text('Sign Out'), findsOneWidget);
+    // Verify Cart and Helpline are not in the dropdown
+    expect(find.text('Krishi Helpline'), findsNothing);
 
     // Tap Sign Out from dropdown
     await tester.tap(find.text('Sign Out'));
