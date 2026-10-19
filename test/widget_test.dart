@@ -283,6 +283,8 @@ void main() {
     expect(find.text('✓ 1 Products in Store'), findsOneWidget);
 
     // Click 'View Products'
+    await tester.ensureVisible(find.text('View Products'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('View Products'));
     await tester.pumpAndSettle();
 

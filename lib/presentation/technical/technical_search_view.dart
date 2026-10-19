@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
+import '../widgets/category_ribbon.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/web_footer.dart';
 import '../category/category_detail_view.dart';
@@ -93,7 +94,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       endDrawer: const QuickCartDrawer(),
       body: SingleChildScrollView(
         child: Column(
@@ -111,6 +112,22 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                   _searchQuery = q;
                   _searchController.text = q;
                 });
+              },
+            ),
+
+            // Category Ribbon with Multi-tier hover navigation
+            CategoryRibbon(
+              selectedCategoryId: 'all',
+              onCategorySelected: (catId, subcategory) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CategoryDetailView(
+                      initialCategoryId: catId,
+                      initialSubcategory: subcategory,
+                    ),
+                  ),
+                );
               },
             ),
 
@@ -286,9 +303,9 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
-            Color(0xFF0F3D24), // Rich dark forest green
-            Color(0xFF1E5E3A),
-            Color(0xFF036DBB), // AgriBegri style blue accent
+            AppColors.primaryDarkGreen,
+            AppColors.primaryGreen,
+            Color(0xFF388E3C),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -296,7 +313,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F3D24).withValues(alpha: 0.2),
+            color: AppColors.primaryDarkGreen.withValues(alpha: 0.25),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -319,16 +336,16 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.ratingAmber.withValues(alpha: 0.25),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.ratingAmber.withValues(alpha: 0.6)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
                 ),
                 child: Text(
                   'ACTIVE INGREDIENT & CHEMICAL DIRECTORY',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.ratingAmber,
+                    color: Colors.white,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -367,10 +384,10 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.border),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x08000000),
+            color: Color(0x06000000),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -383,9 +400,9 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           Container(
             height: 50,
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: AppColors.warmBackground,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFCBD5E1)),
+              border: Border.all(color: AppColors.border),
             ),
             child: TextField(
               controller: _searchController,
@@ -437,10 +454,10 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primaryGreen : const Color(0xFFF1F5F9),
+                    color: isSelected ? AppColors.primaryGreen : Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
+                      color: isSelected ? AppColors.primaryGreen : AppColors.border,
                     ),
                   ),
                   child: Text(
@@ -471,7 +488,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.border),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -500,7 +517,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                   height: 32,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF015591) : Colors.transparent,
+                    color: isSelected ? AppColors.primaryGreen : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -508,7 +525,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color: isSelected ? Colors.white : const Color(0xFF475569),
+                      color: isSelected ? Colors.white : AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -530,7 +547,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.border),
         boxShadow: const [
           BoxShadow(
             color: Color(0x06000000),
@@ -542,7 +559,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          // AgriBegri-style Navy Blue Section Header
+          // BioCrop Forest Green Section Header
           InkWell(
             onTap: () {
               setState(() {
@@ -561,8 +578,8 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF015591), // AgriBegri deep blue
-                    Color(0xFF036DBB),
+                    AppColors.primaryDarkGreen, // Forest Dark Green
+                    AppColors.primaryGreen,     // Rich Agro Green
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -667,7 +684,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
 
     return InkWell(
       onTap: () => _onSelectTechnical(item),
-      hoverColor: const Color(0xFFF8FAFC),
+      hoverColor: AppColors.warmBackground,
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 16 : 24,
@@ -747,7 +764,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: matchingProductsCount > 0
                               ? AppColors.primaryGreen
-                              : const Color(0xFF015591),
+                              : AppColors.primaryDarkGreen,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           elevation: 0,
@@ -839,7 +856,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: matchingProductsCount > 0
                           ? AppColors.primaryGreen
-                          : const Color(0xFF015591),
+                          : AppColors.primaryDarkGreen,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

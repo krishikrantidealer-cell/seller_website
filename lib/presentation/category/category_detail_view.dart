@@ -197,18 +197,18 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEFF6FF),
+                                color: AppColors.lightGreen,
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.4)),
+                                border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.science_outlined, size: 18, color: Color(0xFF1D4ED8)),
+                                  const Icon(Icons.science_outlined, size: 18, color: AppColors.primaryDarkGreen),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: RichText(
                                       text: TextSpan(
-                                        style: GoogleFonts.poppins(fontSize: 13, color: const Color(0xFF1E3A8A)),
+                                        style: GoogleFonts.poppins(fontSize: 13, color: AppColors.primaryDarkGreen),
                                         children: [
                                           const TextSpan(text: 'Showing all brands formulated with: '),
                                           TextSpan(
@@ -229,17 +229,17 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(color: const Color(0xFF93C5FD)),
+                                        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.4)),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
                                             'Clear',
-                                            style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF1D4ED8)),
+                                            style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
                                           ),
                                           const SizedBox(width: 4),
-                                          const Icon(Icons.close_rounded, size: 14, color: Color(0xFF1D4ED8)),
+                                          const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryDarkGreen),
                                         ],
                                       ),
                                     ),
