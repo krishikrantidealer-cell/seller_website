@@ -997,6 +997,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     }
 
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(isMobile ? 12 : 14),
@@ -1015,10 +1016,11 @@ class _MyOrdersViewState extends State<MyOrdersView> {
           onTap: openDetail,
           borderRadius: BorderRadius.circular(isMobile ? 12 : 14),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Compact Header
+              // 1. Compact Header (Full Width)
               Container(
+                width: double.infinity,
                 padding: EdgeInsets.symmetric(
                   horizontal: isMobile ? 12 : 16,
                   vertical: isMobile ? 8 : 10,
@@ -1028,78 +1030,82 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(isMobile ? 12 : 14)),
                   border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
                 ),
-                child: Wrap(
-                  alignment: WrapAlignment.spaceBetween,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: [
-                    // Order ID + Placed Date
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFCBD5E1)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.receipt_long_rounded, size: isMobile ? 12 : 13, color: AppColors.textSecondary),
-                              const SizedBox(width: 4),
-                              Text(
-                                order.id,
-                                style: GoogleFonts.poppins(
-                                  fontSize: isMobile ? 11.5 : 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
-                          style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
-                        ),
-                      ],
-                    ),
-
-                    // Status Badge
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: statusBg,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: statusColor.withValues(alpha: 0.25)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      // Order ID + Placed Date
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
-                          Icon(order.status.icon, size: isMobile ? 11 : 13, color: statusColor),
-                          const SizedBox(width: 4),
-                          Text(
-                            order.status.displayName,
-                            style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 10.5 : 11,
-                              fontWeight: FontWeight.w700,
-                              color: statusColor,
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: const Color(0xFFCBD5E1)),
                             ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.receipt_long_rounded, size: isMobile ? 12 : 13, color: AppColors.textSecondary),
+                                const SizedBox(width: 4),
+                                Text(
+                                  order.id,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isMobile ? 11.5 : 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
+                            style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+
+                      // Status Badge
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: statusBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: statusColor.withValues(alpha: 0.25)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(order.status.icon, size: isMobile ? 11 : 13, color: statusColor),
+                            const SizedBox(width: 4),
+                            Text(
+                              order.status.displayName,
+                              style: GoogleFonts.poppins(
+                                fontSize: isMobile ? 10.5 : 11,
+                                fontWeight: FontWeight.w700,
+                                color: statusColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
-              // 2. Compact Body
-              Padding(
+              // 2. Compact Body (Full Width)
+              Container(
+                width: double.infinity,
                 padding: EdgeInsets.all(isMobile ? 12 : 16),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -1210,8 +1216,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
 
               const Divider(color: Color(0xFFE2E8F0), height: 1),
 
-              // 3. Compact Footer Actions Bar
-              Padding(
+              // 3. Compact Footer Actions Bar (Full Width)
+              Container(
+                width: double.infinity,
                 padding: EdgeInsets.symmetric(
                   horizontal: isMobile ? 10 : 14,
                   vertical: isMobile ? 6 : 8,

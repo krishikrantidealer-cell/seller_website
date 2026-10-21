@@ -659,6 +659,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
     bool isMobile,
   ) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 22),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -673,14 +674,16 @@ class _OrderDetailViewState extends State<OrderDetailView> {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 12,
-            runSpacing: 8,
-            children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 8,
+              children: [
               // Order ID & Placed Time
               Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
@@ -748,7 +751,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+        ),
+        const SizedBox(height: 14),
           const Divider(color: Color(0xFFE2E8F0), height: 1),
           const SizedBox(height: 12),
 
@@ -793,6 +797,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
 
   Widget _buildTrackingTimelineCard(OrderModel order, bool isMobile) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 22),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1031,6 +1036,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
 
   Widget _buildOrderedItemsCard(BuildContext context, OrderModel order, bool isMobile) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 22),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1306,6 +1312,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
 
   Widget _buildFarmAddressCard(OrderModel order, bool isMobile) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1381,6 +1388,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
 
   Widget _buildPaymentAndPricingCard(OrderModel order, bool isMobile) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1509,6 +1517,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
 
   Widget _buildSupportCard(BuildContext context, OrderModel order, bool isMobile) {
     return Container(
+      width: double.infinity,
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
