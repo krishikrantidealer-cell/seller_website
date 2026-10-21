@@ -10,6 +10,11 @@ import '../widgets/cart_drawer.dart';
 import '../widgets/product_card.dart';
 import '../widgets/web_footer.dart';
 import '../product_detail/product_detail_view.dart';
+import '../../data/models/wishlist_state.dart';
+import '../wishlist/wishlist_view.dart';
+import '../profile/farmer_profile_view.dart';
+import '../orders/my_orders_view.dart';
+import '../technical/technical_search_view.dart';
 
 class CategoryDetailView extends StatefulWidget {
   final String initialCategoryId;
@@ -1148,6 +1153,112 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                       ],
                     );
                   }),
+
+                  const Divider(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    child: Text(
+                      'QUICK DISCOVERY',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textMuted,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+
+                  ListTile(
+                    leading: const Icon(Icons.favorite_border_rounded, color: AppColors.primaryCrimson),
+                    title: Text(
+                      'My Wishlist',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    subtitle: AnimatedBuilder(
+                      animation: WishlistController.instance,
+                      builder: (context, _) => Text(
+                        '${WishlistController.instance.totalCount} saved farm products',
+                        style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                      ),
+                    ),
+                    trailing: AnimatedBuilder(
+                      animation: WishlistController.instance,
+                      builder: (context, _) {
+                        final count = WishlistController.instance.totalCount;
+                        if (count == 0) return const SizedBox.shrink();
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryCrimson,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '$count',
+                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const WishlistView()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person_pin_circle_outlined, color: AppColors.primaryGreen),
+                    title: Text(
+                      'Farmer Profile & Delivery Address',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    subtitle: Text('Manage farm depot, village & crop details', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const FarmerProfileView()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.science_outlined, color: AppColors.primaryDarkGreen),
+                    title: Text(
+                      'Search by Technical Name',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TechnicalSearchView()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary),
+                    title: Text(
+                      'Track Orders',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MyOrdersView()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.phone_in_talk_outlined, color: AppColors.primaryGreen),
+                    title: Text(
+                      'Helpline: 1800-203-1425',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    subtitle: Text('Toll-Free Kisan Advisory', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
+                    onTap: () {},
+                  ),
                 ],
               ),
             ),

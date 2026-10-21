@@ -117,26 +117,29 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               animation: WishlistController.instance,
                               builder: (context, _) {
                                 final count = WishlistController.instance.totalCount;
-                                return InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const WishlistView()),
-                                    );
-                                  },
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4),
-                                    child: count > 0
-                                        ? Badge(
-                                            label: Text(
-                                              count.toString(),
-                                              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
-                                            ),
-                                            backgroundColor: AppColors.primaryCrimson,
-                                            child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 22),
-                                          )
-                                        : const Icon(Icons.favorite_border_rounded, color: AppColors.textPrimary, size: 22),
+                                return Tooltip(
+                                  message: count > 0 ? 'Wishlist ($count)' : 'Wishlist',
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => const WishlistView()),
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4),
+                                      child: count > 0
+                                          ? Badge(
+                                              label: Text(
+                                                count.toString(),
+                                                style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                              ),
+                                              backgroundColor: AppColors.primaryCrimson,
+                                              child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 22),
+                                            )
+                                          : const Icon(Icons.favorite_border_rounded, color: AppColors.textPrimary, size: 22),
+                                    ),
                                   ),
                                 );
                               },
@@ -775,6 +778,16 @@ class _MainNavHeaderState extends State<MainNavHeader> {
         subtitle: 'Live parcel status & delivery',
       ),
 
+      // My Wishlist
+      buildMenuItem(
+        value: 'wishlist',
+        icon: Icons.favorite_outline_rounded,
+        iconColor: AppColors.primaryCrimson,
+        iconBg: const Color(0xFFFEF2F2),
+        title: 'My Wishlist',
+        subtitle: '${WishlistController.instance.totalCount} saved farm products',
+      ),
+
       const PopupMenuDivider(height: 1),
 
       // Sign Out
@@ -799,6 +812,11 @@ class _MainNavHeaderState extends State<MainNavHeader> {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const MyOrdersView()),
+        );
+      } else if (value == 'wishlist') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const WishlistView()),
         );
       } else if (value == 'logout') {
         showSignOutConfirmationDialog(context).then((confirmed) {

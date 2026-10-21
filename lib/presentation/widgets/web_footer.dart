@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../category/category_detail_view.dart';
+import '../wishlist/wishlist_view.dart';
+import '../orders/my_orders_view.dart';
 
 class WebFooter extends StatelessWidget {
   const WebFooter({super.key});
@@ -47,7 +49,7 @@ class WebFooter extends StatelessWidget {
                           const SizedBox(height: 32),
                           _categoriesColumn(context),
                           const SizedBox(height: 32),
-                          _quickLinksColumn(),
+                          _quickLinksColumn(context),
                           const SizedBox(height: 32),
                           _supportColumn(context),
                         ],
@@ -60,7 +62,7 @@ class WebFooter extends StatelessWidget {
                         const SizedBox(width: 48),
                         Expanded(flex: 2, child: _categoriesColumn(context)),
                         const SizedBox(width: 48),
-                        Expanded(flex: 2, child: _quickLinksColumn()),
+                        Expanded(flex: 2, child: _quickLinksColumn(context)),
                         const SizedBox(width: 48),
                         Expanded(flex: 3, child: _supportColumn(context)),
                       ],
@@ -429,13 +431,30 @@ class WebFooter extends StatelessWidget {
     );
   }
 
-  Widget _quickLinksColumn() {
+  Widget _quickLinksColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _columnTitle('Quick Links'),
+        _footerLink(
+          'My Saved Wishlist',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const WishlistView()),
+            );
+          },
+        ),
+        _footerLink(
+          'Track Your Order',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyOrdersView()),
+            );
+          },
+        ),
         _footerLink('About EBS Essential BioCrop Science'),
-        _footerLink('Track Your Order'),
         _footerLink('Seller & Distributor Hub'),
         _footerLink('Agronomist Consultation'),
         _footerLink('Research & Formulations'),

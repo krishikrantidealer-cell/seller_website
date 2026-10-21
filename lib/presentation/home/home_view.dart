@@ -14,6 +14,8 @@ import '../category/category_detail_view.dart';
 import '../technical/technical_search_view.dart';
 import '../profile/farmer_profile_view.dart';
 import '../orders/my_orders_view.dart';
+import '../../data/models/wishlist_state.dart';
+import '../wishlist/wishlist_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -787,6 +789,46 @@ class _HomeViewState extends State<HomeView> {
                         letterSpacing: 0.8,
                       ),
                     ),
+                  ),
+
+                  ListTile(
+                    leading: const Icon(Icons.favorite_border_rounded, color: AppColors.primaryCrimson),
+                    title: Text(
+                      'My Wishlist',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                    subtitle: AnimatedBuilder(
+                      animation: WishlistController.instance,
+                      builder: (context, _) => Text(
+                        '${WishlistController.instance.totalCount} saved farm products',
+                        style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                      ),
+                    ),
+                    trailing: AnimatedBuilder(
+                      animation: WishlistController.instance,
+                      builder: (context, _) {
+                        final count = WishlistController.instance.totalCount;
+                        if (count == 0) return const SizedBox.shrink();
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryCrimson,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '$count',
+                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const WishlistView()),
+                      );
+                    },
                   ),
 
                   ListTile(
