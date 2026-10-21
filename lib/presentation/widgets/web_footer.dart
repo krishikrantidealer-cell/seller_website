@@ -240,7 +240,6 @@ class WebFooter extends StatelessWidget {
               _footerLink('Refund & Cancellation'),
             ],
           ),
-          _buildSocialMediaRow(context),
         ],
       ),
     );
@@ -401,17 +400,6 @@ class WebFooter extends StatelessWidget {
           'Email Support: support@ebsbiocrop.com',
           style: GoogleFonts.poppins(color: const Color(0xFF9CA3AF), fontSize: 13),
         ),
-        const SizedBox(height: 20),
-        Text(
-          'Official Social Channels:',
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: 12.5,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 10),
-        _buildSocialMediaRow(context),
       ],
     );
   }

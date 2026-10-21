@@ -269,7 +269,15 @@ void main() {
     expect(find.text('Vegetable Seeds'), findsWidgets);
     expect(find.text('Field Crop Seeds'), findsWidgets);
 
-    // Initial default hovered category is Vegetable Seeds, so its subcategory is visible in side panel
+    // Initial state: subcategories are NOT shown yet (saving space until category is hovered)
+    expect(find.text('Hybrid Tomato Seeds'), findsNothing);
+
+    // Now hover over "Vegetable Seeds"
+    final vegSeeds = find.text('Vegetable Seeds').first;
+    await gesture.moveTo(tester.getCenter(vegSeeds));
+    await tester.pumpAndSettle();
+
+    // Verify subcategories in the side panel opened for Vegetable Seeds
     expect(find.text('Hybrid Tomato Seeds'), findsOneWidget);
 
     // Now hover over "Field Crop Seeds"
@@ -719,10 +727,10 @@ void main() {
     expect(find.text('Connect With Us:'), findsOneWidget);
     expect(find.byType(SocialIconButton), findsWidgets);
 
-    // Verify Facebook, Instagram, and YouTube tooltips exist
-    expect(find.byTooltip('Follow BioCrop on Facebook'), findsWidgets);
-    expect(find.byTooltip('Follow BioCrop on Instagram'), findsWidgets);
-    expect(find.byTooltip('Subscribe to BioCrop on YouTube'), findsWidgets);
+    // Verify Facebook, Instagram, and YouTube icons exist exactly once (only 1 at the top, not repeated)
+    expect(find.byTooltip('Follow BioCrop on Facebook'), findsOneWidget);
+    expect(find.byTooltip('Follow BioCrop on Instagram'), findsOneWidget);
+    expect(find.byTooltip('Subscribe to BioCrop on YouTube'), findsOneWidget);
 
     // Scroll to Facebook icon, tap and verify feedback snackbar
     final fbIcon = find.byTooltip('Follow BioCrop on Facebook').first;
