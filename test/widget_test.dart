@@ -13,6 +13,7 @@ import 'package:seller_website/data/models/order_models.dart';
 import 'package:seller_website/presentation/orders/my_orders_view.dart';
 import 'package:seller_website/presentation/widgets/auth_modal.dart';
 import 'package:seller_website/presentation/widgets/web_footer.dart';
+import 'package:seller_website/presentation/technical/technical_search_view.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -27,10 +28,10 @@ void main() {
     expect(find.textContaining('BioCrop'), findsWidgets);
     expect(find.text('Track Order'), findsOneWidget);
 
-    // Verify Add to Cart and Buy Now buttons exist on catalog cards
+    // Verify Add to Cart button exists on catalog cards and Buy Now is removed
     final addToCartBtn = find.widgetWithText(ElevatedButton, 'Add to Cart').first;
     expect(addToCartBtn, findsOneWidget);
-    expect(find.widgetWithText(ElevatedButton, 'Buy Now'), findsWidgets);
+    expect(find.widgetWithText(ElevatedButton, 'Buy Now'), findsNothing);
 
     // Scroll to and tap Add to Cart to open variants modal
     await tester.ensureVisible(addToCartBtn);
@@ -323,6 +324,41 @@ void main() {
     // Verify redirected to products list with technical formulation active
     expect(find.textContaining('Chlorantraniliprole 18.5% SC'), findsWidgets);
     expect(find.text('Katyayani All in One Insecticide for Crops'), findsOneWidget);
+  });
+
+  testWidgets('TechnicalSearchView renders compactly on mobile without overflow', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: TechnicalSearchView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Search Products By Technical Name'), findsOneWidget);
+    expect(find.textContaining('Formulations'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('TechnicalSearchView renders without overflow on narrow 320px screen', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 568);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: TechnicalSearchView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Search Products By Technical Name'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('ProductDetailView renders properly on mobile view without RenderFlex overflow', (WidgetTester tester) async {

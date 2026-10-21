@@ -163,7 +163,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(
                     horizontal: isMobile ? 12 : 24,
-                    vertical: isMobile ? 16 : 28,
+                    vertical: isMobile ? 12 : 28,
                   ),
                   child: Center(
                     child: ConstrainedBox(
@@ -172,33 +172,37 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Breadcrumb bar
-                          _buildBreadcrumb(context),
-                          const SizedBox(height: 16),
+                          _buildBreadcrumb(context, isMobile),
+                          SizedBox(height: isMobile ? 10 : 16),
 
                           // Hero Banner / Title Card
                           _buildHeaderBanner(isMobile),
-                          const SizedBox(height: 24),
+                          SizedBox(height: isMobile ? 12 : 24),
 
                           // Search & Filter Box
                           _buildSearchAndFilters(isMobile),
-                          const SizedBox(height: 20),
+                          SizedBox(height: isMobile ? 10 : 20),
 
                           // Quick A-Z Letter Strip
-                          _buildLetterQuickJump(),
-                          const SizedBox(height: 24),
+                          _buildLetterQuickJump(isMobile: isMobile),
+                          SizedBox(height: isMobile ? 12 : 24),
 
                           // Results Header
                           Row(
                             children: [
-                              Text(
-                                'Showing $totalCount Technical Formulations',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                              Expanded(
+                                child: Text(
+                                  isMobile
+                                      ? '$totalCount Formulations'
+                                      : 'Showing $totalCount Technical Formulations',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: isMobile ? 13 : 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              const Spacer(),
                               TextButton.icon(
                                 onPressed: () {
                                   setState(() {
@@ -209,11 +213,19 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                                     }
                                   });
                                 },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isMobile ? 6 : 10,
+                                    vertical: isMobile ? 2 : 6,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
                                 icon: Icon(
                                   _expandedLetters.length >= grouped.length
                                       ? Icons.unfold_less_rounded
                                       : Icons.unfold_more_rounded,
-                                  size: 18,
+                                  size: isMobile ? 15 : 18,
                                   color: AppColors.primaryGreen,
                                 ),
                                 label: Text(
@@ -221,7 +233,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                                       ? 'Collapse All'
                                       : 'Expand All',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 13,
+                                    fontSize: isMobile ? 11.5 : 13,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryGreen,
                                   ),
@@ -229,7 +241,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: isMobile ? 10 : 16),
 
                           // Accordion Sections Grouped by Letter
                           if (grouped.isEmpty)
@@ -239,7 +251,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: grouped.length,
-                              separatorBuilder: (context, index) => const SizedBox(height: 16),
+                              separatorBuilder: (context, index) => SizedBox(height: isMobile ? 10 : 16),
                               itemBuilder: (context, index) {
                                 final letter = grouped.keys.elementAt(index);
                                 final items = grouped[letter]!;
@@ -254,7 +266,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                               },
                             ),
 
-                          const SizedBox(height: 48),
+                          SizedBox(height: isMobile ? 24 : 48),
                         ],
                       ),
                     ),
@@ -274,14 +286,14 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
 );
 }
 
-  Widget _buildBreadcrumb(BuildContext context) {
+  Widget _buildBreadcrumb(BuildContext context, bool isMobile) {
     return Row(
       children: [
         InkWell(
           onTap: () => Navigator.pop(context),
           borderRadius: BorderRadius.circular(6),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: isMobile ? 4 : 6),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(6),
@@ -290,12 +302,12 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.arrow_back_rounded, size: 14, color: AppColors.primaryGreen),
+                Icon(Icons.arrow_back_rounded, size: isMobile ? 12 : 14, color: AppColors.primaryGreen),
                 const SizedBox(width: 4),
                 Text(
-                  'Back to Home',
+                  isMobile ? 'Home' : 'Back to Home',
                   style: GoogleFonts.poppins(
-                    fontSize: 12,
+                    fontSize: isMobile ? 11 : 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryGreen,
                   ),
@@ -304,18 +316,21 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 8),
         Text(
           '/',
-          style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 13),
+          style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
         ),
-        const SizedBox(width: 12),
-        Text(
-          'Search by Technical Name',
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            isMobile ? 'Technical Directory' : 'Search by Technical Name',
+            style: GoogleFonts.poppins(
+              fontSize: isMobile ? 11 : 12,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -323,9 +338,84 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
   }
 
   Widget _buildHeaderBanner(bool isMobile) {
+    if (isMobile) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              AppColors.primaryDarkGreen,
+              AppColors.primaryGreen,
+              Color(0xFF388E3C),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryDarkGreen.withValues(alpha: 0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(Icons.science_outlined, color: Colors.white, size: 15),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'ACTIVE INGREDIENT & CHEMICAL DIRECTORY',
+                    style: GoogleFonts.poppins(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white.withValues(alpha: 0.95),
+                      letterSpacing: 0.4,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Search Products By Technical Name',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                height: 1.2,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Find and compare formulations by scientific composition and active salts.',
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: Colors.white.withValues(alpha: 0.9),
+                height: 1.35,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 18 : 28),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -382,7 +472,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           Text(
             'Search Products By Technical Name',
             style: GoogleFonts.poppins(
-              fontSize: isMobile ? 22 : 28,
+              fontSize: 28,
               fontWeight: FontWeight.w800,
               color: Colors.white,
               height: 1.2,
@@ -392,7 +482,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           Text(
             'Farmers and agronomists can search agricultural crop protection chemicals and fertilizers by their active scientific/technical compositions rather than commercial brand names. Compare brands and prices for the exact chemical formulation you need.',
             style: GoogleFonts.poppins(
-              fontSize: isMobile ? 12 : 14,
+              fontSize: 14,
               color: Colors.white.withValues(alpha: 0.9),
               height: 1.5,
             ),
@@ -406,10 +496,10 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
     final categories = ['All', 'Insecticide', 'Fungicide', 'Herbicide', 'Fertilizer', 'Seeds', 'Bio'];
 
     return Container(
-      padding: EdgeInsets.all(isMobile ? 14 : 20),
+      padding: EdgeInsets.all(isMobile ? 10 : 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
         border: Border.all(color: AppColors.border),
         boxShadow: const [
           BoxShadow(
@@ -424,10 +514,10 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
         children: [
           // Search input box
           Container(
-            height: 50,
+            height: isMobile ? 40 : 50,
             decoration: BoxDecoration(
               color: AppColors.warmBackground,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.border),
             ),
             child: TextField(
@@ -436,7 +526,6 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 setState(() {
                   _searchQuery = val;
                   if (val.isNotEmpty) {
-                    // Automatically open first matching letter
                     final matchingLetters = _groupedByLetter.keys;
                     if (matchingLetters.isNotEmpty) {
                       _expandedLetters.addAll(matchingLetters);
@@ -445,12 +534,16 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Search technical names (e.g. Chlorantraniliprole, Imidacloprid, Mancozeb)...',
-                hintStyle: GoogleFonts.poppins(fontSize: 13, color: AppColors.textMuted),
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryGreen),
+                hintText: isMobile
+                    ? 'Search technical names (e.g. Imidacloprid)...'
+                    : 'Search technical names (e.g. Chlorantraniliprole, Imidacloprid, Mancozeb)...',
+                hintStyle: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 13, color: AppColors.textMuted),
+                prefixIcon: Icon(Icons.search, color: AppColors.primaryGreen, size: isMobile ? 18 : 22),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
+                        icon: const Icon(Icons.clear, size: 16),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                         onPressed: () {
                           setState(() {
                             _searchQuery = '';
@@ -460,64 +553,105 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       )
                     : null,
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 10 : 14),
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: isMobile ? 8 : 14),
 
-          // Category filter chips
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: categories.map((cat) {
-              final isSelected = _selectedCategoryFilter == cat;
-              return InkWell(
-                onTap: () {
-                  setState(() => _selectedCategoryFilter = cat);
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primaryGreen : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primaryGreen : AppColors.border,
+          // Category filter chips - Horizontally scrollable on mobile for supreme compactness
+          if (isMobile)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: categories.map((cat) {
+                  final isSelected = _selectedCategoryFilter == cat;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: InkWell(
+                      onTap: () {
+                        setState(() => _selectedCategoryFilter = cat);
+                      },
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.primaryGreen : AppColors.warmBackground,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                          ),
+                        ),
+                        child: Text(
+                          cat == 'All' ? 'All Categories' : cat,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected ? Colors.white : AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: categories.map((cat) {
+                final isSelected = _selectedCategoryFilter == cat;
+                return InkWell(
+                  onTap: () {
+                    setState(() => _selectedCategoryFilter = cat);
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primaryGreen : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primaryGreen : AppColors.border,
+                      ),
+                    ),
+                    child: Text(
+                      cat == 'All' ? 'All Categories' : cat,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected ? Colors.white : AppColors.textSecondary,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    cat == 'All' ? 'All Categories' : cat,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? Colors.white : AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+                );
+              }).toList(),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildLetterQuickJump() {
+  Widget _buildLetterQuickJump({bool isMobile = false}) {
     final letters = [
       'All',
       ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
     ];
 
+    final btnSize = isMobile ? 26.0 : 32.0;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 14, vertical: isMobile ? 6 : 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
         border: Border.all(color: AppColors.border),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
         child: Row(
           children: letters.map((letter) {
             final isSelected = letter == 'All'
@@ -525,7 +659,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 : _selectedLetterFilter == letter;
 
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 2 : 3),
               child: InkWell(
                 onTap: () {
                   setState(() {
@@ -537,19 +671,19 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     }
                   });
                 },
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(5),
                 child: Container(
-                  width: 32,
-                  height: 32,
+                  width: btnSize,
+                  height: btnSize,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: isSelected ? AppColors.primaryGreen : Colors.transparent,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Text(
                     letter,
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: isMobile ? 11 : 12,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                       color: isSelected ? Colors.white : AppColors.textSecondary,
                     ),
@@ -598,8 +732,8 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
             },
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: isMobile ? 16 : 24,
-                vertical: isMobile ? 14 : 18,
+                horizontal: isMobile ? 12 : 24,
+                vertical: isMobile ? 10 : 18,
               ),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -614,8 +748,8 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
               child: Row(
                 children: [
                   Container(
-                    width: 38,
-                    height: 38,
+                    width: isMobile ? 28 : 38,
+                    height: isMobile ? 28 : 38,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
@@ -624,43 +758,50 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     child: Text(
                       letter,
                       style: GoogleFonts.poppins(
-                        fontSize: 20,
+                        fontSize: isMobile ? 15 : 20,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: isMobile ? 10 : 14),
                   Expanded(
                     child: Text(
-                      'Technical Formulations Starting With "$letter"',
+                      isMobile
+                          ? 'Technical Formulations ("$letter")'
+                          : 'Technical Formulations Starting With "$letter"',
                       style: GoogleFonts.poppins(
-                        fontSize: isMobile ? 14 : 16,
+                        fontSize: isMobile ? 12.5 : 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 6 : 10,
+                      vertical: isMobile ? 2 : 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '${items.length} ${items.length == 1 ? 'Item' : 'Items'}',
                       style: GoogleFonts.poppins(
-                        fontSize: 11,
+                        fontSize: isMobile ? 10 : 11,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: isMobile ? 6 : 10),
                   Icon(
                     isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                     color: Colors.white,
-                    size: 24,
+                    size: isMobile ? 20 : 24,
                   ),
                 ],
               ),
@@ -713,8 +854,8 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
       hoverColor: AppColors.warmBackground,
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 16 : 24,
-          vertical: isMobile ? 12 : 16,
+          horizontal: isMobile ? 12 : 24,
+          vertical: isMobile ? 10 : 16,
         ),
         child: isMobile
             ? Column(
@@ -727,7 +868,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         child: Text(
                           item.name,
                           style: GoogleFonts.poppins(
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
                           ),
@@ -735,7 +876,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: badgeColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
@@ -744,7 +885,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         child: Text(
                           item.category,
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
+                            fontSize: 9.5,
                             fontWeight: FontWeight.w700,
                             color: badgeColor,
                           ),
@@ -753,46 +894,51 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     ],
                   ),
                   if (item.description.isNotEmpty) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
                     Text(
                       item.description,
-                      style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary, height: 1.3),
                     ),
                   ],
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       if (matchingProductsCount > 0)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFECFDF5),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
-                          ),
-                          child: Text(
-                            '✓ $matchingProductsCount Products in Store',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF047857),
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                            ),
+                            child: Text(
+                              '✓ $matchingProductsCount Products',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF047857),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
                       const Spacer(),
                       ElevatedButton.icon(
                         onPressed: () => _onSelectTechnical(item),
-                        icon: const Icon(Icons.arrow_forward, size: 14),
+                        icon: const Icon(Icons.arrow_forward, size: 12),
                         label: Text(
                           matchingProductsCount > 0 ? 'View Products' : 'Explore',
-                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(fontSize: 10.5, fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: matchingProductsCount > 0
                               ? AppColors.primaryGreen
                               : AppColors.primaryDarkGreen,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
                           elevation: 0,
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,

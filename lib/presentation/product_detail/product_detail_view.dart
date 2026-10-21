@@ -153,11 +153,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  void _onBuyNow() {
-    CartController.instance.addItem(widget.product, _selectedVariant, _selectedQuantity);
-    _scaffoldKey.currentState?.openEndDrawer();
-  }
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -354,8 +349,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             Expanded(
               child: SizedBox(
                 height: 44,
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: _onAddToCart,
+                  icon: const Icon(Icons.shopping_cart_outlined, size: 17),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
@@ -363,29 +359,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     padding: EdgeInsets.zero,
                   ),
-                  child: Text(
+                  label: Text(
                     'Add to Cart',
-                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SizedBox(
-                height: 44,
-                child: ElevatedButton(
-                  onPressed: _onBuyNow,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryCrimson,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: Text(
-                    'Buy Now',
-                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+                    style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -1075,26 +1051,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: SizedBox(
-                    height: 46,
-                    child: ElevatedButton.icon(
-                      onPressed: _onBuyNow,
-                      icon: const Icon(Icons.bolt_rounded, size: 17),
-                      label: Text(
-                        'Buy Now',
-                        style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryCrimson,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ] else ...[
@@ -1102,39 +1058,19 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             Row(
               children: [
                 _buildQuantityControl(),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   child: SizedBox(
-                    height: 46,
+                    height: 48,
                     child: ElevatedButton.icon(
                       onPressed: _onAddToCart,
                       icon: const Icon(Icons.shopping_cart_outlined, size: 18),
                       label: Text(
                         'Add to Cart',
-                        style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 46,
-                    child: ElevatedButton.icon(
-                      onPressed: _onBuyNow,
-                      icon: const Icon(Icons.bolt_rounded, size: 18),
-                      label: Text(
-                        'Buy Now',
-                        style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryCrimson,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
