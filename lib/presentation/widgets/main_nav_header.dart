@@ -203,17 +203,25 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             child: TextField(
                               controller: _searchController,
                               onSubmitted: widget.onSearch,
+                              textAlignVertical: TextAlignVertical.center,
+                              style: GoogleFonts.poppins(
+                                color: AppColors.textPrimary,
+                                fontSize: 13,
+                              ),
                               decoration: InputDecoration(
+                                isDense: true,
                                 hintText: 'Search seeds, pesticides, fertilizers...',
                                 hintStyle: GoogleFonts.poppins(
                                   color: AppColors.textMuted,
                                   fontSize: 12,
                                 ),
                                 prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 18),
+                                prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 40),
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                                contentPadding: EdgeInsets.zero,
+                                suffixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 40),
                                 suffixIcon: Container(
                                   margin: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
@@ -293,17 +301,25 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 child: TextField(
                                   controller: _searchController,
                                   onSubmitted: widget.onSearch,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 13.5,
+                                  ),
                                   decoration: InputDecoration(
+                                    isDense: true,
                                     hintText: 'Search for seeds, pesticides, fertilizers...',
                                     hintStyle: GoogleFonts.poppins(
                                       color: AppColors.textMuted,
                                       fontSize: 13,
                                     ),
-                                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 20),
+                                    prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 46),
                                     border: InputBorder.none,
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                                    contentPadding: EdgeInsets.zero,
+                                    suffixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 46),
                                     suffixIcon: Container(
                                       margin: const EdgeInsets.all(4),
                                       decoration: BoxDecoration(

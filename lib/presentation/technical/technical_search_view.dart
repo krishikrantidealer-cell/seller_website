@@ -533,12 +533,16 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                   }
                 });
               },
+              textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
+                isDense: true,
                 hintText: isMobile
                     ? 'Search technical names (e.g. Imidacloprid)...'
                     : 'Search technical names (e.g. Chlorantraniliprole, Imidacloprid, Mancozeb)...',
                 hintStyle: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 13, color: AppColors.textMuted),
                 prefixIcon: Icon(Icons.search, color: AppColors.primaryGreen, size: isMobile ? 18 : 22),
+                prefixIconConstraints: BoxConstraints(minWidth: isMobile ? 36 : 44, minHeight: isMobile ? 42 : 48),
+                suffixIconConstraints: BoxConstraints(minWidth: isMobile ? 36 : 44, minHeight: isMobile ? 42 : 48),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear, size: 16),
@@ -553,7 +557,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       )
                     : null,
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: isMobile ? 10 : 14),
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ),

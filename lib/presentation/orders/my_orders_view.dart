@@ -889,6 +889,8 @@ class _MyOrdersViewState extends State<MyOrdersView> {
               : 'Search by Order ID (e.g. EBS-2026), AWB, or product name...',
           hintStyle: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, color: AppColors.textMuted),
           prefixIcon: Icon(Icons.search_rounded, size: isMobile ? 18 : 20, color: AppColors.textSecondary),
+          prefixIconConstraints: BoxConstraints(minWidth: isMobile ? 34 : 40, minHeight: isMobile ? 36 : 42),
+          suffixIconConstraints: BoxConstraints(minWidth: isMobile ? 32 : 38, minHeight: isMobile ? 36 : 42),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(Icons.clear_rounded, size: isMobile ? 16 : 18, color: AppColors.textMuted),
@@ -901,7 +903,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 8 : 11),
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );
