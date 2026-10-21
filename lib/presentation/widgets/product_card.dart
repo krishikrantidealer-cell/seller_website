@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/models/cart_state.dart';
+import '../../data/models/wishlist_state.dart';
 import 'product_variants_modal.dart';
 
 class ProductCard extends StatefulWidget {
@@ -35,7 +36,7 @@ class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: CartController.instance,
+      animation: Listenable.merge([CartController.instance, WishlistController.instance]),
       builder: (context, _) {
         final cart = CartController.instance;
         final variants = widget.product.variants.isNotEmpty ? widget.product.variants : [widget.product.defaultVariant];
@@ -118,13 +119,85 @@ class _ProductCardState extends State<ProductCard> {
                                   ),
                                 ),
                               ),
+                            // Wishlist Heart Icon Button
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    final added = WishlistController.instance.toggleWishlist(widget.product);
+                                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: AppColors.primaryDarkGreen,
+                                        behavior: SnackBarBehavior.floating,
+                                        duration: const Duration(seconds: 2),
+                                        content: Row(
+                                          children: [
+                                            Icon(
+                                              added ? Icons.favorite_rounded : Icons.heart_broken_rounded,
+                                              color: added ? AppColors.primaryCrimson : Colors.white,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                added
+                                                    ? 'Added ${widget.product.title} to wishlist!'
+                                                    : 'Removed from wishlist',
+                                                style: GoogleFonts.poppins(fontSize: 12.5),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    width: isCompact ? 28 : 32,
+                                    height: isCompact ? 28 : 32,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: WishlistController.instance.isLiked(widget.product.id)
+                                            ? AppColors.primaryCrimson.withValues(alpha: 0.3)
+                                            : AppColors.border,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.08),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        WishlistController.instance.isLiked(widget.product.id)
+                                            ? Icons.favorite_rounded
+                                            : Icons.favorite_border_rounded,
+                                        size: isCompact ? 15 : 18,
+                                        color: WishlistController.instance.isLiked(widget.product.id)
+                                            ? AppColors.primaryCrimson
+                                            : AppColors.textMuted,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                             // Added to cart indicator pill
                             if (totalProductQty > 0)
                               Positioned(
                                 top: 8,
-                                right: 8,
+                                right: isCompact ? 34 : 44,
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 6 : 8, vertical: isCompact ? 2 : 4),
+                                  padding: EdgeInsets.symmetric(horizontal: isCompact ? 5 : 7, vertical: isCompact ? 2 : 4),
                                   decoration: BoxDecoration(
                                     color: AppColors.primaryGreen,
                                     borderRadius: BorderRadius.circular(12),

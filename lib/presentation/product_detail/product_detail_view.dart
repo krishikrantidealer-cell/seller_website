@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
+import '../../data/models/wishlist_state.dart';
 import '../../data/models/catalog_models.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
@@ -538,6 +539,77 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ),
                     ],
                   ),
+                ),
+              ),
+              // Wishlist Heart Button
+              Positioned(
+                bottom: 12,
+                right: 12,
+                child: AnimatedBuilder(
+                  animation: WishlistController.instance,
+                  builder: (context, _) {
+                    final isLiked = WishlistController.instance.isLiked(widget.product.id);
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          final added = WishlistController.instance.toggleWishlist(widget.product);
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: AppColors.primaryDarkGreen,
+                              behavior: SnackBarBehavior.floating,
+                              duration: const Duration(seconds: 2),
+                              content: Row(
+                                children: [
+                                  Icon(
+                                    added ? Icons.favorite_rounded : Icons.heart_broken_rounded,
+                                    color: added ? AppColors.primaryCrimson : Colors.white,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      added ? 'Added to wishlist!' : 'Removed from wishlist',
+                                      style: GoogleFonts.poppins(fontSize: 13),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isLiked
+                                  ? AppColors.primaryCrimson.withValues(alpha: 0.3)
+                                  : AppColors.border,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Icon(
+                              isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                              size: 22,
+                              color: isLiked ? AppColors.primaryCrimson : AppColors.textMuted,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

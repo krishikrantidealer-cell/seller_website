@@ -4,10 +4,12 @@ import '../../core/theme/app_colors.dart';
 
 import '../../data/models/cart_state.dart';
 import '../../data/models/auth_state.dart';
+import '../../data/models/wishlist_state.dart';
 import 'auth_modal.dart';
 import '../profile/farmer_profile_view.dart';
 import '../orders/my_orders_view.dart';
 import '../technical/technical_search_view.dart';
+import '../wishlist/wishlist_view.dart';
 
 class MainNavHeader extends StatefulWidget {
   final int? cartItemCount;
@@ -63,7 +65,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
           constraints: const BoxConstraints(maxWidth: 1680),
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final isMobile = constraints.maxWidth < 900;
+              final isMobile = constraints.maxWidth < 1100;
 
               if (isMobile) {
                 return Column(
@@ -110,6 +112,36 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               ),
                               const SizedBox(width: 6),
                             ],
+                            // Mobile Wishlist Button
+                            AnimatedBuilder(
+                              animation: WishlistController.instance,
+                              builder: (context, _) {
+                                final count = WishlistController.instance.totalCount;
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const WishlistView()),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: count > 0
+                                        ? Badge(
+                                            label: Text(
+                                              count.toString(),
+                                              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                            ),
+                                            backgroundColor: AppColors.primaryCrimson,
+                                            child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 22),
+                                          )
+                                        : const Icon(Icons.favorite_border_rounded, color: AppColors.textPrimary, size: 22),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 6),
                             AnimatedBuilder(
                               animation: CartController.instance,
                               builder: (context, _) {
@@ -237,77 +269,86 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 children: [
                   // Brand Logo
                   _buildLogo(),
-                  const SizedBox(width: 32),
+                  const SizedBox(width: 20),
 
                   // Search Bar + Search by Technical Name
                   Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: TextField(
-                              controller: _searchController,
-                              onSubmitted: widget.onSearch,
-                              decoration: InputDecoration(
-                                hintText: 'Search for seeds, pesticides, fertilizers...',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: AppColors.textMuted,
-                                  fontSize: 13,
+                    child: LayoutBuilder(
+                      builder: (context, searchConstraints) {
+                        final isCompactBtn = searchConstraints.maxWidth < 300;
+
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 46,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.border),
                                 ),
-                                prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                                suffixIcon: Container(
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryCrimson,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: IconButton(
-                                    icon: const Icon(Icons.search, color: Colors.white, size: 18),
-                                    onPressed: () {
-                                      widget.onSearch?.call(_searchController.text);
-                                    },
+                                child: TextField(
+                                  controller: _searchController,
+                                  onSubmitted: widget.onSearch,
+                                  decoration: InputDecoration(
+                                    hintText: 'Search for seeds, pesticides, fertilizers...',
+                                    hintStyle: GoogleFonts.poppins(
+                                      color: AppColors.textMuted,
+                                      fontSize: 13,
+                                    ),
+                                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted),
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                                    suffixIcon: Container(
+                                      margin: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryCrimson,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.search, color: Colors.white, size: 18),
+                                        onPressed: () {
+                                          widget.onSearch?.call(_searchController.text);
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Search by Technical Name Button
-                        ElevatedButton.icon(
-                          onPressed: _openTechnicalSearch,
-                          icon: const Icon(Icons.science_outlined, size: 18),
-                          label: Text(
-                            'Search by Technical',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                            const SizedBox(width: 10),
+                            // Search by Technical Name Button
+                            ElevatedButton.icon(
+                              onPressed: _openTechnicalSearch,
+                              icon: const Icon(Icons.science_outlined, size: 17),
+                              label: Text(
+                                isCompactBtn ? 'Technical' : 'Search by Technical',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12.5,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryGreen,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: isCompactBtn ? 10 : 14,
+                                  vertical: 13,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGreen,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ],
+                          ],
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(width: 32),
+                  const SizedBox(width: 20),
 
                   // Right Navigation Actions
                   Row(
@@ -323,7 +364,52 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           );
                         },
                       ),
-                      const SizedBox(width: 24),
+                      const SizedBox(width: 16),
+
+                      // Wishlist
+                      AnimatedBuilder(
+                        animation: WishlistController.instance,
+                        builder: (context, _) {
+                          final count = WishlistController.instance.totalCount;
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const WishlistView()),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                              child: Row(
+                                children: [
+                                  if (count > 0)
+                                    Badge(
+                                      label: Text(
+                                        count.toString(),
+                                        style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
+                                      ),
+                                      backgroundColor: AppColors.primaryCrimson,
+                                      child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 24),
+                                    )
+                                  else
+                                    const Icon(Icons.favorite_border_rounded, color: AppColors.textPrimary, size: 24),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Wishlist',
+                                    style: GoogleFonts.poppins(
+                                      color: count > 0 ? AppColors.primaryCrimson : AppColors.textPrimary,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: 16),
 
                       // Cart
                       AnimatedBuilder(
@@ -334,7 +420,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             onTap: widget.onCartTap,
                             borderRadius: BorderRadius.circular(8),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                               child: Row(
                                 children: [
                                   Badge(
@@ -345,13 +431,13 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                     backgroundColor: AppColors.primaryCrimson,
                                     child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 6),
                                   Text(
                                     'Cart',
                                     style: GoogleFonts.poppins(
                                       color: AppColors.textPrimary,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 14,
+                                      fontSize: 13.5,
                                     ),
                                   ),
                                 ],
@@ -360,7 +446,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           );
                         },
                       ),
-                      const SizedBox(width: 24),
+                      const SizedBox(width: 16),
 
                       // My Account / Phone + OTP Login
                       AnimatedBuilder(

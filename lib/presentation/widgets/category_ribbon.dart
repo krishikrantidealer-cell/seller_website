@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
@@ -1313,11 +1314,27 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
     final isGroupHovered = _hoveredGroup != null && groups.isNotEmpty;
     final activeGroup = _hoveredGroup;
 
+    // Dynamically calculate height to eliminate empty space below
+    final double dynamicHeight;
+    if (groups.isEmpty) {
+      final count = widget.category.subcategories.length;
+      dynamicHeight = (count * 38.0 + 55.0).clamp(120.0, 420.0);
+    } else {
+      final leftHeight = 44.0 + 30.0 + (groups.length * 42.0);
+      final rightHeight = (isGroupHovered && activeGroup != null)
+          ? 52.0 + (activeGroup.subcategories.length * 36.0)
+          : 0.0;
+      final contentHeight = isGroupHovered
+          ? math.max(leftHeight, rightHeight)
+          : leftHeight;
+      dynamicHeight = contentHeight.clamp(140.0, 420.0);
+    }
+
     return Material(
       color: Colors.transparent,
       child: Container(
         width: isGroupHovered ? 540 : (groups.isNotEmpty ? 230 : 320),
-        height: 380,
+        height: dynamicHeight,
         margin: const EdgeInsets.only(top: 4),
         decoration: BoxDecoration(
           color: Colors.white,

@@ -13,7 +13,10 @@ import 'package:seller_website/data/models/order_models.dart';
 import 'package:seller_website/presentation/orders/my_orders_view.dart';
 import 'package:seller_website/presentation/widgets/auth_modal.dart';
 import 'package:seller_website/presentation/widgets/web_footer.dart';
+import 'package:seller_website/presentation/widgets/main_nav_header.dart';
 import 'package:seller_website/presentation/technical/technical_search_view.dart';
+import 'package:seller_website/data/models/wishlist_state.dart';
+import 'package:seller_website/presentation/wishlist/wishlist_view.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -807,6 +810,107 @@ void main() {
     expect(find.text('Opening Facebook...'), findsOneWidget);
 
     // Verify zero rendering exceptions / overflows on 320px screen
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('ProductCard renders heart icon and toggles wishlist state', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    WishlistController.instance.clear();
+    final testProduct = ProductItem.sampleProducts.first;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 260,
+            height: 380,
+            child: ProductCard(product: testProduct),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify unliked heart icon is rendered initially
+    expect(find.byIcon(Icons.favorite_border_rounded), findsOneWidget);
+    expect(WishlistController.instance.isLiked(testProduct.id), isFalse);
+
+    // Tap heart icon to add to wishlist
+    await tester.tap(find.byIcon(Icons.favorite_border_rounded));
+    await tester.pumpAndSettle();
+
+    // Verify product is now liked
+    expect(WishlistController.instance.isLiked(testProduct.id), isTrue);
+    expect(find.byIcon(Icons.favorite_rounded), findsWidgets);
+    expect(find.textContaining('Added'), findsOneWidget);
+
+    // Tap again to remove
+    await tester.tap(find.byIcon(Icons.favorite_rounded).first);
+    await tester.pumpAndSettle();
+
+    expect(WishlistController.instance.isLiked(testProduct.id), isFalse);
+    expect(find.byIcon(Icons.favorite_border_rounded), findsOneWidget);
+  });
+
+  testWidgets('Top bar navigation header displays Wishlist button with live count', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    WishlistController.instance.clear();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: MainNavHeader(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify Wishlist action exists in desktop header
+    expect(find.text('Wishlist'), findsOneWidget);
+
+    // Add a product to wishlist and verify badge updates
+    WishlistController.instance.add(ProductItem.sampleProducts.first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('1'), findsWidgets);
+  });
+
+  testWidgets('WishlistView renders empty state, product items, add to cart and is responsive', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // Test 1: Empty state
+    WishlistController.instance.clear();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: WishlistView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('My Wishlist'), findsWidgets);
+    expect(find.text('Your Wishlist is Empty'), findsOneWidget);
+    expect(find.text('Explore Store'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // Test 2: Populated wishlist with products
+    WishlistController.instance.add(ProductItem.sampleProducts[0]);
+    WishlistController.instance.add(ProductItem.sampleProducts[1]);
+    await tester.pumpAndSettle();
+
+    expect(find.text('2 products saved'), findsOneWidget);
+    expect(find.text('Add to Cart'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 }
