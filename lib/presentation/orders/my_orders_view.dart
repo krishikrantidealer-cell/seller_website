@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -526,68 +527,87 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                 ),
               ),
 
-              // Scrollable Orders Content
+              // Scrollable Orders Content with Pinned Filter Bar
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isMobile = constraints.maxWidth < 900;
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 900;
+                    final horizontalPadding = isMobile ? 12.0 : 24.0;
+                    final sidePadding = math.max(horizontalPadding, (constraints.maxWidth - 1400) / 2);
+                    final filterBarHeight = isMobile ? 88.0 : 62.0;
 
-                          return Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isMobile ? 12 : 24,
-                              vertical: isMobile ? 12 : 24,
+                    return CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        // 1. Top Section (Breadcrumb + Hero Dashboard Banner)
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(
+                            sidePadding,
+                            isMobile ? 10 : 20,
+                            sidePadding,
+                            isMobile ? 8 : 16,
+                          ),
+                          sliver: SliverToBoxAdapter(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildBreadcrumb(context, isMobile),
+                                SizedBox(height: isMobile ? 8 : 14),
+                                _buildHeroBanner(ordersCtrl, isMobile),
+                              ],
                             ),
-                            child: Center(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 1400),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Breadcrumb Bar
-                                    _buildBreadcrumb(context),
-                                    const SizedBox(height: 14),
+                          ),
+                        ),
 
-                                    // Hero Dashboard Banner
-                                    _buildHeroBanner(ordersCtrl, isMobile),
-                                    const SizedBox(height: 20),
+                        // 2. PINNED Filter & Search Bar - DOES NOT SCROLL AWAY
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: _OrdersFilterHeaderDelegate(
+                            height: filterBarHeight,
+                            sidePadding: sidePadding,
+                            child: _buildFilterAndSearchBar(ordersCtrl, isMobile),
+                          ),
+                        ),
 
-                                    // Filter Tabs & Search Controls
-                                    _buildFilterAndSearchBar(ordersCtrl, isMobile),
-                                    const SizedBox(height: 20),
-
-                                    // Orders List or Empty State
-                                    if (orders.isEmpty)
-                                      _buildEmptyState(context, ordersCtrl)
-                                    else
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        itemCount: orders.length,
-                                        separatorBuilder: (_, _) => const SizedBox(height: 18),
-                                        itemBuilder: (context, index) {
-                                          final order = orders[index];
-                                          final isExpanded = _expandedOrderIds.contains(order.id);
-                                          return _buildOrderCard(context, order, isExpanded, isMobile);
-                                        },
-                                      ),
-
-                                    const SizedBox(height: 48),
-                                  ],
-                                ),
-                              ),
+                        // 3. Orders List or Empty State
+                        if (orders.isEmpty)
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              sidePadding,
+                              20,
+                              sidePadding,
+                              isMobile ? 24 : 40,
                             ),
-                          );
-                        },
-                      ),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildEmptyState(context, ordersCtrl),
+                            ),
+                          )
+                        else
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              sidePadding,
+                              isMobile ? 10 : 16,
+                              sidePadding,
+                              isMobile ? 24 : 48,
+                            ),
+                            sliver: SliverList.separated(
+                              itemCount: orders.length,
+                              separatorBuilder: (_, _) => SizedBox(height: isMobile ? 12 : 18),
+                              itemBuilder: (context, index) {
+                                final order = orders[index];
+                                final isExpanded = _expandedOrderIds.contains(order.id);
+                                return _buildOrderCard(context, order, isExpanded, isMobile);
+                              },
+                            ),
+                          ),
 
-                      // Footer
-                      const WebFooter(),
-                    ],
-                  ),
+                        // 4. Integrated Web Footer
+                        const SliverToBoxAdapter(
+                          child: WebFooter(),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -597,16 +617,17 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     );
   }
 
-  Widget _buildBreadcrumb(BuildContext context) {
+  Widget _buildBreadcrumb(BuildContext context, bool isMobile) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
       child: Row(
         children: [
           InkWell(
             onTap: () => Navigator.pop(context),
             borderRadius: BorderRadius.circular(6),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: isMobile ? 4 : 6),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(6),
@@ -615,12 +636,12 @@ class _MyOrdersViewState extends State<MyOrdersView> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.arrow_back_rounded, size: 16, color: AppColors.textPrimary),
-                  const SizedBox(width: 6),
+                  Icon(Icons.arrow_back_rounded, size: isMobile ? 14 : 16, color: AppColors.textPrimary),
+                  SizedBox(width: isMobile ? 4 : 6),
                   Text(
                     'Back',
                     style: GoogleFonts.poppins(
-                      fontSize: 12.5,
+                      fontSize: isMobile ? 11.5 : 12.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
@@ -629,23 +650,23 @@ class _MyOrdersViewState extends State<MyOrdersView> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          Text('/', style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 13)),
-          const SizedBox(width: 10),
+          SizedBox(width: isMobile ? 8 : 10),
+          Text('/', style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: isMobile ? 11.5 : 13)),
+          SizedBox(width: isMobile ? 8 : 10),
           InkWell(
             onTap: () => Navigator.pop(context),
             child: Text(
               'Home',
-              style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textSecondary),
+              style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, color: AppColors.textSecondary),
             ),
           ),
-          const SizedBox(width: 8),
-          Text('/', style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 13)),
-          const SizedBox(width: 8),
+          SizedBox(width: isMobile ? 6 : 8),
+          Text('/', style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: isMobile ? 11.5 : 13)),
+          SizedBox(width: isMobile ? 6 : 8),
           Text(
-            'My Orders & Shipment Tracking',
+            isMobile ? 'My Orders' : 'My Orders & Shipment Tracking',
             style: GoogleFonts.poppins(
-              fontSize: 12.5,
+              fontSize: isMobile ? 11.5 : 12.5,
               fontWeight: FontWeight.w700,
               color: AppColors.primaryGreen,
             ),
@@ -656,9 +677,91 @@ class _MyOrdersViewState extends State<MyOrdersView> {
   }
 
   Widget _buildHeroBanner(OrdersController ctrl, bool isMobile) {
+    if (isMobile) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1B5E20).withValues(alpha: 0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.local_shipping_rounded, color: Colors.white, size: 18),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'My Orders & Farm Deliveries',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      Text(
+                        'Track express shipments, GST invoices & repeat orders.',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          fontSize: 10.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Divider(color: Color(0x33FFFFFF), height: 1),
+            const SizedBox(height: 8),
+
+            // Compact Stat Pills on Mobile
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: [
+                  _buildStatPill('📦 Total Placed', '${ctrl.totalOrderCount} Orders', Colors.white, true),
+                  const SizedBox(width: 8),
+                  _buildStatPill('🚚 In Transit', '${ctrl.activeOrderCount} Active', const Color(0xFFFEF08A), true),
+                  const SizedBox(width: 8),
+                  _buildStatPill('✓ Delivered', '${ctrl.deliveredOrderCount} Completed', const Color(0xFFBBF7D0), true),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 16 : 24),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
@@ -697,7 +800,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                       'My Orders & Farm Deliveries',
                       style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: isMobile ? 18 : 22,
+                        fontSize: 22,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -706,7 +809,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                       'Track live express courier shipments, download GST tax bills, and repeat previous orders.',
                       style: GoogleFonts.poppins(
                         color: Colors.white.withValues(alpha: 0.88),
-                        fontSize: isMobile ? 11.5 : 13,
+                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -723,9 +826,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
             spacing: 12,
             runSpacing: 10,
             children: [
-              _buildStatPill('📦 Total Placed', '${ctrl.totalOrderCount} Orders', Colors.white),
-              _buildStatPill('🚚 In Transit', '${ctrl.activeOrderCount} Active', const Color(0xFFFEF08A)),
-              _buildStatPill('✓ Delivered', '${ctrl.deliveredOrderCount} Completed', const Color(0xFFBBF7D0)),
+              _buildStatPill('📦 Total Placed', '${ctrl.totalOrderCount} Orders', Colors.white, false),
+              _buildStatPill('🚚 In Transit', '${ctrl.activeOrderCount} Active', const Color(0xFFFEF08A), false),
+              _buildStatPill('✓ Delivered', '${ctrl.deliveredOrderCount} Completed', const Color(0xFFBBF7D0), false),
             ],
           ),
         ],
@@ -733,9 +836,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     );
   }
 
-  Widget _buildStatPill(String label, String value, Color textColor) {
+  Widget _buildStatPill(String label, String value, Color textColor, [bool isMobile = false]) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 3 : 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(20),
@@ -743,16 +846,23 @@ class _MyOrdersViewState extends State<MyOrdersView> {
       ),
       child: Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 6,
+        spacing: isMobile ? 4 : 6,
         runSpacing: 2,
         children: [
           Text(
             label,
-            style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: 0.9), fontSize: 11.5),
+            style: GoogleFonts.poppins(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: isMobile ? 10.5 : 11.5,
+            ),
           ),
           Text(
             value,
-            style: GoogleFonts.poppins(color: textColor, fontSize: 12, fontWeight: FontWeight.w800),
+            style: GoogleFonts.poppins(
+              color: textColor,
+              fontSize: isMobile ? 11 : 12,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
@@ -761,22 +871,29 @@ class _MyOrdersViewState extends State<MyOrdersView> {
 
   Widget _buildFilterAndSearchBar(OrdersController ctrl, bool isMobile) {
     final searchField = Container(
+      height: isMobile ? 36 : 42,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(isMobile ? 8 : 10),
         border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: TextField(
         controller: _searchController,
         onChanged: (val) => ctrl.setSearchQuery(val),
-        style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
+        style: GoogleFonts.poppins(fontSize: isMobile ? 12 : 13, color: AppColors.textPrimary),
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
-          hintText: 'Search by Order ID (e.g. EBS-2026), AWB, or product name...',
-          hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textMuted),
-          prefixIcon: const Icon(Icons.search_rounded, size: 20, color: AppColors.textSecondary),
+          isDense: true,
+          hintText: isMobile
+              ? 'Search Order ID, AWB, or product...'
+              : 'Search by Order ID (e.g. EBS-2026), AWB, or product name...',
+          hintStyle: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, color: AppColors.textMuted),
+          prefixIcon: Icon(Icons.search_rounded, size: isMobile ? 18 : 20, color: AppColors.textSecondary),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, size: 18, color: AppColors.textMuted),
+                  icon: Icon(Icons.clear_rounded, size: isMobile ? 16 : 18, color: AppColors.textMuted),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                   onPressed: () {
                     _searchController.clear();
                     ctrl.setSearchQuery('');
@@ -784,30 +901,33 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          contentPadding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 8 : 11),
         ),
       ),
     );
 
     final filterChips = SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          _buildFilterChip(ctrl, 'all', 'All Orders (${ctrl.totalOrderCount})'),
-          const SizedBox(width: 8),
-          _buildFilterChip(ctrl, 'active', 'In Transit & Active (${ctrl.activeOrderCount})'),
-          const SizedBox(width: 8),
-          _buildFilterChip(ctrl, 'delivered', 'Delivered (${ctrl.deliveredOrderCount})'),
+          _buildFilterChip(ctrl, 'all', 'All Orders (${ctrl.totalOrderCount})', isMobile),
+          SizedBox(width: isMobile ? 6 : 8),
+          _buildFilterChip(ctrl, 'active', 'In Transit & Active (${ctrl.activeOrderCount})', isMobile),
+          SizedBox(width: isMobile ? 6 : 8),
+          _buildFilterChip(ctrl, 'delivered', 'Delivered (${ctrl.deliveredOrderCount})', isMobile),
         ],
       ),
     );
 
     if (isMobile) {
       return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           searchField,
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           filterChips,
         ],
       );
@@ -822,13 +942,16 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     );
   }
 
-  Widget _buildFilterChip(OrdersController ctrl, String id, String label) {
+  Widget _buildFilterChip(OrdersController ctrl, String id, String label, [bool isMobile = false]) {
     final isSelected = ctrl.selectedFilter == id;
     return InkWell(
       onTap: () => ctrl.setFilter(id),
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 10 : 14,
+          vertical: isMobile ? 5 : 8,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryGreen : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -849,7 +972,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
         child: Text(
           label,
           style: GoogleFonts.poppins(
-            fontSize: 12.5,
+            fontSize: isMobile ? 11.5 : 12.5,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
             color: isSelected ? Colors.white : AppColors.textPrimary,
           ),
@@ -865,13 +988,13 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -880,25 +1003,25 @@ class _MyOrdersViewState extends State<MyOrdersView> {
         children: [
           // Order Card Header
           Container(
-            padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: 14),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: isMobile ? 9 : 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(isMobile ? 12 : 16)),
+              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
             ),
             child: Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 12,
-              runSpacing: 8,
+              spacing: isMobile ? 8 : 12,
+              runSpacing: isMobile ? 6 : 8,
               children: [
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8,
+                  spacing: isMobile ? 6 : 8,
                   runSpacing: 4,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 7 : 9, vertical: isMobile ? 2.5 : 4),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(6),
@@ -907,12 +1030,12 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.receipt_long_rounded, size: 14, color: AppColors.textSecondary),
-                          const SizedBox(width: 5),
+                          Icon(Icons.receipt_long_rounded, size: isMobile ? 12 : 14, color: AppColors.textSecondary),
+                          SizedBox(width: isMobile ? 4 : 5),
                           Text(
                             order.id,
                             style: GoogleFonts.poppins(
-                              fontSize: 12.5,
+                              fontSize: isMobile ? 11.5 : 12.5,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                             ),
@@ -922,14 +1045,14 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                     ),
                     Text(
                       '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
-                      style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
+                      style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textMuted),
                     ),
                   ],
                 ),
 
                 // Status Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: isMobile ? 3 : 4),
                   decoration: BoxDecoration(
                     color: statusBg,
                     borderRadius: BorderRadius.circular(20),
@@ -938,12 +1061,12 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(order.status.icon, size: 14, color: statusColor),
+                      Icon(order.status.icon, size: isMobile ? 12 : 14, color: statusColor),
                       const SizedBox(width: 5),
                       Text(
                         order.status.displayName,
                         style: GoogleFonts.poppins(
-                          fontSize: 11.5,
+                          fontSize: isMobile ? 10.5 : 11.5,
                           fontWeight: FontWeight.w700,
                           color: statusColor,
                         ),
@@ -957,24 +1080,24 @@ class _MyOrdersViewState extends State<MyOrdersView> {
 
           // Estimated Delivery & Courier Strip
           Container(
-            padding: EdgeInsets.symmetric(horizontal: isMobile ? 14 : 20, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: isMobile ? 7 : 10),
             color: const Color(0xFFF0FDF4),
             child: Row(
               children: [
-                const Icon(Icons.schedule_rounded, size: 16, color: AppColors.primaryDarkGreen),
-                const SizedBox(width: 8),
+                Icon(Icons.schedule_rounded, size: isMobile ? 14 : 16, color: AppColors.primaryDarkGreen),
+                SizedBox(width: isMobile ? 6 : 8),
                 Expanded(
                   child: Text.rich(
                     TextSpan(
                       children: [
                         TextSpan(
                           text: order.status == OrderStatus.delivered ? 'Status: ' : 'Delivery Expected: ',
-                          style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                          style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary),
                         ),
                         TextSpan(
                           text: order.estimatedDelivery,
                           style: GoogleFonts.poppins(
-                            fontSize: 12,
+                            fontSize: isMobile ? 11.5 : 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primaryDarkGreen,
                           ),
@@ -982,7 +1105,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                         if (order.awbNumber.isNotEmpty) ...[
                           TextSpan(
                             text: ' • via ${order.courierName} (AWB: ${order.awbNumber})',
-                            style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textMuted),
+                            style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
                           ),
                         ],
                       ],
@@ -997,20 +1120,20 @@ class _MyOrdersViewState extends State<MyOrdersView> {
 
           // Order Items List
           Padding(
-            padding: EdgeInsets.all(isMobile ? 14 : 20),
+            padding: EdgeInsets.all(isMobile ? 12 : 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ...order.items.map((item) {
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: EdgeInsets.only(bottom: isMobile ? 8 : 12),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Product Thumbnail
                         Container(
-                          width: 56,
-                          height: 56,
+                          width: isMobile ? 44 : 56,
+                          height: isMobile ? 44 : 56,
                           decoration: BoxDecoration(
                             color: const Color(0xFFF1F5F9),
                             borderRadius: BorderRadius.circular(8),
@@ -1023,11 +1146,11 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                             errorBuilder: (_, _, _) => Container(
                               color: const Color(0xFFE2E8F0),
                               alignment: Alignment.center,
-                              child: const Icon(Icons.agriculture_rounded, color: AppColors.primaryGreen, size: 24),
+                              child: Icon(Icons.agriculture_rounded, color: AppColors.primaryGreen, size: isMobile ? 18 : 24),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: isMobile ? 10 : 14),
 
                         // Item details
                         Expanded(
@@ -1037,7 +1160,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                               Text(
                                 item.product.title,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 13.5,
+                                  fontSize: isMobile ? 12.5 : 13.5,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
                                 ),
@@ -1045,28 +1168,29 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                               const SizedBox(height: 2),
                               Text(
                                 '${item.product.technicalName} • ${item.product.vendor}',
-                                style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                                style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11, color: AppColors.textMuted),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 3),
                               Wrap(
-                                spacing: 8,
+                                spacing: 6,
+                                runSpacing: 2,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 5 : 6, vertical: isMobile ? 1.5 : 2),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF1F5F9),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
                                       'Pack: ${item.variant.label}',
-                                      style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                                      style: GoogleFonts.poppins(fontSize: isMobile ? 10 : 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                                     ),
                                   ),
                                   Text(
                                     'Qty: ${item.quantity} × ₹${item.unitPrice.toStringAsFixed(0)}',
-                                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                                    style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 12, color: AppColors.textSecondary),
                                   ),
                                 ],
                               ),
@@ -1078,7 +1202,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                         Text(
                           '₹${item.totalPrice.toStringAsFixed(0)}',
                           style: GoogleFonts.poppins(
-                            fontSize: 14,
+                            fontSize: isMobile ? 13 : 14,
                             fontWeight: FontWeight.w800,
                             color: AppColors.textPrimary,
                           ),
@@ -1088,7 +1212,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                   );
                 }),
 
-                const Divider(color: Color(0xFFE2E8F0), height: 20),
+                Divider(color: const Color(0xFFE2E8F0), height: isMobile ? 14 : 20),
 
                 // Farm Delivery Address & Payment Summary
                 LayoutBuilder(
@@ -1099,24 +1223,26 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.location_on_outlined, size: 16, color: AppColors.primaryGreen),
-                            const SizedBox(width: 6),
+                            Icon(Icons.location_on_outlined, size: isMobile ? 14 : 16, color: AppColors.primaryGreen),
+                            const SizedBox(width: 5),
                             Expanded(
                               child: Text(
                                 'Delivery Farm Depot:',
-                                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                                style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Text(
                           '${order.recipientName} (${order.recipientPhone})',
-                          style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w600),
                         ),
                         Text(
                           order.deliveryAddress,
-                          style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textMuted, height: 1.35),
+                          style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted, height: 1.3),
+                          maxLines: isMobile ? 2 : 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     );
@@ -1126,7 +1252,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                       children: [
                         Text(
                           'Payment: ${order.paymentMethod}',
-                          style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                          style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary),
                         ),
                         const SizedBox(height: 2),
                         Row(
@@ -1134,12 +1260,12 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                           children: [
                             Text(
                               'Total Paid: ',
-                              style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textMuted),
+                              style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 13, color: AppColors.textMuted),
                             ),
                             Text(
                               '₹${order.totalAmount.toStringAsFixed(0)}',
                               style: GoogleFonts.poppins(
-                                fontSize: 18,
+                                fontSize: isMobile ? 15 : 18,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.primaryGreen,
                               ),
@@ -1154,7 +1280,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           addressBlock,
-                          const SizedBox(height: 12),
+                          SizedBox(height: isMobile ? 8 : 12),
                           paymentBlock,
                         ],
                       );
@@ -1174,9 +1300,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
 
                 // Collapsible Live Tracking Timeline Stepper
                 if (isExpanded) ...[
-                  const SizedBox(height: 18),
+                  SizedBox(height: isMobile ? 12 : 18),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(isMobile ? 12 : 16),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(12),
@@ -1187,13 +1313,13 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.alt_route_rounded, size: 18, color: AppColors.primaryGreen),
+                            Icon(Icons.alt_route_rounded, size: isMobile ? 16 : 18, color: AppColors.primaryGreen),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Live Courier Transit Progress',
                                 style: GoogleFonts.poppins(
-                                  fontSize: 13.5,
+                                  fontSize: isMobile ? 12.5 : 13.5,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
                                 ),
@@ -1201,7 +1327,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 14),
+                        SizedBox(height: isMobile ? 10 : 14),
 
                         // Stepper Checkpoints
                         ...order.trackingHistory.asMap().entries.map((entry) {
@@ -1216,8 +1342,8 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                               Column(
                                 children: [
                                   Container(
-                                    width: 16,
-                                    height: 16,
+                                    width: isMobile ? 14 : 16,
+                                    height: isMobile ? 14 : 16,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: cp.isCompleted
@@ -1231,25 +1357,25 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                                       ),
                                     ),
                                     child: cp.isCompleted
-                                        ? const Icon(Icons.check, size: 10, color: Colors.white)
+                                        ? Icon(Icons.check, size: isMobile ? 8 : 10, color: Colors.white)
                                         : null,
                                   ),
                                   if (!isLast)
                                     Container(
                                       width: 2,
-                                      height: 38,
+                                      height: isMobile ? 26 : 38,
                                       color: cp.isCompleted
                                           ? AppColors.primaryGreen
                                           : const Color(0xFFE2E8F0),
                                     ),
                                 ],
                               ),
-                              const SizedBox(width: 14),
+                              SizedBox(width: isMobile ? 10 : 14),
 
                               // Checkpoint Information
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
+                                  padding: EdgeInsets.only(bottom: isMobile ? 8 : 12),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -1262,32 +1388,32 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                                           Text(
                                             cp.title,
                                             style: GoogleFonts.poppins(
-                                              fontSize: 12.5,
+                                              fontSize: isMobile ? 11.5 : 12.5,
                                               fontWeight: cp.isCurrent ? FontWeight.w800 : FontWeight.w600,
                                               color: cp.isCurrent ? const Color(0xFF1E40AF) : AppColors.textPrimary,
                                             ),
                                           ),
                                           Text(
                                             '${cp.date} • ${cp.time}',
-                                            style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                                            style: GoogleFonts.poppins(fontSize: isMobile ? 10 : 11, color: AppColors.textMuted),
                                           ),
                                         ],
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         cp.description,
-                                        style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
+                                        style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textSecondary),
                                       ),
                                       if (cp.location.isNotEmpty) ...[
                                         const SizedBox(height: 2),
                                         Row(
                                           children: [
-                                            const Icon(Icons.pin_drop_outlined, size: 12, color: AppColors.textMuted),
+                                            Icon(Icons.pin_drop_outlined, size: isMobile ? 11 : 12, color: AppColors.textMuted),
                                             const SizedBox(width: 4),
                                             Expanded(
                                               child: Text(
                                                 cp.location,
-                                                style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                                                style: GoogleFonts.poppins(fontSize: isMobile ? 10 : 11, color: AppColors.textMuted),
                                               ),
                                             ),
                                           ],
@@ -1305,7 +1431,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                         if (order.deliveryAgentPhone != null) ...[
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: EdgeInsets.all(isMobile ? 8 : 10),
                             decoration: BoxDecoration(
                               color: const Color(0xFFEFF6FF),
                               borderRadius: BorderRadius.circular(8),
@@ -1313,13 +1439,13 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.two_wheeler_rounded, size: 18, color: Color(0xFF2563EB)),
-                                const SizedBox(width: 10),
+                                Icon(Icons.two_wheeler_rounded, size: isMobile ? 16 : 18, color: const Color(0xFF2563EB)),
+                                SizedBox(width: isMobile ? 8 : 10),
                                 Expanded(
                                   child: Text(
                                     'Delivery Rider: ${order.deliveryAgentName} (${order.deliveryAgentPhone})',
                                     style: GoogleFonts.poppins(
-                                      fontSize: 12,
+                                      fontSize: isMobile ? 11 : 12,
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFF1E40AF),
                                     ),
@@ -1327,12 +1453,15 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                                 ),
                                 TextButton.icon(
                                   onPressed: () => _showHelpModal(context, order),
-                                  icon: const Icon(Icons.phone, size: 14, color: Color(0xFF2563EB)),
+                                  icon: Icon(Icons.phone, size: isMobile ? 12 : 14, color: const Color(0xFF2563EB)),
                                   label: Text(
                                     'Contact',
-                                    style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF2563EB)),
+                                    style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w700, color: const Color(0xFF2563EB)),
                                   ),
-                                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8),
+                                    minimumSize: const Size(0, 28),
+                                  ),
                                 ),
                               ],
                             ),
@@ -1343,29 +1472,31 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                   ),
                 ],
 
-                const SizedBox(height: 16),
+                SizedBox(height: isMobile ? 12 : 16),
                 const Divider(color: Color(0xFFE2E8F0), height: 1),
-                const SizedBox(height: 12),
+                SizedBox(height: isMobile ? 8 : 12),
 
                 // Action Bar
                 Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
+                  spacing: isMobile ? 6 : 10,
+                  runSpacing: isMobile ? 6 : 10,
                   children: [
                     // Toggle Live Tracking
                     OutlinedButton.icon(
                       onPressed: () => _toggleTracking(order.id),
                       icon: Icon(
                         isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.alt_route_rounded,
-                        size: 16,
+                        size: isMobile ? 14 : 16,
                       ),
                       label: Text(
-                        isExpanded ? 'Hide Live Tracking' : 'Track Shipment',
-                        style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w600),
+                        isExpanded ? 'Hide Tracking' : 'Track Shipment',
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w600),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.primaryGreen,
                         side: const BorderSide(color: AppColors.primaryGreen),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 6 : 10),
+                        minimumSize: Size(0, isMobile ? 32 : 38),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
@@ -1373,14 +1504,16 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                     // Download Invoice
                     OutlinedButton.icon(
                       onPressed: () => _showInvoiceDialog(context, order),
-                      icon: const Icon(Icons.receipt_rounded, size: 16),
+                      icon: Icon(Icons.receipt_rounded, size: isMobile ? 14 : 16),
                       label: Text(
                         'Tax Invoice',
-                        style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w600),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textPrimary,
                         side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 6 : 10),
+                        minimumSize: Size(0, isMobile ? 32 : 38),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
@@ -1388,14 +1521,16 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                     // Repeat Order
                     ElevatedButton.icon(
                       onPressed: () => _repeatOrder(order),
-                      icon: const Icon(Icons.repeat_rounded, size: 16),
+                      icon: Icon(Icons.repeat_rounded, size: isMobile ? 14 : 16),
                       label: Text(
                         'Buy Again',
-                        style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
                         foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 6 : 10),
+                        minimumSize: Size(0, isMobile ? 32 : 38),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
@@ -1403,10 +1538,14 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                     // Need Help
                     TextButton.icon(
                       onPressed: () => _showHelpModal(context, order),
-                      icon: const Icon(Icons.help_outline_rounded, size: 16, color: AppColors.textMuted),
+                      icon: Icon(Icons.help_outline_rounded, size: isMobile ? 14 : 16, color: AppColors.textMuted),
                       label: Text(
                         'Need Help?',
-                        style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 10, vertical: isMobile ? 4 : 8),
+                        minimumSize: Size(0, isMobile ? 32 : 38),
                       ),
                     ),
                   ],
@@ -1473,3 +1612,59 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     );
   }
 }
+
+/// Pinned sticky header delegate that keeps the order filter chips and search bar
+/// fixed at the top of the viewport when scrolling through orders.
+class _OrdersFilterHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double height;
+  final double sidePadding;
+
+  _OrdersFilterHeaderDelegate({
+    required this.child,
+    required this.height,
+    required this.sidePadding,
+  });
+
+  @override
+  double get minExtent => height;
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final isPinned = shrinkOffset > 0 || overlapsContent;
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: isPinned
+            ? const Border(
+                bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+              )
+            : null,
+        boxShadow: isPinned
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      padding: EdgeInsets.symmetric(horizontal: sidePadding),
+      alignment: Alignment.center,
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _OrdersFilterHeaderDelegate oldDelegate) {
+    return oldDelegate.height != height ||
+        oldDelegate.sidePadding != sidePadding ||
+        oldDelegate.child != child;
+  }
+}
+

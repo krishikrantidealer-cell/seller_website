@@ -719,6 +719,42 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('MyOrdersView pins filter bar when scrolling and renders compact mobile layout', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    OrdersController.instance.resetForTest();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: MyOrdersView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify initial presence of filter chips and search bar
+    expect(find.textContaining('All Orders'), findsOneWidget);
+    expect(find.byType(TextField), findsWidgets);
+
+    // Scroll down 400 pixels
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+
+    // Filter chips and search bar must STILL be visible (pinned, not scrolled away!)
+    expect(find.textContaining('All Orders'), findsOneWidget);
+    expect(find.textContaining('In Transit & Active'), findsOneWidget);
+    expect(find.textContaining('Search Order ID'), findsOneWidget);
+
+    // Can still interact with pinned filter while scrolled
+    await tester.tap(find.textContaining('All Orders'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('EBS-2026-89412'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Sign out confirmation popup in AuthModal and responsiveness on narrow screens', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1.0;
