@@ -823,7 +823,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
-            'Specialized Types: ',
+            'Subcategories: ',
             style: GoogleFonts.poppins(
               fontSize: 11.5,
               fontWeight: FontWeight.w600,

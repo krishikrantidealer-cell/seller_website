@@ -1131,7 +1131,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
-                                  '${activeGroup.subcategories.length} Specialized Subcategories',
+                                  '${activeGroup.subcategories.length} Subcategories',
                                   style: GoogleFonts.poppins(
                                     fontSize: 11,
                                     color: AppColors.textMuted,
@@ -1571,7 +1571,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    '${activeGroup.subcategories.length} Specialized Subcategories',
+                    '${activeGroup.subcategories.length} Subcategories',
                     style: GoogleFonts.poppins(
                       fontSize: 11,
                       color: AppColors.textMuted,
