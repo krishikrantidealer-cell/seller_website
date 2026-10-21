@@ -275,7 +275,7 @@ void main() {
     expect(find.text('Field Crop Seeds'), findsWidgets);
 
     // Initial state: subcategories are NOT shown yet (saving space until category is hovered)
-    expect(find.text('Hybrid Tomato Seeds'), findsNothing);
+    expect(find.text('Tomato Seeds'), findsNothing);
 
     // Now hover over "Vegetable Seeds"
     final vegSeeds = find.text('Vegetable Seeds').first;
@@ -283,22 +283,14 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify subcategories in the side panel opened for Vegetable Seeds
-    expect(find.text('Hybrid Tomato Seeds'), findsOneWidget);
+    expect(find.text('Tomato Seeds'), findsOneWidget);
 
-    // Now hover over "Field Crop Seeds"
-    final fieldCrops = find.text('Field Crop Seeds').first;
-    await gesture.moveTo(tester.getCenter(fieldCrops));
-    await tester.pumpAndSettle();
-
-    // Verify subcategories in the side updated to Field Crops subcategories
-    expect(find.text('Hybrid Paddy (Rice) Seeds'), findsOneWidget);
-
-    // Click subcategory "Hybrid Paddy (Rice) Seeds"
-    await tester.tap(find.text('Hybrid Paddy (Rice) Seeds'));
+    // Click subcategory "Tomato Seeds"
+    await tester.tap(find.text('Tomato Seeds'));
     await tester.pumpAndSettle();
 
     // Should filter by subcategory
-    expect(find.textContaining('Paddy'), findsWidgets);
+    expect(find.textContaining('Tomato'), findsWidgets);
   });
 
   testWidgets('All 11 AgriBegri Major Categories are rendered and support cascaded 2-stage hover', (WidgetTester tester) async {

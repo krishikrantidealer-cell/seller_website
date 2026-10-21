@@ -308,7 +308,7 @@ class CategoryItem {
     return _legacySubcategories;
   }
 
-  static List<CategoryItem> get sampleCategories => const [
+    static List<CategoryItem> get sampleCategories => const [
     CategoryItem(
       id: 'crop-protection',
       name: 'Crop Protection',
@@ -321,9 +321,8 @@ class CategoryItem {
             'Systemic Insecticides',
             'Contact & Ingestion',
             'Bio & Organic Insecticides',
+            'Combination Insecticides',
             'Target Pest Specialists',
-            'Imidacloprid (Confidor tech)',
-            'Chlorantraniliprole (Coragen tech)',
             'Thiamethoxam SC/WG',
             'Emamectin Benzoate 5% SG',
           ],
@@ -336,41 +335,69 @@ class CategoryItem {
             'Contact & Protective',
             'Bio-Fungicides & Biocontrol',
             'Azoxystrobin + Difenoconazole',
-            'Mancozeb 75% WP (Dithane M-45)',
-            'Tebuconazole + Trifloxystrobin',
             'Hexaconazole 5% SC/EC',
           ],
         ),
         CategoryGroup(
-          name: 'Herbicides & Weedicides',
+          name: 'Herbicides',
           icon: '🌿',
           subcategories: [
-            'Selective Crop Weedicides',
-            'Total & Non-Selective Killers',
-            'Pre-Emergent Weedicides',
-            'Glyphosate Formulations',
-            'Pendimethalin 30% EC',
-            'Quizalofop Ethyl 5% EC',
           ],
         ),
         CategoryGroup(
           name: 'Bio Pesticides',
           icon: '🍃',
           subcategories: [
-            'Neem Oil (10000 PPM / 300 PPM)',
+            'Bio Insecticide',
+            'Bio Fungicide',
+            'Bio Miticide',
             'Beauveria Bassiana Bio-Fungus',
-            'Bacillus Thuringiensis (Bt)',
             'Trichoderma Viride / Harzianum',
-            'Sticky Traps & Pheromone Lures',
+            'Other Bio-Pesticides',
           ],
         ),
         CategoryGroup(
-          name: 'Nematicide & Miticide',
+          name: 'Nematicide',
+          icon: '🔬',
+          subcategories: [
+            'Plant Parasitic Nematode Control',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Acaricide | Miticide',
           icon: '🔬',
           subcategories: [
             'Acaricide & Red Mite Care',
-            'Soil Nematicide Granules',
-            'Plant Parasitic Nematode Control',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bactericides',
+          icon: '🧪',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Adjuvants And Surfactants',
+          icon: '💧',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Animal Repellent',
+          icon: '🦌',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Combo Product',
+          icon: '🏷️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Organic Floor Cleaner',
+          icon: '🍃',
+          subcategories: [
           ],
         ),
       ],
@@ -384,38 +411,50 @@ class CategoryItem {
           name: 'Plant Growth Regulators',
           icon: '⚡',
           subcategories: [
-            'Gibberellic Acid (GA3)',
-            'Nitrobenzene 20% / 35%',
             'Brassinolide Growth Promoter',
-            'Flowering & Fruit Setting Boosters',
+            'Other Plant Growth Regulators',
           ],
         ),
         CategoryGroup(
-          name: 'Micronutrients & Chelates',
-          icon: '🔬',
-          subcategories: [
-            'Chelated Zinc (EDTA 12%)',
-            'Disodium Octaborate (Boron 20%)',
-            'Ferrous Sulphate & Magnesium',
-            'Multi-Micronutrient Crop Mixtures',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Bio Stimulants & Tonics',
-          icon: '🌟',
-          subcategories: [
-            'Seaweed Ascophyllum Nodosum Extract',
-            'Protein Hydrolysate & Amino Tonic',
-            'Liquid Bio-Enzyme Stimulants',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Humic & Fulvic Acids',
+          name: 'Humic Acid',
           icon: '🍂',
           subcategories: [
-            'Concentrated Humic & Fulvic Acid',
-            'Potassium Humate Shiny Flakes',
-            'Soil Conditioning Root Boosters',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Yield Booster',
+          icon: '⚡',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fruit Quality Enhancer',
+          icon: '🍉',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Flowering Stimulants',
+          icon: '⚡',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Humic & Fulvic Acid',
+          icon: '🍂',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Crop Special',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'pH Balancer',
+          icon: '🌿',
+          subcategories: [
           ],
         ),
       ],
@@ -427,46 +466,154 @@ class CategoryItem {
       groups: [
         CategoryGroup(
           name: 'Vegetable Seeds',
-          icon: '🥦',
+          icon: '🌱',
           subcategories: [
-            'Hybrid Tomato Seeds',
-            'Chilli & Pepper Seeds',
-            'Okra (Bhindi) Seeds',
-            'Brinjal (Eggplant) Seeds',
-            'Gourds (Bottle, Bitter, Ridge)',
-            'Cabbage & Cauliflower Seeds',
-            'Onion & Root Vegetable Seeds',
+            'Tomato Seeds',
+            'Chilli Seeds',
+            'Okra Seeds',
+            'Brinjal Seeds',
+            'Cabbage Seeds',
+            'Cauliflower Seeds',
+            'Bottle Gourd Seeds',
+            'Bitter Gourd Seeds',
+            'Cucumber Seeds',
+            'Capsicum Seeds',
+            'Pumpkin Seeds',
+            'Ridge Gourd Seeds',
+            'Sponge Gourd Seeds',
+            'Snake Gourd Seeds',
+            'Ash Gourd Seeds',
+            'Tinda Seeds',
           ],
         ),
         CategoryGroup(
           name: 'Field Crop Seeds',
-          icon: '🌾',
+          icon: '🌱',
           subcategories: [
-            'Hybrid Paddy (Rice) Seeds',
-            'High Yield Wheat Seeds',
-            'Bt Cotton Seeds',
-            'Mustard (Sarson) Seeds',
-            'Hybrid Maize & Corn Seeds',
-            'Pulse & Soybean Seeds',
+            'FODDER',
+            'Oil Crops',
+            'Cereal Crops',
           ],
         ),
         CategoryGroup(
-          name: 'Fruit & Flower Seeds',
-          icon: '🌻',
+          name: 'Fruit Seeds',
+          icon: '🌱',
           subcategories: [
-            'Watermelon & Muskmelon Seeds',
-            'Taiwan 786 Papaya Seeds',
-            'Marigold Flower Seeds',
-            'Exotic Flower & Lawn Seeds',
+            'Watermelon Seeds',
+            'Muskmelon Seeds',
+            'Butternut Squash Seeds',
+            'Papaya Seeds',
           ],
         ),
         CategoryGroup(
-          name: 'Forage & Green Manure',
-          icon: '🌿',
+          name: 'Leafy Vegetable Seeds',
+          icon: '🌱',
           subcategories: [
-            'Lucerne & Alfa Alfa Seeds',
-            'Berseem Clover Seeds',
-            'Dhaincha & Sunhemp Seeds',
+            'Amaranthus Seeds',
+            'Parsely Seeds',
+            'Coriander Seeds',
+            'Pak Choi Seeds',
+            'Swiss Chard Seeds',
+            'Celery Seeds',
+            'Arugula Seeds',
+            'Spinach Seeds',
+            'Kale Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Exotic Vegetable Seeds',
+          icon: '🌱',
+          subcategories: [
+            'Lettuce Seeds',
+            'Broccoli Seeds',
+            'Knol Khol Seeds',
+            'Zucchini Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Root Vegetable Seeds',
+          icon: '🌱',
+          subcategories: [
+            'Radish Seeds',
+            'Carrot Seeds',
+            'Beetroot Seeds',
+            'Turnip Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Cotton Seeds',
+          icon: '🌱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Pulse Seeds',
+          icon: '🌱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Onion Seeds',
+          icon: '🌱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Marigold Seeds',
+          icon: '🌱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Desi Seeds',
+          icon: '🌱',
+          subcategories: [
+            'Bakul Tree Seeds',
+            'Agathi Seeds',
+            'Fig Seeds',
+            'Moringa Tree Seeds',
+            'Peacock Flower Seeds',
+            'Babul Seeds',
+            'Custard Apple',
+            'Avenue Tree Seeds',
+            'Sandalwood Seeds',
+            'Harad Seeds',
+            'Malabar Neem Seeds',
+            'Gulmohar Seeds',
+            'Sagwan Seeds',
+            'Mahogany Seeds',
+            'Sheesham Seeds',
+            'Karanj Seeds',
+            'Terminalia Arjuna Seeds',
+            'Bamboo Seeds',
+            'Siris Seeds',
+            'Lemon Seeds',
+            'Tulsi Seeds',
+            'Rain Tree Seeds',
+            'Subabul Seeds',
+            'Fodder',
+            'Eucalyptus Seeds',
+            'Baheda Seeds',
+            'Guava Seeds',
+            'Anjan Tree Seeds',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Mushroom Seeds',
+          icon: '🌱',
+          subcategories: [
+            'Ready To Fruit',
+            'Mushroom Fertilizer',
+            'Mushroom Spawn',
+            'Mushroom Culture',
+            'Oyster Mushroom',
+            'Mushroom Dowels',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Seeds Ball',
+          icon: '🌱',
+          subcategories: [
           ],
         ),
       ],
@@ -477,42 +624,50 @@ class CategoryItem {
       icon: '🌾',
       groups: [
         CategoryGroup(
-          name: 'Water Soluble NPKs',
-          icon: '🧪',
+          name: 'Water Soluble Fertilizers',
+          icon: '🌾',
           subcategories: [
-            '19:19:19 Complete Balanced NPK',
-            '0:52:34 Mono Potassium Phosphate',
-            '13:0:45 Potassium Nitrate (KNO3)',
-            '12:61:0 Mono Ammonium Phosphate',
           ],
         ),
         CategoryGroup(
           name: 'Bio Fertilizers',
-          icon: '🍃',
+          icon: '🌾',
           subcategories: [
             'Mycorrhiza Bio-Fertilizer (VAM)',
             'Rhizobium Legume Inoculant',
             'Azotobacter Nitrogen Fixer',
             'Phosphate Solubilizing Bacteria (PSB)',
+            'Other Bio-Fertilizers',
           ],
         ),
         CategoryGroup(
-          name: 'Organic Manure & Soil Boosters',
-          icon: '🍂',
+          name: 'Liquid Fertilizers',
+          icon: '🌾',
           subcategories: [
-            'Bio-Enriched Organic Manure',
-            'Pure Neem Cake Powder',
-            'City Compost & Vermicompost',
-            'Phosphate Rich Organic Manure (PROM)',
           ],
         ),
         CategoryGroup(
-          name: 'Bulk Fertilizers',
-          icon: '📦',
+          name: 'Chelated Micronutrient Fertilizer',
+          icon: '🌾',
           subcategories: [
-            'Single Super Phosphate (SSP)',
-            'Granular DAP Alternatives',
-            'Muriate of Potash (MOP)',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Micronutrients Fertilizers',
+          icon: '🌾',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bulk Fertilizer',
+          icon: '🌾',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Root Fertility Booster',
+          icon: '⚡',
+          subcategories: [
           ],
         ),
       ],
@@ -523,41 +678,171 @@ class CategoryItem {
       icon: '🚜',
       groups: [
         CategoryGroup(
-          name: 'Sprayers & Pumps',
+          name: 'Spray Pump',
           icon: '🔋',
           subcategories: [
-            '16L/18L 2-in-1 Battery Sprayers',
-            'Manual Knapsack Pressure Sprayers',
-            'High Pressure HTP & Power Sprayers',
-            'Orchard Mist Blowers & Foggers',
+            'Manual Sprayer',
+            'Portable Power Sprayer',
+            'Double Motor Battery Sprayer',
+            'Pressure Washers',
+            '2 in 1 Battery Sprayer',
+            'Power Sprayer',
+            'Foot & Rocker Sprayer',
+            'Mist Blower Sprayers',
+            'Battery Operated Sprayer',
+            'Sprayer Parts & Accessories',
+            'Tractor Mounted Sprayers',
           ],
         ),
         CategoryGroup(
-          name: 'Power Weeders & Tillers',
+          name: 'Agriculture Hand Tools',
+          icon: '🔧',
+          subcategories: [
+            'Fruit Picker',
+            'Weed Remover Tools',
+            'Milking Machine',
+            'Manual Seeder Machine',
+            'Other Tools',
+            'Manual Plant Transplanter',
+            'Wheel hoe',
+            'Pressure Washer Pipe',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Agricultural Hardware',
           icon: '⚙️',
           subcategories: [
-            'Mini Power Weeders & Tillers',
-            '7HP Heavy Duty Intercultivators',
-            'Rotary Weeder Attachments',
+            'Tiller Attachment',
+            'Brush Cutter Attachments',
+            'Tufrope',
+            'Jatka Machine',
+            'Cable Wire',
+            'Seedling Tray',
           ],
         ),
         CategoryGroup(
-          name: 'Brush Cutters & Tools',
+          name: 'Traps',
+          icon: '🪤',
+          subcategories: [
+            'Mosquito Killer Machine',
+            'Solar Trap',
+            'Traps And Lures',
+            'Sticky Traps',
+            'Animal Repellent Devices',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Weeders',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Brush Cutter',
           icon: '✂️',
           subcategories: [
-            'Brush Cutters (2-Stroke & 4-Stroke)',
-            'Chainsaws & Hedge Trimmers',
-            'Earth Augers & Post Hole Diggers',
           ],
         ),
         CategoryGroup(
-          name: 'Manual Tools & Farm Safety',
-          icon: '🧤',
+          name: 'Chaff Cutter',
+          icon: '✂️',
           subcategories: [
-            'Pruning Shears & Secateurs',
-            'Telescopic Tree Pruners',
-            'Safety Helmets, Masks & Suits',
-            'Spray Nozzles & Brass Delivery Pipes',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Water Pump',
+          icon: '🔋',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Earth Auger',
+          icon: '⚙️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Chain Saw',
+          icon: '✂️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Crop Cover',
+          icon: '🛡️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Tarpaulin',
+          icon: '🛡️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Mulching Paper',
+          icon: '🛡️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Solar Agriculture Products',
+          icon: '☀️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Biofloc Tarpaulin',
+          icon: '🛡️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Vermicompost Bed',
+          icon: '🪱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Azolla Bed',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Pond Liner',
+          icon: '💧',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Hedge Trimmer',
+          icon: '✂️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Weed Mat',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Soil Testing Tools',
+          icon: '🔧',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Torch Light',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fogging Machine',
+          icon: '🌿',
+          subcategories: [
           ],
         ),
       ],
@@ -568,31 +853,33 @@ class CategoryItem {
       icon: '💧',
       groups: [
         CategoryGroup(
-          name: 'Drip Lateral & Emitters',
+          name: 'Rain Pipe',
           icon: '💧',
           subcategories: [
-            '16mm / 12mm Inline Drip Laterals',
-            'Online Drippers (4L/8L/Adjustable)',
-            'Micro-Tubes & Arrow Drippers',
-            'Drip Joiners, Tees & End Caps',
           ],
         ),
         CategoryGroup(
-          name: 'Sprinklers & Rain Guns',
-          icon: '🌧️',
+          name: 'Drip Irrigation Accessories',
+          icon: '💧',
           subcategories: [
-            'Micro & Mini Sprinkler Sets',
-            'Overhead 1.5" Rain Guns & Tripods',
-            'Rain Hose Pipes & Laser Tubing',
           ],
         ),
         CategoryGroup(
-          name: 'Filtration & Fertigation',
-          icon: '🔧',
+          name: 'Pipe & Fitting',
+          icon: '💧',
           subcategories: [
-            'Screen & Disc Filters (2" & 2.5")',
-            'Venturi Fertilizer Injectors',
-            'Air Release & Flush Valves',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Drip Irrigation Kit',
+          icon: '💧',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Sprinkler',
+          icon: '💧',
+          subcategories: [
           ],
         ),
       ],
@@ -603,33 +890,132 @@ class CategoryItem {
       icon: '🏡',
       groups: [
         CategoryGroup(
-          name: 'Potting Mix & Soil Care',
+          name: 'Grow Bag',
           icon: '🪴',
           subcategories: [
-            'Nutrient-Enriched Potting Soil',
-            'Low EC Washed Cocopeat Bricks',
-            'Vermicompost & Cow Dung Compost',
-            'Perlite & Vermiculite Drainage Media',
           ],
         ),
         CategoryGroup(
-          name: 'Plant Care & Nutrition',
-          icon: '🌸',
+          name: 'Gardening Kit',
+          icon: '🪴',
           subcategories: [
-            'Ready-to-use Flowering Sprays',
-            'Organic Neem Oil Pest Spray',
-            'Micro-Nutrient Sticks & Tablets',
-            'Liquid Bio-Enzyme Foliar Tonics',
           ],
         ),
         CategoryGroup(
-          name: 'Garden Tools & Watering',
-          icon: '🚿',
+          name: 'Coco Peat',
+          icon: '🪴',
           subcategories: [
-            '2-Liter Hand Compression Sprayers',
-            'Garden Trowels & Weeder Forks',
-            'Watering Cans & Hose Spray Guns',
-            'Balcony Planters & Grow Bags',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Pesticides',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Waste Compost Management',
+          icon: '♻️',
+          subcategories: [
+            'Bokashi Bin',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Spray Pumps',
+          icon: '🔋',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Accessories',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Lawn Mowers',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Seeds',
+          icon: '🌱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'FLOWER SEEDS',
+          icon: '🌱',
+          subcategories: [
+            'Gomphrena',
+            'Celosia',
+            'Chrysanthemum',
+            'Balsam',
+            'Calendula',
+            'Dahlia',
+            'Vinca',
+            'Zinnia',
+            'Yellow Flower',
+            'Cosmos',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Garden Shade Net',
+          icon: '🛡️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fertilizer',
+          icon: '🌾',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Transplanting/ Repotting Mat',
+          icon: '🪴',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Tools',
+          icon: '🔧',
+          subcategories: [
+            'Weed Extractor',
+            'Khurpa',
+            'Garden Tool Kit',
+            'Pond Skimming Net',
+            'Secateurs',
+            'Weeding Trowel',
+            'Spade (Favada)',
+            'Pruning Saw',
+            'Telescopic Handle',
+            'Scuffle Hoe',
+            'Trowel',
+            'Other Gardening Tools',
+            'Soil Rake (Panja)',
+            'Shears',
+            'Loppers',
+            'Leaf Rake',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Pebbles',
+          icon: '🪨',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fertilizer Blend',
+          icon: '🌾',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'De Oiled Cake',
+          icon: '🌿',
+          subcategories: [
           ],
         ),
       ],
@@ -640,64 +1026,118 @@ class CategoryItem {
       icon: '🍃',
       groups: [
         CategoryGroup(
-          name: 'Neem Formulations',
-          icon: '🌿',
+          name: 'Organic Remedial Inputs',
+          icon: '🍃',
           subcategories: [
-            'Neem Oil (10000 PPM / 300 PPM)',
-            'Neem Seed Kernel Extract (NSKE)',
-            'Neem Cake Granules & Pellets',
+            'Organic Fungicides',
+            'Organic Pesticides',
           ],
         ),
         CategoryGroup(
-          name: 'Waste Decomposer & Microbes',
-          icon: '🧪',
+          name: 'Vermi Compost',
+          icon: '🪱',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Neem Oil',
+          icon: '🍃',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Waste Decomposer',
+          icon: '♻️',
           subcategories: [
             'National Centre Waste Decomposer',
-            'Bio-Enzyme Compost Accelerators',
-            'Soil Beneficial Microbial Consortia',
           ],
         ),
         CategoryGroup(
-          name: 'Organic Inputs & Tonics',
-          icon: '🌱',
+          name: 'Viricides',
+          icon: '🧪',
           subcategories: [
-            'Panchagavya Organic Growth Booster',
-            'Jeevameutham Concentrated Cultures',
-            'Certified Organic Bio-Pesticides',
           ],
         ),
       ],
     ),
     CategoryItem(
-      id: 'cattle-bird-care',
+      id: 'cattle-and-bird-care',
       name: 'Cattle & Bird Care',
       icon: '🐄',
       groups: [
         CategoryGroup(
-          name: 'Animal Nutrition & Feeds',
-          icon: '🥛',
-          subcategories: [
-            'High Milk Yield Cattle Feed Pellets',
-            'Calf Starter Nutrition Pellets',
-            'Bypass Fat & Energy Boosters',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Mineral Mixtures & Supplements',
-          icon: '💊',
-          subcategories: [
-            'Chelated Mineral Mixture for Cows & Buffaloes',
-            'Liquid Calcium & Phosphorus Tonic',
-            'Liver Tonics & Rumen Digestion Boosters',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Poultry & Bird Care',
+          name: 'Poultry Feed Supplements',
           icon: '🐔',
           subcategories: [
-            'Broiler & Layer Feed Supplements',
-            'Bird Electrolytes & Stress Relievers',
-            'Dewormers & Farm Disinfectants',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Goat And Sheep Care',
+          icon: '🐐',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Aqua Care',
+          icon: '🐟',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Mosquito Net',
+          icon: '🛡️',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fodder Seed',
+          icon: '🌱',
+          subcategories: [
+            'Forages',
+            'Sorghum',
+            'Alfalfa',
+            'Gliricidia',
+            'Hedge Lucerne',
+            'Multi Cut Grass',
+            'Napier',
+            'Barseem',
+            'Punjabi Grass',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Animal Feed Supplements',
+          icon: '🐄',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Mineral Mixture',
+          icon: '💊',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Swine Supplement',
+          icon: '🐄',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Aquaculture Feed Additives',
+          icon: '🐟',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bird Food',
+          icon: '🐔',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Silage Bag (Murghas Bag)',
+          icon: '🌿',
+          subcategories: [
           ],
         ),
       ],
@@ -708,30 +1148,33 @@ class CategoryItem {
       icon: '📦',
       groups: [
         CategoryGroup(
-          name: 'Bulk Agrochemicals',
-          icon: '🛢️',
+          name: 'Remedies',
+          icon: '💊',
           subcategories: [
-            'Wholesale Technical Chemical Drums (200L)',
-            'Bulk Insecticide & Fungicide Master Cases',
-            'Commercial Agrochemical Carboys',
           ],
         ),
         CategoryGroup(
-          name: 'Bulk Fertilizers & Soil Care',
-          icon: '🌾',
-          subcategories: [
-            '50kg Commercial Fertilizer Sacks',
-            'Pallet Load Water Soluble NPKs',
-            'Tonner Bulk Organic Manure & Compost',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Bulk Seeds & Grains',
+          name: 'Seeds',
           icon: '🌱',
           subcategories: [
-            'Commercial Hybrid Seed Sacks (25kg)',
-            'Certified Green Manure Bulk Seeds',
-            'Wholesale Nursery Seed Batches',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Organic Products',
+          icon: '🌿',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Irrigation Parts',
+          icon: '💧',
+          subcategories: [
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fertilizers',
+          icon: '🌾',
+          subcategories: [
           ],
         ),
       ],
@@ -740,26 +1183,6 @@ class CategoryItem {
       id: 'har-din-sasta',
       name: 'Har Din Sasta',
       icon: '🏷️',
-      groups: [
-        CategoryGroup(
-          name: 'Daily Value Combos',
-          icon: '🎁',
-          subcategories: [
-            'Pest Control + Growth Tonic Super Combos',
-            'Complete Drip Irrigation Starter Kits',
-            'NPK + Micronutrient Season Packs',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Flash Deals & Clearance',
-          icon: '⚡',
-          subcategories: [
-            'Today Only Farm Bargains',
-            'Stock Clearance Bulk Discounts',
-            'Seasonal Super Saver Farm Offers',
-          ],
-        ),
-      ],
     ),
   ];
 }
