@@ -128,21 +128,22 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                   },
                 ),
 
-                // Category Ribbon with Multi-tier hover navigation
-                CategoryRibbon(
-                  selectedCategoryId: 'all',
-                  onCategorySelected: (catId, subcategory) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => CategoryDetailView(
-                          initialCategoryId: catId,
-                          initialSubcategory: subcategory,
+                // Category Ribbon with Multi-tier hover navigation (Desktop only)
+                if (MediaQuery.sizeOf(context).width >= 768)
+                  CategoryRibbon(
+                    selectedCategoryId: 'all',
+                    onCategorySelected: (catId, subcategory) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CategoryDetailView(
+                            initialCategoryId: catId,
+                            initialSubcategory: subcategory,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
               ],
             ),
           ),

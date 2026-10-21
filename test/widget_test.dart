@@ -353,7 +353,7 @@ void main() {
     expect(find.textContaining('100% Authenticated field purchases'), findsOneWidget);
   });
 
-  testWidgets('Mobile view top bar category turns into mobile category menu bar and drawer', (WidgetTester tester) async {
+  testWidgets('Mobile view header uses single clean menu bar with drawer and no duplicate category bar', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -362,9 +362,8 @@ void main() {
     await tester.pumpWidget(const SellerWebsiteApp());
     await tester.pumpAndSettle();
 
-    // Verify top bar category rendered as mobile menu bar with 'All Categories' button
-    final categoriesBtn = find.text('All Categories');
-    expect(categoriesBtn, findsOneWidget);
+    // Verify duplicate CategoryRibbon is NOT rendered on mobile
+    expect(find.byType(CategoryRibbon), findsNothing);
 
     // Verify hamburger icon exists in the top header
     final menuIconBtn = find.byTooltip('Categories Menu');
@@ -384,8 +383,8 @@ void main() {
     await tester.tap(find.byTooltip('Close Menu'));
     await tester.pumpAndSettle();
 
-    // Tap Categories menu button on the ribbon to open drawer
-    await tester.tap(categoriesBtn);
+    // Reopen drawer via hamburger icon
+    await tester.tap(menuIconBtn);
     await tester.pumpAndSettle();
     expect(find.text('CATEGORIES'), findsOneWidget);
 
@@ -397,21 +396,17 @@ void main() {
     await tester.tap(find.text('All in Seeds'));
     await tester.pumpAndSettle();
 
-    // Verify Seeds category is selected and reflected in mobile menu bar
-    expect(find.text('Seeds'), findsWidgets);
+    // Verify Seeds category is selected and reflected on home page filter banner
+    expect(find.textContaining('Filtered by: Seeds'), findsOneWidget);
 
-    // Verify there is NO horizontal scrolling ListView in CategoryRibbon
-    final ribbonListView = find.descendant(of: find.byType(CategoryRibbon), matching: find.byType(ListView));
-    expect(ribbonListView, findsNothing);
-
-    // Verify 'Clear' button appears on the mobile menu bar and tapping it clears the filter
-    final clearBtn = find.text('Clear');
-    expect(clearBtn, findsOneWidget);
-    await tester.tap(clearBtn);
+    // Verify 'Reset' button appears on the filter banner and tapping it clears the filter
+    final resetBtn = find.text('Reset');
+    expect(resetBtn, findsOneWidget);
+    await tester.tap(resetBtn);
     await tester.pumpAndSettle();
 
-    // Verify reset back to All Categories
-    expect(find.text('All Categories'), findsOneWidget);
+    // Verify reset back - filter banner is gone
+    expect(find.textContaining('Filtered by:'), findsNothing);
   });
 
   testWidgets('CategoryRibbon renders cleanly on narrow mobile screen without overflow', (WidgetTester tester) async {

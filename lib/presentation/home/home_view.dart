@@ -95,6 +95,8 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final filtered = _filteredProducts;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isDesktop = screenWidth >= 768;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -133,17 +135,18 @@ class _HomeViewState extends State<HomeView> {
                   },
                 ),
 
-                // Category Ribbon with Dropdowns
-                CategoryRibbon(
-                  selectedCategoryId: _selectedCategory,
-                  selectedSubcategory: _selectedSubcategory,
-                  onCategorySelected: (catId, subcategory) {
-                    setState(() {
-                      _selectedCategory = catId;
-                      _selectedSubcategory = subcategory;
-                    });
-                  },
-                ),
+                // Category Ribbon with Dropdowns (Desktop only - on mobile, single clean header with hamburger drawer is used)
+                if (isDesktop)
+                  CategoryRibbon(
+                    selectedCategoryId: _selectedCategory,
+                    selectedSubcategory: _selectedSubcategory,
+                    onCategorySelected: (catId, subcategory) {
+                      setState(() {
+                        _selectedCategory = catId;
+                        _selectedSubcategory = subcategory;
+                      });
+                    },
+                  ),
               ],
             ),
           ),
