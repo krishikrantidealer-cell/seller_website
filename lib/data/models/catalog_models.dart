@@ -310,6 +310,117 @@ class CategoryItem {
 
   static List<CategoryItem> get sampleCategories => const [
     CategoryItem(
+      id: 'crop-protection',
+      name: 'Crop Protection',
+      icon: '🛡️',
+      groups: [
+        CategoryGroup(
+          name: 'Insecticides',
+          icon: '🦗',
+          subcategories: [
+            'Systemic Insecticides',
+            'Contact & Ingestion',
+            'Bio & Organic Insecticides',
+            'Target Pest Specialists',
+            'Imidacloprid (Confidor tech)',
+            'Chlorantraniliprole (Coragen tech)',
+            'Thiamethoxam SC/WG',
+            'Emamectin Benzoate 5% SG',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Fungicides',
+          icon: '🍄',
+          subcategories: [
+            'Systemic Fungicides',
+            'Contact & Protective',
+            'Bio-Fungicides & Biocontrol',
+            'Azoxystrobin + Difenoconazole',
+            'Mancozeb 75% WP (Dithane M-45)',
+            'Tebuconazole + Trifloxystrobin',
+            'Hexaconazole 5% SC/EC',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Herbicides & Weedicides',
+          icon: '🌿',
+          subcategories: [
+            'Selective Crop Weedicides',
+            'Total & Non-Selective Killers',
+            'Pre-Emergent Weedicides',
+            'Glyphosate Formulations',
+            'Pendimethalin 30% EC',
+            'Quizalofop Ethyl 5% EC',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bio Pesticides',
+          icon: '🍃',
+          subcategories: [
+            'Neem Oil (10000 PPM / 300 PPM)',
+            'Beauveria Bassiana Bio-Fungus',
+            'Bacillus Thuringiensis (Bt)',
+            'Trichoderma Viride / Harzianum',
+            'Sticky Traps & Pheromone Lures',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Nematicide & Miticide',
+          icon: '🔬',
+          subcategories: [
+            'Acaricide & Red Mite Care',
+            'Soil Nematicide Granules',
+            'Plant Parasitic Nematode Control',
+          ],
+        ),
+      ],
+    ),
+    CategoryItem(
+      id: 'crop-nutrition',
+      name: 'Crop Nutrition',
+      icon: '🧪',
+      groups: [
+        CategoryGroup(
+          name: 'Plant Growth Regulators',
+          icon: '⚡',
+          subcategories: [
+            'Gibberellic Acid (GA3)',
+            'Nitrobenzene 20% / 35%',
+            'Brassinolide Growth Promoter',
+            'Flowering & Fruit Setting Boosters',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Micronutrients & Chelates',
+          icon: '🔬',
+          subcategories: [
+            'Chelated Zinc (EDTA 12%)',
+            'Disodium Octaborate (Boron 20%)',
+            'Ferrous Sulphate & Magnesium',
+            'Multi-Micronutrient Crop Mixtures',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bio Stimulants & Tonics',
+          icon: '🌟',
+          subcategories: [
+            'Seaweed Ascophyllum Nodosum Extract',
+            'Protein Hydrolysate & Amino Tonic',
+            'Liquid Bio-Enzyme Stimulants',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Humic & Fulvic Acids',
+          icon: '🍂',
+          subcategories: [
+            'Concentrated Humic & Fulvic Acid',
+            'Potassium Humate Shiny Flakes',
+            'Soil Conditioning Root Boosters',
+          ],
+        ),
+      ],
+    ),
+    CategoryItem(
       id: 'seeds',
       name: 'Seeds',
       icon: '🌱',
@@ -361,93 +472,9 @@ class CategoryItem {
       ],
     ),
     CategoryItem(
-      id: 'insecticides',
-      name: 'Insecticides',
-      icon: '🦗',
-      groups: [
-        CategoryGroup(
-          name: 'Systemic Insecticides',
-          icon: '💧',
-          subcategories: [
-            'Imidacloprid (Confidor tech)',
-            'Thiamethoxam SC/WG',
-            'Acetamiprid 20% SP',
-            'Fipronil 5% SC / 0.3% GR',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Contact & Ingestion',
-          icon: '⚡',
-          subcategories: [
-            'Chlorantraniliprole (Coragen tech)',
-            'Emamectin Benzoate 5% SG',
-            'Lambda Cyhalothrin 5% EC',
-            'Profenofos 40% + Cypermethrin 4%',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Bio & Organic Insecticides',
-          icon: '🍃',
-          subcategories: [
-            'Neem Oil (10000 PPM / 300 PPM)',
-            'Beauveria Bassiana Bio-Fungus',
-            'Bacillus Thuringiensis (Bt)',
-            'Sticky Traps & Pheromone Lures',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Target Pest Specialists',
-          icon: '🎯',
-          subcategories: [
-            'Whitefly & Sucking Pest Care',
-            'Stem Borer & Bollworm Killers',
-            'Mite & Thrips Specialists',
-            'Termite & Soil Insect Control',
-          ],
-        ),
-      ],
-    ),
-    CategoryItem(
-      id: 'fungicides',
-      name: 'Fungicides',
-      icon: '🍄',
-      groups: [
-        CategoryGroup(
-          name: 'Systemic Fungicides',
-          icon: '🛡️',
-          subcategories: [
-            'Azoxystrobin + Difenoconazole',
-            'Tebuconazole + Trifloxystrobin',
-            'Hexaconazole 5% SC/EC',
-            'Metalaxyl + Mancozeb (Ridomil tech)',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Contact & Protective',
-          icon: '🥊',
-          subcategories: [
-            'Mancozeb 75% WP (Dithane M-45)',
-            'Copper Oxychloride 50% WP',
-            'Chlorothalonil 75% WP',
-            'Sulphur 80% WDG (Foliar/Dust)',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Bio-Fungicides & Biocontrol',
-          icon: '🌿',
-          subcategories: [
-            'Trichoderma Viride / Harzianum',
-            'Pseudomonas Fluorescens',
-            'Downy & Powdery Mildew Care',
-            'Root Rot & Wilt Management',
-          ],
-        ),
-      ],
-    ),
-    CategoryItem(
       id: 'fertilizers',
-      name: 'Fertilizers & Nutrients',
-      icon: '🧪',
+      name: 'Fertilizers',
+      icon: '🌾',
       groups: [
         CategoryGroup(
           name: 'Water Soluble NPKs',
@@ -460,65 +487,39 @@ class CategoryItem {
           ],
         ),
         CategoryGroup(
-          name: 'Micronutrients & Chelates',
-          icon: '🔬',
+          name: 'Bio Fertilizers',
+          icon: '🍃',
           subcategories: [
-            'Chelated Zinc (EDTA 12%)',
-            'Disodium Octaborate (Boron 20%)',
-            'Ferrous Sulphate & Magnesium',
-            'Multi-Micronutrient Crop Mixtures',
+            'Mycorrhiza Bio-Fertilizer (VAM)',
+            'Rhizobium Legume Inoculant',
+            'Azotobacter Nitrogen Fixer',
+            'Phosphate Solubilizing Bacteria (PSB)',
           ],
         ),
         CategoryGroup(
-          name: 'Organic & Soil Boosters',
+          name: 'Organic Manure & Soil Boosters',
           icon: '🍂',
           subcategories: [
-            'Concentrated Humic & Fulvic Acid',
-            'Seaweed Ascophyllum Nodosum Extract',
-            'Mycorrhiza Bio-Fertilizer (VAM)',
             'Bio-Enriched Organic Manure',
+            'Pure Neem Cake Powder',
+            'City Compost & Vermicompost',
+            'Phosphate Rich Organic Manure (PROM)',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bulk Fertilizers',
+          icon: '📦',
+          subcategories: [
+            'Single Super Phosphate (SSP)',
+            'Granular DAP Alternatives',
+            'Muriate of Potash (MOP)',
           ],
         ),
       ],
     ),
     CategoryItem(
-      id: 'herbicides',
-      name: 'Herbicides',
-      icon: '🌿',
-      groups: [
-        CategoryGroup(
-          name: 'Selective Crop Weedicides',
-          icon: '🌾',
-          subcategories: [
-            'Paddy Weedicides (Pretilachlor / Bispyribac)',
-            'Wheat Weedicides (Sulfosulfuron / Clodinafop)',
-            'Soybean & Cotton Weedicides',
-            'Sugarcane & Maize Weedicides',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Total & Non-Selective Killers',
-          icon: '🚫',
-          subcategories: [
-            'Glyphosate Formulations',
-            'Glufosinate Ammonium 13.5%',
-            'Paraquat Dichloride 24% SL',
-          ],
-        ),
-        CategoryGroup(
-          name: 'Pre-Emergent Weedicides',
-          icon: '🌱',
-          subcategories: [
-            'Pendimethalin 30% EC / 38.7% CS',
-            'Atrazine 50% WP',
-            'Oxyfluorfen 23.5% EC',
-          ],
-        ),
-      ],
-    ),
-    CategoryItem(
-      id: 'equipment',
-      name: 'Farm Equipment',
+      id: 'equipments',
+      name: 'Equipments',
       icon: '🚜',
       groups: [
         CategoryGroup(
@@ -532,18 +533,26 @@ class CategoryItem {
           ],
         ),
         CategoryGroup(
-          name: 'Power Tools & Weeders',
+          name: 'Power Weeders & Tillers',
           icon: '⚙️',
           subcategories: [
-            'Brush Cutters (2-Stroke & 4-Stroke)',
             'Mini Power Weeders & Tillers',
+            '7HP Heavy Duty Intercultivators',
+            'Rotary Weeder Attachments',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Brush Cutters & Tools',
+          icon: '✂️',
+          subcategories: [
+            'Brush Cutters (2-Stroke & 4-Stroke)',
             'Chainsaws & Hedge Trimmers',
             'Earth Augers & Post Hole Diggers',
           ],
         ),
         CategoryGroup(
           name: 'Manual Tools & Farm Safety',
-          icon: '✂️',
+          icon: '🧤',
           subcategories: [
             'Pruning Shears & Secateurs',
             'Telescopic Tree Pruners',
@@ -555,7 +564,7 @@ class CategoryItem {
     ),
     CategoryItem(
       id: 'irrigation',
-      name: 'Drip & Irrigation',
+      name: 'Irrigation',
       icon: '💧',
       groups: [
         CategoryGroup(
@@ -573,7 +582,7 @@ class CategoryItem {
           icon: '🌧️',
           subcategories: [
             'Micro & Mini Sprinkler Sets',
-            'Overhead Rain Guns & Tripods',
+            'Overhead 1.5" Rain Guns & Tripods',
             'Rain Hose Pipes & Laser Tubing',
           ],
         ),
@@ -590,7 +599,7 @@ class CategoryItem {
     ),
     CategoryItem(
       id: 'gardening',
-      name: 'Home Gardening',
+      name: 'Gardening',
       icon: '🏡',
       groups: [
         CategoryGroup(
@@ -621,6 +630,133 @@ class CategoryItem {
             'Garden Trowels & Weeder Forks',
             'Watering Cans & Hose Spray Guns',
             'Balcony Planters & Grow Bags',
+          ],
+        ),
+      ],
+    ),
+    CategoryItem(
+      id: 'organic-farming',
+      name: 'Organic Farming',
+      icon: '🍃',
+      groups: [
+        CategoryGroup(
+          name: 'Neem Formulations',
+          icon: '🌿',
+          subcategories: [
+            'Neem Oil (10000 PPM / 300 PPM)',
+            'Neem Seed Kernel Extract (NSKE)',
+            'Neem Cake Granules & Pellets',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Waste Decomposer & Microbes',
+          icon: '🧪',
+          subcategories: [
+            'National Centre Waste Decomposer',
+            'Bio-Enzyme Compost Accelerators',
+            'Soil Beneficial Microbial Consortia',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Organic Inputs & Tonics',
+          icon: '🌱',
+          subcategories: [
+            'Panchagavya Organic Growth Booster',
+            'Jeevameutham Concentrated Cultures',
+            'Certified Organic Bio-Pesticides',
+          ],
+        ),
+      ],
+    ),
+    CategoryItem(
+      id: 'cattle-bird-care',
+      name: 'Cattle & Bird Care',
+      icon: '🐄',
+      groups: [
+        CategoryGroup(
+          name: 'Animal Nutrition & Feeds',
+          icon: '🥛',
+          subcategories: [
+            'High Milk Yield Cattle Feed Pellets',
+            'Calf Starter Nutrition Pellets',
+            'Bypass Fat & Energy Boosters',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Mineral Mixtures & Supplements',
+          icon: '💊',
+          subcategories: [
+            'Chelated Mineral Mixture for Cows & Buffaloes',
+            'Liquid Calcium & Phosphorus Tonic',
+            'Liver Tonics & Rumen Digestion Boosters',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Poultry & Bird Care',
+          icon: '🐔',
+          subcategories: [
+            'Broiler & Layer Feed Supplements',
+            'Bird Electrolytes & Stress Relievers',
+            'Dewormers & Farm Disinfectants',
+          ],
+        ),
+      ],
+    ),
+    CategoryItem(
+      id: 'bulk',
+      name: 'Bulk',
+      icon: '📦',
+      groups: [
+        CategoryGroup(
+          name: 'Bulk Agrochemicals',
+          icon: '🛢️',
+          subcategories: [
+            'Wholesale Technical Chemical Drums (200L)',
+            'Bulk Insecticide & Fungicide Master Cases',
+            'Commercial Agrochemical Carboys',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bulk Fertilizers & Soil Care',
+          icon: '🌾',
+          subcategories: [
+            '50kg Commercial Fertilizer Sacks',
+            'Pallet Load Water Soluble NPKs',
+            'Tonner Bulk Organic Manure & Compost',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Bulk Seeds & Grains',
+          icon: '🌱',
+          subcategories: [
+            'Commercial Hybrid Seed Sacks (25kg)',
+            'Certified Green Manure Bulk Seeds',
+            'Wholesale Nursery Seed Batches',
+          ],
+        ),
+      ],
+    ),
+    CategoryItem(
+      id: 'har-din-sasta',
+      name: 'Har Din Sasta',
+      icon: '🏷️',
+      groups: [
+        CategoryGroup(
+          name: 'Daily Value Combos',
+          icon: '🎁',
+          subcategories: [
+            'Pest Control + Growth Tonic Super Combos',
+            'Complete Drip Irrigation Starter Kits',
+            'NPK + Micronutrient Season Packs',
+          ],
+        ),
+        CategoryGroup(
+          name: 'Flash Deals & Clearance',
+          icon: '⚡',
+          subcategories: [
+            'Today Only Farm Bargains',
+            'Stock Clearance Bulk Discounts',
+            'Seasonal Super Saver Farm Offers',
           ],
         ),
       ],

@@ -39,7 +39,8 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   @override
   void dispose() {
     _hideTimer?.cancel();
-    _removeOverlay();
+    _overlayEntry?.remove();
+    _overlayEntry = null;
     super.dispose();
   }
 
@@ -277,7 +278,11 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     final isAllSelected = widget.selectedCategoryId == 'all';
     final activeCat = categories.cast<CategoryItem?>().firstWhere(
       (c) => c?.id == widget.selectedCategoryId,
-      orElse: () => null,
+      orElse: () => categories.cast<CategoryItem?>().firstWhere(
+        (c) => c?.name.toLowerCase() == widget.selectedCategoryId.toLowerCase() ||
+               c?.groups.any((g) => g.name.toLowerCase() == widget.selectedCategoryId.toLowerCase() || widget.selectedCategoryId.toLowerCase().contains(g.name.toLowerCase())) == true,
+        orElse: () => null,
+      ),
     );
 
     return LayoutBuilder(

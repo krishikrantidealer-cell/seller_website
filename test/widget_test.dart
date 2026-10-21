@@ -296,6 +296,72 @@ void main() {
     expect(find.textContaining('Paddy'), findsWidgets);
   });
 
+  testWidgets('All 11 AgriBegri Major Categories are rendered and support cascaded 2-stage hover', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1600, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: CategoryRibbon(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify all 11 AgriBegri major category names exist in the data model
+    final expected11Categories = [
+      'Crop Protection',
+      'Crop Nutrition',
+      'Seeds',
+      'Fertilizers',
+      'Equipments',
+      'Irrigation',
+      'Gardening',
+      'Organic Farming',
+      'Cattle & Bird Care',
+      'Bulk',
+      'Har Din Sasta',
+    ];
+
+    expect(CategoryItem.sampleCategories.length, equals(11));
+    for (final catName in expected11Categories) {
+      expect(
+        CategoryItem.sampleCategories.any((c) => c.name == catName),
+        isTrue,
+        reason: 'Major category $catName should exist in sampleCategories',
+      );
+    }
+
+    // Hover over 'Crop Protection' in the category ribbon
+    final cropProtectionTab = find.text('Crop Protection').first;
+    expect(cropProtectionTab, findsOneWidget);
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    await gesture.moveTo(tester.getCenter(cropProtectionTab));
+    await tester.pumpAndSettle();
+
+    // Verify Level 1 categories show: 'Insecticides', 'Fungicides', 'Bio Pesticides'
+    expect(find.text('Insecticides'), findsWidgets);
+    expect(find.text('Fungicides'), findsWidgets);
+    expect(find.text('Bio Pesticides'), findsWidgets);
+
+    // Initial state: Level 2 subcategories not rendered until Category is hovered
+    expect(find.text('Systemic Insecticides'), findsNothing);
+
+    // Hover over 'Insecticides' category
+    final insecticidesCategory = find.text('Insecticides').first;
+    await gesture.moveTo(tester.getCenter(insecticidesCategory));
+    await tester.pumpAndSettle();
+
+    // Subcategories should now be visible in the side panel
+    expect(find.text('Systemic Insecticides'), findsOneWidget);
+    expect(find.text('Contact & Ingestion'), findsOneWidget);
+  });
+
   testWidgets('Search by Technical Name opens directory and filters by formulation', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;

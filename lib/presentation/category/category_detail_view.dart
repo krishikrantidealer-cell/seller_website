@@ -50,10 +50,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   List<ProductItem> get _filteredProducts {
+    final currentCategoryItem = CategoryItem.sampleCategories.cast<CategoryItem?>().firstWhere(
+      (c) => c?.id == _selectedCategory,
+      orElse: () => null,
+    );
+    final categoryGroupNames = currentCategoryItem?.groups.map((g) => g.name.toLowerCase()).toList() ?? [];
+
     final list = _allProducts.where((p) {
       final matchesBestSeller = !_isBestSellersMode || p.isBestSeller;
       final matchesCategory = _selectedCategory == 'all' ||
-          p.category.toLowerCase().contains(_selectedCategory.toLowerCase());
+          p.category.toLowerCase().contains(_selectedCategory.toLowerCase()) ||
+          (currentCategoryItem != null && p.category.toLowerCase().contains(currentCategoryItem.name.toLowerCase())) ||
+          (currentCategoryItem != null && currentCategoryItem.name.toLowerCase().contains(p.category.toLowerCase())) ||
+          categoryGroupNames.any((g) => p.category.toLowerCase().contains(g) || g.contains(p.category.toLowerCase()));
       final matchesSubcategory = _selectedSubcategory == null ||
           p.title.toLowerCase().contains(_selectedSubcategory!.toLowerCase()) ||
           p.technicalName.toLowerCase().contains(_selectedSubcategory!.toLowerCase()) ||
