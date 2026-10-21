@@ -715,16 +715,29 @@ class _MainNavHeaderState extends State<MainNavHeader> {
           MaterialPageRoute(builder: (_) => const MyOrdersView()),
         );
       } else if (value == 'logout') {
-        auth.logout();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Signed out successfully'),
-            backgroundColor: AppColors.textPrimary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        showSignOutConfirmationDialog(context).then((confirmed) {
+          if (confirmed == true && context.mounted) {
+            auth.logout();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Signed out successfully',
+                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.5),
+                    ),
+                  ],
+                ),
+                backgroundColor: AppColors.textPrimary,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       }
     }
 

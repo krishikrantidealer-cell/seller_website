@@ -31,6 +31,130 @@ void showAuthModal(BuildContext context) {
   }
 }
 
+/// Displays an elegant confirmation popup before signing out of the Kisan portal.
+Future<bool?> showSignOutConfirmationDialog(BuildContext context) {
+  return showDialog<bool>(
+    context: context,
+    barrierDismissible: true,
+    builder: (ctx) {
+      final isMobile = MediaQuery.sizeOf(ctx).width < 600;
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Container(
+          width: isMobile ? double.infinity : 400,
+          constraints: const BoxConstraints(maxWidth: 400),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x26000000),
+                blurRadius: 24,
+                offset: Offset(0, 10),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon Header
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF1F2),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFFECDD3), width: 1.5),
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: AppColors.primaryCrimson,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Title
+              Text(
+                'Sign Out from BioCrop?',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Subtitle
+              Text(
+                'Are you sure you want to sign out? You will need to verify your mobile number with OTP to access your orders and profile again.',
+                style: GoogleFonts.poppins(
+                  fontSize: 12.5,
+                  color: AppColors.textSecondary,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryCrimson,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Yes, Sign Out',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 class _AuthModalWrapper extends StatelessWidget {
   final bool isMobile;
 
@@ -870,19 +994,30 @@ class _AccountProfileView extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: () {
-                auth.logout();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'You have been logged out.',
-                      style: GoogleFonts.poppins(color: Colors.white),
+              onPressed: () async {
+                final confirmed = await showSignOutConfirmationDialog(context);
+                if (confirmed == true && context.mounted) {
+                  auth.logout();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Signed out successfully',
+                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.5),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: AppColors.textPrimary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      duration: const Duration(seconds: 2),
                     ),
-                    backgroundColor: AppColors.textPrimary,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
+                  );
+                }
               },
               icon: const Icon(Icons.logout_rounded, size: 16, color: AppColors.primaryCrimson),
               label: Text(

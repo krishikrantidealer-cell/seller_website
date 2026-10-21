@@ -11,6 +11,7 @@ import 'package:seller_website/presentation/widgets/category_ribbon.dart';
 import 'package:seller_website/presentation/widgets/product_card.dart';
 import 'package:seller_website/data/models/order_models.dart';
 import 'package:seller_website/presentation/orders/my_orders_view.dart';
+import 'package:seller_website/presentation/widgets/auth_modal.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -119,6 +120,26 @@ void main() {
 
     // Tap Sign Out from dropdown
     await tester.tap(find.text('Sign Out'));
+    await tester.pumpAndSettle();
+
+    // Verify Sign Out confirmation popup appears
+    expect(find.text('Sign Out from BioCrop?'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.text('Yes, Sign Out'), findsOneWidget);
+
+    // Tap Cancel - should dismiss popup and keep user logged in
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('98765 43210'), findsWidgets);
+
+    // Open dropdown again and tap Sign Out
+    await tester.tap(find.textContaining('98765 43210').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sign Out'));
+    await tester.pumpAndSettle();
+
+    // Tap Yes, Sign Out on confirmation popup
+    await tester.tap(find.text('Yes, Sign Out'));
     await tester.pumpAndSettle();
 
     // Verify user is logged out back to Login / My Account
@@ -592,6 +613,51 @@ void main() {
 
     expect(find.text('My Orders & Farm Deliveries'), findsWidgets);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Sign out confirmation popup in AuthModal and responsiveness on narrow screens', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    AuthController.instance.setUserForTest(
+      const UserModel(
+        phoneNumber: '9876543210',
+        name: 'Ramesh Singh',
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () => showSignOutConfirmationDialog(context),
+                child: const Text('Open Dialog'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap to open sign out confirmation popup
+    await tester.tap(find.text('Open Dialog'));
+    await tester.pumpAndSettle();
+
+    // Verify confirmation popup widgets
+    expect(find.text('Sign Out from BioCrop?'), findsOneWidget);
+    expect(find.text('Cancel'), findsOneWidget);
+    expect(find.text('Yes, Sign Out'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // Tap Cancel
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sign Out from BioCrop?'), findsNothing);
   });
 }
 
