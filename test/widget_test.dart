@@ -12,6 +12,7 @@ import 'package:seller_website/presentation/widgets/product_card.dart';
 import 'package:seller_website/data/models/order_models.dart';
 import 'package:seller_website/presentation/orders/my_orders_view.dart';
 import 'package:seller_website/presentation/widgets/auth_modal.dart';
+import 'package:seller_website/presentation/widgets/web_footer.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -658,6 +659,50 @@ void main() {
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
     expect(find.text('Sign Out from BioCrop?'), findsNothing);
+  });
+
+  testWidgets('WebFooter renders responsive trust cards without horizontal overflow and displays Facebook, Instagram, YouTube icons', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: WebFooter(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify all 4 trust cards are rendered
+    expect(find.text('Guaranteed Authentic Value'), findsOneWidget);
+    expect(find.text('FREE Pan-India Shipping'), findsOneWidget);
+    expect(find.text('CERTIFIED Lab Quality'), findsOneWidget);
+    expect(find.text('EASY Returns & Advisory'), findsOneWidget);
+
+    // Verify social media labels & widgets are rendered
+    expect(find.text('Connect With Us:'), findsOneWidget);
+    expect(find.byType(SocialIconButton), findsWidgets);
+
+    // Verify Facebook, Instagram, and YouTube tooltips exist
+    expect(find.byTooltip('Follow BioCrop on Facebook'), findsWidgets);
+    expect(find.byTooltip('Follow BioCrop on Instagram'), findsWidgets);
+    expect(find.byTooltip('Subscribe to BioCrop on YouTube'), findsWidgets);
+
+    // Scroll to Facebook icon, tap and verify feedback snackbar
+    final fbIcon = find.byTooltip('Follow BioCrop on Facebook').first;
+    await tester.ensureVisible(fbIcon);
+    await tester.pumpAndSettle();
+    await tester.tap(fbIcon);
+    await tester.pumpAndSettle();
+    expect(find.text('Opening Facebook...'), findsOneWidget);
+
+    // Verify zero rendering exceptions / overflows on 320px screen
+    expect(tester.takeException(), isNull);
   });
 }
 

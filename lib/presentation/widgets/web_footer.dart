@@ -42,26 +42,26 @@ class WebFooter extends StatelessWidget {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _brandColumn(),
+                          _brandColumn(context),
                           const SizedBox(height: 32),
                           _categoriesColumn(),
                           const SizedBox(height: 32),
                           _quickLinksColumn(),
                           const SizedBox(height: 32),
-                          _supportColumn(),
+                          _supportColumn(context),
                         ],
                       );
                     }
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(flex: 3, child: _brandColumn()),
+                        Expanded(flex: 3, child: _brandColumn(context)),
                         const SizedBox(width: 48),
                         Expanded(flex: 2, child: _categoriesColumn()),
                         const SizedBox(width: 48),
                         Expanded(flex: 2, child: _quickLinksColumn()),
                         const SizedBox(width: 48),
-                        Expanded(flex: 3, child: _supportColumn()),
+                        Expanded(flex: 3, child: _supportColumn(context)),
                       ],
                     );
                   },
@@ -85,8 +85,6 @@ class WebFooter extends StatelessWidget {
   Widget _buildTrustBadgesSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isCompactRow = constraints.maxWidth < 1000;
-
         final badges = [
           _TrustBadgeItem(
             icon: Icons.price_check_rounded,
@@ -118,21 +116,42 @@ class WebFooter extends StatelessWidget {
           ),
         ];
 
-        if (isCompactRow) {
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                for (int i = 0; i < badges.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 12),
-                  _buildBadgeCard(badges[i], width: 280),
-                ],
+        // Mobile (< 650px): vertical full-width stack with responsive cards
+        if (constraints.maxWidth < 650) {
+          return Column(
+            children: [
+              for (int i = 0; i < badges.length; i++) ...[
+                if (i > 0) const SizedBox(height: 10),
+                _buildBadgeCard(badges[i], isFullWidth: true),
               ],
-            ),
+            ],
           );
         }
 
+        // Tablet (650px to 1050px): clean 2x2 grid
+        if (constraints.maxWidth < 1050) {
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(child: _buildBadgeCard(badges[0])),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildBadgeCard(badges[1])),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: _buildBadgeCard(badges[2])),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildBadgeCard(badges[3])),
+                ],
+              ),
+            ],
+          );
+        }
+
+        // Desktop (>= 1050px): 4 badges in a single row
         return Row(
           children: [
             for (int i = 0; i < badges.length; i++) ...[
@@ -145,25 +164,24 @@ class WebFooter extends StatelessWidget {
     );
   }
 
-  Widget _buildBadgeCard(_TrustBadgeItem item, {double? width}) {
+  Widget _buildBadgeCard(_TrustBadgeItem item, {double? width, bool isFullWidth = false}) {
     return Container(
-      width: width,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      width: isFullWidth ? double.infinity : width,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: const Color(0xFF24201E),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFF332D29)),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(9),
             decoration: BoxDecoration(
               color: item.iconBgColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(item.icon, color: item.iconColor, size: 22),
+            child: Icon(item.icon, color: item.iconColor, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -174,7 +192,7 @@ class WebFooter extends StatelessWidget {
                 Text(
                   item.title,
                   style: GoogleFonts.poppins(
-                    fontSize: 13,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
@@ -187,8 +205,9 @@ class WebFooter extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     color: const Color(0xFF9CA3AF),
+                    height: 1.3,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -206,7 +225,7 @@ class WebFooter extends StatelessWidget {
         alignment: WrapAlignment.spaceBetween,
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: 24,
-        runSpacing: 12,
+        runSpacing: 14,
         children: [
           Text(
             '© 2026 EBS Essential BioCrop Science. All rights reserved.',
@@ -221,12 +240,13 @@ class WebFooter extends StatelessWidget {
               _footerLink('Refund & Cancellation'),
             ],
           ),
+          _buildSocialMediaRow(context),
         ],
       ),
     );
   }
 
-  Widget _brandColumn() {
+  Widget _brandColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -302,6 +322,17 @@ class WebFooter extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 20),
+        Text(
+          'Connect With Us:',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildSocialMediaRow(context),
       ],
     );
   }
@@ -335,7 +366,7 @@ class WebFooter extends StatelessWidget {
     );
   }
 
-  Widget _supportColumn() {
+  Widget _supportColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -365,11 +396,35 @@ class WebFooter extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
         Text(
           'Email Support: support@ebsbiocrop.com',
           style: GoogleFonts.poppins(color: const Color(0xFF9CA3AF), fontSize: 13),
         ),
+        const SizedBox(height: 20),
+        Text(
+          'Official Social Channels:',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildSocialMediaRow(context),
+      ],
+    );
+  }
+
+  Widget _buildSocialMediaRow(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: const [
+        SocialIconButton(platform: SocialPlatform.facebook),
+        SizedBox(width: 12),
+        SocialIconButton(platform: SocialPlatform.instagram),
+        SizedBox(width: 12),
+        SocialIconButton(platform: SocialPlatform.youtube),
       ],
     );
   }
@@ -404,6 +459,252 @@ class WebFooter extends StatelessWidget {
       ),
     );
   }
+}
+
+enum SocialPlatform {
+  facebook(
+    name: 'Facebook',
+    tooltip: 'Follow BioCrop on Facebook',
+    color: Color(0xFF1877F2),
+  ),
+  instagram(
+    name: 'Instagram',
+    tooltip: 'Follow BioCrop on Instagram',
+    gradient: LinearGradient(
+      begin: Alignment.bottomLeft,
+      end: Alignment.topRight,
+      colors: [
+        Color(0xFFFCAF45),
+        Color(0xFFF77737),
+        Color(0xFFF04B46),
+        Color(0xFFDD2A7B),
+        Color(0xFF833AB4),
+      ],
+    ),
+  ),
+  youtube(
+    name: 'YouTube',
+    tooltip: 'Subscribe to BioCrop on YouTube',
+    color: Color(0xFFFF0000),
+  );
+
+  final String name;
+  final String tooltip;
+  final Color? color;
+  final Gradient? gradient;
+
+  const SocialPlatform({
+    required this.name,
+    required this.tooltip,
+    this.color,
+    this.gradient,
+  });
+}
+
+class SocialIconButton extends StatefulWidget {
+  final SocialPlatform platform;
+  final VoidCallback? onTap;
+
+  const SocialIconButton({
+    super.key,
+    required this.platform,
+    this.onTap,
+  });
+
+  @override
+  State<SocialIconButton> createState() => _SocialIconButtonState();
+}
+
+class _SocialIconButtonState extends State<SocialIconButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget iconWidget;
+    switch (widget.platform) {
+      case SocialPlatform.facebook:
+        iconWidget = const CustomPaint(
+          size: Size(18, 18),
+          painter: FacebookLogoPainter(),
+        );
+        break;
+      case SocialPlatform.instagram:
+        iconWidget = const CustomPaint(
+          size: Size(18, 18),
+          painter: InstagramLogoPainter(),
+        );
+        break;
+      case SocialPlatform.youtube:
+        iconWidget = const CustomPaint(
+          size: Size(18, 18),
+          painter: YouTubeLogoPainter(),
+        );
+        break;
+    }
+
+    return Tooltip(
+      message: widget.platform.tooltip,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap ??
+              () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Opening ${widget.platform.name}...',
+                      style: GoogleFonts.poppins(fontSize: 12.5),
+                    ),
+                    backgroundColor: AppColors.primaryDarkGreen,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+          child: AnimatedScale(
+            scale: _isHovered ? 1.12 : 1.0,
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: widget.platform.color,
+                gradient: widget.platform.gradient,
+                shape: BoxShape.circle,
+                boxShadow: _isHovered
+                    ? [
+                        BoxShadow(
+                          color: (widget.platform.color ?? const Color(0xFFDD2A7B)).withValues(alpha: 0.45),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : [
+                        const BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+              ),
+              alignment: Alignment.center,
+              child: iconWidget,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FacebookLogoPainter extends CustomPainter {
+  final Color color;
+  const FacebookLogoPainter({this.color = Colors.white});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    canvas.save();
+    canvas.scale(size.width / 24.0, size.height / 24.0);
+
+    final path = Path();
+    path.moveTo(14.0, 13.5);
+    path.lineTo(16.5, 13.5);
+    path.lineTo(17.5, 9.5);
+    path.lineTo(14.0, 9.5);
+    path.lineTo(14.0, 7.5);
+    path.cubicTo(14.0, 6.45, 14.75, 6.0, 15.8, 6.0);
+    path.lineTo(17.5, 6.0);
+    path.lineTo(17.5, 2.3);
+    path.cubicTo(16.8, 2.15, 15.5, 2.0, 13.8, 2.0);
+    path.cubicTo(9.9, 2.0, 7.5, 4.35, 7.5, 8.6);
+    path.lineTo(7.5, 9.5);
+    path.lineTo(5.0, 9.5);
+    path.lineTo(5.0, 13.5);
+    path.lineTo(7.5, 13.5);
+    path.lineTo(7.5, 22.0);
+    path.lineTo(14.0, 22.0);
+    path.close();
+
+    canvas.drawPath(path, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class InstagramLogoPainter extends CustomPainter {
+  final Color color;
+  const InstagramLogoPainter({this.color = Colors.white});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 24.0, size.height / 24.0);
+
+    final strokePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round
+      ..isAntiAlias = true;
+
+    final fillPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    final outerRRect = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(3.2, 3.2, 17.6, 17.6),
+      const Radius.circular(5.2),
+    );
+    canvas.drawRRect(outerRRect, strokePaint);
+    canvas.drawCircle(const Offset(12.0, 12.0), 4.3, strokePaint);
+    canvas.drawCircle(const Offset(16.8, 7.2), 1.25, fillPaint);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class YouTubeLogoPainter extends CustomPainter {
+  final Color color;
+  const YouTubeLogoPainter({this.color = Colors.white});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 24.0, size.height / 24.0);
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+
+    final path = Path();
+    path.moveTo(9.5, 7.2);
+    path.lineTo(16.8, 12.0);
+    path.lineTo(9.5, 16.8);
+    path.close();
+
+    canvas.drawPath(path, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _TrustBadgeItem {
