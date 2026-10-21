@@ -125,10 +125,15 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: AppColors.background,
       drawer: _buildMobileNavigationDrawer(context),
       endDrawer: const QuickCartDrawer(),
-      body: Column(
-        children: [
-          // Sticky Top Navigation Header with Drop Shadow
-          Container(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxHeight <= 1.0 || constraints.maxWidth <= 1.0) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            children: [
+              // Sticky Top Navigation Header with Drop Shadow
+              Container(
             decoration: const BoxDecoration(
               boxShadow: [
                 BoxShadow(
@@ -317,9 +322,11 @@ class _HomeViewState extends State<HomeView> {
       ),
     ),
   ],
-),
 );
-}
+        },
+      ),
+    );
+  }
 
   Widget _buildBestSellersHeader(List<ProductItem> filtered, bool isMobile) {
     final bool isFiltered = _selectedCategory != 'all' || _selectedSubcategory != null || _searchFilter.isNotEmpty;

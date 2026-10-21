@@ -11,6 +11,7 @@ import 'package:seller_website/presentation/widgets/category_ribbon.dart';
 import 'package:seller_website/presentation/widgets/product_card.dart';
 import 'package:seller_website/data/models/order_models.dart';
 import 'package:seller_website/presentation/orders/my_orders_view.dart';
+import 'package:seller_website/presentation/orders/order_detail_view.dart';
 import 'package:seller_website/presentation/widgets/auth_modal.dart';
 import 'package:seller_website/presentation/widgets/web_footer.dart';
 import 'package:seller_website/presentation/widgets/main_nav_header.dart';
@@ -752,6 +753,66 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('EBS-2026-89412'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Compact order card in MyOrdersView navigates to OrderDetailView and can navigate back', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    OrdersController.instance.resetForTest();
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: MyOrdersView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify compact view button
+    final viewDetailsBtn = find.text('View Order Details').first;
+    expect(viewDetailsBtn, findsOneWidget);
+
+    // Tap to open OrderDetailView
+    await tester.tap(viewDetailsBtn);
+    await tester.pumpAndSettle();
+
+    // Verify we are on OrderDetailView
+    expect(find.text('Back to My Orders'), findsOneWidget);
+    expect(find.textContaining('Order Details #EBS-2026-89412'), findsOneWidget);
+    expect(find.textContaining('Live Courier Shipment Tracking'), findsOneWidget);
+    expect(find.textContaining('Ordered Products'), findsOneWidget);
+    expect(find.textContaining('Farm Delivery Depot Address'), findsOneWidget);
+    expect(find.textContaining('Payment Details'), findsOneWidget);
+
+    // Tap back button
+    await tester.tap(find.text('Back to My Orders'));
+    await tester.pumpAndSettle();
+
+    // Verify back on MyOrdersView
+    expect(find.text('My Orders & Farm Deliveries'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('OrderDetailView renders without overflow on narrow mobile screens (320px)', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final order = OrderModel.sampleOrders.first;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: OrderDetailView(order: order),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Back to My Orders'), findsOneWidget);
+    expect(find.textContaining('Live Courier Shipment Tracking'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

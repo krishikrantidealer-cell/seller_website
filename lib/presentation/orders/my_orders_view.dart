@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/order_models.dart';
+import 'order_detail_view.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/top_info_bar.dart';
@@ -28,23 +29,24 @@ class MyOrdersView extends StatefulWidget {
 class _MyOrdersViewState extends State<MyOrdersView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final TextEditingController _searchController;
-  final Set<String> _expandedOrderIds = {};
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: OrdersController.instance.searchQuery);
 
-    // Expand initial order if provided or expand the first in-transit order by default
     if (widget.initialOrderId != null) {
-      _expandedOrderIds.add(widget.initialOrderId!);
-    } else {
-      final active = OrdersController.instance.allOrders.where(
-        (o) => o.status == OrderStatus.inTransit || o.status == OrderStatus.outForDelivery,
-      );
-      if (active.isNotEmpty) {
-        _expandedOrderIds.add(active.first.id);
-      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ord = OrdersController.instance.getOrderById(widget.initialOrderId!);
+        if (ord != null && mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OrderDetailView(order: ord),
+            ),
+          );
+        }
+      });
     }
   }
 
@@ -52,16 +54,6 @@ class _MyOrdersViewState extends State<MyOrdersView> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _toggleTracking(String orderId) {
-    setState(() {
-      if (_expandedOrderIds.contains(orderId)) {
-        _expandedOrderIds.remove(orderId);
-      } else {
-        _expandedOrderIds.add(orderId);
-      }
-    });
   }
 
   void _repeatOrder(OrderModel order) {
@@ -503,9 +495,14 @@ class _MyOrdersViewState extends State<MyOrdersView> {
           key: _scaffoldKey,
           backgroundColor: AppColors.background,
           endDrawer: const QuickCartDrawer(),
-          body: Column(
-            children: [
-              // Sticky Nav Header
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxHeight <= 1.0 || constraints.maxWidth <= 1.0) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                children: [
+                  // Sticky Nav Header
               Container(
                 decoration: const BoxDecoration(
                   boxShadow: [
@@ -595,8 +592,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                               separatorBuilder: (_, _) => SizedBox(height: isMobile ? 12 : 18),
                               itemBuilder: (context, index) {
                                 final order = orders[index];
-                                final isExpanded = _expandedOrderIds.contains(order.id);
-                                return _buildOrderCard(context, order, isExpanded, isMobile);
+                                return _buildOrderCard(context, order, isMobile);
                               },
                             ),
                           ),
@@ -611,11 +607,13 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                 ),
               ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
-  }
+  },
+);
+}
 
   Widget _buildBreadcrumb(BuildContext context, bool isMobile) {
     return SingleChildScrollView(
@@ -983,579 +981,333 @@ class _MyOrdersViewState extends State<MyOrdersView> {
     );
   }
 
-  Widget _buildOrderCard(BuildContext context, OrderModel order, bool isExpanded, bool isMobile) {
+  Widget _buildOrderCard(BuildContext context, OrderModel order, bool isMobile) {
     final statusColor = order.status.color;
     final statusBg = order.status.backgroundColor;
+    final firstItem = order.items.isNotEmpty ? order.items.first : null;
+    final remainingCount = order.items.length - 1;
+
+    void openDetail() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OrderDetailView(order: order),
+        ),
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(isMobile ? 12 : 16),
+        borderRadius: BorderRadius.circular(isMobile ? 12 : 14),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: 0.025),
             blurRadius: 8,
-            offset: const Offset(0, 3),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Order Card Header
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: isMobile ? 9 : 14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(isMobile ? 12 : 16)),
-              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-            ),
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: isMobile ? 8 : 12,
-              runSpacing: isMobile ? 6 : 8,
-              children: [
-                Wrap(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: openDetail,
+          borderRadius: BorderRadius.circular(isMobile ? 12 : 14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Compact Header
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 12 : 16,
+                  vertical: isMobile ? 8 : 10,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(isMobile ? 12 : 14)),
+                  border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
                   crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: isMobile ? 6 : 8,
-                  runSpacing: 4,
+                  spacing: 8,
+                  runSpacing: 6,
                   children: [
+                    // Order ID + Placed Date
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: const Color(0xFFCBD5E1)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.receipt_long_rounded, size: isMobile ? 12 : 13, color: AppColors.textSecondary),
+                              const SizedBox(width: 4),
+                              Text(
+                                order.id,
+                                style: GoogleFonts.poppins(
+                                  fontSize: isMobile ? 11.5 : 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
+                          style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+
+                    // Status Badge
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 7 : 9, vertical: isMobile ? 2.5 : 4),
+                      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFCBD5E1)),
+                        color: statusBg,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: statusColor.withValues(alpha: 0.25)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.receipt_long_rounded, size: isMobile ? 12 : 14, color: AppColors.textSecondary),
-                          SizedBox(width: isMobile ? 4 : 5),
+                          Icon(order.status.icon, size: isMobile ? 11 : 13, color: statusColor),
+                          const SizedBox(width: 4),
                           Text(
-                            order.id,
+                            order.status.displayName,
                             style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 11.5 : 12.5,
+                              fontSize: isMobile ? 10.5 : 11,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
+                              color: statusColor,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Text(
-                      '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
-                      style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textMuted),
                     ),
                   ],
                 ),
+              ),
 
-                // Status Badge
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: isMobile ? 3 : 4),
-                  decoration: BoxDecoration(
-                    color: statusBg,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(order.status.icon, size: isMobile ? 12 : 14, color: statusColor),
-                      const SizedBox(width: 5),
-                      Text(
-                        order.status.displayName,
-                        style: GoogleFonts.poppins(
-                          fontSize: isMobile ? 10.5 : 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: statusColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Estimated Delivery & Courier Strip
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: isMobile ? 12 : 20, vertical: isMobile ? 7 : 10),
-            color: const Color(0xFFF0FDF4),
-            child: Row(
-              children: [
-                Icon(Icons.schedule_rounded, size: isMobile ? 14 : 16, color: AppColors.primaryDarkGreen),
-                SizedBox(width: isMobile ? 6 : 8),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: order.status == OrderStatus.delivered ? 'Status: ' : 'Delivery Expected: ',
-                          style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary),
-                        ),
-                        TextSpan(
-                          text: order.estimatedDelivery,
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 11.5 : 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primaryDarkGreen,
-                          ),
-                        ),
-                        if (order.awbNumber.isNotEmpty) ...[
-                          TextSpan(
-                            text: ' • via ${order.courierName} (AWB: ${order.awbNumber})',
-                            style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
-                          ),
-                        ],
-                      ],
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Order Items List
-          Padding(
-            padding: EdgeInsets.all(isMobile ? 12 : 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...order.items.map((item) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: isMobile ? 8 : 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Product Thumbnail
-                        Container(
-                          width: isMobile ? 44 : 56,
-                          height: isMobile ? 44 : 56,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: Image.network(
-                            item.product.imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Container(
-                              color: const Color(0xFFE2E8F0),
-                              alignment: Alignment.center,
-                              child: Icon(Icons.agriculture_rounded, color: AppColors.primaryGreen, size: isMobile ? 18 : 24),
+              // 2. Compact Body
+              Padding(
+                padding: EdgeInsets.all(isMobile ? 12 : 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Product Thumbnail (with multi-item indicator)
+                    if (firstItem != null)
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: isMobile ? 46 : 56,
+                            height: isMobile ? 46 : 56,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.network(
+                              firstItem.product.imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => const Center(
+                                child: Icon(Icons.agriculture_rounded, color: AppColors.primaryGreen, size: 20),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(width: isMobile ? 10 : 14),
-
-                        // Item details
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.product.title,
-                                style: GoogleFonts.poppins(
-                                  fontSize: isMobile ? 12.5 : 13.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                          if (remainingCount > 0)
+                            Positioned(
+                              right: -4,
+                              bottom: -4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryGreen,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.white, width: 1.5),
+                                ),
+                                child: Text(
+                                  '+$remainingCount',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${item.product.technicalName} • ${item.product.vendor}',
-                                style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11, color: AppColors.textMuted),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 3),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 2,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 5 : 6, vertical: isMobile ? 1.5 : 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F5F9),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      'Pack: ${item.variant.label}',
-                                      style: GoogleFonts.poppins(fontSize: isMobile ? 10 : 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Qty: ${item.quantity} × ₹${item.unitPrice.toStringAsFixed(0)}',
-                                    style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 12, color: AppColors.textSecondary),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Item Total
-                        Text(
-                          '₹${item.totalPrice.toStringAsFixed(0)}',
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 13 : 14,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-
-                Divider(color: const Color(0xFFE2E8F0), height: isMobile ? 14 : 20),
-
-                // Farm Delivery Address & Payment Summary
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isNarrow = constraints.maxWidth < 650;
-                    final addressBlock = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.location_on_outlined, size: isMobile ? 14 : 16, color: AppColors.primaryGreen),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Text(
-                                'Delivery Farm Depot:',
-                                style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
-                              ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          '${order.recipientName} (${order.recipientPhone})',
-                          style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w600),
-                        ),
-                        Text(
-                          order.deliveryAddress,
-                          style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted, height: 1.3),
-                          maxLines: isMobile ? 2 : 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    );
+                        ],
+                      ),
+                    SizedBox(width: isMobile ? 10 : 14),
 
-                    final paymentBlock = Column(
-                      crossAxisAlignment: isNarrow ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Payment: ${order.paymentMethod}',
-                          style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Total Paid: ',
-                              style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 13, color: AppColors.textMuted),
-                            ),
-                            Text(
-                              '₹${order.totalAmount.toStringAsFixed(0)}',
-                              style: GoogleFonts.poppins(
-                                fontSize: isMobile ? 15 : 18,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.primaryGreen,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-
-                    if (isNarrow) {
-                      return Column(
+                    // Details Column
+                    Expanded(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          addressBlock,
-                          SizedBox(height: isMobile ? 8 : 12),
-                          paymentBlock,
-                        ],
-                      );
-                    }
-
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(child: addressBlock),
-                        const SizedBox(width: 20),
-                        paymentBlock,
-                      ],
-                    );
-                  },
-                ),
-
-                // Collapsible Live Tracking Timeline Stepper
-                if (isExpanded) ...[
-                  SizedBox(height: isMobile ? 12 : 18),
-                  Container(
-                    padding: EdgeInsets.all(isMobile ? 12 : 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.alt_route_rounded, size: isMobile ? 16 : 18, color: AppColors.primaryGreen),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Live Courier Transit Progress',
+                          Text(
+                            firstItem != null
+                                ? '${firstItem.product.title}${remainingCount > 0 ? " + $remainingCount more item${remainingCount > 1 ? 's' : ''}" : ""}'
+                                : 'Order #${order.id}',
+                            style: GoogleFonts.poppins(
+                              fontSize: isMobile ? 12.5 : 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 2,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                '${order.totalItemCount} item${order.totalItemCount > 1 ? 's' : ''} • ₹${order.totalAmount.toStringAsFixed(0)}',
                                 style: GoogleFonts.poppins(
-                                  fontSize: isMobile ? 12.5 : 13.5,
+                                  fontSize: isMobile ? 11.5 : 12.5,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
+                                  color: AppColors.primaryDarkGreen,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: isMobile ? 10 : 14),
-
-                        // Stepper Checkpoints
-                        ...order.trackingHistory.asMap().entries.map((entry) {
-                          final idx = entry.key;
-                          final cp = entry.value;
-                          final isLast = idx == order.trackingHistory.length - 1;
-
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Timeline Bullet & Line
-                              Column(
-                                children: [
-                                  Container(
-                                    width: isMobile ? 14 : 16,
-                                    height: isMobile ? 14 : 16,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: cp.isCompleted
-                                          ? AppColors.primaryGreen
-                                          : (cp.isCurrent ? const Color(0xFF3B82F6) : Colors.white),
-                                      border: Border.all(
-                                        color: cp.isCompleted || cp.isCurrent
-                                            ? Colors.transparent
-                                            : const Color(0xFFCBD5E1),
-                                        width: 2,
-                                      ),
-                                    ),
-                                    child: cp.isCompleted
-                                        ? Icon(Icons.check, size: isMobile ? 8 : 10, color: Colors.white)
-                                        : null,
-                                  ),
-                                  if (!isLast)
-                                    Container(
-                                      width: 2,
-                                      height: isMobile ? 26 : 38,
-                                      color: cp.isCompleted
-                                          ? AppColors.primaryGreen
-                                          : const Color(0xFFE2E8F0),
-                                    ),
-                                ],
-                              ),
-                              SizedBox(width: isMobile ? 10 : 14),
-
-                              // Checkpoint Information
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: isMobile ? 8 : 12),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Wrap(
-                                        alignment: WrapAlignment.spaceBetween,
-                                        crossAxisAlignment: WrapCrossAlignment.center,
-                                        spacing: 8,
-                                        runSpacing: 2,
-                                        children: [
-                                          Text(
-                                            cp.title,
-                                            style: GoogleFonts.poppins(
-                                              fontSize: isMobile ? 11.5 : 12.5,
-                                              fontWeight: cp.isCurrent ? FontWeight.w800 : FontWeight.w600,
-                                              color: cp.isCurrent ? const Color(0xFF1E40AF) : AppColors.textPrimary,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${cp.date} • ${cp.time}',
-                                            style: GoogleFonts.poppins(fontSize: isMobile ? 10 : 11, color: AppColors.textMuted),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        cp.description,
-                                        style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textSecondary),
-                                      ),
-                                      if (cp.location.isNotEmpty) ...[
-                                        const SizedBox(height: 2),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.pin_drop_outlined, size: isMobile ? 11 : 12, color: AppColors.textMuted),
-                                            const SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                cp.location,
-                                                style: GoogleFonts.poppins(fontSize: isMobile ? 10 : 11, color: AppColors.textMuted),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ],
-                                  ),
+                              Text(
+                                '(${order.paymentMethod})',
+                                style: GoogleFonts.poppins(
+                                  fontSize: isMobile ? 10 : 11,
+                                  color: AppColors.textMuted,
                                 ),
                               ),
                             ],
-                          );
-                        }),
-
-                        // Rider Contact strip if assigned
-                        if (order.deliveryAgentPhone != null) ...[
-                          const SizedBox(height: 6),
-                          Container(
-                            padding: EdgeInsets.all(isMobile ? 8 : 10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xFFBFDBFE)),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            'Delivery: ${order.estimatedDelivery} via ${order.courierName}${order.awbNumber.isNotEmpty ? " (AWB: ${order.awbNumber})" : ""}',
+                            style: GoogleFonts.poppins(
+                              fontSize: isMobile ? 10.5 : 11.5,
+                              color: AppColors.textSecondary,
                             ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.two_wheeler_rounded, size: isMobile ? 16 : 18, color: const Color(0xFF2563EB)),
-                                SizedBox(width: isMobile ? 8 : 10),
-                                Expanded(
-                                  child: Text(
-                                    'Delivery Rider: ${order.deliveryAgentName} (${order.deliveryAgentPhone})',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: isMobile ? 11 : 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF1E40AF),
-                                    ),
-                                  ),
-                                ),
-                                TextButton.icon(
-                                  onPressed: () => _showHelpModal(context, order),
-                                  icon: Icon(Icons.phone, size: isMobile ? 12 : 14, color: const Color(0xFF2563EB)),
-                                  label: Text(
-                                    'Contact',
-                                    style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w700, color: const Color(0xFF2563EB)),
-                                  ),
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8),
-                                    minimumSize: const Size(0, 28),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
 
-                SizedBox(height: isMobile ? 12 : 16),
-                const Divider(color: Color(0xFFE2E8F0), height: 1),
-                SizedBox(height: isMobile ? 8 : 12),
+              const Divider(color: Color(0xFFE2E8F0), height: 1),
 
-                // Action Bar
-                Wrap(
-                  spacing: isMobile ? 6 : 10,
-                  runSpacing: isMobile ? 6 : 10,
+              // 3. Compact Footer Actions Bar
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 10 : 14,
+                  vertical: isMobile ? 6 : 8,
+                ),
+                child: Wrap(
+                  spacing: isMobile ? 6 : 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    // Toggle Live Tracking
-                    OutlinedButton.icon(
-                      onPressed: () => _toggleTracking(order.id),
-                      icon: Icon(
-                        isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.alt_route_rounded,
-                        size: isMobile ? 14 : 16,
-                      ),
-                      label: Text(
-                        isExpanded ? 'Hide Tracking' : 'Track Shipment',
-                        style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w600),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primaryGreen,
-                        side: const BorderSide(color: AppColors.primaryGreen),
-                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 6 : 10),
-                        minimumSize: Size(0, isMobile ? 32 : 38),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-
-                    // Download Invoice
-                    OutlinedButton.icon(
-                      onPressed: () => _showInvoiceDialog(context, order),
-                      icon: Icon(Icons.receipt_rounded, size: isMobile ? 14 : 16),
-                      label: Text(
-                        'Tax Invoice',
-                        style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w600),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textPrimary,
-                        side: const BorderSide(color: Color(0xFFCBD5E1)),
-                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 6 : 10),
-                        minimumSize: Size(0, isMobile ? 32 : 38),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-
-                    // Repeat Order
+                    // View Order Details (Primary Action)
                     ElevatedButton.icon(
-                      onPressed: () => _repeatOrder(order),
-                      icon: Icon(Icons.repeat_rounded, size: isMobile ? 14 : 16),
+                      onPressed: openDetail,
+                      icon: const Icon(Icons.arrow_forward_rounded, size: 14),
                       label: Text(
-                        'Buy Again',
-                        style: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 12.5, fontWeight: FontWeight.w700),
+                        'View Order Details',
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
                         foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 6 : 10),
-                        minimumSize: Size(0, isMobile ? 32 : 38),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: isMobile ? 5 : 8),
+                        minimumSize: Size(0, isMobile ? 30 : 34),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+
+                    // Quick Track Shipment
+                    OutlinedButton.icon(
+                      onPressed: openDetail,
+                      icon: const Icon(Icons.alt_route_rounded, size: 14),
+                      label: Text(
+                        'Track Shipment',
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryGreen,
+                        side: const BorderSide(color: AppColors.primaryGreen),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 5 : 8),
+                        minimumSize: Size(0, isMobile ? 30 : 34),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+
+                    // Buy Again
+                    OutlinedButton.icon(
+                      onPressed: () => _repeatOrder(order),
+                      icon: const Icon(Icons.repeat_rounded, size: 14),
+                      label: Text(
+                        'Buy Again',
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 5 : 8),
+                        minimumSize: Size(0, isMobile ? 30 : 34),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+
+                    // Tax Invoice
+                    OutlinedButton.icon(
+                      onPressed: () => _showInvoiceDialog(context, order),
+                      icon: const Icon(Icons.receipt_rounded, size: 14),
+                      label: Text(
+                        'Tax Invoice',
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textPrimary,
+                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 12, vertical: isMobile ? 5 : 8),
+                        minimumSize: Size(0, isMobile ? 30 : 34),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                     ),
 
                     // Need Help
                     TextButton.icon(
                       onPressed: () => _showHelpModal(context, order),
-                      icon: Icon(Icons.help_outline_rounded, size: isMobile ? 14 : 16, color: AppColors.textMuted),
+                      icon: const Icon(Icons.help_outline_rounded, size: 14, color: AppColors.textMuted),
                       label: Text(
                         'Need Help?',
-                        style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+                        style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
                       ),
                       style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 10, vertical: isMobile ? 4 : 8),
-                        minimumSize: Size(0, isMobile ? 32 : 38),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        minimumSize: Size(0, isMobile ? 30 : 34),
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
