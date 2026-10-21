@@ -452,11 +452,8 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
             if (isMobile) {
               _showMobileCategoryOptions(context, cat);
             } else {
-              if (isOpen) {
-                _removeOverlay();
-              } else {
-                _showCategoryDropdown(context, cat, link);
-              }
+              _removeOverlay();
+              widget.onCategorySelected?.call(cat.id, null);
             }
           },
           child: Container(

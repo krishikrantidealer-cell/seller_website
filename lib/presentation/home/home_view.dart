@@ -64,6 +64,18 @@ class _HomeViewState extends State<HomeView> {
     return match.name;
   }
 
+  void _openCategoryDetail(String categoryId, String? subcategory) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CategoryDetailView(
+          initialCategoryId: categoryId,
+          initialSubcategory: subcategory,
+        ),
+      ),
+    );
+  }
+
   void _onAddToCart(ProductItem product, ProductVariant variant) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -149,10 +161,7 @@ class _HomeViewState extends State<HomeView> {
                     selectedCategoryId: _selectedCategory,
                     selectedSubcategory: _selectedSubcategory,
                     onCategorySelected: (catId, subcategory) {
-                      setState(() {
-                        _selectedCategory = catId;
-                        _selectedSubcategory = subcategory;
-                      });
+                      _openCategoryDetail(catId, subcategory);
                     },
                   ),
               ],
@@ -684,10 +693,7 @@ class _HomeViewState extends State<HomeView> {
                         : null,
                     onTap: () {
                       Navigator.pop(context);
-                      setState(() {
-                        _selectedCategory = 'all';
-                        _selectedSubcategory = null;
-                      });
+                      _openCategoryDetail('all', null);
                     },
                   ),
                   const Divider(height: 1),
@@ -719,10 +725,7 @@ class _HomeViewState extends State<HomeView> {
                           ),
                           onTap: () {
                             Navigator.pop(context);
-                            setState(() {
-                              _selectedCategory = cat.id;
-                              _selectedSubcategory = null;
-                            });
+                            _openCategoryDetail(cat.id, null);
                           },
                         ),
                         if (cat.groups.isNotEmpty)
@@ -747,10 +750,7 @@ class _HomeViewState extends State<HomeView> {
                                       : null,
                                   onTap: () {
                                     Navigator.pop(context);
-                                    setState(() {
-                                      _selectedCategory = cat.id;
-                                      _selectedSubcategory = sub;
-                                    });
+                                    _openCategoryDetail(cat.id, sub);
                                   },
                                 ),
                               ).toList(),
@@ -767,10 +767,7 @@ class _HomeViewState extends State<HomeView> {
                                   : null,
                               onTap: () {
                                 Navigator.pop(context);
-                                setState(() {
-                                  _selectedCategory = cat.id;
-                                  _selectedSubcategory = sub;
-                                });
+                                _openCategoryDetail(cat.id, sub);
                               },
                             ),
                           ),

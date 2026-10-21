@@ -17,6 +17,8 @@ import 'package:seller_website/presentation/widgets/main_nav_header.dart';
 import 'package:seller_website/presentation/technical/technical_search_view.dart';
 import 'package:seller_website/data/models/wishlist_state.dart';
 import 'package:seller_website/presentation/wishlist/wishlist_view.dart';
+import 'package:seller_website/presentation/category/category_detail_view.dart';
+import 'package:seller_website/presentation/home/home_view.dart';
 
 void main() {
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
@@ -509,17 +511,18 @@ void main() {
     await tester.tap(find.text('All in Seeds'));
     await tester.pumpAndSettle();
 
-    // Verify Seeds category is selected and reflected on home page filter banner
-    expect(find.textContaining('Filtered by: Seeds'), findsOneWidget);
+    // Verify CategoryDetailView opens with Seeds category instead of applying filter on home screen
+    expect(find.byType(CategoryDetailView), findsOneWidget);
+    expect(find.text('Seeds'), findsWidgets);
+    expect(find.text('Back to Home'), findsOneWidget);
 
-    // Verify 'Reset' button appears on the filter banner and tapping it clears the filter
-    final resetBtn = find.text('Reset');
-    expect(resetBtn, findsOneWidget);
-    await tester.tap(resetBtn);
+    // Tap 'Back to Home' to return to home page
+    await tester.tap(find.text('Back to Home'));
     await tester.pumpAndSettle();
 
-    // Verify reset back - filter banner is gone
-    expect(find.textContaining('Filtered by:'), findsNothing);
+    // Verify back on home page with Best Sellers
+    expect(find.byType(HomeView), findsOneWidget);
+    expect(find.text('Best Sellers'), findsWidgets);
   });
 
   testWidgets('CategoryRibbon renders cleanly on narrow mobile screen without overflow', (WidgetTester tester) async {
@@ -912,6 +915,40 @@ void main() {
     expect(find.text('2 products saved'), findsOneWidget);
     expect(find.text('Add to Cart'), findsWidgets);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Category click on Home opens dedicated CategoryDetailView instead of home filter', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Verify on home screen
+    expect(find.byType(HomeView), findsOneWidget);
+    expect(find.text('Best Sellers'), findsWidgets);
+
+    // Click on 'Crop Protection' tab in category ribbon
+    final cropProtectionTab = find.text('Crop Protection').first;
+    await tester.tap(cropProtectionTab);
+    await tester.pumpAndSettle();
+
+    // Verify CategoryDetailView opened instead of applying filter on home screen
+    expect(find.byType(CategoryDetailView), findsOneWidget);
+    expect(find.text('Crop Protection'), findsWidgets);
+    expect(find.textContaining('Shield your yield'), findsOneWidget);
+    expect(find.text('Back to Home'), findsOneWidget);
+    expect(find.text('All in Crop Protection'), findsOneWidget);
+
+    // Tap 'Back to Home'
+    await tester.tap(find.text('Back to Home'));
+    await tester.pumpAndSettle();
+
+    // Verify back on home screen
+    expect(find.byType(HomeView), findsOneWidget);
+    expect(find.text('Best Sellers'), findsWidgets);
   });
 }
 

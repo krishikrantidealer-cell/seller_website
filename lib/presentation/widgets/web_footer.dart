@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
+import '../category/category_detail_view.dart';
 
 class WebFooter extends StatelessWidget {
   const WebFooter({super.key});
@@ -44,7 +45,7 @@ class WebFooter extends StatelessWidget {
                         children: [
                           _brandColumn(context),
                           const SizedBox(height: 32),
-                          _categoriesColumn(),
+                          _categoriesColumn(context),
                           const SizedBox(height: 32),
                           _quickLinksColumn(),
                           const SizedBox(height: 32),
@@ -57,7 +58,7 @@ class WebFooter extends StatelessWidget {
                       children: [
                         Expanded(flex: 3, child: _brandColumn(context)),
                         const SizedBox(width: 48),
-                        Expanded(flex: 2, child: _categoriesColumn()),
+                        Expanded(flex: 2, child: _categoriesColumn(context)),
                         const SizedBox(width: 48),
                         Expanded(flex: 2, child: _quickLinksColumn()),
                         const SizedBox(width: 48),
@@ -336,17 +337,94 @@ class WebFooter extends StatelessWidget {
     );
   }
 
-  Widget _categoriesColumn() {
+  Widget _categoriesColumn(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _columnTitle('Categories'),
-        _footerLink('Insecticides & Pesticides'),
-        _footerLink('Bio & Organic Fertilizers'),
-        _footerLink('Certified Hybrid Seeds'),
-        _footerLink('Fungicides & Bactericides'),
-        _footerLink('Agricultural Sprayers'),
-        _footerLink('Drip Irrigation Equipment'),
+        _footerLink(
+          'Insecticides & Pesticides',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryDetailView(
+                  initialCategoryId: 'crop-protection',
+                  initialSubcategory: 'Insecticides',
+                ),
+              ),
+            );
+          },
+        ),
+        _footerLink(
+          'Bio & Organic Fertilizers',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryDetailView(
+                  initialCategoryId: 'fertilizers',
+                  initialSubcategory: 'Bio Fertilizers',
+                ),
+              ),
+            );
+          },
+        ),
+        _footerLink(
+          'Certified Hybrid Seeds',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryDetailView(
+                  initialCategoryId: 'seeds',
+                ),
+              ),
+            );
+          },
+        ),
+        _footerLink(
+          'Fungicides & Bactericides',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryDetailView(
+                  initialCategoryId: 'crop-protection',
+                  initialSubcategory: 'Fungicides',
+                ),
+              ),
+            );
+          },
+        ),
+        _footerLink(
+          'Agricultural Sprayers',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryDetailView(
+                  initialCategoryId: 'equipments',
+                  initialSubcategory: 'Sprayers & Pumps',
+                ),
+              ),
+            );
+          },
+        ),
+        _footerLink(
+          'Drip Irrigation Equipment',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const CategoryDetailView(
+                  initialCategoryId: 'irrigation',
+                  initialSubcategory: 'Drip Lateral & Emitters',
+                ),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
@@ -431,11 +509,11 @@ class WebFooter extends StatelessWidget {
     );
   }
 
-  Widget _footerLink(String label) {
+  Widget _footerLink(String label, {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         child: Text(
           label,
           style: GoogleFonts.poppins(
