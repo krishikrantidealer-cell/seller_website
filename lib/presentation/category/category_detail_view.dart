@@ -691,72 +691,94 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
     // If a major category with groups is selected, show its groups as the main pill row
     if (activeCat != null && activeCat.groups.isNotEmpty) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children: [
-            _buildPill(
-              label: 'All in ${activeCat.name}',
-              iconEmoji: activeCat.icon,
-              isSelected: _selectedSubcategory == null,
-              onTap: () {
-                setState(() => _selectedSubcategory = null);
-              },
-            ),
-            ...activeCat.groups.map((group) {
-              final isGroupSelected = _selectedSubcategory == group.name;
-              return Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: _buildPill(
-                  label: group.name,
-                  iconEmoji: group.icon,
-                  isSelected: isGroupSelected,
-                  onTap: () {
-                    setState(() => _selectedSubcategory = group.name);
-                  },
-                ),
-              );
-            }),
-          ],
+      final children = [
+        _buildPill(
+          label: 'All in ${activeCat.name}',
+          iconEmoji: activeCat.icon,
+          isSelected: _selectedSubcategory == null,
+          onTap: () {
+            setState(() => _selectedSubcategory = null);
+          },
         ),
+        ...activeCat.groups.map((group) {
+          final isGroupSelected = _selectedSubcategory == group.name;
+          return _buildPill(
+            label: group.name,
+            iconEmoji: group.icon,
+            isSelected: isGroupSelected,
+            onTap: () {
+              setState(() => _selectedSubcategory = group.name);
+            },
+          );
+        }),
+      ];
+
+      if (isMobile) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: children
+                .map((p) => Padding(padding: const EdgeInsets.only(right: 8), child: p))
+                .toList(),
+          ),
+        );
+      }
+
+      // On desktop / laptop, wrap pills into rows so no category chip is ever cut off
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: children,
       );
     }
 
     // Default: show major categories
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: [
-          _buildPill(
-            label: 'All Products',
-            isSelected: _selectedCategory == 'all',
-            onTap: () {
-              setState(() {
-                _selectedCategory = 'all';
-                _selectedSubcategory = null;
-              });
-            },
-          ),
-          ...CategoryItem.sampleCategories.map((cat) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: _buildPill(
-                label: cat.name,
-                iconEmoji: cat.icon,
-                isSelected: _selectedCategory == cat.id,
-                onTap: () {
-                  setState(() {
-                    _selectedCategory = cat.id;
-                    _selectedSubcategory = null;
-                  });
-                },
-              ),
-            );
-          }),
-        ],
+    final defaultChildren = [
+      _buildPill(
+        label: 'All Products',
+        isSelected: _selectedCategory == 'all',
+        onTap: () {
+          setState(() {
+            _selectedCategory = 'all';
+            _selectedSubcategory = null;
+          });
+        },
       ),
+      ...CategoryItem.sampleCategories.map((cat) {
+        return _buildPill(
+          label: cat.name,
+          iconEmoji: cat.icon,
+          isSelected: _selectedCategory == cat.id,
+          onTap: () {
+            setState(() {
+              _selectedCategory = cat.id;
+              _selectedSubcategory = null;
+            });
+          },
+        );
+      }),
+    ];
+
+    if (isMobile) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: defaultChildren
+              .map((p) => Padding(padding: const EdgeInsets.only(right: 8), child: p))
+              .toList(),
+        ),
+      );
+    }
+
+    // On desktop / laptop, wrap pills into rows so no category chip is ever cut off
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: defaultChildren,
     );
   }
 

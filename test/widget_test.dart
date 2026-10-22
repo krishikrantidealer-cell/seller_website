@@ -391,13 +391,14 @@ void main() {
 
     // Hover over 'Cattle & Bird Care' tab near the right edge
     expect(find.text('Cattle & Bird Care'), findsWidgets);
-    // On a 1280px laptop screen, scroll category ribbon horizontally to reveal right-edge categories
     final ribbonScroll = find.byType(SingleChildScrollView).first;
-    await tester.drag(ribbonScroll, const Offset(-800, 0));
-    await tester.pumpAndSettle();
+    final cattleFinder = find.text('Cattle & Bird Care').first;
+    while (tester.getCenter(cattleFinder).dx > 1150) {
+      await tester.drag(ribbonScroll, const Offset(-200, 0));
+      await tester.pumpAndSettle();
+    }
 
-    final cattleWidget = find.text('Cattle & Bird Care').first;
-    await gesture.moveTo(tester.getCenter(cattleWidget));
+    await gesture.moveTo(tester.getCenter(cattleFinder));
     await tester.pumpAndSettle();
 
     // Level 1 category groups show (e.g. 'Fodder Seed')
@@ -1114,6 +1115,11 @@ void main() {
     expect(find.textContaining('Shield your yield'), findsOneWidget);
     expect(find.text('Back to Home'), findsOneWidget);
     expect(find.text('All in Crop Protection'), findsOneWidget);
+
+    // Verify all category group pills wrap cleanly on desktop and are not cut off
+    expect(find.text('Combo Product'), findsOneWidget);
+    final comboRight = tester.getTopRight(find.text('Combo Product')).dx;
+    expect(comboRight < 1440.0, isTrue, reason: 'Combo Product pill must not be cut off at screen edge');
 
     // Tap 'Back to Home'
     await tester.tap(find.text('Back to Home'));

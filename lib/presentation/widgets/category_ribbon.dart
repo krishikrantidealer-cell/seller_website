@@ -594,10 +594,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     final isOpen = _activeOpenTab == cat.id;
     final hasDropdown = cat.groups.isNotEmpty || cat.subcategories.isNotEmpty;
 
-    final double hPadding = isUltraCompact ? 5.0 : (isLaptop ? 6.5 : (isCompact ? 8.5 : 11.0));
-    final double fontSize = isUltraCompact ? 11.0 : (isLaptop ? 11.5 : (isCompact ? 12.0 : 12.5));
-    final double iconGap = isUltraCompact ? 3.0 : (isLaptop ? 3.5 : (isCompact ? 4.0 : 5.0));
-    final double arrowSize = isUltraCompact ? 12.0 : (isLaptop ? 13.0 : 14.0);
+    final double hPadding = isUltraCompact ? 4.5 : (isLaptop ? 5.5 : (isCompact ? 7.5 : 10.5));
+    final double fontSize = isUltraCompact ? 10.8 : (isLaptop ? 11.2 : (isCompact ? 11.8 : 12.5));
+    final double iconGap = isUltraCompact ? 2.5 : (isLaptop ? 3.0 : (isCompact ? 3.5 : 4.5));
+    final double arrowSize = isUltraCompact ? 11.5 : (isLaptop ? 12.5 : (isCompact ? 13.5 : 14.5));
 
     return CompositedTransformTarget(
       link: link,
