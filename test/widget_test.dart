@@ -358,6 +358,19 @@ void main() {
     // Subcategories should now be visible in the side panel
     expect(find.text('Systemic Insecticides'), findsOneWidget);
     expect(find.text('Contact & Ingestion'), findsOneWidget);
+
+    // Hover over 'Equipments' tab (category index 4) to verify alignment directly below the tab
+    final equipmentsTab = find.text('Equipments').first;
+    await gesture.moveTo(tester.getCenter(equipmentsTab));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Spray Pump'), findsWidgets);
+    final equipmentsPos = tester.getTopLeft(equipmentsTab);
+    final sprayPumpFinder = find.text('Spray Pump').first;
+    final popupPos = tester.getTopLeft(sprayPumpFinder);
+
+    // Verify popup appears directly below Equipments tab horizontally (aligned with tab)
+    expect((popupPos.dx - equipmentsPos.dx).abs() < 50.0, isTrue);
   });
 
   testWidgets('Search by Technical Name opens directory and filters by formulation', (WidgetTester tester) async {

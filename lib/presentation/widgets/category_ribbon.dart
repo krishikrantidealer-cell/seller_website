@@ -115,13 +115,25 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     _overlayEntry = null;
     setState(() => _activeOpenTab = cat.id);
 
-    final categories = CategoryItem.sampleCategories;
-    final catIndex = categories.indexWhere((c) => c.id == cat.id);
-    double dx = 0;
-    if (catIndex >= 6) {
-      dx = -260;
-    } else if (catIndex >= 4) {
-      dx = -140;
+    // Calculate dynamic horizontal offset so the dropdown opens directly below the category tab,
+    // while gracefully shifting left only if it would overflow the right edge of the screen.
+    double dx = 0.0;
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox != null && renderBox.hasSize) {
+      final tabGlobal = renderBox.localToGlobal(Offset.zero);
+      final tabWidth = renderBox.size.width;
+      final screenWidth = MediaQuery.sizeOf(context).width;
+      final initialPopupWidth = cat.groups.isNotEmpty ? 230.0 : 320.0;
+
+      final rightEdge = tabGlobal.dx + initialPopupWidth;
+      if (rightEdge > screenWidth - 16) {
+        final overflow = rightEdge - (screenWidth - 16);
+        dx = -overflow;
+        final minDx = tabWidth - initialPopupWidth;
+        if (dx < minDx) {
+          dx = minDx;
+        }
+      }
     }
 
     final entry = OverlayEntry(
@@ -434,65 +446,69 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   }
 
   Widget _buildCategoryTab(BuildContext context, CategoryItem cat, bool isMobile) {
-    final link = _categoryLinks[cat.id] ?? LayerLink();
+    final link = _categoryLinks.putIfAbsent(cat.id, () => LayerLink());
     final isCategorySelected = widget.selectedCategoryId == cat.id;
     final isOpen = _activeOpenTab == cat.id;
 
     return CompositedTransformTarget(
       link: link,
-      child: MouseRegion(
-        onEnter: (_) {
-          if (!isMobile) _showCategoryDropdown(context, cat, link);
-        },
-        onExit: (_) {
-          if (!isMobile) _scheduleHide();
-        },
-        child: InkWell(
-          onTap: () {
-            if (isMobile) {
-              _showMobileCategoryOptions(context, cat);
-            } else {
-              _removeOverlay();
-              widget.onCategorySelected?.call(cat.id, null);
-            }
-          },
-          child: Container(
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              color: (isOpen || isCategorySelected) ? AppColors.primaryDarkGreen : Colors.transparent,
-              border: isCategorySelected
-                  ? const Border(bottom: BorderSide(color: Colors.white, width: 3))
-                  : null,
-            ),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(cat.icon, style: const TextStyle(fontSize: 14)),
-                const SizedBox(width: 7),
-                Text(
-                  cat.name,
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 12.5,
-                    fontWeight: isCategorySelected ? FontWeight.w700 : FontWeight.w500,
-                  ),
+      child: Builder(
+        builder: (tabContext) {
+          return MouseRegion(
+            onEnter: (_) {
+              if (!isMobile) _showCategoryDropdown(tabContext, cat, link);
+            },
+            onExit: (_) {
+              if (!isMobile) _scheduleHide();
+            },
+            child: InkWell(
+              onTap: () {
+                if (isMobile) {
+                  _showMobileCategoryOptions(context, cat);
+                } else {
+                  _removeOverlay();
+                  widget.onCategorySelected?.call(cat.id, null);
+                }
+              },
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: (isOpen || isCategorySelected) ? AppColors.primaryDarkGreen : Colors.transparent,
+                  border: isCategorySelected
+                      ? const Border(bottom: BorderSide(color: Colors.white, width: 3))
+                      : null,
                 ),
-                const SizedBox(width: 4),
-                AnimatedRotation(
-                  turns: isOpen ? 0.5 : 0.0,
-                  duration: const Duration(milliseconds: 180),
-                  child: Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white.withValues(alpha: 0.85),
-                    size: 16,
-                  ),
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(cat.icon, style: const TextStyle(fontSize: 14)),
+                    const SizedBox(width: 7),
+                    Text(
+                      cat.name,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 12.5,
+                        fontWeight: isCategorySelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    AnimatedRotation(
+                      turns: isOpen ? 0.5 : 0.0,
+                      duration: const Duration(milliseconds: 180),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.white.withValues(alpha: 0.85),
+                        size: 16,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
