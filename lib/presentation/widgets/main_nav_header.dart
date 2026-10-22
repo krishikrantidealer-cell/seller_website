@@ -510,66 +510,82 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     final double titleFontSize = isSmallMobile ? 12 : (isCompact ? 15 : 22);
     final double iconSize = isSmallMobile ? 14 : (isCompact ? 18 : 24);
     final double iconPadding = isSmallMobile ? 3 : (isCompact ? 6 : 8);
+    final double logoBoxSize = isSmallMobile ? 20 : (isCompact ? 30 : 40);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: EdgeInsets.all(iconPadding),
-          decoration: BoxDecoration(
-            color: AppColors.primaryGreen,
-            borderRadius: BorderRadius.circular(isSmallMobile ? 6 : 8),
-          ),
-          child: Icon(Icons.eco_rounded, color: Colors.white, size: iconSize),
-        ),
-        SizedBox(width: isSmallMobile ? 4 : (isCompact ? 6 : 10)),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'EBS ',
-                      style: GoogleFonts.poppins(
-                        fontSize: titleFontSize,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryCrimson,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    TextSpan(
-                      text: 'BioCrop',
-                      style: GoogleFonts.poppins(
-                        fontSize: titleFontSize,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryGreen,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(isSmallMobile ? 4 : 6),
+            child: Image.asset(
+              'assets/images/company_logo.png',
+              height: logoBoxSize,
+              width: logoBoxSize,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Container(
+                padding: EdgeInsets.all(iconPadding),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen,
+                  borderRadius: BorderRadius.circular(isSmallMobile ? 6 : 8),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Icon(Icons.eco_rounded, color: Colors.white, size: iconSize),
               ),
-            if (!isCompact && !isSmallMobile)
-              Text(
-                'ESSENTIAL BIO CROP SCIENCE',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
-                  fontSize: 8.8,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryCrimson,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ],
+          SizedBox(width: isSmallMobile ? 4 : (isCompact ? 6 : 10)),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'EBS ',
+                        style: GoogleFonts.poppins(
+                          fontSize: titleFontSize,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primaryCrimson,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'BioCrop',
+                        style: GoogleFonts.poppins(
+                          fontSize: titleFontSize,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primaryGreen,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (!isCompact && !isSmallMobile)
+                  Text(
+                    'ESSENTIAL BIO CROP SCIENCE',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      fontSize: 8.8,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryCrimson,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
