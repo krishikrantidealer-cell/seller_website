@@ -1195,6 +1195,23 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('CategoryDetailView handles initial 1x1 constraint layout pass without RenderFlex overflow', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1, 1);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CategoryDetailView(
+          initialCategoryId: 'crop-protection',
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
 }
 
 

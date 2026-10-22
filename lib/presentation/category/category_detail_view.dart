@@ -170,120 +170,127 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       backgroundColor: AppColors.background,
       drawer: _buildMobileNavigationDrawer(context),
       endDrawer: const QuickCartDrawer(),
-      body: Column(
-        children: [
-          // Sticky Top Navigation Header with Drop Shadow
-          Container(
-            decoration: const BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x14000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 3),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxHeight <= 1.0 || constraints.maxWidth <= 1.0) {
+            return const SizedBox.shrink();
+          }
+          return Column(
+            children: [
+              // Sticky Top Navigation Header with Drop Shadow
+              Container(
+                decoration: const BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x14000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Top Bar
-                const TopInfoBar(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Top Bar
+                    const TopInfoBar(),
 
-                // Main Header with search and cart tap
-                MainNavHeader(
-                  onMenuTap: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                  onCartTap: () {
-                    _scaffoldKey.currentState?.openEndDrawer();
-                  },
-                  onSearch: (query) {
-                    setState(() => _searchFilter = query);
-                  },
+                    // Main Header with search and cart tap
+                    MainNavHeader(
+                      onMenuTap: () {
+                        _scaffoldKey.currentState?.openDrawer();
+                      },
+                      onCartTap: () {
+                        _scaffoldKey.currentState?.openEndDrawer();
+                      },
+                      onSearch: (query) {
+                        setState(() => _searchFilter = query);
+                      },
+                    ),
+
+                    // Category Ribbon (Desktop only)
+                    if (isDesktop)
+                      CategoryRibbon(
+                        selectedCategoryId: _selectedCategory,
+                        selectedSubcategory: _selectedSubcategory,
+                        onCategorySelected: (catId, subcategory) {
+                          setState(() {
+                            _selectedCategory = catId;
+                            _selectedSubcategory = subcategory;
+                            _selectedTechnicalName = null;
+                          });
+                        },
+                      ),
+                  ],
                 ),
-
-                // Category Ribbon (Desktop only)
-                if (isDesktop)
-                  CategoryRibbon(
-                    selectedCategoryId: _selectedCategory,
-                    selectedSubcategory: _selectedSubcategory,
-                    onCategorySelected: (catId, subcategory) {
-                      setState(() {
-                        _selectedCategory = catId;
-                        _selectedSubcategory = subcategory;
-                        _selectedTechnicalName = null;
-                      });
-                    },
-                  ),
-              ],
-            ),
-          ),
-
-          // Scrollable Content
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Main Content Area
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isMobile = constraints.maxWidth < 650;
-
-                      return Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 8 : 24,
-                          vertical: isMobile ? 8 : 20,
-                        ),
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 1680),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Top Action Bar: Clean Back button on left, Filter/Sort button on right (zero wasted card space)
-                                _buildTopActionBar(isMobile),
-                                const SizedBox(height: 8),
-
-                                // Active Technical Formulation Filter Pill
-                                if (_selectedTechnicalName != null) ...[
-                                  _buildTechnicalActivePill(),
-                                  const SizedBox(height: 8),
-                                ],
-
-                                // Categories of this Major Category (Rendered in both Mobile & Desktop)
-                                if (!_isBestSellersMode && _selectedTechnicalName == null) ...[
-                                  _buildCategoryPills(isMobile),
-                                  // Subcategories row (Desktop ONLY: !isMobile)
-                                  if (!isMobile && currentSubcategories.isNotEmpty) ...[
-                                    const SizedBox(height: 6),
-                                    _buildSubcategoriesRow(currentSubcategories, isMobile: isMobile),
-                                  ],
-                                  const SizedBox(height: 10),
-                                ],
-
-                                // Product Grid
-                                if (filtered.isEmpty)
-                                  _buildEmptyState(isMobile)
-                                else
-                                  _buildProductGrid(filtered, constraints),
-
-                                const SizedBox(height: 48),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  // Integrated Footer
-                  const WebFooter(),
-                ],
               ),
-            ),
-          ),
-        ],
+
+              // Scrollable Content
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Main Content Area
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isMobile = constraints.maxWidth < 650;
+
+                          return Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 8 : 24,
+                              vertical: isMobile ? 8 : 20,
+                            ),
+                            child: Center(
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 1680),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Top Action Bar: Clean Back button on left, Filter/Sort button on right (zero wasted card space)
+                                    _buildTopActionBar(isMobile),
+                                    const SizedBox(height: 8),
+
+                                    // Active Technical Formulation Filter Pill
+                                    if (_selectedTechnicalName != null) ...[
+                                      _buildTechnicalActivePill(),
+                                      const SizedBox(height: 8),
+                                    ],
+
+                                    // Categories of this Major Category (Rendered in both Mobile & Desktop)
+                                    if (!_isBestSellersMode && _selectedTechnicalName == null) ...[
+                                      _buildCategoryPills(isMobile),
+                                      // Subcategories row (Desktop ONLY: !isMobile)
+                                      if (!isMobile && currentSubcategories.isNotEmpty) ...[
+                                        const SizedBox(height: 6),
+                                        _buildSubcategoriesRow(currentSubcategories, isMobile: isMobile),
+                                      ],
+                                      const SizedBox(height: 10),
+                                    ],
+
+                                    // Product Grid
+                                    if (filtered.isEmpty)
+                                      _buildEmptyState(isMobile)
+                                    else
+                                      _buildProductGrid(filtered, constraints),
+
+                                    const SizedBox(height: 48),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+
+                      // Integrated Footer
+                      const WebFooter(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
