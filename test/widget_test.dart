@@ -1177,7 +1177,12 @@ void main() {
     expect(find.text('Back to Home'), findsOneWidget);
     expect(find.text('Featured'), findsOneWidget);
 
-    // Verify mobile major category bar and subcategory bar are NOT rendered on mobile
+    // Verify categories in this major category are rendered on mobile
+    expect(find.text('All in Crop Protection'), findsOneWidget);
+    expect(find.text('Insecticides'), findsWidgets);
+    expect(find.text('Fungicides'), findsWidgets);
+
+    // Verify subcategory row is NOT rendered on mobile
     expect(find.text('Subcategories: '), findsNothing);
     expect(find.text('Systemic Insecticides'), findsNothing);
 

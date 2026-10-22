@@ -251,10 +251,11 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   const SizedBox(height: 8),
                                 ],
 
-                                // Category Switcher Pills & Subcategories (Desktop ONLY: !isMobile)
-                                if (!isMobile && !_isBestSellersMode && _selectedTechnicalName == null) ...[
+                                // Categories of this Major Category (Rendered in both Mobile & Desktop)
+                                if (!_isBestSellersMode && _selectedTechnicalName == null) ...[
                                   _buildCategoryPills(isMobile),
-                                  if (currentSubcategories.isNotEmpty) ...[
+                                  // Subcategories row (Desktop ONLY: !isMobile)
+                                  if (!isMobile && currentSubcategories.isNotEmpty) ...[
                                     const SizedBox(height: 6),
                                     _buildSubcategoriesRow(currentSubcategories, isMobile: isMobile),
                                   ],
@@ -444,9 +445,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       orElse: () => null,
     );
 
-    // If a major category with groups is selected, show its groups as the main pill row
-    if (activeCat != null && activeCat.groups.isNotEmpty) {
-      final children = [
+    // If a major category is selected, show its categories as the pill row
+    if (activeCat != null) {
+      final List<Widget> children = [
         _buildPill(
           label: 'All in ${activeCat.name}',
           iconEmoji: activeCat.icon,
@@ -456,19 +457,42 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             setState(() => _selectedSubcategory = null);
           },
         ),
-        ...activeCat.groups.map((group) {
-          final isGroupSelected = _selectedSubcategory == group.name;
-          return _buildPill(
-            label: group.name,
-            iconEmoji: group.icon,
-            isSelected: isGroupSelected,
-            isMobile: isMobile,
-            onTap: () {
-              setState(() => _selectedSubcategory = group.name);
-            },
-          );
-        }),
       ];
+
+      if (activeCat.groups.isNotEmpty) {
+        for (final group in activeCat.groups) {
+          final isGroupSelected = _selectedSubcategory == group.name;
+          children.add(
+            _buildPill(
+              label: group.name,
+              iconEmoji: group.icon,
+              isSelected: isGroupSelected,
+              isMobile: isMobile,
+              onTap: () {
+                setState(() => _selectedSubcategory = group.name);
+              },
+            ),
+          );
+        }
+      } else if (activeCat.subcategories.isNotEmpty) {
+        for (final sub in activeCat.subcategories) {
+          final isSubSelected = _selectedSubcategory == sub;
+          children.add(
+            _buildPill(
+              label: sub,
+              isSelected: isSubSelected,
+              isMobile: isMobile,
+              onTap: () {
+                setState(() => _selectedSubcategory = sub);
+              },
+            ),
+          );
+        }
+      }
+
+      if (children.length <= 1) {
+        return const SizedBox.shrink();
+      }
 
       if (isMobile) {
         return SingleChildScrollView(
@@ -491,7 +515,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       );
     }
 
-    // Default: show major categories
+    // When on 'All Products' in mobile view: do not show redundant major categories
+    if (isMobile) {
+      return const SizedBox.shrink();
+    }
+
+    // Default desktop: show major categories
     final defaultChildren = [
       _buildPill(
         label: 'All Products',
@@ -520,19 +549,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       }),
     ];
 
-    if (isMobile) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children: defaultChildren
-              .map((p) => Padding(padding: const EdgeInsets.only(right: 6), child: p))
-              .toList(),
-        ),
-      );
-    }
-
-    // On desktop / laptop, wrap pills into rows so no category chip is ever cut off
     return Wrap(
       spacing: 8,
       runSpacing: 8,
