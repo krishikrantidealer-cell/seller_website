@@ -32,44 +32,44 @@ class MobileNavigationDrawer extends StatelessWidget {
         top: false,
         child: Column(
           children: [
-            // Premium Brand Header
+            // Compact Brand Header
             _buildDrawerHeader(context),
 
             // Scrollable Navigation Body
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 children: [
-                  // Quick Actions Bar (Orders, Wishlist, Technical, Helpline)
+                  // Quick Actions Bar (Orders, Wishlist, Technical, Profile)
                   _buildQuickActionBar(context),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 4),
 
                   // Section Header: Categories
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'CATEGORIES',
                           style: GoogleFonts.poppins(
-                            fontSize: 11,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textMuted,
-                            letterSpacing: 1.0,
+                            letterSpacing: 0.8,
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                           decoration: BoxDecoration(
                             color: const Color(0xFFE2E8F0),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             '11 Categories',
                             style: GoogleFonts.poppins(
-                              fontSize: 10,
+                              fontSize: 9.5,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textSecondary,
                             ),
@@ -81,11 +81,11 @@ class MobileNavigationDrawer extends StatelessWidget {
 
                   // All Products Item
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                     child: Material(
                       color: selectedCategoryId == 'all' ? AppColors.lightGreen : Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                         side: BorderSide(
                           color: selectedCategoryId == 'all'
                               ? AppColors.primaryGreen.withValues(alpha: 0.4)
@@ -95,17 +95,19 @@ class MobileNavigationDrawer extends StatelessWidget {
                       clipBehavior: Clip.antiAlias,
                       child: ListTile(
                         dense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                        visualDensity: VisualDensity.compact,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                        minLeadingWidth: 26,
                         leading: Container(
-                          width: 32,
-                          height: 32,
+                          width: 28,
+                          height: 28,
                           decoration: BoxDecoration(
                             color: selectedCategoryId == 'all' ? AppColors.primaryGreen : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Icon(
                             Icons.grid_view_rounded,
-                            size: 18,
+                            size: 16,
                             color: selectedCategoryId == 'all' ? Colors.white : AppColors.primaryGreen,
                           ),
                         ),
@@ -113,17 +115,13 @@ class MobileNavigationDrawer extends StatelessWidget {
                           'All Products',
                           style: GoogleFonts.poppins(
                             fontWeight: selectedCategoryId == 'all' ? FontWeight.w700 : FontWeight.w600,
-                            fontSize: 13,
+                            fontSize: 12.5,
                             color: selectedCategoryId == 'all' ? AppColors.primaryDarkGreen : AppColors.textPrimary,
                           ),
                         ),
-                        subtitle: Text(
-                          'Browse full agricultural inventory',
-                          style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
-                        ),
                         trailing: selectedCategoryId == 'all'
-                            ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: 18)
-                            : const Icon(Icons.chevron_right_rounded, size: 18, color: AppColors.textMuted),
+                            ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: 16)
+                            : const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textMuted),
                         onTap: () {
                           Navigator.pop(context);
                           if (onAllProductsSelected != null) {
@@ -141,11 +139,11 @@ class MobileNavigationDrawer extends StatelessWidget {
                     final isCatSelected = selectedCategoryId == cat.id;
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       child: Material(
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                           side: BorderSide(
                             color: isCatSelected ? AppColors.primaryGreen.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
                             width: isCatSelected ? 1.2 : 1.0,
@@ -157,39 +155,35 @@ class MobileNavigationDrawer extends StatelessWidget {
                           child: ExpansionTile(
                             key: PageStorageKey('drawer_cat_${cat.id}'),
                             initiallyExpanded: isCatSelected,
-                            tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                            dense: true,
+                            visualDensity: VisualDensity.compact,
+                            tilePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                             leading: Container(
-                              width: 34,
-                              height: 34,
+                              width: 28,
+                              height: 28,
                               decoration: BoxDecoration(
                                 color: isCatSelected ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
                                   color: isCatSelected ? AppColors.primaryGreen.withValues(alpha: 0.2) : const Color(0xFFE2E8F0),
                                 ),
                               ),
                               alignment: Alignment.center,
-                              child: Text(cat.icon, style: const TextStyle(fontSize: 16)),
+                              child: Text(cat.icon, style: const TextStyle(fontSize: 14)),
                             ),
                             title: Text(
                               cat.name,
                               style: GoogleFonts.poppins(
                                 fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
-                                fontSize: 13,
+                                fontSize: 12.5,
                                 color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
                               ),
-                            ),
-                            subtitle: Text(
-                              cat.groups.isNotEmpty
-                                  ? '${cat.groups.length} groups • ${cat.subcategories.length} items'
-                                  : '${cat.subcategories.length} subcategories',
-                              style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
                             ),
                             children: [
                               Material(
                                 color: const Color(0xFFF8FAFC),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   child: Column(
                                     children: [
                                       // Quick All in Category button
@@ -198,14 +192,14 @@ class MobileNavigationDrawer extends StatelessWidget {
                                           Navigator.pop(context);
                                           onCategorySelected(cat.id, null);
                                         },
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(6),
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                           decoration: BoxDecoration(
                                             color: isCatSelected && selectedSubcategory == null
                                                 ? AppColors.primaryGreen
                                                 : Colors.white,
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius: BorderRadius.circular(6),
                                             border: Border.all(
                                               color: isCatSelected && selectedSubcategory == null
                                                   ? AppColors.primaryGreen
@@ -219,7 +213,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                 'All in ${cat.name}',
                                                 style: GoogleFonts.poppins(
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
+                                                  fontSize: 11.5,
                                                   color: isCatSelected && selectedSubcategory == null
                                                       ? Colors.white
                                                       : AppColors.primaryDarkGreen,
@@ -227,7 +221,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                               ),
                                               Icon(
                                                 Icons.arrow_forward_rounded,
-                                                size: 14,
+                                                size: 13,
                                                 color: isCatSelected && selectedSubcategory == null
                                                     ? Colors.white
                                                     : AppColors.primaryGreen,
@@ -237,17 +231,17 @@ class MobileNavigationDrawer extends StatelessWidget {
                                         ),
                                       ),
 
-                                      const SizedBox(height: 6),
+                                      const SizedBox(height: 4),
 
                                       // Groups and subcategories
                                       if (cat.groups.isNotEmpty)
                                         ...cat.groups.map(
                                           (group) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 6),
+                                            padding: const EdgeInsets.only(bottom: 4),
                                             child: Material(
                                               color: Colors.white,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius: BorderRadius.circular(6),
                                                 side: const BorderSide(color: Color(0xFFE2E8F0)),
                                               ),
                                               clipBehavior: Clip.antiAlias,
@@ -255,14 +249,15 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                 data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                                                 child: ExpansionTile(
                                                   dense: true,
-                                                  tilePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                                  visualDensity: VisualDensity.compact,
+                                                  tilePadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                                                   leading: group.icon != null
-                                                      ? Text(group.icon!, style: const TextStyle(fontSize: 14))
+                                                      ? Text(group.icon!, style: const TextStyle(fontSize: 13))
                                                       : null,
                                                   title: Text(
                                                     group.name,
                                                     style: GoogleFonts.poppins(
-                                                      fontSize: 12,
+                                                      fontSize: 11.5,
                                                       fontWeight: FontWeight.w600,
                                                       color: selectedSubcategory == group.name
                                                           ? AppColors.primaryDarkGreen
@@ -278,18 +273,19 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                             final isSubSelected = isCatSelected && selectedSubcategory == sub;
                                                             return ListTile(
                                                               dense: true,
-                                                              contentPadding: const EdgeInsets.only(left: 28, right: 12),
+                                                              visualDensity: VisualDensity.compact,
+                                                              contentPadding: const EdgeInsets.only(left: 24, right: 10),
                                                               title: Text(
                                                                 sub,
                                                                 style: GoogleFonts.poppins(
-                                                                  fontSize: 11.5,
+                                                                  fontSize: 11,
                                                                   fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
                                                                   color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
                                                                 ),
                                                               ),
                                                               trailing: isSubSelected
-                                                                  ? const Icon(Icons.check, size: 14, color: AppColors.primaryGreen)
-                                                                  : const Icon(Icons.chevron_right_rounded, size: 14, color: Color(0xFFCBD5E1)),
+                                                                  ? const Icon(Icons.check, size: 13, color: AppColors.primaryGreen)
+                                                                  : const Icon(Icons.chevron_right_rounded, size: 13, color: Color(0xFFCBD5E1)),
                                                               onTap: () {
                                                                 Navigator.pop(context);
                                                                 onCategorySelected(cat.id, sub);
@@ -311,18 +307,19 @@ class MobileNavigationDrawer extends StatelessWidget {
                                             final isSubSelected = isCatSelected && selectedSubcategory == sub;
                                             return ListTile(
                                               dense: true,
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                              visualDensity: VisualDensity.compact,
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                                               title: Text(
                                                 sub,
                                                 style: GoogleFonts.poppins(
-                                                  fontSize: 12,
+                                                  fontSize: 11.5,
                                                   fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
                                                   color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
                                                 ),
                                               ),
                                               trailing: isSubSelected
-                                                  ? const Icon(Icons.check, size: 14, color: AppColors.primaryGreen)
-                                                  : const Icon(Icons.chevron_right_rounded, size: 14, color: Color(0xFFCBD5E1)),
+                                                  ? const Icon(Icons.check, size: 13, color: AppColors.primaryGreen)
+                                                  : const Icon(Icons.chevron_right_rounded, size: 13, color: Color(0xFFCBD5E1)),
                                               onTap: () {
                                                 Navigator.pop(context);
                                                 onCategorySelected(cat.id, sub);
@@ -341,7 +338,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                     );
                   }),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -352,8 +349,14 @@ class MobileNavigationDrawer extends StatelessWidget {
   }
 
   Widget _buildDrawerHeader(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return Container(
-      padding: const EdgeInsets.only(top: 48, bottom: 14, left: 16, right: 16),
+      padding: EdgeInsets.only(
+        top: topPadding > 0 ? topPadding + 6 : 14,
+        bottom: 10,
+        left: 14,
+        right: 14,
+      ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [Color(0xFF0F3E17), Color(0xFF1E5B29)],
@@ -371,27 +374,27 @@ class MobileNavigationDrawer extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 30,
+                      height: 30,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(7),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(3),
                       child: Image.asset(
                         'assets/images/company_logo.png',
                         fit: BoxFit.contain,
-                        errorBuilder: (_, _, _) => const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 22),
+                        errorBuilder: (_, _, _) => const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 18),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +402,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                           Text(
                             'EBS BioCrop',
                             style: GoogleFonts.poppins(
-                              fontSize: 16,
+                              fontSize: 14.5,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
                               letterSpacing: 0.2,
@@ -408,7 +411,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                           Text(
                             'Direct Farmer Store • Authentic Inputs',
                             style: GoogleFonts.poppins(
-                              fontSize: 10.5,
+                              fontSize: 9.5,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFFBBF7D0),
                             ),
@@ -422,13 +425,15 @@ class MobileNavigationDrawer extends StatelessWidget {
                 ),
               ),
               IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 icon: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.close_rounded, size: 18, color: Colors.white),
+                  child: const Icon(Icons.close_rounded, size: 16, color: Colors.white),
                 ),
                 tooltip: 'Close Menu',
                 onPressed: () => Navigator.pop(context),
@@ -436,7 +441,7 @@ class MobileNavigationDrawer extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           // User Welcome & Status Badge
           AnimatedBuilder(
@@ -450,24 +455,24 @@ class MobileNavigationDrawer extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmerProfileView()));
                   },
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          width: 26,
-                          height: 26,
+                          width: 24,
+                          height: 24,
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.person_rounded, size: 16, color: AppColors.primaryGreen),
+                          child: const Icon(Icons.person_rounded, size: 14, color: AppColors.primaryGreen),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -478,7 +483,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                 'Namaste, $name',
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
                                   fontWeight: FontWeight.w700,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -487,7 +492,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                 'Verified Farmer • Tap for profile & orders',
                                 style: GoogleFonts.poppins(
                                   color: const Color(0xFFBBF7D0),
-                                  fontSize: 9.5,
+                                  fontSize: 9,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -495,7 +500,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.white70),
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 11, color: Colors.white70),
                       ],
                     ),
                   ),
@@ -507,17 +512,17 @@ class MobileNavigationDrawer extends StatelessWidget {
                   Navigator.pop(context);
                   showAuthModal(context);
                 },
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.login_rounded, size: 18, color: Colors.white),
+                      const Icon(Icons.login_rounded, size: 16, color: Colors.white),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Column(
@@ -527,7 +532,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                               'Login / Register with Mobile',
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
-                                fontSize: 12,
+                                fontSize: 11.5,
                                 fontWeight: FontWeight.w700,
                               ),
                               maxLines: 1,
@@ -537,7 +542,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                               'Get Kisan discounts & live order tracking',
                               style: GoogleFonts.poppins(
                                 color: const Color(0xFFBBF7D0),
-                                fontSize: 9.5,
+                                fontSize: 9,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -547,15 +552,15 @@ class MobileNavigationDrawer extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           'SIGN IN',
                           style: GoogleFonts.poppins(
-                            fontSize: 10,
+                            fontSize: 9,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primaryDarkGreen,
                           ),
@@ -574,17 +579,17 @@ class MobileNavigationDrawer extends StatelessWidget {
 
   Widget _buildQuickActionBar(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x06000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            blurRadius: 3,
+            offset: Offset(0, 1),
           ),
         ],
       ),
@@ -652,7 +657,7 @@ class MobileNavigationDrawer extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -660,16 +665,16 @@ class MobileNavigationDrawer extends StatelessWidget {
               isLabelVisible: badgeCount != null && badgeCount > 0,
               label: Text(
                 '$badgeCount',
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold),
               ),
               backgroundColor: AppColors.primaryCrimson,
-              child: Icon(icon, size: 20, color: AppColors.primaryDarkGreen),
+              child: Icon(icon, size: 19, color: AppColors.primaryDarkGreen),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               label,
               style: GoogleFonts.poppins(
-                fontSize: 10.5,
+                fontSize: 9.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),

@@ -567,7 +567,11 @@ void main() {
     await tester.tap(menuIconBtn);
     await tester.pumpAndSettle();
 
-    // Verify drawer opened with categories
+    // Verify drawer opened with compact quick actions and categories
+    expect(find.descendant(of: find.byType(Drawer), matching: find.text('Orders')), findsOneWidget);
+    expect(find.descendant(of: find.byType(Drawer), matching: find.text('Wishlist')), findsOneWidget);
+    expect(find.descendant(of: find.byType(Drawer), matching: find.text('Technical')), findsOneWidget);
+    expect(find.descendant(of: find.byType(Drawer), matching: find.text('Profile')), findsOneWidget);
     expect(find.text('CATEGORIES'), findsOneWidget);
     expect(find.descendant(of: find.byType(Drawer), matching: find.text('All Products')), findsOneWidget);
     final drawerSeeds = find.descendant(of: find.byType(Drawer), matching: find.text('Seeds'));
