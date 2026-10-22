@@ -341,113 +341,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                     );
                   }),
 
-                  const SizedBox(height: 12),
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
-
-                  // Farmer Services & Trust Badges
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'FARMER SERVICES',
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textMuted,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ),
-
-                  _buildServiceTile(
-                    icon: Icons.person_pin_circle_outlined,
-                    iconColor: AppColors.primaryGreen,
-                    title: 'Farmer Profile & Farm Depot',
-                    subtitle: 'Manage land, village & crop delivery',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmerProfileView()));
-                    },
-                  ),
-
-                  _buildServiceTile(
-                    icon: Icons.science_outlined,
-                    iconColor: AppColors.primaryDarkGreen,
-                    title: 'Search by Technical Name',
-                    subtitle: 'Find formulations & active ingredients',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const TechnicalSearchView()));
-                    },
-                  ),
-
-                  _buildServiceTile(
-                    icon: Icons.local_shipping_outlined,
-                    iconColor: const Color(0xFF2563EB),
-                    title: 'Track Orders',
-                    subtitle: 'Live courier tracking & dispatch',
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const MyOrdersView()));
-                    },
-                  ),
-
-                  // Helpline Call Card
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.25)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryGreen,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.phone_in_talk_rounded, color: Colors.white, size: 18),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Toll-Free Kisan Helpline',
-                                style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
-                              ),
-                              Text(
-                                '1800-203-1425',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.primaryDarkGreen,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                          ),
-                          child: Text(
-                            'FREE',
-                            style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.primaryDarkGreen),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -735,16 +629,11 @@ class MobileNavigationDrawer extends StatelessWidget {
           ),
           Expanded(
             child: _buildQuickActionItem(
-              icon: Icons.support_agent_rounded,
-              label: 'Help',
+              icon: Icons.person_outline_rounded,
+              label: 'Profile',
               onTap: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Calling Kisan Advisory Helpline: 1800-203-1425'),
-                    backgroundColor: AppColors.primaryGreen,
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const FarmerProfileView()));
               },
             ),
           ),
@@ -786,41 +675,6 @@ class MobileNavigationDrawer extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildServiceTile({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Material(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: Color(0xFFF1F5F9)),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: ListTile(
-          dense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          leading: Icon(icon, color: iconColor, size: 20),
-          title: Text(
-            title,
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 12),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
-          ),
-          trailing: const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textMuted),
-          onTap: onTap,
         ),
       ),
     );
