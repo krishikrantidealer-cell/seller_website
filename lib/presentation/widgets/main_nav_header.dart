@@ -507,84 +507,46 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   }
 
   Widget _buildLogo({bool isCompact = false, bool isSmallMobile = false}) {
-    final double titleFontSize = isSmallMobile ? 12 : (isCompact ? 15 : 22);
-    final double iconSize = isSmallMobile ? 14 : (isCompact ? 18 : 24);
-    final double iconPadding = isSmallMobile ? 3 : (isCompact ? 6 : 8);
-    final double logoBoxSize = isSmallMobile ? 20 : (isCompact ? 30 : 40);
+    final double logoHeight = isSmallMobile ? 34 : (isCompact ? 42 : 52);
 
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).popUntil((route) => route.isFirst);
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(isSmallMobile ? 4 : 6),
-            child: Image.asset(
-              'assets/images/company_logo.png',
-              height: logoBoxSize,
-              width: logoBoxSize,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                padding: EdgeInsets.all(iconPadding),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen,
-                  borderRadius: BorderRadius.circular(isSmallMobile ? 6 : 8),
-                ),
-                child: Icon(Icons.eco_rounded, color: Colors.white, size: iconSize),
+    return Tooltip(
+      message: 'EBS Essential BioCrop Science',
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+          child: Image.asset(
+            'assets/images/company_logo.png',
+            height: logoHeight,
+            fit: BoxFit.contain,
+            errorBuilder: (_, _, _) => Container(
+              height: logoHeight,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 6),
+                  Text(
+                    'BioCrop',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          SizedBox(width: isSmallMobile ? 4 : (isCompact ? 6 : 10)),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'EBS ',
-                        style: GoogleFonts.poppins(
-                          fontSize: titleFontSize,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryCrimson,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'BioCrop',
-                        style: GoogleFonts.poppins(
-                          fontSize: titleFontSize,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryGreen,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (!isCompact && !isSmallMobile)
-                  Text(
-                    'ESSENTIAL BIO CROP SCIENCE',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
-                      fontSize: 8.8,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryCrimson,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
