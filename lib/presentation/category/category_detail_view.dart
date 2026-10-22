@@ -358,13 +358,18 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                   ),
                                 ],
 
+                                // Mobile Major Categories Selector (allows mobile users to seamlessly switch major categories)
+                                if (isMobile && !_isBestSellersMode && _selectedTechnicalName == null) ...[
+                                  _buildMobileMajorCategoryBar(),
+                                  const SizedBox(height: 8),
+                                ],
+
                                 // Category Switcher Pills & Subcategories
                                 if (!_isBestSellersMode && _selectedTechnicalName == null) ...[
-                                  const SizedBox(height: 12),
                                   _buildCategoryPills(isMobile),
                                   if (currentSubcategories.isNotEmpty) ...[
-                                    const SizedBox(height: 10),
-                                    _buildSubcategoriesRow(currentSubcategories),
+                                    const SizedBox(height: 8),
+                                    _buildSubcategoriesRow(currentSubcategories, isMobile: isMobile),
                                   ],
                                 ],
 
@@ -426,7 +431,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         Expanded(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -526,7 +531,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 14 : 20),
+      padding: EdgeInsets.all(isMobile ? 12 : 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -546,8 +551,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: isMobile ? 42 : 52,
-                height: isMobile ? 42 : 52,
+                width: isMobile ? 38 : 52,
+                height: isMobile ? 38 : 52,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0FDF4),
                   borderRadius: BorderRadius.circular(12),
@@ -556,10 +561,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 alignment: Alignment.center,
                 child: Text(
                   iconEmoji,
-                  style: TextStyle(fontSize: isMobile ? 22 : 28),
+                  style: TextStyle(fontSize: isMobile ? 20 : 28),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -567,19 +572,21 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Flexible(
+                        Expanded(
                           child: Text(
                             pageTitle,
                             style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 18 : 22,
+                              fontSize: isMobile ? 16 : 22,
                               fontWeight: FontWeight.w800,
                               color: AppColors.textPrimary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF0FDF4),
                             borderRadius: BorderRadius.circular(14),
@@ -588,9 +595,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                           child: Text(
                             _isBestSellersMode && _selectedCategory == 'all'
                                 ? '$count Best Sellers'
-                                : '$count Products Available',
+                                : '$count Products',
                             style: GoogleFonts.poppins(
-                              fontSize: 11.5,
+                              fontSize: isMobile ? 11 : 11.5,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryDarkGreen,
                             ),
@@ -602,58 +609,89 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                     Text(
                       description,
                       style: GoogleFonts.poppins(
-                        fontSize: isMobile ? 12 : 13,
+                        fontSize: isMobile ? 11.5 : 13,
                         color: AppColors.textSecondary,
-                        height: 1.4,
+                        height: 1.35,
                       ),
+                      maxLines: isMobile ? 2 : null,
+                      overflow: isMobile ? TextOverflow.ellipsis : null,
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           const Divider(height: 1, color: Color(0xFFF1F5F9)),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  'Authentic, lab-tested formulations guaranteed',
-                  style: GoogleFonts.poppins(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textMuted,
+          const SizedBox(height: 8),
+          if (isMobile)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.verified_rounded, size: 14, color: AppColors.primaryGreen),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          '100% Authentic',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryDarkGreen,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Sort: ',
+                const SizedBox(width: 8),
+                _buildSortDropdown(isMobile: true),
+              ],
+            )
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    'Authentic, lab-tested formulations guaranteed',
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textMuted,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 6),
-                  _buildSortDropdown(),
-                ],
-              ),
-            ],
-          ),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Sort: ',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    _buildSortDropdown(isMobile: false),
+                  ],
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildSortDropdown() {
+  Widget _buildSortDropdown({bool isMobile = false}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: 2),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(8),
@@ -674,10 +712,90 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             if (val != null) setState(() => _sortBy = val);
           },
           style: GoogleFonts.poppins(
-            fontSize: 12,
+            fontSize: isMobile ? 11 : 12,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileMajorCategoryBar() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: [
+          _buildMobileMajorCategoryChip(
+            id: 'all',
+            title: 'All Products',
+            iconEmoji: '🌾',
+            isSelected: _selectedCategory == 'all',
+          ),
+          ...CategoryItem.sampleCategories.map((cat) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: _buildMobileMajorCategoryChip(
+                id: cat.id,
+                title: cat.name,
+                iconEmoji: cat.icon,
+                isSelected: _selectedCategory == cat.id,
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileMajorCategoryChip({
+    required String id,
+    required String title,
+    required String iconEmoji,
+    required bool isSelected,
+  }) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedCategory = id;
+          _selectedSubcategory = null;
+          _selectedTechnicalName = null;
+        });
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryGreen : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(iconEmoji, style: const TextStyle(fontSize: 12)),
+            const SizedBox(width: 4),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.textPrimary,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -696,6 +814,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           label: 'All in ${activeCat.name}',
           iconEmoji: activeCat.icon,
           isSelected: _selectedSubcategory == null,
+          isMobile: isMobile,
           onTap: () {
             setState(() => _selectedSubcategory = null);
           },
@@ -706,6 +825,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             label: group.name,
             iconEmoji: group.icon,
             isSelected: isGroupSelected,
+            isMobile: isMobile,
             onTap: () {
               setState(() => _selectedSubcategory = group.name);
             },
@@ -719,7 +839,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           physics: const BouncingScrollPhysics(),
           child: Row(
             children: children
-                .map((p) => Padding(padding: const EdgeInsets.only(right: 8), child: p))
+                .map((p) => Padding(padding: const EdgeInsets.only(right: 6), child: p))
                 .toList(),
           ),
         );
@@ -739,6 +859,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       _buildPill(
         label: 'All Products',
         isSelected: _selectedCategory == 'all',
+        isMobile: isMobile,
         onTap: () {
           setState(() {
             _selectedCategory = 'all';
@@ -751,6 +872,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           label: cat.name,
           iconEmoji: cat.icon,
           isSelected: _selectedCategory == cat.id,
+          isMobile: isMobile,
           onTap: () {
             setState(() {
               _selectedCategory = cat.id;
@@ -767,7 +889,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         physics: const BouncingScrollPhysics(),
         child: Row(
           children: defaultChildren
-              .map((p) => Padding(padding: const EdgeInsets.only(right: 8), child: p))
+              .map((p) => Padding(padding: const EdgeInsets.only(right: 6), child: p))
               .toList(),
         ),
       );
@@ -787,13 +909,17 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     String? iconEmoji,
     required bool isSelected,
     required VoidCallback onTap,
+    bool isMobile = false,
   }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 11 : 14,
+          vertical: isMobile ? 6 : 7,
+        ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryGreen : Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -815,16 +941,16 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (iconEmoji != null) ...[
-              Text(iconEmoji, style: const TextStyle(fontSize: 13)),
-              const SizedBox(width: 6),
+              Text(iconEmoji, style: TextStyle(fontSize: isMobile ? 12 : 13)),
+              SizedBox(width: isMobile ? 4 : 6),
             ] else if (isSelected) ...[
-              const Icon(Icons.check_circle_rounded, size: 14, color: Colors.white),
-              const SizedBox(width: 6),
+              Icon(Icons.check_circle_rounded, size: isMobile ? 12 : 14, color: Colors.white),
+              SizedBox(width: isMobile ? 4 : 6),
             ],
             Text(
               label,
               style: GoogleFonts.poppins(
-                fontSize: 12,
+                fontSize: isMobile ? 11.5 : 12,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected ? Colors.white : AppColors.textPrimary,
               ),
@@ -835,7 +961,68 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     );
   }
 
-  Widget _buildSubcategoriesRow(List<String> subcategories) {
+  Widget _buildSubcategoriesRow(List<String> subcategories, {bool isMobile = false}) {
+    final chips = subcategories.map((sub) {
+      final isSelected = _selectedSubcategory == sub;
+      return InkWell(
+        onTap: () {
+          setState(() => _selectedSubcategory = isSelected ? null : sub);
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile ? 8 : 9,
+            vertical: isMobile ? 3.5 : 4,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primaryDarkGreen : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            sub,
+            style: GoogleFonts.poppins(
+              fontSize: isMobile ? 10.5 : 11,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected ? Colors.white : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      );
+    }).toList();
+
+    if (isMobile) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              Text(
+                'Subcategories: ',
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(width: 4),
+              ...chips.map((c) => Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: c,
+              )),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
@@ -857,30 +1044,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
               color: AppColors.textSecondary,
             ),
           ),
-          ...subcategories.map((sub) {
-            final isSelected = _selectedSubcategory == sub;
-            return InkWell(
-              onTap: () {
-                setState(() => _selectedSubcategory = isSelected ? null : sub);
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primaryDarkGreen : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  sub,
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? Colors.white : AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            );
-          }),
+          ...chips,
         ],
       ),
     );

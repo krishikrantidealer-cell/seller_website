@@ -75,9 +75,8 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(
+                        Expanded(
                           child: Row(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
                               if (widget.onMenuTap != null) ...[
                                 IconButton(
@@ -89,10 +88,13 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 ),
                                 const SizedBox(width: 6),
                               ],
-                              Flexible(
-                                child: _buildLogo(
-                                  isCompact: constraints.maxWidth < 600,
-                                  isSmallMobile: constraints.maxWidth < 420,
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: _buildLogo(
+                                    isCompact: constraints.maxWidth < 600,
+                                    isSmallMobile: constraints.maxWidth < 420,
+                                  ),
                                 ),
                               ),
                             ],
@@ -172,7 +174,12 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               builder: (context, _) {
                                 final auth = AuthController.instance;
                                 if (auth.isLoggedIn) {
-                                  return _buildProfileDropdown(context, auth, isMobile: true);
+                                  return _buildProfileDropdown(
+                                    context,
+                                    auth,
+                                    isMobile: true,
+                                    isCompact: constraints.maxWidth < 360,
+                                  );
                                 }
                                 return IconButton(
                                   icon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryGreen, size: 22),
@@ -580,7 +587,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     );
   }
 
-  Widget _buildProfileDropdown(BuildContext context, AuthController auth, {required bool isMobile}) {
+  Widget _buildProfileDropdown(BuildContext context, AuthController auth, {required bool isMobile, bool isCompact = false}) {
     final rawPhone = auth.currentUser?.phoneNumber ?? '';
     final shortPhone = rawPhone.length == 10
         ? '${rawPhone.substring(0, 5)} ${rawPhone.substring(5)}'
@@ -886,19 +893,21 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 ),
                 child: const Icon(Icons.person_rounded, color: Colors.white, size: 12),
               ),
-              const SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  shortPhone,
-                  style: GoogleFonts.poppins(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 10.5,
+              if (!isCompact) ...[
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(
+                    shortPhone,
+                    style: GoogleFonts.poppins(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
+              ],
               const SizedBox(width: 2),
               const Icon(Icons.keyboard_arrow_down_rounded, size: 14, color: AppColors.textSecondary),
             ],

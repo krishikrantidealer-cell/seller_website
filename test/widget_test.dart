@@ -1153,6 +1153,42 @@ void main() {
     expect(find.byType(HomeView), findsOneWidget);
     expect(find.text('Best Sellers'), findsWidgets);
   });
+
+  testWidgets('CategoryDetailView mobile view has major category bar, compact header, and horizontal subcategory scroll', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: CategoryDetailView(
+          initialCategoryId: 'crop-protection',
+          initialSubcategory: 'Insecticides',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify CategoryDetailView is rendered
+    expect(find.byType(CategoryDetailView), findsOneWidget);
+
+    // Verify mobile major category bar exists with 'Crop Protection' and 'Fertilizers'
+    expect(find.text('Crop Protection'), findsWidgets);
+    expect(find.text('Fertilizers'), findsWidgets);
+
+    // Verify subcategories are rendered
+    expect(find.text('Systemic Insecticides'), findsWidgets);
+
+    // Verify compact authentic guarantee and sort dropdown
+    expect(find.text('100% Authentic'), findsOneWidget);
+    expect(find.text('Featured'), findsOneWidget);
+
+    // Switch to narrow screen (320px) to verify no overflow on small phones
+    tester.view.physicalSize = const Size(320, 568);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
 }
 
 
