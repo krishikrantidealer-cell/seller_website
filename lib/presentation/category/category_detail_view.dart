@@ -102,53 +102,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     return list;
   }
 
-  String _getCategoryTitle(String catId) {
-    if (catId == 'all') return 'All Categories';
-    final match = CategoryItem.sampleCategories.firstWhere(
-      (c) => c.id == catId,
-      orElse: () => CategoryItem(id: catId, name: catId, icon: '🌿'),
-    );
-    return match.name;
-  }
-
-  String _getCategoryIcon(String catId) {
-    if (catId == 'all') return '🛒';
-    final match = CategoryItem.sampleCategories.cast<CategoryItem?>().firstWhere(
-      (c) => c?.id == catId,
-      orElse: () => null,
-    );
-    return match?.icon ?? '🌿';
-  }
-
-  String _getCategoryDescription(String catId) {
-    switch (catId) {
-      case 'crop-protection':
-        return 'Shield your yield with authentic insecticides, fungicides, herbicides, and bio-pesticides from certified manufacturers.';
-      case 'crop-nutrition':
-        return 'Maximize crop health and flowering with premium plant growth regulators, chelates, bio-stimulants, and humic formulations.';
-      case 'seeds':
-        return 'High-germination hybrid vegetable, field crop, fruit, and flower seeds for bountiful farm harvest.';
-      case 'fertilizers':
-        return 'Water-soluble NPKs, bio-fertilizers, organic manure, and micronutrients formulated for balanced plant nutrition.';
-      case 'equipments':
-        return 'Durable sprayers, power weeders, brush cutters, and safety equipment to empower daily agricultural work.';
-      case 'irrigation':
-        return 'Drip lateral pipes, rain guns, emitters, and fertigation systems for optimal water efficiency.';
-      case 'gardening':
-        return 'Cocopeat, potting soil, plant care tonics, and lightweight gardening tools for terrace and kitchen gardens.';
-      case 'organic-farming':
-        return '100% organic neem formulations, waste decomposers, and natural bio-inputs for residue-free farming.';
-      case 'cattle-and-bird-care':
-        return 'High-yield cattle feed, chelated mineral mixtures, calcium tonics, and poultry health care supplements.';
-      case 'bulk':
-        return 'Wholesale drums, pallet loads, and 50kg commercial packaging for large-scale farm operations and dealers.';
-      case 'har-din-sasta':
-        return 'Daily agricultural value combos, season packs, and flash discounts offering farmers maximum savings.';
-      default:
-        return 'Explore our comprehensive range of authentic, lab-tested agricultural products with nationwide delivery.';
-    }
-  }
-
   List<String> _getCurrentSubcategories() {
     if (_selectedCategory == 'all') return [];
     final match = CategoryItem.sampleCategories.firstWhere(
@@ -288,92 +241,25 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (isMobile) ...[
-                                  // Compact Mobile Header (Back button + Title + Count + Sort in one streamlined bar)
-                                  _buildCompactMobileHeader(filtered.length),
-                                  const SizedBox(height: 6),
-                                ] else ...[
-                                  // Desktop Breadcrumb & Back Navigation
-                                  _buildBreadcrumbBar(isMobile),
-                                  const SizedBox(height: 12),
-                                  // Desktop Header Card with Category Title, Product Count, and Sort Dropdown
-                                  _buildHeaderCard(filtered.length, isMobile),
-                                ],
+                                // Top Action Bar: Clean Back button on left, Filter/Sort button on right (zero wasted card space)
+                                _buildTopActionBar(isMobile),
+                                const SizedBox(height: 8),
 
                                 // Active Technical Formulation Filter Pill
                                 if (_selectedTechnicalName != null) ...[
+                                  _buildTechnicalActivePill(),
                                   const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.lightGreen,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.science_outlined, size: 18, color: AppColors.primaryDarkGreen),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: RichText(
-                                            text: TextSpan(
-                                              style: GoogleFonts.poppins(fontSize: 13, color: AppColors.primaryDarkGreen),
-                                              children: [
-                                                const TextSpan(text: 'Showing all brands formulated with: '),
-                                                TextSpan(
-                                                  text: _selectedTechnicalName!,
-                                                  style: const TextStyle(fontWeight: FontWeight.w700),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            setState(() => _selectedTechnicalName = null);
-                                          },
-                                          borderRadius: BorderRadius.circular(14),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(14),
-                                              border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.4)),
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  'Clear',
-                                                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
-                                                ),
-                                                const SizedBox(width: 4),
-                                                const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryDarkGreen),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                 ],
 
-                                // Mobile Major Categories Selector (allows mobile users to seamlessly switch major categories)
-                                if (isMobile && !_isBestSellersMode && _selectedTechnicalName == null) ...[
-                                  _buildMobileMajorCategoryBar(),
-                                  const SizedBox(height: 6),
-                                ],
-
-                                // Category Switcher Pills & Subcategories
-                                if (!_isBestSellersMode && _selectedTechnicalName == null) ...[
+                                // Category Switcher Pills & Subcategories (Desktop ONLY: !isMobile)
+                                if (!isMobile && !_isBestSellersMode && _selectedTechnicalName == null) ...[
                                   _buildCategoryPills(isMobile),
                                   if (currentSubcategories.isNotEmpty) ...[
                                     const SizedBox(height: 6),
                                     _buildSubcategoriesRow(currentSubcategories, isMobile: isMobile),
                                   ],
+                                  const SizedBox(height: 10),
                                 ],
-
-                                const SizedBox(height: 10),
 
                                 // Product Grid
                                 if (filtered.isEmpty)
@@ -401,23 +287,58 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     );
   }
 
-  Widget _buildCompactMobileHeader(int count) {
-    final String pageTitle = _selectedTechnicalName != null
-        ? _selectedTechnicalName!
-        : (_selectedCategory == 'all'
-            ? (_isBestSellersMode ? 'Best Sellers' : 'All Products')
-            : _getCategoryTitle(_selectedCategory));
-    final String iconEmoji = _selectedTechnicalName != null
-        ? '🔬'
-        : (_isBestSellersMode ? '⭐' : _getCategoryIcon(_selectedCategory));
+  Widget _buildTopActionBar(bool isMobile) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isMobile ? 6 : 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Back Button
+          InkWell(
+            onTap: () => Navigator.pop(context),
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 8 : 14,
+                vertical: isMobile ? 5 : 8,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFCBD5E1)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.arrow_back_rounded, size: isMobile ? 14 : 18, color: AppColors.primaryGreen),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Back to Home',
+                    style: GoogleFonts.poppins(
+                      fontSize: isMobile ? 11 : 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryGreen,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
 
+          // Filter Button
+          _buildFilterSortButton(isMobile),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterSortButton(bool isMobile) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 12, vertical: isMobile ? 2 : 6),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFCBD5E1)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x06000000),
@@ -426,518 +347,96 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           ),
         ],
       ),
-      child: Column(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.arrow_back_rounded, size: 13, color: AppColors.primaryGreen),
-                      const SizedBox(width: 3),
-                      Text(
-                        'Back to Home',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryGreen,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          Icon(Icons.tune_rounded, size: isMobile ? 14 : 18, color: AppColors.primaryGreen),
+          const SizedBox(width: 4),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _sortBy,
+              isDense: true,
+              icon: Icon(Icons.keyboard_arrow_down_rounded, size: isMobile ? 14 : 18, color: AppColors.textPrimary),
+              items: [
+                const DropdownMenuItem(value: 'featured', child: Text('Featured')),
+                DropdownMenuItem(value: 'price_asc', child: Text(isMobile ? '₹ Low' : 'Price: Low to High')),
+                DropdownMenuItem(value: 'price_desc', child: Text(isMobile ? '₹ High' : 'Price: High to Low')),
+                DropdownMenuItem(value: 'rating', child: Text(isMobile ? 'Top' : 'Highest Rated')),
+              ],
+              onChanged: (val) {
+                if (val != null) setState(() => _sortBy = val);
+              },
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 10.5 : 12.5,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(iconEmoji, style: const TextStyle(fontSize: 13)),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        pageTitle,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0FDF4),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                      ),
-                      child: Text(
-                        '$count',
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primaryDarkGreen,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    const Icon(Icons.verified_rounded, size: 12, color: AppColors.primaryGreen),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        '100% Authentic',
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryDarkGreen,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '• Tested',
-                      style: GoogleFonts.poppins(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 6),
-              _buildSortDropdown(isMobile: true),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBreadcrumbBar(bool isMobile) {
-    return Row(
-      children: [
-        InkWell(
-          onTap: () => Navigator.pop(context),
-          borderRadius: BorderRadius.circular(6),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.arrow_back_rounded, size: 14, color: AppColors.primaryGreen),
-                const SizedBox(width: 4),
-                Text(
-                  'Back to Home',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Text(
-                    'Home',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
-                  ),
-                ),
-                Text(
-                  '  /  ',
-                  style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
-                ),
-                if (!_isBestSellersMode) ...[
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _selectedCategory = 'all';
-                        _selectedSubcategory = null;
-                        _selectedTechnicalName = null;
-                      });
-                    },
-                    child: Text(
-                      'Categories',
-                      style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
-                    ),
-                  ),
-                  Text(
-                    '  /  ',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                ],
-                Text(
-                  _selectedTechnicalName != null
-                      ? 'Technical Formulations'
-                      : (_isBestSellersMode
-                          ? 'Best Sellers'
-                          : (_selectedCategory == 'all' ? 'All Products' : _getCategoryTitle(_selectedCategory))),
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryGreen,
-                  ),
-                ),
-                if (_selectedTechnicalName != null) ...[
-                  Text(
-                    '  /  ',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                  Text(
-                    _selectedTechnicalName!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ] else if (_selectedSubcategory != null) ...[
-                  Text(
-                    '  /  ',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
-                  ),
-                  Text(
-                    _selectedSubcategory!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHeaderCard(int count, bool isMobile) {
-    final String pageTitle = _selectedTechnicalName != null
-        ? _selectedTechnicalName!
-        : (_selectedCategory == 'all'
-            ? (_isBestSellersMode ? 'Best Sellers' : 'All Products')
-            : _getCategoryTitle(_selectedCategory));
-    final String iconEmoji = _selectedTechnicalName != null
-        ? '🔬'
-        : (_isBestSellersMode ? '⭐' : _getCategoryIcon(_selectedCategory));
-    final String description = _selectedTechnicalName != null
-        ? 'Formulations and commercial products containing $_selectedTechnicalName active ingredients.'
-        : (_isBestSellersMode
-            ? 'Top rated, highly trusted farm inputs chosen by thousands of progressive farmers.'
-            : _getCategoryDescription(_selectedCategory));
-
+  Widget _buildTechnicalActivePill() {
     return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 12 : 20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x06000000),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+        color: AppColors.lightGreen,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: isMobile ? 38 : 52,
-                height: isMobile ? 38 : 52,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0FDF4),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.2)),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  iconEmoji,
-                  style: TextStyle(fontSize: isMobile ? 20 : 28),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            pageTitle,
-                            style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 16 : 22,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDF4),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-                          ),
-                          child: Text(
-                            _isBestSellersMode && _selectedCategory == 'all'
-                                ? '$count Best Sellers'
-                                : '$count Products',
-                            style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 11 : 11.5,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryDarkGreen,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: GoogleFonts.poppins(
-                        fontSize: isMobile ? 11.5 : 13,
-                        color: AppColors.textSecondary,
-                        height: 1.35,
-                      ),
-                      maxLines: isMobile ? 2 : null,
-                      overflow: isMobile ? TextOverflow.ellipsis : null,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: Color(0xFFF1F5F9)),
-          const SizedBox(height: 8),
-          if (isMobile)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.verified_rounded, size: 14, color: AppColors.primaryGreen),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          '100% Authentic',
-                          style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.primaryDarkGreen,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _buildSortDropdown(isMobile: true),
-              ],
-            )
-          else
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    'Authentic, lab-tested formulations guaranteed',
-                    style: GoogleFonts.poppins(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textMuted,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Sort: ',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    _buildSortDropdown(isMobile: false),
-                  ],
-                ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSortDropdown({bool isMobile = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 10, vertical: 2),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _sortBy,
-          isDense: true,
-          icon: Icon(Icons.keyboard_arrow_down_rounded, size: isMobile ? 16 : 18),
-          items: [
-            const DropdownMenuItem(value: 'featured', child: Text('Featured')),
-            DropdownMenuItem(value: 'price_asc', child: Text(isMobile ? 'Price: Low' : 'Price: Low to High')),
-            DropdownMenuItem(value: 'price_desc', child: Text(isMobile ? 'Price: High' : 'Price: High to Low')),
-            DropdownMenuItem(value: 'rating', child: Text(isMobile ? 'Top Rated' : 'Highest Rated')),
-          ],
-          onChanged: (val) {
-            if (val != null) setState(() => _sortBy = val);
-          },
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 10.5 : 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMobileMajorCategoryBar() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
       child: Row(
         children: [
-          _buildMobileMajorCategoryChip(
-            id: 'all',
-            title: 'All Products',
-            iconEmoji: '🌾',
-            isSelected: _selectedCategory == 'all',
-          ),
-          ...CategoryItem.sampleCategories.map((cat) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: _buildMobileMajorCategoryChip(
-                id: cat.id,
-                title: cat.name,
-                iconEmoji: cat.icon,
-                isSelected: _selectedCategory == cat.id,
+          const Icon(Icons.science_outlined, size: 18, color: AppColors.primaryDarkGreen),
+          const SizedBox(width: 8),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: GoogleFonts.poppins(fontSize: 13, color: AppColors.primaryDarkGreen),
+                children: [
+                  const TextSpan(text: 'Showing all brands formulated with: '),
+                  TextSpan(
+                    text: _selectedTechnicalName!,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
               ),
-            );
-          }),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              setState(() => _selectedTechnicalName = null);
+            },
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.4)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Clear',
+                    style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryDarkGreen),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMobileMajorCategoryChip({
-    required String id,
-    required String title,
-    required String iconEmoji,
-    required bool isSelected,
-  }) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedCategory = id;
-          _selectedSubcategory = null;
-          _selectedTechnicalName = null;
-        });
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryGreen : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(iconEmoji, style: const TextStyle(fontSize: 12)),
-            const SizedBox(width: 4),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
+
+
 
   Widget _buildCategoryPills(bool isMobile) {
     final activeCat = CategoryItem.sampleCategories.cast<CategoryItem?>().firstWhere(

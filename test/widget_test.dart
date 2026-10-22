@@ -173,8 +173,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify CategoryDetailView opens in Best Sellers mode
-    expect(find.text('Best Sellers'), findsWidgets);
-    expect(find.textContaining('8 Best Sellers'), findsWidgets);
+    expect(find.byType(CategoryDetailView), findsOneWidget);
+    expect(find.text('Back to Home'), findsOneWidget);
+    expect(find.text('Featured'), findsOneWidget);
     // Categories filter chips should NOT be displayed in Best Sellers view
     expect(find.text('All Products'), findsNothing);
     expect(find.text('Insecticides'), findsNothing);
@@ -589,10 +590,10 @@ void main() {
     await tester.tap(find.text('All in Seeds'));
     await tester.pumpAndSettle();
 
-    // Verify CategoryDetailView opens with Seeds category instead of applying filter on home screen
+    // Verify CategoryDetailView opens instead of applying filter on home screen
     expect(find.byType(CategoryDetailView), findsOneWidget);
-    expect(find.text('Seeds'), findsWidgets);
     expect(find.text('Back to Home'), findsOneWidget);
+    expect(find.text('Featured'), findsOneWidget);
 
     // Tap 'Back to Home' to return to home page
     await tester.tap(find.text('Back to Home'));
@@ -1112,7 +1113,6 @@ void main() {
     // Verify CategoryDetailView opened instead of applying filter on home screen
     expect(find.byType(CategoryDetailView), findsOneWidget);
     expect(find.text('Crop Protection'), findsWidgets);
-    expect(find.textContaining('Shield your yield'), findsOneWidget);
     expect(find.text('Back to Home'), findsOneWidget);
     expect(find.text('All in Crop Protection'), findsOneWidget);
 
@@ -1154,7 +1154,7 @@ void main() {
     expect(find.text('Best Sellers'), findsWidgets);
   });
 
-  testWidgets('CategoryDetailView mobile view has major category bar, compact header, and horizontal subcategory scroll', (WidgetTester tester) async {
+  testWidgets('CategoryDetailView mobile view renders compact top bar with back button and filter button without major or sub category bars', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -1173,16 +1173,13 @@ void main() {
     // Verify CategoryDetailView is rendered
     expect(find.byType(CategoryDetailView), findsOneWidget);
 
-    // Verify mobile major category bar exists with 'Crop Protection' and 'Fertilizers'
-    expect(find.text('Crop Protection'), findsWidgets);
-    expect(find.text('Fertilizers'), findsWidgets);
-
-    // Verify subcategories are rendered
-    expect(find.text('Systemic Insecticides'), findsWidgets);
-
-    // Verify compact authentic guarantee and sort dropdown
-    expect(find.text('100% Authentic'), findsOneWidget);
+    // Verify top bar with back button and filter button
+    expect(find.text('Back to Home'), findsOneWidget);
     expect(find.text('Featured'), findsOneWidget);
+
+    // Verify mobile major category bar and subcategory bar are NOT rendered on mobile
+    expect(find.text('Subcategories: '), findsNothing);
+    expect(find.text('Systemic Insecticides'), findsNothing);
 
     // Switch to narrow screen (320px) to verify no overflow on small phones
     tester.view.physicalSize = const Size(320, 568);
