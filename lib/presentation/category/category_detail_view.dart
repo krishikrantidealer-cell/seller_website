@@ -449,7 +449,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     if (activeCat != null) {
       final List<Widget> children = [
         _buildPill(
-          label: 'All in ${activeCat.name}',
+          label: isMobile ? 'All' : 'All in ${activeCat.name}',
           iconEmoji: activeCat.icon,
           isSelected: _selectedSubcategory == null,
           isMobile: isMobile,
@@ -496,6 +496,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
       if (isMobile) {
         return SingleChildScrollView(
+          clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: Row(
@@ -653,6 +654,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: SingleChildScrollView(
+          clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           child: Row(

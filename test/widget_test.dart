@@ -1177,8 +1177,8 @@ void main() {
     expect(find.text('Back to Home'), findsOneWidget);
     expect(find.text('Featured'), findsOneWidget);
 
-    // Verify categories in this major category are rendered on mobile
-    expect(find.text('All in Crop Protection'), findsOneWidget);
+    // Verify categories in this major category are rendered on mobile ('All' instead of 'All in ...')
+    expect(find.text('All'), findsOneWidget);
     expect(find.text('Insecticides'), findsWidgets);
     expect(find.text('Fungicides'), findsWidgets);
 
