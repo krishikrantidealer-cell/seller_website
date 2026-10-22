@@ -373,6 +373,52 @@ void main() {
     expect((popupPos.dx - equipmentsPos.dx).abs() < 50.0, isTrue);
   });
 
+  testWidgets('Category ribbon is responsive on laptop screens and opens subcategories to the left without cutting off', (WidgetTester tester) async {
+    // Standard laptop screen size (1280 x 800)
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Verify pinned ALL CATEGORIES is visible on the left
+    expect(find.text('ALL CATEGORIES'), findsOneWidget);
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+
+    // Hover over 'Cattle & Bird Care' tab near the right edge
+    expect(find.text('Cattle & Bird Care'), findsWidgets);
+    // On a 1280px laptop screen, scroll category ribbon horizontally to reveal right-edge categories
+    final ribbonScroll = find.byType(SingleChildScrollView).first;
+    await tester.drag(ribbonScroll, const Offset(-800, 0));
+    await tester.pumpAndSettle();
+
+    final cattleWidget = find.text('Cattle & Bird Care').first;
+    await gesture.moveTo(tester.getCenter(cattleWidget));
+    await tester.pumpAndSettle();
+
+    // Level 1 category groups show (e.g. 'Fodder Seed')
+    expect(find.text('Fodder Seed'), findsWidgets);
+
+    // Hover over 'Fodder Seed' to open Level 2 subcategories flyout
+    final fodderGroup = find.text('Fodder Seed').first;
+    await gesture.moveTo(tester.getCenter(fodderGroup));
+    await tester.pumpAndSettle();
+
+    // Verify subcategories appear (e.g. 'Forages', 'Sorghum')
+    expect(find.text('Forages'), findsOneWidget);
+    expect(find.text('Sorghum'), findsOneWidget);
+
+    // Check that 'Forages' and subcategory flyout do not exceed screen width (1280px)
+    final foragesTopRight = tester.getTopRight(find.text('Forages').first);
+    expect(foragesTopRight.dx <= 1280.0, isTrue, reason: 'Subcategories flyout must stay within visible screen boundary');
+    final foragesTopLeft = tester.getTopLeft(find.text('Forages').first);
+    expect(foragesTopLeft.dx >= 0.0, isTrue, reason: 'Subcategories flyout must not clip on left side of screen');
+  });
+
   testWidgets('Search by Technical Name opens directory and filters by formulation', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;

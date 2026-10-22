@@ -52,30 +52,35 @@ class TopInfoBar extends StatelessWidget {
                 );
               }
 
+              final isLaptop = constraints.maxWidth < 1360;
+              final double itemGap = isLaptop ? 10.0 : 16.0;
+              final double fontSize = isLaptop ? 11.0 : 12.0;
+
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Contact info
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.phone_in_talk_rounded, size: 14, color: Colors.white),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Text(
                         'Call to Order: ${AppConstants.orderCallNumber}',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 12,
+                          fontSize: fontSize,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: itemGap),
                       Container(width: 1, height: 12, color: Colors.white.withValues(alpha: 0.4)),
-                      const SizedBox(width: 16),
+                      SizedBox(width: itemGap),
                       Text(
                         'Helpline: ${AppConstants.helplineNumber}',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 12,
+                          fontSize: fontSize,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -83,16 +88,18 @@ class TopInfoBar extends StatelessWidget {
                   ),
                   // Right utilities
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _navLink('Ask EBS Experts'),
-                      const SizedBox(width: 16),
-                      _navLink('Be a Partner'),
-                      const SizedBox(width: 16),
-                      _navLink('Sell with Us'),
-                      const SizedBox(width: 16),
+                      _navLink('Ask EBS Experts', fontSize: fontSize),
+                      SizedBox(width: itemGap),
+                      _navLink('Be a Partner', fontSize: fontSize),
+                      SizedBox(width: itemGap),
+                      _navLink('Sell with Us', fontSize: fontSize),
+                      SizedBox(width: itemGap),
                       Container(width: 1, height: 12, color: Colors.white.withValues(alpha: 0.4)),
-                      const SizedBox(width: 16),
+                      SizedBox(width: itemGap),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.language, size: 14, color: Colors.white),
                           const SizedBox(width: 4),
@@ -100,7 +107,7 @@ class TopInfoBar extends StatelessWidget {
                             'EN',
                             style: GoogleFonts.poppins(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: fontSize,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -117,14 +124,14 @@ class TopInfoBar extends StatelessWidget {
     );
   }
 
-  Widget _navLink(String label) {
+  Widget _navLink(String label, {double fontSize = 12.0}) {
     return InkWell(
       onTap: () {},
       child: Text(
         label,
         style: GoogleFonts.poppins(
           color: Colors.white,
-          fontSize: 12,
+          fontSize: fontSize,
           fontWeight: FontWeight.w500,
         ),
       ),
