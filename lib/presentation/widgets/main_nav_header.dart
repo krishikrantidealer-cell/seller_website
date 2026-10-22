@@ -507,7 +507,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   }
 
   Widget _buildLogo({bool isCompact = false, bool isSmallMobile = false}) {
-    final double logoHeight = isSmallMobile ? 34 : (isCompact ? 42 : 52);
+    final double logoHeight = isSmallMobile ? 38 : (isCompact ? 50 : 70);
 
     return Tooltip(
       message: 'EBS Essential BioCrop Science',
@@ -522,6 +522,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             'assets/images/company_logo.png',
             height: logoHeight,
             fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
             errorBuilder: (_, _, _) => Container(
               height: logoHeight,
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
