@@ -7,14 +7,10 @@ import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
 import '../widgets/cart_drawer.dart';
+import '../widgets/mobile_navigation_drawer.dart';
 import '../widgets/product_card.dart';
 import '../widgets/web_footer.dart';
 import '../product_detail/product_detail_view.dart';
-import '../../data/models/wishlist_state.dart';
-import '../wishlist/wishlist_view.dart';
-import '../profile/farmer_profile_view.dart';
-import '../orders/my_orders_view.dart';
-import '../technical/technical_search_view.dart';
 
 class CategoryDetailView extends StatefulWidget {
   final String initialCategoryId;
@@ -283,8 +279,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                       return Container(
                         width: double.infinity,
                         padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 12 : 24,
-                          vertical: isMobile ? 12 : 20,
+                          horizontal: isMobile ? 8 : 24,
+                          vertical: isMobile ? 8 : 20,
                         ),
                         child: Center(
                           child: ConstrainedBox(
@@ -292,19 +288,23 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Breadcrumb & Back Navigation
-                                _buildBreadcrumbBar(isMobile),
-
-                                const SizedBox(height: 12),
-
-                                // Header Card with Category Title, Product Count, and Sort Dropdown
-                                _buildHeaderCard(filtered.length, isMobile),
+                                if (isMobile) ...[
+                                  // Compact Mobile Header (Back button + Title + Count + Sort in one streamlined bar)
+                                  _buildCompactMobileHeader(filtered.length),
+                                  const SizedBox(height: 6),
+                                ] else ...[
+                                  // Desktop Breadcrumb & Back Navigation
+                                  _buildBreadcrumbBar(isMobile),
+                                  const SizedBox(height: 12),
+                                  // Desktop Header Card with Category Title, Product Count, and Sort Dropdown
+                                  _buildHeaderCard(filtered.length, isMobile),
+                                ],
 
                                 // Active Technical Formulation Filter Pill
                                 if (_selectedTechnicalName != null) ...[
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: 8),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                     decoration: BoxDecoration(
                                       color: AppColors.lightGreen,
                                       borderRadius: BorderRadius.circular(10),
@@ -361,19 +361,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                                 // Mobile Major Categories Selector (allows mobile users to seamlessly switch major categories)
                                 if (isMobile && !_isBestSellersMode && _selectedTechnicalName == null) ...[
                                   _buildMobileMajorCategoryBar(),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 6),
                                 ],
 
                                 // Category Switcher Pills & Subcategories
                                 if (!_isBestSellersMode && _selectedTechnicalName == null) ...[
                                   _buildCategoryPills(isMobile),
                                   if (currentSubcategories.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 6),
                                     _buildSubcategoriesRow(currentSubcategories, isMobile: isMobile),
                                   ],
                                 ],
 
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 10),
 
                                 // Product Grid
                                 if (filtered.isEmpty)
@@ -395,6 +395,144 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompactMobileHeader(int count) {
+    final String pageTitle = _selectedTechnicalName != null
+        ? _selectedTechnicalName!
+        : (_selectedCategory == 'all'
+            ? (_isBestSellersMode ? 'Best Sellers' : 'All Products')
+            : _getCategoryTitle(_selectedCategory));
+    final String iconEmoji = _selectedTechnicalName != null
+        ? '🔬'
+        : (_isBestSellersMode ? '⭐' : _getCategoryIcon(_selectedCategory));
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 4,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.arrow_back_rounded, size: 13, color: AppColors.primaryGreen),
+                      const SizedBox(width: 3),
+                      Text(
+                        'Back to Home',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Row(
+                  children: [
+                    Text(iconEmoji, style: const TextStyle(fontSize: 13)),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        pageTitle,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0FDF4),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
+                      ),
+                      child: Text(
+                        '$count',
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryDarkGreen,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.verified_rounded, size: 12, color: AppColors.primaryGreen),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        '100% Authentic',
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryDarkGreen,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '• Tested',
+                      style: GoogleFonts.poppins(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              _buildSortDropdown(isMobile: true),
+            ],
           ),
         ],
       ),
@@ -691,7 +829,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   Widget _buildSortDropdown({bool isMobile = false}) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 10, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 10, vertical: 2),
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(8),
@@ -701,18 +839,18 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         child: DropdownButton<String>(
           value: _sortBy,
           isDense: true,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
-          items: const [
-            DropdownMenuItem(value: 'featured', child: Text('Featured')),
-            DropdownMenuItem(value: 'price_asc', child: Text('Price: Low to High')),
-            DropdownMenuItem(value: 'price_desc', child: Text('Price: High to Low')),
-            DropdownMenuItem(value: 'rating', child: Text('Highest Rated')),
+          icon: Icon(Icons.keyboard_arrow_down_rounded, size: isMobile ? 16 : 18),
+          items: [
+            const DropdownMenuItem(value: 'featured', child: Text('Featured')),
+            DropdownMenuItem(value: 'price_asc', child: Text(isMobile ? 'Price: Low' : 'Price: Low to High')),
+            DropdownMenuItem(value: 'price_desc', child: Text(isMobile ? 'Price: High' : 'Price: High to Low')),
+            DropdownMenuItem(value: 'rating', child: Text(isMobile ? 'Top Rated' : 'Highest Rated')),
           ],
           onChanged: (val) {
             if (val != null) setState(() => _sortBy = val);
           },
           style: GoogleFonts.poppins(
-            fontSize: isMobile ? 11 : 12,
+            fontSize: isMobile ? 10.5 : 12,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
@@ -1163,276 +1301,23 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   }
 
   Widget _buildMobileNavigationDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.white,
-      child: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: AppColors.lightGreen,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 20),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        'Categories',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 22),
-                    tooltip: 'Close Menu',
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.grid_view_rounded, color: AppColors.primaryGreen),
-                    title: Text(
-                      'All Products',
-                      style: GoogleFonts.poppins(
-                        fontWeight: _selectedCategory == 'all' ? FontWeight.w700 : FontWeight.w600,
-                        fontSize: 13.5,
-                        color: _selectedCategory == 'all' ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                      ),
-                    ),
-                    trailing: _selectedCategory == 'all'
-                        ? const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 18)
-                        : null,
-                    onTap: () {
-                      Navigator.pop(context);
-                      setState(() {
-                        _selectedCategory = 'all';
-                        _selectedSubcategory = null;
-                        _selectedTechnicalName = null;
-                      });
-                    },
-                  ),
-                  const Divider(height: 1),
-                  ...CategoryItem.sampleCategories.map((cat) {
-                    final isCatSelected = _selectedCategory == cat.id;
-                    return ExpansionTile(
-                      key: PageStorageKey('drawer_cat_${cat.id}'),
-                      initiallyExpanded: isCatSelected,
-                      leading: Text(cat.icon, style: const TextStyle(fontSize: 18)),
-                      title: Text(
-                        cat.name,
-                        style: GoogleFonts.poppins(
-                          fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
-                          fontSize: 13.5,
-                          color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                        ),
-                      ),
-                      children: [
-                        ListTile(
-                          dense: true,
-                          contentPadding: const EdgeInsets.only(left: 36, right: 16),
-                          title: Text(
-                            'All in ${cat.name}',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryGreen,
-                              fontSize: 12.5,
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            setState(() {
-                              _selectedCategory = cat.id;
-                              _selectedSubcategory = null;
-                              _selectedTechnicalName = null;
-                            });
-                          },
-                        ),
-                        if (cat.groups.isNotEmpty)
-                          ...cat.groups.map(
-                            (group) => ExpansionTile(
-                              dense: true,
-                              tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-                              leading: group.icon != null
-                                  ? Text(group.icon!, style: const TextStyle(fontSize: 15))
-                                  : null,
-                              title: Text(
-                                group.name,
-                                style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w600),
-                              ),
-                              children: group.subcategories.map(
-                                (sub) => ListTile(
-                                  dense: true,
-                                  contentPadding: const EdgeInsets.only(left: 48, right: 16),
-                                  title: Text(sub, style: GoogleFonts.poppins(fontSize: 12)),
-                                  trailing: (isCatSelected && _selectedSubcategory == sub)
-                                      ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
-                                      : null,
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    setState(() {
-                                      _selectedCategory = cat.id;
-                                      _selectedSubcategory = sub;
-                                      _selectedTechnicalName = null;
-                                    });
-                                  },
-                                ),
-                              ).toList(),
-                            ),
-                          )
-                        else
-                          ...cat.subcategories.map(
-                            (sub) => ListTile(
-                              dense: true,
-                              contentPadding: const EdgeInsets.only(left: 36, right: 16),
-                              title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
-                              trailing: (isCatSelected && _selectedSubcategory == sub)
-                                  ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
-                                  : null,
-                              onTap: () {
-                                Navigator.pop(context);
-                                setState(() {
-                                  _selectedCategory = cat.id;
-                                  _selectedSubcategory = sub;
-                                  _selectedTechnicalName = null;
-                                });
-                              },
-                            ),
-                          ),
-                      ],
-                    );
-                  }),
-
-                  const Divider(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                    child: Text(
-                      'QUICK DISCOVERY',
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textMuted,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
-
-                  ListTile(
-                    leading: const Icon(Icons.favorite_border_rounded, color: AppColors.primaryCrimson),
-                    title: Text(
-                      'My Wishlist',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    subtitle: AnimatedBuilder(
-                      animation: WishlistController.instance,
-                      builder: (context, _) => Text(
-                        '${WishlistController.instance.totalCount} saved farm products',
-                        style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
-                      ),
-                    ),
-                    trailing: AnimatedBuilder(
-                      animation: WishlistController.instance,
-                      builder: (context, _) {
-                        final count = WishlistController.instance.totalCount;
-                        if (count == 0) return const SizedBox.shrink();
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryCrimson,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '$count',
-                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      },
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const WishlistView()),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.person_pin_circle_outlined, color: AppColors.primaryGreen),
-                    title: Text(
-                      'Farmer Profile & Delivery Address',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    subtitle: Text('Manage farm depot, village & crop details', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const FarmerProfileView()),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.science_outlined, color: AppColors.primaryDarkGreen),
-                    title: Text(
-                      'Search by Technical Name',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const TechnicalSearchView()),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.local_shipping_outlined, color: AppColors.textPrimary),
-                    title: Text(
-                      'Track Orders',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const MyOrdersView()),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.phone_in_talk_outlined, color: AppColors.primaryGreen),
-                    title: Text(
-                      'Helpline: 1800-203-1425',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                    subtitle: Text('Toll-Free Kisan Advisory', style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted)),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return MobileNavigationDrawer(
+      selectedCategoryId: _selectedCategory,
+      selectedSubcategory: _selectedSubcategory,
+      onCategorySelected: (catId, sub) {
+        setState(() {
+          _selectedCategory = catId;
+          _selectedSubcategory = sub;
+          _selectedTechnicalName = null;
+        });
+      },
+      onAllProductsSelected: () {
+        setState(() {
+          _selectedCategory = 'all';
+          _selectedSubcategory = null;
+          _selectedTechnicalName = null;
+        });
+      },
     );
   }
 }
