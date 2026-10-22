@@ -1121,6 +1121,30 @@ void main() {
     final comboRight = tester.getTopRight(find.text('Combo Product')).dx;
     expect(comboRight < 1440.0, isTrue, reason: 'Combo Product pill must not be cut off at screen edge');
 
+    // Tap on 'Insecticides' group to reveal subcategories
+    await tester.tap(find.text('Insecticides').first);
+    await tester.pumpAndSettle();
+
+    // Verify subcategories show up, but 'All in Category' is removed
+    expect(find.text('Subcategories: '), findsOneWidget);
+    expect(find.text('All in Category'), findsNothing);
+    expect(find.text('Systemic Insecticides'), findsOneWidget);
+
+    // Enter a search that yields 0 products to trigger empty state with 'Reset All Filters'
+    final searchInput = find.byType(TextField);
+    if (searchInput.evaluate().isNotEmpty) {
+      await tester.enterText(searchInput.first, 'XYZNonExistentProductQuery');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reset All Filters'), findsOneWidget);
+      await tester.tap(find.text('Reset All Filters'));
+      await tester.pumpAndSettle();
+
+      // Verify it resets to "All in that major category" (All in Crop Protection)
+      expect(find.text('All in Crop Protection'), findsOneWidget);
+    }
+
     // Tap 'Back to Home'
     await tester.tap(find.text('Back to Home'));
     await tester.pumpAndSettle();

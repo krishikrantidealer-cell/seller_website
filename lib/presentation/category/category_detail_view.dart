@@ -857,32 +857,11 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
               color: AppColors.textSecondary,
             ),
           ),
-          InkWell(
-            onTap: () {
-              setState(() => _selectedSubcategory = null);
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                color: _selectedSubcategory == null ? AppColors.primaryDarkGreen : const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'All in Category',
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _selectedSubcategory == null ? Colors.white : AppColors.textSecondary,
-                ),
-              ),
-            ),
-          ),
           ...subcategories.map((sub) {
             final isSelected = _selectedSubcategory == sub;
             return InkWell(
               onTap: () {
-                setState(() => _selectedSubcategory = sub);
+                setState(() => _selectedSubcategory = isSelected ? null : sub);
               },
               borderRadius: BorderRadius.circular(12),
               child: Container(
@@ -934,7 +913,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           ElevatedButton.icon(
             onPressed: () {
               setState(() {
-                _selectedCategory = 'all';
+                // Navigate to "All in that major category"
+                if (_selectedCategory == 'all' && widget.initialCategoryId != 'all') {
+                  _selectedCategory = widget.initialCategoryId;
+                }
                 _selectedSubcategory = null;
                 _selectedTechnicalName = null;
                 _searchFilter = '';
