@@ -47,7 +47,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     final max = _scrollController.position.maxScrollExtent;
     final offset = _scrollController.offset;
     final canLeft = offset > 4;
-    final canRight = offset < max - 4;
+    final canRight = max > 8 && offset < max - 4;
     if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
       setState(() {
         _canScrollLeft = canLeft;
@@ -217,10 +217,14 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
           return _buildMobileMenuBar(context, categories);
         }
 
-        final isCompact = screenWidth < 1560;
-        final isUltraCompact = screenWidth < 1360;
-        final double allCatHPadding = isUltraCompact ? 10.0 : (isCompact ? 12.0 : 14.0);
-        final double allCatFontSize = isUltraCompact ? 11.5 : (isCompact ? 12.0 : 12.5);
+        // Check scroll bounds on layout build so arrow buttons react immediately
+        WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
+
+        final isCompact = screenWidth < 1650;
+        final isLaptop = screenWidth < 1480;
+        final isUltraCompact = screenWidth < 1320;
+        final double allCatHPadding = isUltraCompact ? 8.0 : (isLaptop ? 9.5 : (isCompact ? 11.0 : 13.0));
+        final double allCatFontSize = isUltraCompact ? 11.0 : (isLaptop ? 11.5 : (isCompact ? 12.0 : 12.5));
 
         return Container(
           width: double.infinity,
@@ -335,28 +339,48 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
 
                   // Scrollable category tabs with responsive padding & sizing
                   Expanded(
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (_) {
-                        _checkScroll();
+                    child: NotificationListener<ScrollMetricsNotification>(
+                      onNotification: (notification) {
+                        final max = notification.metrics.maxScrollExtent;
+                        final offset = notification.metrics.pixels;
+                        final canLeft = offset > 4;
+                        final canRight = max > 8 && offset < max - 4;
+                        if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _canScrollLeft = canLeft;
+                                _canScrollRight = canRight;
+                              });
+                            }
+                          });
+                        }
                         return false;
                       },
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
-                        child: Row(
-                          children: [
-                            ...categories.map(
-                              (cat) => _buildCategoryTab(
-                                context,
-                                cat,
-                                isMobile,
-                                isCompact: isCompact,
-                                isUltraCompact: isUltraCompact,
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (_) {
+                          _checkScroll();
+                          return false;
+                        },
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: [
+                              ...categories.map(
+                                (cat) => _buildCategoryTab(
+                                  context,
+                                  cat,
+                                  isMobile,
+                                  isCompact: isCompact,
+                                  isLaptop: isLaptop,
+                                  isUltraCompact: isUltraCompact,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                          ],
+                              const SizedBox(width: 8),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -562,16 +586,18 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     CategoryItem cat,
     bool isMobile, {
     bool isCompact = false,
+    bool isLaptop = false,
     bool isUltraCompact = false,
   }) {
     final link = _categoryLinks.putIfAbsent(cat.id, () => LayerLink());
     final isCategorySelected = widget.selectedCategoryId == cat.id;
     final isOpen = _activeOpenTab == cat.id;
+    final hasDropdown = cat.groups.isNotEmpty || cat.subcategories.isNotEmpty;
 
-    final double hPadding = isUltraCompact ? 8.0 : (isCompact ? 10.0 : 13.0);
-    final double fontSize = isUltraCompact ? 11.5 : (isCompact ? 12.0 : 12.5);
-    final double iconGap = isUltraCompact ? 4.0 : (isCompact ? 5.0 : 7.0);
-    final double arrowSize = isUltraCompact ? 14.0 : 16.0;
+    final double hPadding = isUltraCompact ? 5.0 : (isLaptop ? 6.5 : (isCompact ? 8.5 : 11.0));
+    final double fontSize = isUltraCompact ? 11.0 : (isLaptop ? 11.5 : (isCompact ? 12.0 : 12.5));
+    final double iconGap = isUltraCompact ? 3.0 : (isLaptop ? 3.5 : (isCompact ? 4.0 : 5.0));
+    final double arrowSize = isUltraCompact ? 12.0 : (isLaptop ? 13.0 : 14.0);
 
     return CompositedTransformTarget(
       link: link,
@@ -579,10 +605,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
         builder: (tabContext) {
           return MouseRegion(
             onEnter: (_) {
-              if (!isMobile) _showCategoryDropdown(tabContext, cat, link);
+              if (!isMobile && hasDropdown) _showCategoryDropdown(tabContext, cat, link);
             },
             onExit: (_) {
-              if (!isMobile) _scheduleHide();
+              if (!isMobile && hasDropdown) _scheduleHide();
             },
             child: InkWell(
               onTap: () {
@@ -606,7 +632,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(cat.icon, style: TextStyle(fontSize: isUltraCompact ? 13 : 14)),
+                    Text(cat.icon, style: TextStyle(fontSize: isUltraCompact ? 12.5 : 13.5)),
                     SizedBox(width: iconGap),
                     Text(
                       cat.name,
@@ -616,16 +642,18 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                         fontWeight: isCategorySelected ? FontWeight.w700 : FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(width: 3),
-                    AnimatedRotation(
-                      turns: isOpen ? 0.5 : 0.0,
-                      duration: const Duration(milliseconds: 180),
-                      child: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: Colors.white.withValues(alpha: 0.85),
-                        size: arrowSize,
+                    if (hasDropdown) ...[
+                      const SizedBox(width: 2.5),
+                      AnimatedRotation(
+                        turns: isOpen ? 0.5 : 0.0,
+                        duration: const Duration(milliseconds: 180),
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.white.withValues(alpha: 0.85),
+                          size: arrowSize,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),

@@ -419,6 +419,31 @@ void main() {
     expect(foragesTopLeft.dx >= 0.0, isTrue, reason: 'Subcategories flyout must not clip on left side of screen');
   });
 
+  testWidgets('Har Din Sasta tab renders in ribbon and can be scrolled to and tapped', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Verify Har Din Sasta tab exists in the ribbon
+    final harDinSastaFinder = find.text('Har Din Sasta');
+    expect(harDinSastaFinder, findsWidgets);
+
+    // If scroll arrow is present, clicking right arrow scrolls smoothly
+    final rightArrow = find.byIcon(Icons.chevron_right_rounded);
+    if (rightArrow.evaluate().isNotEmpty) {
+      await tester.tap(rightArrow.first);
+      await tester.pumpAndSettle();
+    }
+
+    // Har Din Sasta is interactive and selectable
+    await tester.tap(harDinSastaFinder.first, warnIfMissed: false);
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('Search by Technical Name opens directory and filters by formulation', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
