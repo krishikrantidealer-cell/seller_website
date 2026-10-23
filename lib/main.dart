@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
+import 'core/di/injection_container.dart';
 import 'presentation/home/home_view.dart';
 
 void main() {
@@ -12,11 +13,13 @@ class SellerWebsiteApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'EBS Essential BioCrop Science | Agriculture E-Commerce',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const HomeView(),
+    return AppBlocProviders(
+      child: MaterialApp(
+        title: 'EBS Essential BioCrop Science | Agriculture E-Commerce',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const HomeView(),
+      ),
     );
   }
 }
