@@ -274,32 +274,71 @@ class ProductItem {
   ];
 }
 
+class CategorySubItem {
+  final String id;
+  final String name;
+  final String slug;
+  final String? categoryImageUrl;
+  final int sortOrder;
+
+  const CategorySubItem({
+    required this.id,
+    required this.name,
+    this.slug = '',
+    this.categoryImageUrl,
+    this.sortOrder = 0,
+  });
+}
+
 class CategoryGroup {
+  final String? id;
+  final String? slug;
   final String name;
   final String? icon;
+  final String? categoryImageUrl;
+  final int sortOrder;
   final List<String> subcategories;
+  final List<CategorySubItem> subcategoryItems;
 
   const CategoryGroup({
+    this.id,
+    this.slug,
     required this.name,
     this.icon,
+    this.categoryImageUrl,
+    this.sortOrder = 0,
     required this.subcategories,
+    this.subcategoryItems = const [],
   });
 }
 
 class CategoryItem {
   final String id;
+  final String? backendId;
+  final String slug;
   final String name;
   final String icon;
+  final String? categoryImageUrl;
+  final String? bannerImage;
+  final String? bannerTitle;
+  final int sortOrder;
   final List<CategoryGroup> groups;
   final List<String> _legacySubcategories;
 
   const CategoryItem({
     required this.id,
+    this.backendId,
+    String? slug,
     required this.name,
     required this.icon,
+    this.categoryImageUrl,
+    this.bannerImage,
+    this.bannerTitle,
+    this.sortOrder = 0,
     this.groups = const [],
     List<String> subcategories = const [],
-  }) : _legacySubcategories = subcategories;
+  })  : slug = slug ?? id,
+        _legacySubcategories = subcategories;
 
   List<String> get subcategories {
     if (groups.isNotEmpty) {
@@ -308,41 +347,82 @@ class CategoryItem {
     return _legacySubcategories;
   }
 
-    static List<CategoryItem> get sampleCategories => const [
+  /// Resolves an emoji icon for a Level 0 Major Category name.
+  static String iconForMajorCategory(String name) {
+    final lower = name.trim().toLowerCase();
+    if (lower.contains('crop protection') || lower.contains('protection')) return '🛡️';
+    if (lower.contains('crop nutrition') || lower.contains('nutrition')) return '🧪';
+    if (lower.contains('seed')) return '🌱';
+    if (lower.contains('fertilizer')) return '🌾';
+    if (lower.contains('equipment')) return '🚜';
+    if (lower.contains('irrigation')) return '💧';
+    if (lower.contains('garden')) return '🏡';
+    if (lower.contains('organic')) return '🍃';
+    if (lower.contains('cattle') || lower.contains('bird') || lower.contains('animal')) return '🐄';
+    if (lower.contains('bulk')) return '📦';
+    if (lower.contains('sasta') || lower.contains('offer') || lower.contains('deal')) return '🏷️';
+    if (lower.contains('growth regulator')) return '⚡';
+    return '🌿';
+  }
+
+  /// Resolves an emoji icon for a Level 1 Sub-Category name.
+  static String iconForSubcategory(String name, {String? parentName}) {
+    final lower = name.trim().toLowerCase();
+    if (lower.contains('insecticide')) return '🦗';
+    if (lower.contains('fungicide')) return '🍄';
+    if (lower.contains('herbicide') || lower.contains('weeder') || lower.contains('weed')) return '🌿';
+    if (lower.contains('bio pesticide') || lower.contains('neem') || lower.contains('organic')) return '🍃';
+    if (lower.contains('nematicide') || lower.contains('acaricide') || lower.contains('miticide')) return '🔬';
+    if (lower.contains('bactericide') || lower.contains('viricide')) return '🧪';
+    if (lower.contains('adjuvant') || lower.contains('surfactant') || lower.contains('pipe') || lower.contains('drip') || lower.contains('sprinkler') || lower.contains('pond')) return '💧';
+    if (lower.contains('repellent')) return '🦌';
+    if (lower.contains('combo')) return '🏷️';
+    if (lower.contains('growth') || lower.contains('booster') || lower.contains('flowering')) return '⚡';
+    if (lower.contains('humic') || lower.contains('fulvic')) return '🍂';
+    if (lower.contains('fruit')) return '🍉';
+    if (lower.contains('seed') || lower.contains('fodder')) return '🌱';
+    if (lower.contains('fertilizer')) return '🌾';
+    if (lower.contains('spray') || lower.contains('pump')) return '🔋';
+    if (lower.contains('tool') || lower.contains('testing')) return '🔧';
+    if (lower.contains('hardware') || lower.contains('auger')) return '⚙️';
+    if (lower.contains('trap')) return '🪤';
+    if (lower.contains('cutter') || lower.contains('saw') || lower.contains('trimmer')) return '✂️';
+    if (lower.contains('cover') || lower.contains('tarpaulin') || lower.contains('mulch') || lower.contains('net')) return '🛡️';
+    if (lower.contains('solar')) return '☀️';
+    if (lower.contains('vermi')) return '🪱';
+    if (lower.contains('bag') || lower.contains('kit') || lower.contains('coco') || lower.contains('mat')) return '🪴';
+    if (lower.contains('compost') || lower.contains('decomposer')) return '♻️';
+    if (lower.contains('pebble')) return '🪨';
+    if (lower.contains('poultry') || lower.contains('bird')) return '🐔';
+    if (lower.contains('goat') || lower.contains('sheep')) return '🐐';
+    if (lower.contains('aqua') || lower.contains('fish')) return '🐟';
+    if (lower.contains('mineral') || lower.contains('remed')) return '💊';
+    if (lower.contains('cattle') || lower.contains('animal') || lower.contains('swine')) return '🐄';
+    if (parentName != null) return iconForMajorCategory(parentName);
+    return '🌿';
+  }
+
+  static List<CategoryItem> get sampleCategories => const [
     CategoryItem(
       id: 'crop-protection',
+      backendId: '6ab4f6f619ec643fd9bf362c',
       name: 'Crop Protection',
       icon: '🛡️',
       groups: [
         CategoryGroup(
           name: 'Insecticides',
           icon: '🦗',
-          subcategories: [
-            'Systemic Insecticides',
-            'Contact & Ingestion',
-            'Bio & Organic Insecticides',
-            'Combination Insecticides',
-            'Target Pest Specialists',
-            'Thiamethoxam SC/WG',
-            'Emamectin Benzoate 5% SG',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fungicides',
           icon: '🍄',
-          subcategories: [
-            'Systemic Fungicides',
-            'Contact & Protective',
-            'Bio-Fungicides & Biocontrol',
-            'Azoxystrobin + Difenoconazole',
-            'Hexaconazole 5% SC/EC',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Herbicides',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Bio Pesticides',
@@ -351,116 +431,96 @@ class CategoryItem {
             'Bio Insecticide',
             'Bio Fungicide',
             'Bio Miticide',
-            'Beauveria Bassiana Bio-Fungus',
-            'Trichoderma Viride / Harzianum',
-            'Other Bio-Pesticides',
           ],
         ),
         CategoryGroup(
           name: 'Nematicide',
           icon: '🔬',
-          subcategories: [
-            'Plant Parasitic Nematode Control',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Acaricide | Miticide',
           icon: '🔬',
-          subcategories: [
-            'Acaricide & Red Mite Care',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Bactericides',
           icon: '🧪',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Adjuvants And Surfactants',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Animal Repellent',
           icon: '🦌',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Combo Product',
           icon: '🏷️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Organic Floor Cleaner',
           icon: '🍃',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'crop-nutrition',
+      backendId: '6ab4f6f619ec643fd9bf3671',
       name: 'Crop Nutrition',
       icon: '🧪',
       groups: [
         CategoryGroup(
           name: 'Plant Growth Regulators',
           icon: '⚡',
-          subcategories: [
-            'Brassinolide Growth Promoter',
-            'Other Plant Growth Regulators',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Humic Acid',
           icon: '🍂',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Yield Booster',
           icon: '⚡',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fruit Quality Enhancer',
           icon: '🍉',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Flowering Stimulants',
           icon: '⚡',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Humic & Fulvic Acid',
           icon: '🍂',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Crop Special',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'pH Balancer',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'seeds',
+      backendId: '6ab4f6f619ec643fd9bf3689',
       name: 'Seeds',
       icon: '🌱',
       groups: [
@@ -543,26 +603,22 @@ class CategoryItem {
         CategoryGroup(
           name: 'Cotton Seeds',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Pulse Seeds',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Onion Seeds',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Marigold Seeds',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Desi Seeds',
@@ -613,67 +669,56 @@ class CategoryItem {
         CategoryGroup(
           name: 'Seeds Ball',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'fertilizers',
+      backendId: '6ab4f6f619ec643fd9bf36eb',
       name: 'Fertilizers',
       icon: '🌾',
       groups: [
         CategoryGroup(
           name: 'Water Soluble Fertilizers',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Bio Fertilizers',
           icon: '🌾',
-          subcategories: [
-            'Mycorrhiza Bio-Fertilizer (VAM)',
-            'Rhizobium Legume Inoculant',
-            'Azotobacter Nitrogen Fixer',
-            'Phosphate Solubilizing Bacteria (PSB)',
-            'Other Bio-Fertilizers',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Liquid Fertilizers',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Chelated Micronutrient Fertilizer',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Micronutrients Fertilizers',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Bulk Fertilizer',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Root Fertility Booster',
           icon: '⚡',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'equipments',
+      backendId: '6ab4f6f619ec643fd9bf36f9',
       name: 'Equipments',
       icon: '🚜',
       groups: [
@@ -734,184 +779,158 @@ class CategoryItem {
         CategoryGroup(
           name: 'Weeders',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Brush Cutter',
           icon: '✂️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Chaff Cutter',
           icon: '✂️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Water Pump',
           icon: '🔋',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Earth Auger',
           icon: '⚙️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Chain Saw',
           icon: '✂️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Crop Cover',
           icon: '🛡️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Tarpaulin',
           icon: '🛡️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Mulching Paper',
           icon: '🛡️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Solar Agriculture Products',
           icon: '☀️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Biofloc Tarpaulin',
           icon: '🛡️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Vermicompost Bed',
           icon: '🪱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Azolla Bed',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Pond Liner',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Hedge Trimmer',
           icon: '✂️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Weed Mat',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Soil Testing Tools',
           icon: '🔧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Torch Light',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fogging Machine',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'irrigation',
+      backendId: '6ab4f6f619ec643fd9bf372f',
       name: 'Irrigation',
       icon: '💧',
       groups: [
         CategoryGroup(
           name: 'Rain Pipe',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Drip Irrigation Accessories',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Pipe & Fitting',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Drip Irrigation Kit',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Sprinkler',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'gardening',
+      backendId: '6ab4f6f619ec643fd9bf3735',
       name: 'Gardening',
       icon: '🏡',
       groups: [
         CategoryGroup(
           name: 'Grow Bag',
           icon: '🪴',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Gardening Kit',
           icon: '🪴',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Coco Peat',
           icon: '🪴',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Pesticides',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Waste Compost Management',
@@ -923,26 +942,22 @@ class CategoryItem {
         CategoryGroup(
           name: 'Spray Pumps',
           icon: '🔋',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Accessories',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Lawn Mowers',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Seeds',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'FLOWER SEEDS',
@@ -963,20 +978,17 @@ class CategoryItem {
         CategoryGroup(
           name: 'Garden Shade Net',
           icon: '🛡️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fertilizer',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Transplanting/ Repotting Mat',
           icon: '🪴',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Tools',
@@ -1003,25 +1015,23 @@ class CategoryItem {
         CategoryGroup(
           name: 'Pebbles',
           icon: '🪨',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fertilizer Blend',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'De Oiled Cake',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'organic-farming',
+      backendId: '6ab4f6f619ec643fd9bf3762',
       name: 'Organic Farming',
       icon: '🍃',
       groups: [
@@ -1036,58 +1046,50 @@ class CategoryItem {
         CategoryGroup(
           name: 'Vermi Compost',
           icon: '🪱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Neem Oil',
           icon: '🍃',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Waste Decomposer',
           icon: '♻️',
-          subcategories: [
-            'National Centre Waste Decomposer',
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Viricides',
           icon: '🧪',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'cattle-and-bird-care',
+      backendId: '6ab4f6f619ec643fd9bf376a',
       name: 'Cattle & Bird Care',
       icon: '🐄',
       groups: [
         CategoryGroup(
           name: 'Poultry Feed Supplements',
           icon: '🐔',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Goat And Sheep Care',
           icon: '🐐',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Aqua Care',
           icon: '🐟',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Mosquito Net',
           icon: '🛡️',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fodder Seed',
@@ -1107,82 +1109,79 @@ class CategoryItem {
         CategoryGroup(
           name: 'Animal Feed Supplements',
           icon: '🐄',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Mineral Mixture',
           icon: '💊',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Swine Supplement',
           icon: '🐄',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Aquaculture Feed Additives',
           icon: '🐟',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Bird Food',
           icon: '🐔',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Silage Bag (Murghas Bag)',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'bulk',
+      backendId: '6ab4f6f619ec643fd9bf377f',
       name: 'Bulk',
       icon: '📦',
       groups: [
         CategoryGroup(
           name: 'Remedies',
           icon: '💊',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Seeds',
           icon: '🌱',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Organic Products',
           icon: '🌿',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Irrigation Parts',
           icon: '💧',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
         CategoryGroup(
           name: 'Fertilizers',
           icon: '🌾',
-          subcategories: [
-          ],
+          subcategories: [],
         ),
       ],
     ),
     CategoryItem(
       id: 'har-din-sasta',
+      backendId: '6ab4f6f619ec643fd9bf3785',
       name: 'Har Din Sasta',
       icon: '🏷️',
+    ),
+    CategoryItem(
+      id: 'growth-regulators',
+      backendId: '6ae2d682477dabe731e2c1f6',
+      name: 'Growth Regulators',
+      icon: '⚡',
     ),
   ];
 }

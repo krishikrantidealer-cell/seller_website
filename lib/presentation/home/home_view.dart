@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/services/category_api_service.dart';
+import '../../logic/category/category_bloc.dart';
+import '../../logic/category/category_event.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
@@ -29,11 +33,36 @@ class _HomeViewState extends State<HomeView> {
 
   final List<ProductItem> _allProducts = ProductItem.sampleProducts;
 
+  @override
+  void initState() {
+    super.initState();
+    CategoryController.instance.addListener(_onCategoriesUpdated);
+    final bloc = context.read<CategoryBloc?>();
+    if (bloc != null) {
+      bloc.add(const InitializeCategories());
+    } else {
+      CategoryController.instance.fetchCategories();
+    }
+  }
+
+  @override
+  void dispose() {
+    CategoryController.instance.removeListener(_onCategoriesUpdated);
+    super.dispose();
+  }
+
+  void _onCategoriesUpdated() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   List<ProductItem> get _filteredProducts {
+    final categories = CategoryController.instance.categories;
     return _allProducts.where((p) {
       final matchesBestSeller = _selectedCategory == 'all' ? p.isBestSeller : true;
-      final currentCategoryItem = CategoryItem.sampleCategories.cast<CategoryItem?>().firstWhere(
-        (c) => c?.id == _selectedCategory,
+      final currentCategoryItem = categories.cast<CategoryItem?>().firstWhere(
+        (c) => c?.id == _selectedCategory || c?.backendId == _selectedCategory,
         orElse: () => null,
       );
       final categoryGroupNames = currentCategoryItem?.groups.map((g) => g.name.toLowerCase()).toList() ?? [];
@@ -55,10 +84,8 @@ class _HomeViewState extends State<HomeView> {
 
   String _getCategoryTitle(String catId) {
     if (catId == 'all') return 'All Categories';
-    final match = CategoryItem.sampleCategories.firstWhere(
-      (c) => c.id == catId,
-      orElse: () => CategoryItem(id: catId, name: catId, icon: '🌿'),
-    );
+    final match = CategoryController.instance.findCategory(catId) ??
+        CategoryItem(id: catId, name: catId, icon: '🌿');
     return match.name;
   }
 

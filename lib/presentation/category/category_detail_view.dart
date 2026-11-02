@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/services/category_api_service.dart';
+import '../../logic/category/category_bloc.dart';
+import '../../logic/category/category_event.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
@@ -49,13 +53,29 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     _selectedSubcategory = widget.initialSubcategory;
     _selectedTechnicalName = widget.initialTechnicalName;
     _isBestSellersMode = widget.isBestSellersOnly;
+    CategoryController.instance.addListener(_onCategoriesUpdated);
+    final bloc = context.read<CategoryBloc?>();
+    if (bloc != null) {
+      bloc.add(const InitializeCategories());
+    } else {
+      CategoryController.instance.fetchCategories();
+    }
+  }
+
+  @override
+  void dispose() {
+    CategoryController.instance.removeListener(_onCategoriesUpdated);
+    super.dispose();
+  }
+
+  void _onCategoriesUpdated() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   List<ProductItem> get _filteredProducts {
-    final currentCategoryItem = CategoryItem.sampleCategories.cast<CategoryItem?>().firstWhere(
-      (c) => c?.id == _selectedCategory,
-      orElse: () => null,
-    );
+    final currentCategoryItem = CategoryController.instance.findCategory(_selectedCategory);
     final categoryGroupNames = currentCategoryItem?.groups.map((g) => g.name.toLowerCase()).toList() ?? [];
 
     final list = _allProducts.where((p) {
@@ -104,10 +124,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   List<String> _getCurrentSubcategories() {
     if (_selectedCategory == 'all') return [];
-    final match = CategoryItem.sampleCategories.firstWhere(
-      (c) => c.id == _selectedCategory,
-      orElse: () => CategoryItem(id: _selectedCategory, name: '', icon: ''),
-    );
+    final match = CategoryController.instance.findCategory(_selectedCategory) ??
+        CategoryItem(id: _selectedCategory, name: '', icon: '');
     if (_selectedSubcategory != null) {
       final activeGroup = match.groups.cast<CategoryGroup?>().firstWhere(
         (g) => g?.name.toLowerCase() == _selectedSubcategory!.toLowerCase(),
@@ -447,10 +465,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
 
   Widget _buildCategoryPills(bool isMobile) {
-    final activeCat = CategoryItem.sampleCategories.cast<CategoryItem?>().firstWhere(
-      (c) => c?.id == _selectedCategory,
-      orElse: () => null,
-    );
+    final categories = CategoryController.instance.categories;
+    final activeCat = CategoryController.instance.findCategory(_selectedCategory);
 
     // If a major category is selected, show its categories as the pill row
     if (activeCat != null) {
@@ -541,7 +557,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           });
         },
       ),
-      ...CategoryItem.sampleCategories.map((cat) {
+      ...categories.map((cat) {
         return _buildPill(
           label: cat.name,
           iconEmoji: cat.icon,

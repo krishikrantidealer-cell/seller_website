@@ -1,8 +1,18 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 import 'package:seller_website/data/models/catalog_models.dart';
+import 'package:seller_website/data/services/category_api_service.dart';
+import 'package:seller_website/core/network/api_client.dart';
+import 'package:seller_website/core/network/websocket_service.dart';
+import 'package:seller_website/data/datasources/category_remote_datasource.dart';
+import 'package:seller_website/data/repositories/category_repository_impl.dart';
+import 'package:seller_website/logic/category/category_bloc.dart';
+import 'package:seller_website/logic/category/category_event.dart';
 import 'package:seller_website/main.dart';
 import 'package:seller_website/presentation/product_detail/product_detail_view.dart';
 import 'package:seller_website/data/models/auth_state.dart';
@@ -295,11 +305,12 @@ void main() {
     expect(find.textContaining('Tomato'), findsWidgets);
   });
 
-  testWidgets('All 11 AgriBegri Major Categories are rendered and support cascaded 2-stage hover', (WidgetTester tester) async {
+  testWidgets('All 12 AgriBegri Major Categories are rendered and support cascaded 2-stage hover', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1600, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+    CategoryController.instance.resetToSampleCategories();
 
     await tester.pumpWidget(
       const MaterialApp(
@@ -310,8 +321,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // Verify all 11 AgriBegri major category names exist in the data model
-    final expected11Categories = [
+    // Verify all 12 AgriBegri major category names exist in the data model
+    final expected12Categories = [
       'Crop Protection',
       'Crop Nutrition',
       'Seeds',
@@ -323,10 +334,11 @@ void main() {
       'Cattle & Bird Care',
       'Bulk',
       'Har Din Sasta',
+      'Growth Regulators',
     ];
 
-    expect(CategoryItem.sampleCategories.length, equals(11));
-    for (final catName in expected11Categories) {
+    expect(CategoryItem.sampleCategories.length, equals(12));
+    for (final catName in expected12Categories) {
       expect(
         CategoryItem.sampleCategories.any((c) => c.name == catName),
         isTrue,
@@ -349,16 +361,17 @@ void main() {
     expect(find.text('Bio Pesticides'), findsWidgets);
 
     // Initial state: Level 2 subcategories not rendered until Category is hovered
-    expect(find.text('Systemic Insecticides'), findsNothing);
+    expect(find.text('Bio Insecticide'), findsNothing);
 
-    // Hover over 'Insecticides' category
-    final insecticidesCategory = find.text('Insecticides').first;
-    await gesture.moveTo(tester.getCenter(insecticidesCategory));
+    // Hover over 'Bio Pesticides' category
+    final bioPesticidesCategory = find.text('Bio Pesticides').first;
+    await gesture.moveTo(tester.getCenter(bioPesticidesCategory));
     await tester.pumpAndSettle();
 
     // Subcategories should now be visible in the side panel
-    expect(find.text('Systemic Insecticides'), findsOneWidget);
-    expect(find.text('Contact & Ingestion'), findsOneWidget);
+    expect(find.text('Bio Insecticide'), findsOneWidget);
+    expect(find.text('Bio Fungicide'), findsOneWidget);
+    expect(find.text('Bio Miticide'), findsOneWidget);
 
     // Hover over 'Equipments' tab (category index 4) to verify alignment directly below the tab
     final equipmentsTab = find.text('Equipments').first;
@@ -1125,14 +1138,14 @@ void main() {
     final comboRight = tester.getTopRight(find.text('Combo Product')).dx;
     expect(comboRight < 1440.0, isTrue, reason: 'Combo Product pill must not be cut off at screen edge');
 
-    // Tap on 'Insecticides' group to reveal subcategories
-    await tester.tap(find.text('Insecticides').first);
+    // Tap on 'Bio Pesticides' group to reveal its Level 2 subcategories
+    await tester.tap(find.text('Bio Pesticides').first);
     await tester.pumpAndSettle();
 
     // Verify subcategories show up, but 'All in Category' is removed
     expect(find.text('Subcategories: '), findsOneWidget);
     expect(find.text('All in Category'), findsNothing);
-    expect(find.text('Systemic Insecticides'), findsOneWidget);
+    expect(find.text('Bio Insecticide'), findsOneWidget);
 
     // Enter a search that yields 0 products to trigger empty state with 'Reset All Filters'
     final searchInput = find.byType(TextField);
@@ -1211,6 +1224,184 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('CategoryController.fetchCategories parses 3-tier hierarchy from GET /api/v1/categories and updates HomeView & CategoryRibbon', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(CategoryController.instance.resetToSampleCategories);
+
+    final mockClient = MockClient((http.Request request) async {
+      expect(request.url.path, equals('/api/v1/categories'));
+      final payload = {
+        'success': true,
+        'message': 'Categories retrieved successfully',
+        'data': {
+          'content': [
+            {
+              'id': '6ab4f6f619ec643fd9bf362c',
+              'name': 'Crop Protection',
+              'slug': 'crop-protection',
+              'parentId': null,
+              'level': 0,
+              'sortOrder': 1,
+              'isActive': true,
+            },
+            {
+              'id': '6ab4f6f619ec643fd9bf3689',
+              'name': 'Seeds',
+              'slug': 'seeds',
+              'parentId': null,
+              'level': 0,
+              'sortOrder': 2,
+              'isActive': true,
+            },
+            {
+              'id': '6ab4f6f619ec643fd9bf3620',
+              'name': 'Insecticides',
+              'slug': 'insecticides',
+              'parentId': '6ab4f6f619ec643fd9bf362c',
+              'level': 1,
+              'sortOrder': 1,
+              'isActive': true,
+            },
+            {
+              'id': '6ab4f6f619ec643fd9bf366a',
+              'name': 'Bio Pesticides',
+              'slug': 'bio-pesticides',
+              'parentId': '6ab4f6f619ec643fd9bf362c',
+              'level': 1,
+              'sortOrder': 2,
+              'isActive': true,
+            },
+            {
+              'id': '6ab4f6f619ec643fd9bf366b',
+              'name': 'Bio Insecticide',
+              'slug': 'bio-insecticide',
+              'parentId': '6ab4f6f619ec643fd9bf366a',
+              'level': 2,
+              'sortOrder': 1,
+              'isActive': true,
+            },
+            {
+              'id': '6ab4f6f619ec643fd9bf366c',
+              'name': 'Bio Fungicide',
+              'slug': 'bio-fungicide',
+              'parentId': '6ab4f6f619ec643fd9bf366a',
+              'level': 1 + 1,
+              'sortOrder': 2,
+              'isActive': true,
+            },
+          ],
+          'page': 0,
+          'size': 6,
+          'totalElements': 6,
+          'totalPages': 1,
+          'first': true,
+          'last': true,
+        },
+      };
+      return http.Response(jsonEncode(payload), 200);
+    });
+
+    await CategoryController.instance.fetchCategories(
+      client: mockClient,
+      forceRefresh: true,
+    );
+
+    expect(CategoryController.instance.hasLoadedFromApi, isTrue);
+    expect(CategoryController.instance.categories.length, equals(2));
+    expect(CategoryController.instance.categories.first.name, equals('Crop Protection'));
+    expect(CategoryController.instance.categories.first.backendId, equals('6ab4f6f619ec643fd9bf362c'));
+    expect(CategoryController.instance.categories.first.groups.length, equals(2));
+    expect(CategoryController.instance.categories.first.groups[1].name, equals('Bio Pesticides'));
+    expect(
+      CategoryController.instance.categories.first.groups[1].subcategories,
+      equals(['Bio Insecticide', 'Bio Fungicide']),
+    );
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Crop Protection'), findsWidgets);
+    expect(find.text('Seeds'), findsWidgets);
+  });
+
+  testWidgets('CategoryBloc fetches categories via CategoryRepository and reacts to WebSocket categories:* events', (WidgetTester tester) async {
+    addTearDown(CategoryController.instance.resetToSampleCategories);
+
+    int fetchCount = 0;
+    final mockClient = MockClient((http.Request request) async {
+      fetchCount++;
+      final isSecondFetch = fetchCount >= 2;
+      final payload = {
+        'success': true,
+        'message': 'Categories retrieved successfully',
+        'data': {
+          'content': [
+            {
+              'id': '6ab4f6f619ec643fd9bf362c',
+              'name': 'Crop Protection',
+              'slug': 'crop-protection',
+              'parentId': null,
+              'level': 0,
+              'sortOrder': 1,
+              'isActive': true,
+            },
+            if (isSecondFetch)
+              {
+                'id': '6ab4f6f619ec643fd9bf3735',
+                'name': 'Gardening',
+                'slug': 'gardening',
+                'parentId': null,
+                'level': 0,
+                'sortOrder': 2,
+                'isActive': true,
+              },
+          ],
+          'page': 0,
+          'size': 2,
+          'totalElements': isSecondFetch ? 2 : 1,
+          'totalPages': 1,
+          'first': true,
+          'last': true,
+        },
+      };
+      return http.Response(jsonEncode(payload), 200);
+    });
+
+    final apiClient = ApiClient(client: mockClient);
+    final remoteDataSource = CategoryRemoteDataSourceImpl(apiClient);
+    final repository = CategoryRepositoryImpl(remoteDataSource: remoteDataSource);
+    final wsService = WebSocketService();
+    final bloc = CategoryBloc(
+      categoryRepository: repository,
+      webSocketService: wsService,
+    );
+    addTearDown(bloc.close);
+
+    // 1. Trigger FetchCategories event on CategoryBloc
+    bloc.add(const FetchCategories(isRefresh: true));
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, equals(1));
+    expect(bloc.state.categories.length, equals(1));
+    expect(bloc.state.categories.first.name, equals('Crop Protection'));
+
+    // 2. Simulate real-time WebSocket event `categories:created` from backend
+    wsService.handleRawMessageForTest(
+      jsonEncode({
+        'event': 'categories:created',
+        'data': {'id': '6ab4f6f619ec643fd9bf3735', 'name': 'Gardening'},
+      }),
+    );
+    await tester.pumpAndSettle();
+
+    expect(fetchCount, equals(2));
+    expect(bloc.state.categories.length, equals(2));
+    expect(bloc.state.categories[1].name, equals('Gardening'));
   });
 }
 

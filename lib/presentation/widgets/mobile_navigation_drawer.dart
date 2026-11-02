@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/services/category_api_service.dart';
 import '../../data/models/auth_state.dart';
 import '../../data/models/wishlist_state.dart';
+import '../../logic/category/category_bloc.dart';
+import '../../logic/category/category_state.dart';
 import 'auth_modal.dart';
 import '../profile/farmer_profile_view.dart';
 import '../orders/my_orders_view.dart';
@@ -37,315 +41,357 @@ class MobileNavigationDrawer extends StatelessWidget {
 
             // Scrollable Navigation Body
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                children: [
-                  // Quick Actions Bar (Orders, Wishlist, Technical, Profile)
-                  _buildQuickActionBar(context),
-
-                  const SizedBox(height: 4),
-
-                  // Section Header: Categories
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'CATEGORIES',
-                          style: GoogleFonts.poppins(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textMuted,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE2E8F0),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            '11 Categories',
-                            style: GoogleFonts.poppins(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // All Products Item
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    child: Material(
-                      color: selectedCategoryId == 'all' ? AppColors.lightGreen : Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: selectedCategoryId == 'all'
-                              ? AppColors.primaryGreen.withValues(alpha: 0.4)
-                              : const Color(0xFFE2E8F0),
-                        ),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: ListTile(
-                        dense: true,
-                        visualDensity: VisualDensity.compact,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                        minLeadingWidth: 26,
-                        leading: Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: selectedCategoryId == 'all' ? AppColors.primaryGreen : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Icon(
-                            Icons.grid_view_rounded,
-                            size: 16,
-                            color: selectedCategoryId == 'all' ? Colors.white : AppColors.primaryGreen,
-                          ),
-                        ),
-                        title: Text(
-                          'All Products',
-                          style: GoogleFonts.poppins(
-                            fontWeight: selectedCategoryId == 'all' ? FontWeight.w700 : FontWeight.w600,
-                            fontSize: 12.5,
-                            color: selectedCategoryId == 'all' ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                          ),
-                        ),
-                        trailing: selectedCategoryId == 'all'
-                            ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: 16)
-                            : const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textMuted),
-                        onTap: () {
-                          Navigator.pop(context);
-                          if (onAllProductsSelected != null) {
-                            onAllProductsSelected!();
-                          } else {
-                            onCategorySelected('all', null);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-
-                  // Major Categories Accordions
-                  ...CategoryItem.sampleCategories.map((cat) {
-                    final isCatSelected = selectedCategoryId == cat.id;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      child: Material(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: isCatSelected ? AppColors.primaryGreen.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
-                            width: isCatSelected ? 1.2 : 1.0,
-                          ),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Theme(
-                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            key: PageStorageKey('drawer_cat_${cat.id}'),
-                            initiallyExpanded: isCatSelected,
-                            dense: true,
-                            visualDensity: VisualDensity.compact,
-                            tilePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                            leading: Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: isCatSelected ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: isCatSelected ? AppColors.primaryGreen.withValues(alpha: 0.2) : const Color(0xFFE2E8F0),
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(cat.icon, style: const TextStyle(fontSize: 14)),
-                            ),
-                            title: Text(
-                              cat.name,
-                              style: GoogleFonts.poppins(
-                                fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
-                                fontSize: 12.5,
-                                color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                              ),
-                            ),
-                            children: [
-                              Material(
-                                color: const Color(0xFFF8FAFC),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  child: Column(
-                                    children: [
-                                      // Quick All in Category button
-                                      InkWell(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                          onCategorySelected(cat.id, null);
-                                        },
-                                        borderRadius: BorderRadius.circular(6),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: isCatSelected && selectedSubcategory == null
-                                                ? AppColors.primaryGreen
-                                                : Colors.white,
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(
-                                              color: isCatSelected && selectedSubcategory == null
-                                                  ? AppColors.primaryGreen
-                                                  : const Color(0xFFE2E8F0),
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'All in ${cat.name}',
-                                                style: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 11.5,
-                                                  color: isCatSelected && selectedSubcategory == null
-                                                      ? Colors.white
-                                                      : AppColors.primaryDarkGreen,
-                                                ),
-                                              ),
-                                              Icon(
-                                                Icons.arrow_forward_rounded,
-                                                size: 13,
-                                                color: isCatSelected && selectedSubcategory == null
-                                                    ? Colors.white
-                                                    : AppColors.primaryGreen,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 4),
-
-                                      // Groups and subcategories
-                                      if (cat.groups.isNotEmpty)
-                                        ...cat.groups.map(
-                                          (group) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 4),
-                                            child: Material(
-                                              color: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(6),
-                                                side: const BorderSide(color: Color(0xFFE2E8F0)),
-                                              ),
-                                              clipBehavior: Clip.antiAlias,
-                                              child: Theme(
-                                                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                                                child: ExpansionTile(
-                                                  dense: true,
-                                                  visualDensity: VisualDensity.compact,
-                                                  tilePadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                                                  leading: group.icon != null
-                                                      ? Text(group.icon!, style: const TextStyle(fontSize: 13))
-                                                      : null,
-                                                  title: Text(
-                                                    group.name,
-                                                    style: GoogleFonts.poppins(
-                                                      fontSize: 11.5,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: selectedSubcategory == group.name
-                                                          ? AppColors.primaryDarkGreen
-                                                          : AppColors.textPrimary,
-                                                    ),
-                                                  ),
-                                                  children: [
-                                                    Material(
-                                                      color: Colors.white,
-                                                      child: Column(
-                                                        children: group.subcategories.map(
-                                                          (sub) {
-                                                            final isSubSelected = isCatSelected && selectedSubcategory == sub;
-                                                            return ListTile(
-                                                              dense: true,
-                                                              visualDensity: VisualDensity.compact,
-                                                              contentPadding: const EdgeInsets.only(left: 24, right: 10),
-                                                              title: Text(
-                                                                sub,
-                                                                style: GoogleFonts.poppins(
-                                                                  fontSize: 11,
-                                                                  fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
-                                                                  color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
-                                                                ),
-                                                              ),
-                                                              trailing: isSubSelected
-                                                                  ? const Icon(Icons.check, size: 13, color: AppColors.primaryGreen)
-                                                                  : const Icon(Icons.chevron_right_rounded, size: 13, color: Color(0xFFCBD5E1)),
-                                                              onTap: () {
-                                                                Navigator.pop(context);
-                                                                onCategorySelected(cat.id, sub);
-                                                              },
-                                                            );
-                                                          },
-                                                        ).toList(),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      else
-                                        ...cat.subcategories.map(
-                                          (sub) {
-                                            final isSubSelected = isCatSelected && selectedSubcategory == sub;
-                                            return ListTile(
-                                              dense: true,
-                                              visualDensity: VisualDensity.compact,
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                                              title: Text(
-                                                sub,
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 11.5,
-                                                  fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
-                                                  color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
-                                                ),
-                                              ),
-                                              trailing: isSubSelected
-                                                  ? const Icon(Icons.check, size: 13, color: AppColors.primaryGreen)
-                                                  : const Icon(Icons.chevron_right_rounded, size: 13, color: Color(0xFFCBD5E1)),
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                                onCategorySelected(cat.id, sub);
-                                              },
-                                            );
-                                          },
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+              child: Builder(
+                builder: (context) {
+                  final categoryBloc = context.read<CategoryBloc?>();
+                  if (categoryBloc != null) {
+                    return BlocBuilder<CategoryBloc, CategoryState>(
+                      bloc: categoryBloc,
+                      builder: (context, state) {
+                        return _buildCategoriesList(context, state.effectiveCategories);
+                      },
                     );
-                  }),
-
-                  const SizedBox(height: 12),
-                ],
+                  }
+                  return ListenableBuilder(
+                    listenable: CategoryController.instance,
+                    builder: (context, _) {
+                      return _buildCategoriesList(context, CategoryController.instance.categories);
+                    },
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildCategoriesList(BuildContext context, List<CategoryItem> categories) {
+    return ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    children: [
+                      // Quick Actions Bar (Orders, Wishlist, Technical, Profile)
+                      _buildQuickActionBar(context),
+
+                      const SizedBox(height: 4),
+
+                      // Section Header: Categories
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'CATEGORIES',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textMuted,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE2E8F0),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${categories.length} Categories',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 9.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // All Products Item
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        child: Material(
+                          color: selectedCategoryId == 'all' ? AppColors.lightGreen : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                              color: selectedCategoryId == 'all'
+                                  ? AppColors.primaryGreen.withValues(alpha: 0.4)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: ListTile(
+                            dense: true,
+                            visualDensity: VisualDensity.compact,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                            minLeadingWidth: 26,
+                            leading: Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: selectedCategoryId == 'all' ? AppColors.primaryGreen : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                Icons.grid_view_rounded,
+                                size: 16,
+                                color: selectedCategoryId == 'all' ? Colors.white : AppColors.primaryGreen,
+                              ),
+                            ),
+                            title: Text(
+                              'All Products',
+                              style: GoogleFonts.poppins(
+                                fontWeight: selectedCategoryId == 'all' ? FontWeight.w700 : FontWeight.w600,
+                                fontSize: 12.5,
+                                color: selectedCategoryId == 'all' ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                              ),
+                            ),
+                            trailing: selectedCategoryId == 'all'
+                                ? const Icon(Icons.check_circle_rounded, color: AppColors.primaryGreen, size: 16)
+                                : const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.textMuted),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (onAllProductsSelected != null) {
+                                onAllProductsSelected!();
+                              } else {
+                                onCategorySelected('all', null);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+
+                      // Major Categories Accordions
+                      ...categories.map((cat) {
+                        final isCatSelected = selectedCategoryId == cat.id;
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                          child: Material(
+                            color: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              side: BorderSide(
+                                color: isCatSelected ? AppColors.primaryGreen.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+                                width: isCatSelected ? 1.2 : 1.0,
+                              ),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Theme(
+                              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                              child: ExpansionTile(
+                                key: PageStorageKey('drawer_cat_${cat.id}'),
+                                initiallyExpanded: isCatSelected,
+                                dense: true,
+                                visualDensity: VisualDensity.compact,
+                                tilePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                leading: Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: isCatSelected ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: isCatSelected ? AppColors.primaryGreen.withValues(alpha: 0.2) : const Color(0xFFE2E8F0),
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(cat.icon, style: const TextStyle(fontSize: 14)),
+                                ),
+                                title: Text(
+                                  cat.name,
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
+                                    fontSize: 12.5,
+                                    color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                                  ),
+                                ),
+                                children: [
+                                  Material(
+                                    color: const Color(0xFFF8FAFC),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      child: Column(
+                                        children: [
+                                          // Quick All in Category button
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              onCategorySelected(cat.id, null);
+                                            },
+                                            borderRadius: BorderRadius.circular(6),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                              decoration: BoxDecoration(
+                                                color: isCatSelected && selectedSubcategory == null
+                                                    ? AppColors.primaryGreen
+                                                    : Colors.white,
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: isCatSelected && selectedSubcategory == null
+                                                      ? AppColors.primaryGreen
+                                                      : const Color(0xFFE2E8F0),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    'All in ${cat.name}',
+                                                    style: GoogleFonts.poppins(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 11.5,
+                                                      color: isCatSelected && selectedSubcategory == null
+                                                          ? Colors.white
+                                                          : AppColors.primaryDarkGreen,
+                                                    ),
+                                                  ),
+                                                  Icon(
+                                                    Icons.arrow_forward_rounded,
+                                                    size: 13,
+                                                    color: isCatSelected && selectedSubcategory == null
+                                                        ? Colors.white
+                                                        : AppColors.primaryGreen,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+
+                                          const SizedBox(height: 4),
+
+                                          // Groups and subcategories
+                                          if (cat.groups.isNotEmpty)
+                                            ...cat.groups.map(
+                                              (group) => Padding(
+                                                padding: const EdgeInsets.only(bottom: 4),
+                                                child: Material(
+                                                  color: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(6),
+                                                    side: const BorderSide(color: Color(0xFFE2E8F0)),
+                                                  ),
+                                                  clipBehavior: Clip.antiAlias,
+                                                  child: Theme(
+                                                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                                    child: ExpansionTile(
+                                                      dense: true,
+                                                      visualDensity: VisualDensity.compact,
+                                                      tilePadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                                      leading: group.icon != null
+                                                          ? Text(group.icon!, style: const TextStyle(fontSize: 13))
+                                                          : null,
+                                                      title: Text(
+                                                        group.name,
+                                                        style: GoogleFonts.poppins(
+                                                          fontSize: 11.5,
+                                                          fontWeight: FontWeight.w600,
+                                                          color: selectedSubcategory == group.name
+                                                              ? AppColors.primaryDarkGreen
+                                                              : AppColors.textPrimary,
+                                                        ),
+                                                      ),
+                                                      children: [
+                                                        Material(
+                                                          color: Colors.white,
+                                                          child: Column(
+                                                            children: [
+                                                              ListTile(
+                                                                dense: true,
+                                                                visualDensity: VisualDensity.compact,
+                                                                contentPadding: const EdgeInsets.only(left: 24, right: 10),
+                                                                title: Text(
+                                                                  'All ${group.name}',
+                                                                  style: GoogleFonts.poppins(
+                                                                    fontSize: 11,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    color: AppColors.primaryGreen,
+                                                                  ),
+                                                                ),
+                                                                trailing: const Icon(Icons.arrow_forward_rounded, size: 12, color: AppColors.primaryGreen),
+                                                                onTap: () {
+                                                                  Navigator.pop(context);
+                                                                  onCategorySelected(cat.id, group.name);
+                                                                },
+                                                              ),
+                                                              ...group.subcategories.map(
+                                                                (sub) {
+                                                                  final isSubSelected = isCatSelected && selectedSubcategory == sub;
+                                                                  return ListTile(
+                                                                    dense: true,
+                                                                    visualDensity: VisualDensity.compact,
+                                                                    contentPadding: const EdgeInsets.only(left: 24, right: 10),
+                                                                    title: Text(
+                                                                      sub,
+                                                                      style: GoogleFonts.poppins(
+                                                                        fontSize: 11,
+                                                                        fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
+                                                                        color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
+                                                                      ),
+                                                                    ),
+                                                                    trailing: isSubSelected
+                                                                        ? const Icon(Icons.check, size: 13, color: AppColors.primaryGreen)
+                                                                        : const Icon(Icons.chevron_right_rounded, size: 13, color: Color(0xFFCBD5E1)),
+                                                                    onTap: () {
+                                                                      Navigator.pop(context);
+                                                                      onCategorySelected(cat.id, sub);
+                                                                    },
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          else
+                                            ...cat.subcategories.map(
+                                              (sub) {
+                                                final isSubSelected = isCatSelected && selectedSubcategory == sub;
+                                                return ListTile(
+                                                  dense: true,
+                                                  visualDensity: VisualDensity.compact,
+                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                                  title: Text(
+                                                    sub,
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 11.5,
+                                                      fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
+                                                      color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
+                                                    ),
+                                                  ),
+                                                  trailing: isSubSelected
+                                                      ? const Icon(Icons.check, size: 13, color: AppColors.primaryGreen)
+                                                      : const Icon(Icons.chevron_right_rounded, size: 13, color: Color(0xFFCBD5E1)),
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                    onCategorySelected(cat.id, sub);
+                                                  },
+                                                );
+                                              },
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+
+                      const SizedBox(height: 12),
+                    ],
+                  );
   }
 
   Widget _buildDrawerHeader(BuildContext context) {

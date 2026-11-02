@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/services/category_api_service.dart';
+import '../../logic/category/category_bloc.dart';
+import '../../logic/category/category_state.dart';
 
 class CategoryRibbon extends StatefulWidget {
   final String selectedCategoryId;
@@ -35,7 +39,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   @override
   void initState() {
     super.initState();
-    for (final cat in CategoryItem.sampleCategories) {
+    for (final cat in CategoryController.instance.categories) {
       _categoryLinks[cat.id] = LayerLink();
     }
     _scrollController.addListener(_checkScroll);
@@ -206,220 +210,241 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = CategoryItem.sampleCategories;
+    final categoryBloc = context.read<CategoryBloc?>();
+    if (categoryBloc != null) {
+      return BlocBuilder<CategoryBloc, CategoryState>(
+        bloc: categoryBloc,
+        builder: (context, state) {
+          return _buildRibbonContent(context, state.effectiveCategories);
+        },
+      );
+    }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = MediaQuery.sizeOf(context).width;
-        final isMobile = constraints.maxWidth < 768 || screenWidth < 768;
-
-        if (isMobile) {
-          return _buildMobileMenuBar(context, categories);
-        }
-
-        // Check scroll bounds on layout build so arrow buttons react immediately
-        WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
-
-        final isCompact = screenWidth < 1650;
-        final isLaptop = screenWidth < 1480;
-        final isUltraCompact = screenWidth < 1320;
-        final double allCatHPadding = isUltraCompact ? 8.0 : (isLaptop ? 9.5 : (isCompact ? 11.0 : 13.0));
-        final double allCatFontSize = isUltraCompact ? 11.0 : (isLaptop ? 11.5 : (isCompact ? 12.0 : 12.5));
-
-        return Container(
-          width: double.infinity,
-          color: AppColors.primaryGreen,
-          height: 48,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1680),
-              child: Row(
-                children: [
-                  const SizedBox(width: 8),
-
-                  // Master "ALL CATEGORIES" Tab with hover mega-menu on desktop (pinned at left)
-                  CompositedTransformTarget(
-                    link: _allCategoriesLink,
-                    child: MouseRegion(
-                      onEnter: (_) {
-                        if (!isMobile) _showMegaMenu(context, categories);
-                      },
-                      onExit: (_) {
-                        if (!isMobile) _scheduleHide();
-                      },
-                      child: InkWell(
-                        onTap: () {
-                          if (isMobile) {
-                            _openMobileMenu(context, categories);
-                          } else {
-                            if (_overlayEntry != null && _activeOpenTab == 'all') {
-                              _removeOverlay();
-                            } else {
-                              _showMegaMenu(context, categories);
-                            }
-                          }
-                        },
-                        child: Container(
-                          height: 38,
-                          padding: EdgeInsets.symmetric(horizontal: allCatHPadding),
-                          decoration: BoxDecoration(
-                            color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
-                                ? AppColors.primaryDarkGreen
-                                : Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
-                                  ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.grid_view_rounded, color: Colors.white, size: 16),
-                              const SizedBox(width: 6),
-                              Text(
-                                'ALL CATEGORIES',
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: allCatFontSize,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              AnimatedRotation(
-                                turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
-                                duration: const Duration(milliseconds: 180),
-                                child: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 4),
-                  Container(
-                    height: 24,
-                    width: 1,
-                    color: Colors.white.withValues(alpha: 0.25),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                  ),
-                  const SizedBox(width: 2),
-
-                  // Left scroll arrow button for laptop/narrow screens
-                  if (_canScrollLeft)
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          _scrollController.animateTo(
-                            math.max(0.0, _scrollController.offset - 220),
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          height: 32,
-                          width: 26,
-                          margin: const EdgeInsets.only(right: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.22),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 20),
-                        ),
-                      ),
-                    ),
-
-                  // Scrollable category tabs with responsive padding & sizing
-                  Expanded(
-                    child: NotificationListener<ScrollMetricsNotification>(
-                      onNotification: (notification) {
-                        final max = notification.metrics.maxScrollExtent;
-                        final offset = notification.metrics.pixels;
-                        final canLeft = offset > 4;
-                        final canRight = max > 8 && offset < max - 4;
-                        if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            if (mounted) {
-                              setState(() {
-                                _canScrollLeft = canLeft;
-                                _canScrollRight = canRight;
-                              });
-                            }
-                          });
-                        }
-                        return false;
-                      },
-                      child: NotificationListener<ScrollNotification>(
-                        onNotification: (_) {
-                          _checkScroll();
-                          return false;
-                        },
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: [
-                              ...categories.map(
-                                (cat) => _buildCategoryTab(
-                                  context,
-                                  cat,
-                                  isMobile,
-                                  isCompact: isCompact,
-                                  isLaptop: isLaptop,
-                                  isUltraCompact: isUltraCompact,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Right scroll arrow button for laptop/narrow screens
-                  if (_canScrollRight)
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          _scrollController.animateTo(
-                            _scrollController.offset + 220,
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          height: 32,
-                          width: 26,
-                          margin: const EdgeInsets.only(left: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.22),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
-                        ),
-                      ),
-                    ),
-
-                  const SizedBox(width: 6),
-                ],
-              ),
-            ),
-          ),
-        );
+    return ListenableBuilder(
+      listenable: CategoryController.instance,
+      builder: (context, _) {
+        return _buildRibbonContent(context, CategoryController.instance.categories);
       },
     );
+  }
+
+  Widget _buildRibbonContent(BuildContext context, List<CategoryItem> categories) {
+    for (final cat in categories) {
+      _categoryLinks.putIfAbsent(cat.id, () => LayerLink());
+    }
+
+    return LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.sizeOf(context).width;
+            final isMobile = constraints.maxWidth < 768 || screenWidth < 768;
+
+            if (isMobile) {
+              return _buildMobileMenuBar(context, categories);
+            }
+
+            // Check scroll bounds on layout build so arrow buttons react immediately
+            WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
+
+            final isCompact = screenWidth < 1650;
+            final isLaptop = screenWidth < 1480;
+            final isUltraCompact = screenWidth < 1320;
+            final double allCatHPadding = isUltraCompact ? 8.0 : (isLaptop ? 9.5 : (isCompact ? 11.0 : 13.0));
+            final double allCatFontSize = isUltraCompact ? 11.0 : (isLaptop ? 11.5 : (isCompact ? 12.0 : 12.5));
+
+            return Container(
+              width: double.infinity,
+              color: AppColors.primaryGreen,
+              height: 48,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1680),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 8),
+
+                      // Master "ALL CATEGORIES" Tab with hover mega-menu on desktop (pinned at left)
+                      CompositedTransformTarget(
+                        link: _allCategoriesLink,
+                        child: MouseRegion(
+                          onEnter: (_) {
+                            if (!isMobile) _showMegaMenu(context, categories);
+                          },
+                          onExit: (_) {
+                            if (!isMobile) _scheduleHide();
+                          },
+                          child: InkWell(
+                            onTap: () {
+                              if (isMobile) {
+                                _openMobileMenu(context, categories);
+                              } else {
+                                if (_overlayEntry != null && _activeOpenTab == 'all') {
+                                  _removeOverlay();
+                                } else {
+                                  _showMegaMenu(context, categories);
+                                }
+                              }
+                            },
+                            child: Container(
+                              height: 38,
+                              padding: EdgeInsets.symmetric(horizontal: allCatHPadding),
+                              decoration: BoxDecoration(
+                                color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
+                                    ? AppColors.primaryDarkGreen
+                                    : Colors.white.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
+                                      ? Colors.white
+                                      : Colors.white.withValues(alpha: 0.2),
+                                  width: 1,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.grid_view_rounded, color: Colors.white, size: 16),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'ALL CATEGORIES',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: allCatFontSize,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.3,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  AnimatedRotation(
+                                    turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
+                                    duration: const Duration(milliseconds: 180),
+                                    child: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 16),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 4),
+                      Container(
+                        height: 24,
+                        width: 1,
+                        color: Colors.white.withValues(alpha: 0.25),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                      ),
+                      const SizedBox(width: 2),
+
+                      // Left scroll arrow button for laptop/narrow screens
+                      if (_canScrollLeft)
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _scrollController.animateTo(
+                                math.max(0.0, _scrollController.offset - 220),
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              height: 32,
+                              width: 26,
+                              margin: const EdgeInsets.only(right: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.22),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 20),
+                            ),
+                          ),
+                        ),
+
+                      // Scrollable category tabs with responsive padding & sizing
+                      Expanded(
+                        child: NotificationListener<ScrollMetricsNotification>(
+                          onNotification: (notification) {
+                            final max = notification.metrics.maxScrollExtent;
+                            final offset = notification.metrics.pixels;
+                            final canLeft = offset > 4;
+                            final canRight = max > 8 && offset < max - 4;
+                            if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (mounted) {
+                                  setState(() {
+                                    _canScrollLeft = canLeft;
+                                    _canScrollRight = canRight;
+                                  });
+                                }
+                              });
+                            }
+                            return false;
+                          },
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (_) {
+                              _checkScroll();
+                              return false;
+                            },
+                            child: SingleChildScrollView(
+                              controller: _scrollController,
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              child: Row(
+                                children: [
+                                  ...categories.map(
+                                    (cat) => _buildCategoryTab(
+                                      context,
+                                      cat,
+                                      isMobile,
+                                      isCompact: isCompact,
+                                      isLaptop: isLaptop,
+                                      isUltraCompact: isUltraCompact,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Right scroll arrow button for laptop/narrow screens
+                      if (_canScrollRight)
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              _scrollController.animateTo(
+                                _scrollController.offset + 220,
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              height: 32,
+                              width: 26,
+                              margin: const EdgeInsets.only(left: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.22),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
+                            ),
+                          ),
+                        ),
+
+                      const SizedBox(width: 6),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
   }
 
   /// Dedicated Mobile Category Menu Bar (clean non-scrolling full menu bar)
@@ -1478,8 +1503,8 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
   @override
   Widget build(BuildContext context) {
     final groups = widget.category.groups;
-    final isGroupHovered = _hoveredGroup != null && groups.isNotEmpty;
     final activeGroup = _hoveredGroup;
+    final isGroupHovered = activeGroup != null && groups.isNotEmpty && activeGroup.subcategories.isNotEmpty;
 
     // Dynamically calculate height to eliminate empty space below
     final double dynamicHeight;
@@ -1488,7 +1513,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
       dynamicHeight = (count * 38.0 + 55.0).clamp(120.0, 420.0);
     } else {
       final leftHeight = 44.0 + 30.0 + (groups.length * 42.0);
-      final rightHeight = (isGroupHovered && activeGroup != null)
+      final rightHeight = isGroupHovered
           ? 52.0 + (activeGroup.subcategories.length * 36.0)
           : 0.0;
       final contentHeight = isGroupHovered
@@ -1572,7 +1597,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Subcategories Column on LEFT when flyout opens to left
-                        if (isGroupHovered && activeGroup != null)
+                        if (isGroupHovered)
                           Expanded(
                             child: Container(
                               color: Colors.white,
@@ -1620,7 +1645,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                               ),
 
                         // Right Column (Side Panel): Subcategories shown ONLY when a category is hovered
-                        if (isGroupHovered && activeGroup != null)
+                        if (isGroupHovered)
                           Expanded(
                             child: Container(
                               color: Colors.white,
@@ -1747,11 +1772,12 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                     child: Row(
                       children: isLeftLayout
                           ? [
-                              Icon(
-                                Icons.chevron_left_rounded,
-                                size: 16,
-                                color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
-                              ),
+                              if (group.subcategories.isNotEmpty)
+                                Icon(
+                                  Icons.chevron_left_rounded,
+                                  size: 16,
+                                  color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
+                                ),
                               const SizedBox(width: 6),
                               if (group.icon != null) ...[
                                 Text(group.icon!, style: const TextStyle(fontSize: 14)),
@@ -1789,11 +1815,12 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              Icon(
-                                Icons.chevron_right_rounded,
-                                size: 16,
-                                color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
-                              ),
+                              if (group.subcategories.isNotEmpty)
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 16,
+                                  color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
+                                ),
                             ],
                     ),
                   ),
