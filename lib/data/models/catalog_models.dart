@@ -1,54 +1,164 @@
 class ProductVariant {
   final String id;
+  final String? sku;
   final String label;
+  final String? unit;
+  final double? packSizeValue;
+  final String? packSizeUnit;
+  final int? packQuantity;
+  final String? shippedBy;
   final double displayRate;
   final double printedMrp;
+  final double? gstPercentage;
+  final int? stock;
   final bool inStock;
+  final bool isDefault;
 
   const ProductVariant({
     required this.id,
+    this.sku,
     required this.label,
+    this.unit,
+    this.packSizeValue,
+    this.packSizeUnit,
+    this.packQuantity,
+    this.shippedBy,
     required this.displayRate,
     required this.printedMrp,
+    this.gstPercentage,
+    this.stock,
     this.inStock = true,
+    this.isDefault = false,
   });
 
   int get discountPercent {
     if (printedMrp <= 0 || displayRate >= printedMrp) return 0;
     return (((printedMrp - displayRate) / printedMrp) * 100).round();
   }
+
+  factory ProductVariant.fromPublicJson(Map<String, dynamic> json) {
+    final id = json['id']?.toString() ?? '';
+    final packSizeRaw = json['packSize'];
+    final packSizeVal = packSizeRaw is num ? packSizeRaw.toDouble() : double.tryParse(packSizeRaw?.toString() ?? '');
+    final packSizeUnit = json['packSizeUnit']?.toString() ?? json['unit']?.toString();
+    String label = json['label']?.toString().trim() ?? '';
+    if (label.isEmpty && packSizeVal != null) {
+      final sizeStr = packSizeVal == packSizeVal.roundToDouble()
+          ? packSizeVal.toInt().toString()
+          : packSizeVal.toString();
+      label = '$sizeStr ${packSizeUnit ?? ''}'.trim();
+    }
+    if (label.isEmpty) {
+      label = 'Standard Pack';
+    }
+
+    final displayRateRaw = json['displayRate'];
+    final printedMrpRaw = json['printedMrp'];
+    final displayRate = displayRateRaw is num
+        ? displayRateRaw.toDouble()
+        : (double.tryParse(displayRateRaw?.toString() ?? '') ?? 0.0);
+    final printedMrp = printedMrpRaw is num
+        ? printedMrpRaw.toDouble()
+        : (double.tryParse(printedMrpRaw?.toString() ?? '') ?? displayRate);
+
+    final stockRaw = json['stock'];
+    final stock = stockRaw is num ? stockRaw.toInt() : int.tryParse(stockRaw?.toString() ?? '');
+    final inStock = json['inStock'] is bool
+        ? json['inStock'] as bool
+        : (stock == null || stock > 0);
+
+    return ProductVariant(
+      id: id.isNotEmpty ? id : label,
+      sku: json['sku']?.toString(),
+      label: label,
+      unit: json['unit']?.toString(),
+      packSizeValue: packSizeVal,
+      packSizeUnit: packSizeUnit,
+      packQuantity: json['packQuantity'] is num ? (json['packQuantity'] as num).toInt() : null,
+      shippedBy: json['shippedBy']?.toString(),
+      displayRate: displayRate,
+      printedMrp: printedMrp > 0 ? printedMrp : displayRate,
+      gstPercentage: json['gstPercentage'] is num ? (json['gstPercentage'] as num).toDouble() : null,
+      stock: stock,
+      inStock: inStock,
+      isDefault: json['isDefault'] == true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sku': sku,
+      'label': label,
+      'unit': unit,
+      'packSize': packSizeValue,
+      'packSizeUnit': packSizeUnit,
+      'packQuantity': packQuantity,
+      'shippedBy': shippedBy,
+      'displayRate': displayRate,
+      'printedMrp': printedMrp,
+      'gstPercentage': gstPercentage,
+      'stock': stock,
+      'inStock': inStock,
+      'isDefault': isDefault,
+    };
+  }
 }
 
 class ProductItem {
   final String id;
+  final String? sellerId;
+  final String? sku;
+  final String? productCode;
+  final String? hsnCode;
   final String title;
   final String technicalName;
   final String vendor;
+  final String? description;
   final String imageUrl;
+  final List<String> imageUrls;
   final double displayRate;
   final double printedMrp;
   final double rating;
   final int reviewsCount;
   final String category;
+  final String? categoryId;
+  final String? rootCategoryId;
   final String packSize;
+  final List<String> assignedCollections;
   final bool isAvailable;
   final bool isBestSeller;
+  final String? refundPolicy;
+  final double? productWeight;
+  final String? productWeightUnit;
   final List<ProductVariant> variants;
 
   const ProductItem({
     required this.id,
+    this.sellerId,
+    this.sku,
+    this.productCode,
+    this.hsnCode,
     required this.title,
     required this.technicalName,
     required this.vendor,
+    this.description,
     required this.imageUrl,
+    this.imageUrls = const [],
     required this.displayRate,
     required this.printedMrp,
     this.rating = 4.8,
     this.reviewsCount = 42,
     required this.category,
+    this.categoryId,
+    this.rootCategoryId,
     required this.packSize,
+    this.assignedCollections = const [],
     this.isAvailable = true,
     this.isBestSeller = false,
+    this.refundPolicy,
+    this.productWeight,
+    this.productWeightUnit,
     this.variants = const [],
   });
 
@@ -58,7 +168,9 @@ class ProductItem {
   }
 
   ProductVariant get defaultVariant {
-    if (variants.isNotEmpty) return variants.first;
+    if (variants.isNotEmpty) {
+      return variants.firstWhere((v) => v.isDefault, orElse: () => variants.first);
+    }
     return ProductVariant(
       id: '${id}_def',
       label: packSize,
@@ -66,6 +178,236 @@ class ProductItem {
       printedMrp: printedMrp,
     );
   }
+
+  /// Resolves category name and rootCategoryId against a 3-level CategoryItem hierarchy.
+  ProductItem withResolvedCategory(List<CategoryItem> categories) {
+    final rawCatId = categoryId?.trim() ?? '';
+    if (rawCatId.isEmpty) return this;
+
+    final resolved = CategoryItem.resolveCategoryHierarchy(rawCatId, categories);
+    if (resolved == null) return this;
+
+    return ProductItem(
+      id: id,
+      sellerId: sellerId,
+      sku: sku,
+      productCode: productCode,
+      hsnCode: hsnCode,
+      title: title,
+      technicalName: technicalName,
+      vendor: vendor,
+      description: description,
+      imageUrl: imageUrl,
+      imageUrls: imageUrls,
+      displayRate: displayRate,
+      printedMrp: printedMrp,
+      rating: rating,
+      reviewsCount: reviewsCount,
+      category: resolved.leafName,
+      categoryId: categoryId,
+      rootCategoryId: resolved.rootId,
+      packSize: packSize,
+      assignedCollections: assignedCollections,
+      isAvailable: isAvailable,
+      isBestSeller: isBestSeller,
+      refundPolicy: refundPolicy,
+      productWeight: productWeight,
+      productWeightUnit: productWeightUnit,
+      variants: variants,
+    );
+  }
+
+  factory ProductItem.fromPublicJson(
+    Map<String, dynamic> json, {
+    List<CategoryItem>? categories,
+  }) {
+    final id = (json['id'] ?? json['_id'] ?? '').toString();
+    final title = (json['title'] ?? 'Agricultural Input').toString().trim();
+    final technicalName = (json['technicalName'] ?? title).toString().trim();
+    final rawVendor = (json['sellerName'] ?? json['vendor'] ?? '').toString().trim();
+    final vendor = rawVendor.isNotEmpty ? rawVendor : 'EBS BioCrop Science';
+
+    // Extract images from `productImages` (`midUrl`, `lowUrl`, `originalUrl`, or GCS object names)
+    const gcsBucketBase = 'https://storage.googleapis.com/sellerhub-prod-media-us';
+    final List<String> extractedImages = [];
+    void addCandidate(String? rawUrl) {
+      final trimmed = rawUrl?.trim() ?? '';
+      if (trimmed.isNotEmpty && !extractedImages.contains(trimmed)) {
+        extractedImages.add(trimmed);
+      }
+    }
+
+    final rawImages = json['productImages'];
+    if (rawImages is List) {
+      final sortedImages = rawImages.whereType<Map>().map((m) => Map<String, dynamic>.from(m)).toList()
+        ..sort((a, b) {
+          final orderA = (a['displayOrder'] is num) ? (a['displayOrder'] as num).toInt() : 0;
+          final orderB = (b['displayOrder'] is num) ? (b['displayOrder'] as num).toInt() : 0;
+          return orderA.compareTo(orderB);
+        });
+      for (final img in sortedImages) {
+        String? bestUrl;
+        final mid = img['midUrl']?.toString().trim();
+        final orig = img['originalUrl']?.toString().trim();
+        final low = img['lowUrl']?.toString().trim();
+        final plain = img['url']?.toString().trim();
+        final midObj = img['midObjectName']?.toString().trim();
+        final origObj = img['originalObjectName']?.toString().trim();
+        final lowObj = img['lowObjectName']?.toString().trim();
+
+        if (mid != null && mid.isNotEmpty) {
+          bestUrl = mid;
+        } else if (orig != null && orig.isNotEmpty) {
+          bestUrl = orig;
+        } else if (low != null && low.isNotEmpty) {
+          bestUrl = low;
+        } else if (plain != null && plain.isNotEmpty) {
+          bestUrl = plain;
+        } else if (midObj != null && midObj.isNotEmpty) {
+          bestUrl = midObj.startsWith('http') ? midObj : '$gcsBucketBase/$midObj';
+        } else if (origObj != null && origObj.isNotEmpty) {
+          bestUrl = origObj.startsWith('http') ? origObj : '$gcsBucketBase/$origObj';
+        } else if (lowObj != null && lowObj.isNotEmpty) {
+          bestUrl = lowObj.startsWith('http') ? lowObj : '$gcsBucketBase/$lowObj';
+        }
+
+        if (bestUrl != null && bestUrl.isNotEmpty && !extractedImages.contains(bestUrl)) {
+          extractedImages.add(bestUrl);
+        }
+      }
+    }
+    if (extractedImages.isEmpty) {
+      if (json['imageUrls'] is List) {
+        for (final item in (json['imageUrls'] as List)) {
+          addCandidate(item?.toString());
+        }
+      }
+      addCandidate(json['imageUrl']?.toString());
+    }
+    final primaryImageUrl = extractedImages.isNotEmpty ? extractedImages.first : '';
+
+    // Extract variants
+    final List<ProductVariant> parsedVariants = [];
+    final rawVariants = json['variants'];
+    if (rawVariants is List) {
+      for (final v in rawVariants) {
+        if (v is Map) {
+          parsedVariants.add(ProductVariant.fromPublicJson(Map<String, dynamic>.from(v)));
+        }
+      }
+    }
+
+    final defaultVar = parsedVariants.isNotEmpty
+        ? parsedVariants.firstWhere((v) => v.isDefault, orElse: () => parsedVariants.first)
+        : null;
+
+    final displayRateRaw = json['displayRate'];
+    final printedMrpRaw = json['printedMrp'];
+    final displayRate = defaultVar?.displayRate ??
+        (displayRateRaw is num
+            ? displayRateRaw.toDouble()
+            : (double.tryParse(displayRateRaw?.toString() ?? '') ?? 0.0));
+    final printedMrp = defaultVar?.printedMrp ??
+        (printedMrpRaw is num
+            ? printedMrpRaw.toDouble()
+            : (double.tryParse(printedMrpRaw?.toString() ?? '') ?? displayRate));
+    final packSize = defaultVar?.label ?? (json['packSize']?.toString() ?? '');
+
+    // Category resolution purely from backend categories (no dummy fallback)
+    final rawCategoryId = json['categoryId']?.toString().trim();
+    final rawCategoryName = json['category']?.toString().trim();
+    final categoryHierarchy = categories ?? const <CategoryItem>[];
+    final resolved = (rawCategoryId != null && rawCategoryId.isNotEmpty && categoryHierarchy.isNotEmpty)
+        ? CategoryItem.resolveCategoryHierarchy(rawCategoryId, categoryHierarchy)
+        : null;
+
+    final categoryName = resolved?.leafName ??
+        ((rawCategoryName != null && rawCategoryName.isNotEmpty) ? rawCategoryName : '');
+    final rootCategoryId = resolved?.rootId ?? json['rootCategoryId']?.toString();
+
+    // Rating & Reviews purely from backend
+    final avgRatingRaw = json['averageRating'] ?? json['rating'];
+    final parsedRating = avgRatingRaw is num ? avgRatingRaw.toDouble() : double.tryParse(avgRatingRaw?.toString() ?? '');
+    final rating = (parsedRating != null && parsedRating >= 0) ? parsedRating : 0.0;
+
+    final totalReviewsRaw = json['totalReviews'] ?? json['reviewsCount'];
+    final parsedReviews = totalReviewsRaw is num ? totalReviewsRaw.toInt() : int.tryParse(totalReviewsRaw?.toString() ?? '');
+    final reviewsCount = (parsedReviews != null && parsedReviews >= 0) ? parsedReviews : 0;
+
+    // Assigned collections & featured flag
+    final List<String> collections = [];
+    if (json['assignedCollections'] is List) {
+      for (final c in (json['assignedCollections'] as List)) {
+        final s = c?.toString().trim() ?? '';
+        if (s.isNotEmpty) collections.add(s);
+      }
+    }
+
+    final isFeatured = json['isFeatured'] == true ||
+        json['isBestSeller'] == true ||
+        collections.any((c) => c.toLowerCase().contains('best') || c.toLowerCase().contains('feature'));
+
+    return ProductItem(
+      id: id,
+      sellerId: json['sellerId']?.toString(),
+      sku: json['sku']?.toString(),
+      productCode: json['productCode']?.toString(),
+      hsnCode: json['hsnCode']?.toString(),
+      title: title,
+      technicalName: technicalName,
+      vendor: vendor,
+      description: json['description']?.toString(),
+      imageUrl: primaryImageUrl,
+      imageUrls: extractedImages,
+      displayRate: displayRate,
+      printedMrp: printedMrp > 0 ? printedMrp : displayRate,
+      rating: rating,
+      reviewsCount: reviewsCount,
+      category: categoryName,
+      categoryId: rawCategoryId,
+      rootCategoryId: rootCategoryId,
+      packSize: packSize,
+      assignedCollections: collections,
+      isAvailable: json['isAvailable'] != false,
+      isBestSeller: isFeatured,
+      refundPolicy: json['refundPolicy']?.toString(),
+      productWeight: json['productWeight'] is num ? (json['productWeight'] as num).toDouble() : null,
+      productWeightUnit: json['productWeightUnit']?.toString(),
+      variants: parsedVariants,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sellerId': sellerId,
+      'sku': sku,
+      'productCode': productCode,
+      'hsnCode': hsnCode,
+      'title': title,
+      'technicalName': technicalName,
+      'sellerName': vendor,
+      'description': description,
+      'imageUrl': imageUrl,
+      'imageUrls': imageUrls,
+      'displayRate': displayRate,
+      'printedMrp': printedMrp,
+      'averageRating': rating,
+      'totalReviews': reviewsCount,
+      'category': category,
+      'categoryId': categoryId,
+      'rootCategoryId': rootCategoryId,
+      'packSize': packSize,
+      'assignedCollections': assignedCollections,
+      'isAvailable': isAvailable,
+      'isFeatured': isBestSeller,
+      'refundPolicy': refundPolicy,
+      'productWeight': productWeight,
+      'productWeightUnit': productWeightUnit,
+      'variants': variants.map((v) => v.toJson()).toList(),
+    };
+  }
+
 
   static List<ProductItem> get sampleProducts => const [
     ProductItem(
@@ -271,6 +613,133 @@ class ProductItem {
         ProductVariant(id: 'v12_2', label: '10 gm x 2 Qty', displayRate: 1320, printedMrp: 1700),
       ],
     ),
+    ProductItem(
+      id: 'PROD-013',
+      title: 'Aries Agromin Max Chelated Micronutrient Mixture',
+      technicalName: 'Chelated Zinc, Iron, Boron & Magnesium',
+      vendor: 'Aries Agro Ltd',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/multiplex-soil.webp',
+      displayRate: 460,
+      printedMrp: 610,
+      category: 'Crop Nutrition',
+      packSize: '500 g',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v13_1', label: '250 gm', displayRate: 250, printedMrp: 330),
+        ProductVariant(id: 'v13_2', label: '500 gm', displayRate: 460, printedMrp: 610),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-014',
+      title: 'Jain Drip Irrigation Lateral Pipe 16mm Inline Kit',
+      technicalName: 'UV Stabilized LLDPE Drip Lateral 16mm',
+      vendor: 'Jain Irrigation Systems',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/neptune-sprayer.webp',
+      displayRate: 1850,
+      printedMrp: 2400,
+      category: 'Irrigation',
+      packSize: '300 Meter Roll',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v14_1', label: '300 Meter Roll', displayRate: 1850, printedMrp: 2400),
+        ProductVariant(id: 'v14_2', label: '500 Meter Roll', displayRate: 2950, printedMrp: 3800),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-015',
+      title: 'TrustBasket Heavy Duty HDPE Rectangular Grow Bag',
+      technicalName: 'UV Treated 260 GSM Terrace Garden Grow Bag',
+      vendor: 'TrustBasket Gardening',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/multiplex-soil.webp',
+      displayRate: 349,
+      printedMrp: 499,
+      category: 'Gardening',
+      packSize: 'Pack of 4',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v15_1', label: '12x12 Inch (Pack of 4)', displayRate: 349, printedMrp: 499),
+        ProductVariant(id: 'v15_2', label: '15x15 Inch (Pack of 4)', displayRate: 499, printedMrp: 699),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-016',
+      title: 'EBS Cold Pressed Pure Neem Oil 10000 PPM Bio-Input',
+      technicalName: 'Azadirachtin 1% EC (10000 ppm) Organic',
+      vendor: 'EBS BioCrop Science',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/katyayani-all-in-one.webp',
+      displayRate: 540,
+      printedMrp: 720,
+      category: 'Organic Farming',
+      packSize: '1 Ltr',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v16_1', label: '500 ml', displayRate: 290, printedMrp: 390),
+        ProductVariant(id: 'v16_2', label: '1 Ltr', displayRate: 540, printedMrp: 720),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-017',
+      title: 'Virbac Agrimin Forte Chelated Cattle Mineral Mixture',
+      technicalName: 'High Bioavailability Dairy Vitamin & Mineral Mix',
+      vendor: 'Virbac Animal Health',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/multiplex-soil.webp',
+      displayRate: 295,
+      printedMrp: 360,
+      category: 'Cattle & Bird Care',
+      packSize: '1 kg',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v17_1', label: '1 kg Pack', displayRate: 295, printedMrp: 360),
+        ProductVariant(id: 'v17_2', label: '5 kg Bag', displayRate: 1380, printedMrp: 1750),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-018',
+      title: 'EBS Farm Depot Wholesale NPK 19:19:19 Master Carton',
+      technicalName: '100% Water Soluble NPK 19-19-19 Bulk Case',
+      vendor: 'EBS BioCrop Science',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/iffco-nano.webp',
+      displayRate: 3250,
+      printedMrp: 4500,
+      category: 'Bulk',
+      packSize: '25 kg Bag',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v18_1', label: '25 kg Bulk Bag', displayRate: 3250, printedMrp: 4500),
+        ProductVariant(id: 'v18_2', label: '50 kg Master Pack', displayRate: 6200, printedMrp: 8800),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-019',
+      title: 'Kisan Super Saver Humic + Seaweed Combo Pack',
+      technicalName: 'Potassium Humate 98% + Ascophyllum Nodosum',
+      vendor: 'EBS BioCrop Science',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/upl-saaf.webp',
+      displayRate: 399,
+      printedMrp: 799,
+      category: 'Har Din Sasta',
+      packSize: 'Combo (500g + 500ml)',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v19_1', label: 'Standard Combo', displayRate: 399, printedMrp: 799),
+      ],
+    ),
+    ProductItem(
+      id: 'PROD-020',
+      title: 'Sumitomo Progibb Gibberellic Acid Plant Growth Regulator',
+      technicalName: 'Gibberellic Acid 0.001% L (PGR)',
+      vendor: 'Sumitomo Chemical',
+      imageUrl: 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/targa-super.webp',
+      displayRate: 480,
+      printedMrp: 620,
+      category: 'Growth Regulators',
+      packSize: '500 ml',
+      isBestSeller: false,
+      variants: [
+        ProductVariant(id: 'v20_1', label: '250 ml', displayRate: 260, printedMrp: 340),
+        ProductVariant(id: 'v20_2', label: '500 ml', displayRate: 480, printedMrp: 620),
+      ],
+    ),
   ];
 }
 
@@ -345,6 +814,170 @@ class CategoryItem {
       return groups.expand((g) => g.subcategories).toList();
     }
     return _legacySubcategories;
+  }
+
+  /// Resolves a backend categoryId (Level 0, Level 1, or Level 2) to its leaf name and Level 0 rootId.
+  static ({String leafName, String rootId})? resolveCategoryHierarchy(
+    String targetId,
+    List<CategoryItem> categories,
+  ) {
+    final normalized = targetId.trim().toLowerCase();
+    if (normalized.isEmpty) return null;
+
+    for (final cat in categories) {
+      if (cat.id.toLowerCase() == normalized ||
+          cat.slug.toLowerCase() == normalized ||
+          (cat.backendId != null && cat.backendId!.toLowerCase() == normalized) ||
+          cat.name.toLowerCase() == normalized) {
+        return (leafName: cat.name, rootId: cat.id);
+      }
+      for (final group in cat.groups) {
+        if ((group.id != null && group.id!.toLowerCase() == normalized) ||
+            (group.slug != null && group.slug!.toLowerCase() == normalized) ||
+            group.name.toLowerCase() == normalized) {
+          return (leafName: group.name, rootId: cat.id);
+        }
+        for (final subItem in group.subcategoryItems) {
+          if (subItem.id.toLowerCase() == normalized ||
+              (subItem.slug.isNotEmpty && subItem.slug.toLowerCase() == normalized) ||
+              subItem.name.toLowerCase() == normalized) {
+            return (leafName: subItem.name, rootId: cat.id);
+          }
+        }
+        for (final subName in group.subcategories) {
+          if (subName.toLowerCase() == normalized) {
+            return (leafName: subName, rootId: cat.id);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /// Returns true if [product] belongs to this Level 0 category or any of its Level 1 / Level 2 descendants.
+  bool matchesProduct(ProductItem product) {
+    final cId = id.trim().toLowerCase();
+    final cSlug = slug.trim().toLowerCase();
+    final cBackendId = backendId?.trim().toLowerCase() ?? '';
+    final cName = name.trim().toLowerCase();
+
+    // 1. Check by rootCategoryId
+    final pRootId = product.rootCategoryId?.trim().toLowerCase() ?? '';
+    if (pRootId.isNotEmpty) {
+      if (pRootId == cId || pRootId == cSlug || (cBackendId.isNotEmpty && pRootId == cBackendId)) {
+        return true;
+      }
+    }
+
+    // 2. Check by backend categoryId across Level 0, Level 1, and Level 2
+    final pCatId = product.categoryId?.trim().toLowerCase() ?? '';
+    if (pCatId.isNotEmpty) {
+      if (pCatId == cId || pCatId == cSlug || (cBackendId.isNotEmpty && pCatId == cBackendId)) {
+        return true;
+      }
+      for (final group in groups) {
+        final gId = group.id?.trim().toLowerCase() ?? '';
+        final gSlug = group.slug?.trim().toLowerCase() ?? '';
+        if ((gId.isNotEmpty && pCatId == gId) || (gSlug.isNotEmpty && pCatId == gSlug)) {
+          return true;
+        }
+        for (final subItem in group.subcategoryItems) {
+          final sId = subItem.id.trim().toLowerCase();
+          final sSlug = subItem.slug.trim().toLowerCase();
+          if ((sId.isNotEmpty && pCatId == sId) || (sSlug.isNotEmpty && pCatId == sSlug)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // 3. Check by human-readable category name against Level 0, Level 1, and Level 2 names
+    final pCat = product.category.trim().toLowerCase();
+    if (pCat.isEmpty) return false;
+
+    if (pCat == cName ||
+        pCat == cId ||
+        pCat == cSlug ||
+        pCat == '${cName}s' ||
+        '${pCat}s' == cName) {
+      return true;
+    }
+
+    for (final group in groups) {
+      final gName = group.name.trim().toLowerCase();
+      final gSlug = group.slug?.trim().toLowerCase() ?? '';
+      if (pCat == gName ||
+          (gSlug.isNotEmpty && pCat == gSlug) ||
+          pCat == '${gName}s' ||
+          '${pCat}s' == gName) {
+        return true;
+      }
+      for (final sub in group.subcategories) {
+        final sName = sub.trim().toLowerCase();
+        if (pCat == sName || pCat == '${sName}s' || '${pCat}s' == sName) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// Returns true if [product] matches the selected [subcategory] (Level 1 group or Level 2 nested category).
+  bool matchesSubcategory(ProductItem product, String subcategory) {
+    final target = subcategory.trim().toLowerCase();
+    if (target.isEmpty) return true;
+
+    final pCatId = product.categoryId?.trim().toLowerCase() ?? '';
+
+    for (final group in groups) {
+      final gName = group.name.trim().toLowerCase();
+      final gId = group.id?.trim().toLowerCase() ?? '';
+      final gSlug = group.slug?.trim().toLowerCase() ?? '';
+
+      // If filtering by this Level 1 group
+      if (target == gName || (gId.isNotEmpty && target == gId) || (gSlug.isNotEmpty && target == gSlug)) {
+        if (pCatId.isNotEmpty) {
+          if ((gId.isNotEmpty && pCatId == gId) || (gSlug.isNotEmpty && pCatId == gSlug)) {
+            return true;
+          }
+          for (final subItem in group.subcategoryItems) {
+            if (pCatId == subItem.id.trim().toLowerCase() ||
+                (subItem.slug.isNotEmpty && pCatId == subItem.slug.trim().toLowerCase())) {
+              return true;
+            }
+          }
+        }
+        final pCat = product.category.trim().toLowerCase();
+        if (pCat == gName ||
+            pCat.contains(gName) ||
+            gName.contains(pCat) ||
+            group.subcategories.any((s) => s.trim().toLowerCase() == pCat)) {
+          return true;
+        }
+      }
+
+      // If filtering by a Level 2 subcategory inside this group
+      for (final subItem in group.subcategoryItems) {
+        final sName = subItem.name.trim().toLowerCase();
+        final sId = subItem.id.trim().toLowerCase();
+        final sSlug = subItem.slug.trim().toLowerCase();
+        if (target == sName || (sId.isNotEmpty && target == sId) || (sSlug.isNotEmpty && target == sSlug)) {
+          if (pCatId.isNotEmpty && (pCatId == sId || (sSlug.isNotEmpty && pCatId == sSlug))) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Fallback text matching (supports sampleProducts and keyword matching)
+    final pCat = product.category.toLowerCase();
+    final pTitle = product.title.toLowerCase();
+    final pTech = product.technicalName.toLowerCase();
+    return pCat.contains(target) ||
+        target.contains(pCat) ||
+        pTitle.contains(target) ||
+        pTech.contains(target);
   }
 
   /// Resolves an emoji icon for a Level 0 Major Category name.

@@ -18,6 +18,8 @@ class ApiEndpoints {
   /// Products & Collections (Public storefront catalog)
   static const String products = '/api/v1/products';
   static String productById(String id) => '/api/v1/products/$id';
+  static String productsByCategory(String categoryId) => '/api/v1/products/category/$categoryId';
+  static const String productsSearch = '/api/v1/products/search';
   static const String collections = '/api/v1/collections';
   static String collectionById(String id) => '/api/v1/collections/$id';
 

@@ -1,18 +1,24 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:seller_website/data/models/catalog_models.dart';
 import 'package:seller_website/data/services/category_api_service.dart';
+import 'package:seller_website/data/services/product_api_service.dart';
 import 'package:seller_website/core/network/api_client.dart';
 import 'package:seller_website/core/network/websocket_service.dart';
 import 'package:seller_website/data/datasources/category_remote_datasource.dart';
+import 'package:seller_website/data/datasources/product_remote_datasource.dart';
 import 'package:seller_website/data/repositories/category_repository_impl.dart';
+import 'package:seller_website/data/repositories/product_repository_impl.dart';
 import 'package:seller_website/logic/category/category_bloc.dart';
 import 'package:seller_website/logic/category/category_event.dart';
+import 'package:seller_website/logic/product/product_bloc.dart';
+import 'package:seller_website/logic/product/product_event.dart';
 import 'package:seller_website/main.dart';
 import 'package:seller_website/presentation/product_detail/product_detail_view.dart';
 import 'package:seller_website/data/models/auth_state.dart';
@@ -30,8 +36,14 @@ import 'package:seller_website/data/models/wishlist_state.dart';
 import 'package:seller_website/presentation/wishlist/wishlist_view.dart';
 import 'package:seller_website/presentation/category/category_detail_view.dart';
 import 'package:seller_website/presentation/home/home_view.dart';
+import 'package:seller_website/presentation/widgets/app_product_image.dart';
 
 void main() {
+  setUp(() {
+    CategoryController.instance.resetToSampleCategories();
+    ProductController.instance.resetToSampleProducts();
+  });
+
   testWidgets('SellerWebsiteApp smoke test', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
@@ -434,6 +446,59 @@ void main() {
     expect(foragesTopLeft.dx >= 0.0, isTrue, reason: 'Subcategories flyout must not clip on left side of screen');
   });
 
+  testWidgets('Hovered category dropdown allows scrolling categories list smoothly without closing overlay', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const SellerWebsiteApp());
+    await tester.pumpAndSettle();
+
+    // Hover over 'Crop Protection' in the category ribbon
+    final cropProtectionTab = find.text('Crop Protection').first;
+    expect(cropProtectionTab, findsOneWidget);
+
+    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await gesture.addPointer(location: Offset.zero);
+    await gesture.moveTo(tester.getCenter(cropProtectionTab));
+    await tester.pumpAndSettle();
+
+    // Dropdown should be open with categories list and placeholder
+    expect(find.text('CATEGORIES'), findsOneWidget);
+    expect(find.text('Insecticides'), findsWidgets);
+    expect(find.text('Explore Crop Protection'), findsOneWidget);
+
+    // Scroll categories list down
+    final categoriesScrollFinder = find.byType(ListView).first;
+    await tester.drag(categoriesScrollFinder, const Offset(0, -180));
+    await tester.pumpAndSettle();
+
+    final scrollableState = tester.state<ScrollableState>(find.descendant(of: categoriesScrollFinder, matching: find.byType(Scrollable)));
+    final offsetBeforeHover = scrollableState.position.pixels;
+    expect(offsetBeforeHover, greaterThan(0.0));
+
+    // Dropdown should STILL be open and not dismissed by scrolling
+    expect(find.text('CATEGORIES'), findsOneWidget);
+    expect(find.text('Explore Crop Protection'), findsOneWidget);
+
+    // Hover over 'Bio Pesticides'
+    final bioPesticidesFinder = find.text('Bio Pesticides').first;
+    await gesture.moveTo(tester.getCenter(bioPesticidesFinder));
+    await tester.pumpAndSettle();
+
+    // Verify categories list does NOT automatically scroll to top
+    final offsetAfterHover = scrollableState.position.pixels;
+    expect(offsetAfterHover, equals(offsetBeforeHover));
+
+    // Subcategories list is displayed
+    expect(find.text('Bio Insecticide'), findsOneWidget);
+
+    // Tap subcategory
+    await tester.tap(find.text('Bio Insecticide'));
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('Har Din Sasta tab renders in ribbon and can be scrolled to and tapped', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
@@ -550,7 +615,7 @@ void main() {
     expect(find.textContaining('100% Authenticated field purchases'), findsOneWidget);
 
     // Expand Farmer Reviews mobile accordion
-    final reviewsAccordion = find.text('Farmer Reviews (3)');
+    final reviewsAccordion = find.textContaining('Farmer Reviews');
     await tester.ensureVisible(reviewsAccordion);
     await tester.tap(reviewsAccordion);
     await tester.pumpAndSettle();
@@ -558,6 +623,133 @@ void main() {
     // Verify reviews content rendered without overflow
     expect(find.text('Write a Review'), findsOneWidget);
     expect(find.textContaining('100% Authenticated field purchases'), findsOneWidget);
+  });
+
+  testWidgets('ProductDetailView gallery hides thumbnail selector row when product has single image and shows thumbnails only when multiple images exist', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // 1. Single image product: thumbnail row must NOT be shown
+    final singleImageProduct = ProductItem(
+      id: 'SINGLE-001',
+      title: 'Single Image Agro Fertilizer',
+      technicalName: 'Acetobacter Bio-fertilizer',
+      vendor: 'Patel Agro Traders',
+      imageUrl: 'https://example.com/single.jpg',
+      imageUrls: const ['https://example.com/single.jpg'],
+      displayRate: 510,
+      printedMrp: 1200,
+      category: 'Bio Fertilizers',
+      packSize: '1 Ltr',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ProductDetailView(product: singleImageProduct),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify main image is shown
+    expect(find.text('Single Image Agro Fertilizer'), findsWidgets);
+    // Dummy thumbnail icons must NOT exist in the gallery
+    expect(find.byIcon(Icons.science_rounded), findsNothing);
+    // Since only 1 image exists, there is only 1 AppProductImage with single.jpg (the main display image), NO thumbnail AppProductImage
+    expect(
+      find.byWidgetPredicate((w) => w is AppProductImage && w.imageUrl == 'https://example.com/single.jpg'),
+      findsOneWidget,
+    );
+
+    // 2. Multiple images product: thumbnail selectors row MUST be shown
+    final multiImageProduct = ProductItem(
+      id: 'MULTI-001',
+      title: 'Multi Image Agro Input',
+      technicalName: 'Azotobacter culture',
+      vendor: 'Patel Agro Traders',
+      imageUrl: 'https://example.com/img1.jpg',
+      imageUrls: const [
+        'https://example.com/img1.jpg',
+        'https://example.com/img2.jpg',
+        'https://example.com/img3.jpg',
+      ],
+      displayRate: 850,
+      printedMrp: 1100,
+      category: 'Bio Fertilizers',
+      packSize: '1 Ltr',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ProductDetailView(product: multiImageProduct),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Now thumbnail items img2 and img3 exist in the gallery
+    expect(
+      find.byWidgetPredicate((w) => w is AppProductImage && w.imageUrl == 'https://example.com/img2.jpg'),
+      findsOneWidget,
+    );
+    expect(
+      find.byWidgetPredicate((w) => w is AppProductImage && w.imageUrl == 'https://example.com/img3.jpg'),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.science_rounded), findsNothing);
+  });
+
+  testWidgets('ProductDetailView renders real description and verified specifications without hardcoded dummy technical specs or application guides', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final productWithHtml = ProductItem(
+      id: 'DESC-001',
+      title: 'EBS Acetobacter Bio Fertilizer',
+      technicalName: 'Acetobacter 5x10^8 CFU/ml',
+      vendor: 'Patel Agro Traders',
+      description: '<p>Acetobacter fixes atmospheric nitrogen in sugarcane.</p><h3>Key Benefits</h3><ul><li>High yield enhancement</li><li>Soil microbial boost</li></ul>',
+      imageUrl: 'https://example.com/acetobacter.jpg',
+      imageUrls: const ['https://example.com/acetobacter.jpg'],
+      displayRate: 510,
+      printedMrp: 1200,
+      category: 'Bio Fertilizers',
+      packSize: '1 Ltr',
+      sku: 'SKU-ACT-1L',
+      hsnCode: '31010099',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ProductDetailView(product: productWithHtml),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify tabs: Description & Specifications + Farmer Reviews
+    expect(find.text('Description & Specifications'), findsOneWidget);
+    expect(find.textContaining('Farmer Reviews'), findsWidgets);
+    // Hardcoded fake tabs must NOT exist
+    expect(find.text('Technical Specs'), findsNothing);
+    expect(find.text('Application Guide'), findsNothing);
+    expect(find.textContaining('1.5 - 2.0 ml / gm per liter of water'), findsNothing);
+
+    // Verify parsed HTML description contents
+    expect(find.textContaining('Acetobacter fixes atmospheric nitrogen in sugarcane'), findsOneWidget);
+    expect(find.text('Key Benefits'), findsOneWidget);
+    expect(find.text('High yield enhancement'), findsOneWidget);
+    expect(find.text('Soil microbial boost'), findsOneWidget);
+
+    // Verify authentic specifications table
+    expect(find.text('Product Specifications & Details'), findsOneWidget);
+    expect(find.text('Active Ingredient / Formula'), findsOneWidget);
+    expect(find.text('Acetobacter 5x10^8 CFU/ml'), findsWidgets);
+    expect(find.text('SKU Code'), findsOneWidget);
+    expect(find.text('SKU-ACT-1L'), findsOneWidget);
+    expect(find.text('HSN Code'), findsOneWidget);
+    expect(find.text('31010099'), findsOneWidget);
   });
 
   testWidgets('Mobile view header uses single clean menu bar with drawer and no duplicate category bar', (WidgetTester tester) async {
@@ -1402,6 +1594,186 @@ void main() {
     expect(fetchCount, equals(2));
     expect(bloc.state.categories.length, equals(2));
     expect(bloc.state.categories[1].name, equals('Gardening'));
+  });
+
+  testWidgets('ProductBloc fetches public products without auth, maps Level 1/2 categoryIds to Level 0 categories on HomeView, and reacts to WebSocket products:* events', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(CategoryController.instance.resetToSampleCategories);
+    addTearDown(ProductController.instance.resetToSampleProducts);
+
+    // 1. Seed a 3-tier category hierarchy (Crop Protection -> Insecticides, Seeds -> Vegetable Seeds -> Tomato Seeds)
+    final categories = CategoryController.buildCategoryHierarchy([
+      const ApiCategoryRecord(
+        id: '6ab4f6f619ec643fd9bf362c',
+        name: 'Crop Protection',
+        slug: 'crop-protection',
+        parentId: null,
+        level: 0,
+        sortOrder: 1,
+        isActive: true,
+      ),
+      const ApiCategoryRecord(
+        id: '6ab4f6f619ec643fd9bf3620',
+        name: 'Insecticides',
+        slug: 'insecticides',
+        parentId: '6ab4f6f619ec643fd9bf362c',
+        level: 1,
+        sortOrder: 1,
+        isActive: true,
+      ),
+      const ApiCategoryRecord(
+        id: '6ab4f6f619ec643fd9bf3689',
+        name: 'Seeds',
+        slug: 'seeds',
+        parentId: null,
+        level: 0,
+        sortOrder: 2,
+        isActive: true,
+      ),
+      const ApiCategoryRecord(
+        id: '6ab4f6f619ec643fd9bf368a',
+        name: 'Vegetable Seeds',
+        slug: 'vegetable-seeds',
+        parentId: '6ab4f6f619ec643fd9bf3689',
+        level: 1,
+        sortOrder: 1,
+        isActive: true,
+      ),
+      const ApiCategoryRecord(
+        id: '6ab4f6f619ec643fd9bf368b',
+        name: 'Tomato Seeds',
+        slug: 'tomato-seeds',
+        parentId: '6ab4f6f619ec643fd9bf368a',
+        level: 2,
+        sortOrder: 1,
+        isActive: true,
+      ),
+    ]);
+    CategoryController.instance.syncFromBloc(categories);
+
+    int productFetchCount = 0;
+    final mockClient = MockClient((http.Request request) async {
+      productFetchCount++;
+      // Verify no Authorization header is required for public products API
+      expect(request.headers.containsKey('Authorization'), isFalse);
+      expect(request.url.path, equals('/api/v1/products'));
+
+      final payload = {
+        'success': true,
+        'message': 'Products retrieved successfully',
+        'data': {
+          'content': [
+            {
+              'id': 'prod_live_1',
+              'title': 'Pralaya Super Cypermethrin 25% EC',
+              'technicalName': 'Cypermethrin 25% EC',
+              'sellerName': 'essentialbiocropscience',
+              // Assigned to Level 1 category `Insecticides` under `Crop Protection`
+              'categoryId': '6ab4f6f619ec643fd9bf3620',
+              'isAvailable': true,
+              'isFeatured': true,
+              'productImages': [
+                {
+                  'id': 'img1',
+                  'displayOrder': 0,
+                  'midUrl': 'https://dujjhct8zer0r.cloudfront.net/images/prod_image/katyayani-all-in-one.webp',
+                },
+              ],
+              'variants': [
+                {
+                  'id': 'v_live_1',
+                  'label': '1 Ltr',
+                  'displayRate': productFetchCount >= 2 ? 490.0 : 510.0,
+                  'printedMrp': 1200.0,
+                  'stock': 100,
+                  'isDefault': true,
+                },
+              ],
+            },
+            {
+              'id': 'prod_live_2',
+              'title': 'EBS Hybrid Arka Rakshak Tomato Seeds',
+              'technicalName': 'F1 Hybrid Tomato Seeds',
+              'sellerName': 'essentialbiocropscience',
+              // Assigned to Level 2 nested category `Tomato Seeds` under `Seeds -> Vegetable Seeds`
+              'categoryId': '6ab4f6f619ec643fd9bf368b',
+              'isAvailable': true,
+              'isFeatured': false,
+              'variants': [
+                {
+                  'id': 'v_live_2',
+                  'label': '10 gm',
+                  'displayRate': 620.0,
+                  'printedMrp': 850.0,
+                  'stock': 50,
+                  'isDefault': true,
+                },
+              ],
+            },
+          ],
+          'page': 0,
+          'size': 500,
+          'totalElements': 2,
+          'totalPages': 1,
+          'first': true,
+          'last': true,
+        },
+      };
+      return http.Response(jsonEncode(payload), 200);
+    });
+
+    final apiClient = ApiClient(client: mockClient);
+    final productRemote = ProductRemoteDataSourceImpl(apiClient);
+    final productRepo = ProductRepositoryImpl(remoteDataSource: productRemote);
+    final wsService = WebSocketService();
+
+    // 2. Pump SellerWebsiteApp with our injected ProductRepository
+    await tester.pumpWidget(
+      SellerWebsiteApp(productRepository: productRepo),
+    );
+    await tester.pumpAndSettle();
+
+    final homeContext = tester.element(find.byType(HomeView));
+    final productBloc = BlocProvider.of<ProductBloc>(homeContext);
+
+    // 3. Trigger FetchProducts via ProductBloc and verify public API fetch without auth
+    final firstLoad = productBloc.stream.first;
+    productBloc.add(const FetchProducts(isRefresh: true));
+    await firstLoad;
+    await tester.pumpAndSettle();
+
+    expect(productFetchCount, equals(1));
+    expect(productBloc.state.products.length, equals(2));
+    expect(productBloc.state.products[0].rootCategoryId, equals('crop-protection'));
+    expect(productBloc.state.products[1].rootCategoryId, equals('seeds'));
+
+    // 4. Verify Level 0 category sections are rendered one by one on HomeView with their products
+    expect(find.byKey(const ValueKey('home_level0_section_crop-protection')), findsOneWidget);
+    expect(find.byKey(const ValueKey('home_level0_section_seeds')), findsOneWidget);
+    expect(find.text('Pralaya Super Cypermethrin 25% EC'), findsWidgets);
+    expect(find.text('EBS Hybrid Arka Rakshak Tomato Seeds'), findsWidgets);
+
+    // 5. Simulate real-time WebSocket `products:updated` event and verify automatic refresh
+    final wsReload = productBloc.stream.first;
+    wsService.handleRawMessageForTest(
+      jsonEncode({
+        'event': 'products:updated',
+        'data': {'id': 'prod_live_1'},
+      }),
+    );
+    await wsReload;
+    await tester.pumpAndSettle();
+
+    expect(productFetchCount, equals(2));
+    expect(productBloc.state.products.first.displayRate, equals(490.0));
+
+    // 6. Verify backend categories have no static emoji icons and ProductCard renders AppProductImage
+    expect(categories.first.icon, isEmpty);
+    expect(categories.first.groups.first.icon, isNull);
+    expect(find.byType(AppProductImage), findsWidgets);
   });
 }
 

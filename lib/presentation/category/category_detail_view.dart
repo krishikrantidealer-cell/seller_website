@@ -5,8 +5,11 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/services/category_api_service.dart';
+import '../../data/services/product_api_service.dart';
 import '../../logic/category/category_bloc.dart';
 import '../../logic/category/category_event.dart';
+import '../../logic/product/product_bloc.dart';
+import '../../logic/product/product_event.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
@@ -44,7 +47,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   String _searchFilter = '';
   String _sortBy = 'featured';
 
-  final List<ProductItem> _allProducts = ProductItem.sampleProducts;
+  List<ProductItem> get _allProducts => ProductController.instance.products;
 
   @override
   void initState() {
@@ -53,22 +56,32 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     _selectedSubcategory = widget.initialSubcategory;
     _selectedTechnicalName = widget.initialTechnicalName;
     _isBestSellersMode = widget.isBestSellersOnly;
-    CategoryController.instance.addListener(_onCategoriesUpdated);
-    final bloc = context.read<CategoryBloc?>();
-    if (bloc != null) {
-      bloc.add(const InitializeCategories());
+    CategoryController.instance.addListener(_onCatalogUpdated);
+    ProductController.instance.addListener(_onCatalogUpdated);
+
+    final categoryBloc = context.read<CategoryBloc?>();
+    if (categoryBloc != null) {
+      categoryBloc.add(const InitializeCategories());
     } else {
       CategoryController.instance.fetchCategories();
+    }
+
+    final productBloc = context.read<ProductBloc?>();
+    if (productBloc != null) {
+      productBloc.add(const InitializeProducts());
+    } else {
+      ProductController.instance.fetchProducts();
     }
   }
 
   @override
   void dispose() {
-    CategoryController.instance.removeListener(_onCategoriesUpdated);
+    CategoryController.instance.removeListener(_onCatalogUpdated);
+    ProductController.instance.removeListener(_onCatalogUpdated);
     super.dispose();
   }
 
-  void _onCategoriesUpdated() {
+  void _onCatalogUpdated() {
     if (mounted) {
       setState(() {});
     }
@@ -76,17 +89,18 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
 
   List<ProductItem> get _filteredProducts {
     final currentCategoryItem = CategoryController.instance.findCategory(_selectedCategory);
-    final categoryGroupNames = currentCategoryItem?.groups.map((g) => g.name.toLowerCase()).toList() ?? [];
+    final hasAnyBestSeller = _allProducts.any((p) => p.isBestSeller);
 
     final list = _allProducts.where((p) {
-      final matchesBestSeller = !_isBestSellersMode || p.isBestSeller;
+      if (!p.isAvailable) return false;
+      final matchesBestSeller = !_isBestSellersMode || (hasAnyBestSeller ? p.isBestSeller : true);
       final matchesCategory = _selectedCategory == 'all' ||
-          p.category.toLowerCase().contains(_selectedCategory.toLowerCase()) ||
-          (currentCategoryItem != null && p.category.toLowerCase().contains(currentCategoryItem.name.toLowerCase())) ||
-          (currentCategoryItem != null && currentCategoryItem.name.toLowerCase().contains(p.category.toLowerCase())) ||
-          categoryGroupNames.any((g) => p.category.toLowerCase().contains(g) || g.contains(p.category.toLowerCase()));
+          (currentCategoryItem != null && currentCategoryItem.matchesProduct(p)) ||
+          p.category.toLowerCase().contains(_selectedCategory.toLowerCase());
 
       final matchesSubcategory = _selectedSubcategory == null ||
+          (currentCategoryItem != null &&
+              currentCategoryItem.matchesSubcategory(p, _selectedSubcategory!)) ||
           p.category.toLowerCase().contains(_selectedSubcategory!.toLowerCase()) ||
           _selectedSubcategory!.toLowerCase().contains(p.category.toLowerCase()) ||
           p.title.toLowerCase().contains(_selectedSubcategory!.toLowerCase()) ||
@@ -617,7 +631,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (iconEmoji != null) ...[
+            if (iconEmoji != null && iconEmoji.isNotEmpty) ...[
               Text(iconEmoji, style: TextStyle(fontSize: isMobile ? 12 : 13)),
               SizedBox(width: isMobile ? 4 : 6),
             ] else if (isSelected) ...[

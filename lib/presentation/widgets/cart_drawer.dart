@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
+import 'app_product_image.dart';
 
 class QuickCartDrawer extends StatelessWidget {
   final VoidCallback? onClose;
@@ -188,14 +189,12 @@ class QuickCartDrawer extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppColors.border),
           ),
-          child: Image.network(
-            item.product.imageUrl,
+          child: AppProductImage(
+            imageUrl: item.product.imageUrl,
+            fallbackUrls: item.product.imageUrls,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.eco_rounded,
-              color: AppColors.primaryGreen,
-              size: 28,
-            ),
+            fallbackIcon: Icons.eco_rounded,
+            fallbackIconSize: 28,
           ),
         ),
         const SizedBox(width: 14),

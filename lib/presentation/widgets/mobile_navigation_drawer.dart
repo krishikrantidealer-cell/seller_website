@@ -8,6 +8,7 @@ import '../../data/models/auth_state.dart';
 import '../../data/models/wishlist_state.dart';
 import '../../logic/category/category_bloc.dart';
 import '../../logic/category/category_state.dart';
+import 'app_product_image.dart';
 import 'auth_modal.dart';
 import '../profile/farmer_profile_view.dart';
 import '../orders/my_orders_view.dart';
@@ -200,7 +201,24 @@ class MobileNavigationDrawer extends StatelessWidget {
                                     ),
                                   ),
                                   alignment: Alignment.center,
-                                  child: Text(cat.icon, style: const TextStyle(fontSize: 14)),
+                                  child: (cat.categoryImageUrl != null &&
+                                          cat.categoryImageUrl!.trim().isNotEmpty)
+                                      ? AppProductImage(
+                                          imageUrl: cat.categoryImageUrl!,
+                                          width: 22,
+                                          height: 22,
+                                          fit: BoxFit.cover,
+                                          borderRadius: 4,
+                                        )
+                                      : (cat.icon.isNotEmpty
+                                          ? Text(cat.icon, style: const TextStyle(fontSize: 14))
+                                          : Icon(
+                                              Icons.category_outlined,
+                                              size: 14,
+                                              color: isCatSelected
+                                                  ? AppColors.primaryGreen
+                                                  : AppColors.textSecondary,
+                                            )),
                                 ),
                                 title: Text(
                                   cat.name,

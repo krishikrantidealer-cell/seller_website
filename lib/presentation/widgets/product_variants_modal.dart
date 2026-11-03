@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/models/cart_state.dart';
+import 'app_product_image.dart';
 
 /// Opens a responsive popup (modal bottom sheet on mobile, dialog on desktop)
 /// displaying all available pack sizes / variants of a product with real-time
@@ -138,11 +139,12 @@ class _ProductVariantsSheetContent extends StatelessWidget {
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             padding: const EdgeInsets.all(4),
-            child: Image.network(
-              product.imageUrl,
+            child: AppProductImage(
+              imageUrl: product.imageUrl,
+              fallbackUrls: product.imageUrls,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.agriculture_rounded, size: 28, color: AppColors.textMuted),
+              fallbackIcon: Icons.agriculture_rounded,
+              fallbackIconSize: 28,
             ),
           ),
           const SizedBox(width: 12),
@@ -373,11 +375,12 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   padding: const EdgeInsets.all(4),
-                  child: Image.network(
-                    product.imageUrl,
+                  child: AppProductImage(
+                    imageUrl: product.imageUrl,
+                    fallbackUrls: product.imageUrls,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.agriculture_rounded, size: 28, color: AppColors.textMuted),
+                    fallbackIcon: Icons.agriculture_rounded,
+                    fallbackIconSize: 28,
                   ),
                 ),
                 const SizedBox(width: 14),

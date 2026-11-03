@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/wishlist_state.dart';
+import '../widgets/app_product_image.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/top_info_bar.dart';
@@ -470,14 +471,12 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                     color: Colors.white,
                     padding: const EdgeInsets.all(12),
                     child: Center(
-                      child: Image.network(
-                        widget.product.imageUrl,
+                      child: AppProductImage(
+                        imageUrl: widget.product.imageUrl,
+                        fallbackUrls: widget.product.imageUrls,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Icon(
-                          Icons.agriculture_rounded,
-                          size: 48,
-                          color: AppColors.textMuted,
-                        ),
+                        fallbackIcon: Icons.agriculture_rounded,
+                        fallbackIconSize: 48,
                       ),
                     ),
                   ),
@@ -773,14 +772,12 @@ class _WishlistHorizontalCard extends StatelessWidget {
                     border: Border.all(color: AppColors.border),
                   ),
                   padding: const EdgeInsets.all(6),
-                  child: Image.network(
-                    product.imageUrl,
+                  child: AppProductImage(
+                    imageUrl: product.imageUrl,
+                    fallbackUrls: product.imageUrls,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.agriculture_rounded,
-                      size: 40,
-                      color: AppColors.textMuted,
-                    ),
+                    fallbackIcon: Icons.agriculture_rounded,
+                    fallbackIconSize: 40,
                   ),
                 ),
               ),

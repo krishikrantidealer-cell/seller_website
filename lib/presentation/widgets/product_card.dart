@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/wishlist_state.dart';
+import 'app_product_image.dart';
 import 'product_variants_modal.dart';
 
 class ProductCard extends StatefulWidget {
@@ -31,6 +32,15 @@ class _ProductCardState extends State<ProductCard> {
   void initState() {
     super.initState();
     _selectedVariant = widget.product.defaultVariant;
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.id != widget.product.id ||
+        !widget.product.variants.any((v) => v.id == _selectedVariant.id)) {
+      _selectedVariant = widget.product.defaultVariant;
+    }
   }
 
   @override
@@ -84,17 +94,12 @@ class _ProductCardState extends State<ProductCard> {
                                   horizontal: isCompact ? 6 : 10,
                                   vertical: isCompact ? 4 : 8,
                                 ),
-                                child: Image.network(
-                                  widget.product.imageUrl,
+                                child: AppProductImage(
+                                  imageUrl: widget.product.imageUrl,
+                                  fallbackUrls: widget.product.imageUrls,
                                   fit: BoxFit.contain,
-                                  errorBuilder: (context, error, stackTrace) => Container(
-                                    color: Colors.white,
-                                    child: const Icon(
-                                      Icons.agriculture_rounded,
-                                      size: 48,
-                                      color: AppColors.textMuted,
-                                    ),
-                                  ),
+                                  fallbackIcon: Icons.agriculture_rounded,
+                                  fallbackIconSize: 48,
                                 ),
                               ),
                             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/services/product_api_service.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
@@ -69,7 +70,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
 
   // Check how many products in our store share this technical formulation
   int _getProductCountForTechnical(String techName) {
-    return ProductItem.sampleProducts.where((p) {
+    return ProductController.instance.products.where((p) {
       return p.technicalName.toLowerCase().contains(techName.toLowerCase()) ||
           techName.toLowerCase().contains(p.technicalName.toLowerCase());
     }).length;

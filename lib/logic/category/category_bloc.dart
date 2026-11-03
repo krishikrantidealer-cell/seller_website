@@ -78,7 +78,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     } catch (_) {}
 
     if (!_isTestEnvironment) {
-      add(const FetchCategories(isBackground: true));
+      add(const FetchCategories(isBackground: false));
     }
   }
 
@@ -117,14 +117,12 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     CategoriesExternalUpdated event,
     Emitter<CategoryState> emit,
   ) {
-    if (event.categories.isNotEmpty) {
-      emit(
-        state.copyWith(
-          status: CategoryStatus.loaded,
-          categories: event.categories,
-        ),
-      );
-    }
+    emit(
+      state.copyWith(
+        status: CategoryStatus.loaded,
+        categories: event.categories,
+      ),
+    );
   }
 
   void _onSelectCategoryFilter(

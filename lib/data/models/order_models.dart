@@ -364,7 +364,7 @@ class OrderModel {
 class OrdersController extends ChangeNotifier {
   static final OrdersController instance = OrdersController._internal();
   OrdersController._internal() {
-    _orders = OrderModel.sampleOrders;
+    _orders = [];
   }
 
   late List<OrderModel> _orders;

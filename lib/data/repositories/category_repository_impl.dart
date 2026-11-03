@@ -35,12 +35,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
     final records = await remoteDataSource.getCategories();
     await localDataSource?.cacheRecords(records);
     final hierarchy = CategoryController.buildCategoryHierarchy(records);
-    if (hierarchy.isNotEmpty) {
-      _memoryHierarchyCache = hierarchy;
-      CategoryController.instance.syncFromBloc(hierarchy);
-      return hierarchy;
-    }
-    return CategoryItem.sampleCategories;
+    _memoryHierarchyCache = hierarchy;
+    CategoryController.instance.syncFromBloc(hierarchy);
+    return hierarchy;
   }
 
   void _syncInBackground() async {

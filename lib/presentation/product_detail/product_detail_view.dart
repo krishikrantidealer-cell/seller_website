@@ -5,6 +5,8 @@ import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import '../../data/models/wishlist_state.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/services/product_api_service.dart';
+import '../widgets/app_product_image.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/cart_drawer.dart';
@@ -48,12 +50,15 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Map<String, String>? _newReviewVideo;
 
   double get _averageRating {
-    if (_reviews.isEmpty) return 0.0;
-    final total = _reviews.fold<int>(0, (sum, item) => sum + item.rating);
-    return total / _reviews.length;
+    if (_reviews.isNotEmpty) {
+      final total = _reviews.fold<int>(0, (sum, item) => sum + item.rating);
+      return total / _reviews.length;
+    }
+    return widget.product.rating;
   }
 
-  int get _totalReviewsCount => _reviews.length;
+  int get _totalReviewsCount =>
+      _reviews.isNotEmpty ? _reviews.length : widget.product.reviewsCount;
 
   @override
   void initState() {
@@ -63,57 +68,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   void _initReviews() {
-    _reviews = [
-      FarmerReviewItem(
-        id: 'rev_1',
-        authorName: 'Rajesh Patil',
-        authorRole: 'Cotton Grower, Jalna (Maharashtra)',
-        rating: 5,
-        title: 'Outstanding pest knockdown within 48 hours',
-        comment:
-            'Applied on 6 acres of cotton during the peak vegetative stage when whitefly and bollworm nymphs appeared. Visible knockdown in 48 hours without causing leaf scorch or stress. Company batch authenticity QR code scanned verified genuine.',
-        date: '3 days ago',
-        isVerified: true,
-        cropType: 'Cotton',
-        imageUrls: const [
-          'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&auto=format&fit=crop&q=80',
-          'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80',
-        ],
-        videoName: 'cotton_spray_demonstration_trial.mp4',
-        videoDuration: '0:38 min',
-        videoSize: '14.2 MB',
-        videoThumbnailUrl:
-            'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80',
-      ),
-      FarmerReviewItem(
-        id: 'rev_2',
-        authorName: 'Suresh Reddy',
-        authorRole: 'Chilli Farmer, Guntur (Andhra Pradesh)',
-        rating: 5,
-        title: 'Superior flower retention & healthy canopy',
-        comment:
-            'Observed high leaf shine and drastically reduced flower dropping in chilli within a week of application. Formulation purity is far better than regional distributors, plus EBS delivered right to village depot.',
-        date: '1 week ago',
-        isVerified: true,
-        cropType: 'Chilli',
-        imageUrls: const [
-          'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?w=600&auto=format&fit=crop&q=80',
-        ],
-      ),
-      FarmerReviewItem(
-        id: 'rev_3',
-        authorName: 'Harpreet Singh',
-        authorRole: 'Paddy Grower, Karnal (Haryana)',
-        rating: 5,
-        title: 'Fast delivery & authentic sealed company bottle',
-        comment:
-            'Arrived in heavy duty tamper-proof cardboard box in 3 business days. Customer care agronomist advised accurate tank mixing instructions per 16-liter knapsack sprayer.',
-        date: '2 weeks ago',
-        isVerified: true,
-        cropType: 'Paddy',
-        imageUrls: const [],
-      ),
-    ];
+    _reviews = [];
   }
 
   @override
@@ -159,10 +114,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobileScreen = screenWidth < 700;
 
-    final categoryMatches = ProductItem.sampleProducts
+    final allProducts = ProductController.instance.products;
+    final categoryMatches = allProducts
         .where((p) => p.id != widget.product.id && p.category.toLowerCase() == widget.product.category.toLowerCase())
         .toList();
-    final otherProducts = ProductItem.sampleProducts
+    final otherProducts = allProducts
         .where((p) => p.id != widget.product.id && !categoryMatches.contains(p))
         .toList();
     final similarProducts = [...categoryMatches, ...otherProducts].take(6).toList();
@@ -482,14 +438,15 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               Center(
                 child: Padding(
                   padding: EdgeInsets.all(isMobile ? 16.0 : 28.0),
-                  child: Image.network(
-                    widget.product.imageUrl,
+                  child: AppProductImage(
+                    imageUrl: widget.product.imageUrls.isNotEmpty &&
+                            _selectedImageIndex < widget.product.imageUrls.length
+                        ? widget.product.imageUrls[_selectedImageIndex]
+                        : widget.product.imageUrl,
+                    fallbackUrls: widget.product.imageUrls,
                     fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.agriculture_rounded,
-                      size: 80,
-                      color: AppColors.textMuted,
-                    ),
+                    fallbackIcon: Icons.agriculture_rounded,
+                    fallbackIconSize: 80,
                   ),
                 ),
               ),
@@ -616,49 +573,48 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           ),
         ),
 
-        const SizedBox(height: 12),
-
-        // Thumbnail selectors
-        Row(
-          children: [
-            for (int i = 0; i < 3; i++) ...[
-              if (i > 0) const SizedBox(width: 10),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedImageIndex = i;
-                  });
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  width: isMobile ? 60 : 70,
-                  height: isMobile ? 60 : 70,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+        // Thumbnail selectors (only show if the product has multiple genuine images)
+        if (widget.product.imageUrls.length > 1) ...[
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (int i = 0; i < widget.product.imageUrls.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectedImageIndex = i;
+                      });
+                    },
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _selectedImageIndex == i ? AppColors.primaryGreen : AppColors.border,
-                      width: _selectedImageIndex == i ? 2.0 : 1.0,
+                    child: Container(
+                      width: isMobile ? 60 : 70,
+                      height: isMobile ? 60 : 70,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _selectedImageIndex == i ? AppColors.primaryGreen : AppColors.border,
+                          width: _selectedImageIndex == i ? 2.0 : 1.0,
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(5),
+                      child: AppProductImage(
+                        imageUrl: widget.product.imageUrls[i],
+                        fallbackUrls: widget.product.imageUrls,
+                        fit: BoxFit.contain,
+                        fallbackIcon: Icons.image,
+                        fallbackIconSize: 24,
+                      ),
                     ),
                   ),
-                  padding: const EdgeInsets.all(5),
-                  child: i == 0
-                      ? Image.network(
-                          widget.product.imageUrl,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.image, size: 24, color: AppColors.textMuted),
-                        )
-                      : Icon(
-                          i == 1 ? Icons.science_rounded : Icons.eco_rounded,
-                          color: _selectedImageIndex == i ? AppColors.primaryGreen : AppColors.textMuted,
-                          size: 26,
-                        ),
-                ),
-              ),
-            ],
-          ],
-        ),
+                ],
+              ],
+            ),
+          ),
+        ],
 
         const SizedBox(height: 14),
 
@@ -835,11 +791,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 onTap: () {
                   if (isMobile) {
                     setState(() {
-                      _expandedMobileSections.add(3);
+                      _expandedMobileSections.add(1);
                     });
                   } else {
                     setState(() {
-                      _activeTabIndex = 3;
+                      _activeTabIndex = 1;
                     });
                   }
                 },
@@ -1289,23 +1245,13 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           ),
         ),
 
-        // 1. Overview Accordion Card (Open by default)
+        // 1. Description & Specifications Accordion Card (Open by default)
         _buildAccordionCard(
           index: 0,
-          icon: Icons.info_outline_rounded,
+          icon: Icons.article_outlined,
           iconColor: AppColors.primaryGreen,
-          title: 'Product Overview',
-          subtitle: 'Formulation, purpose & key crop benefits',
-          content: _buildOverviewContent(isMobile: true),
-        ),
-
-        // 2. Technical Specs Accordion Card
-        _buildAccordionCard(
-          index: 1,
-          icon: Icons.science_outlined,
-          iconColor: const Color(0xFF0284C7),
-          title: 'Technical Specifications',
-          subtitle: 'Active ingredients, dosage & PHI',
+          title: 'Product Description & Specifications',
+          subtitle: 'Detailed description & verified product specifications',
           trailingBadge: Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
             decoration: BoxDecoration(
@@ -1322,22 +1268,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ),
             ),
           ),
-          content: _buildTechnicalSpecsContent(isMobile: true),
+          content: _buildProductDescriptionAndSpecs(isMobile: true),
         ),
 
-        // 3. Application Guide Accordion Card
+        // 2. Farmer Reviews Accordion Card
         _buildAccordionCard(
-          index: 2,
-          icon: Icons.water_drop_outlined,
-          iconColor: const Color(0xFF0D9488),
-          title: 'Application & Dosage Guide',
-          subtitle: 'Spraying instructions & safety precautions',
-          content: _buildApplicationGuideContent(isMobile: true),
-        ),
-
-        // 4. Farmer Reviews Accordion Card
-        _buildAccordionCard(
-          index: 3,
+          index: 1,
           icon: Icons.star_rounded,
           iconColor: AppColors.ratingAmber,
           title: 'Farmer Reviews ($_totalReviewsCount)',
@@ -1497,16 +1433,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Widget _buildDesktopTabsSection() {
     final tabItems = [
       (
-        label: 'Product Overview',
-        icon: Icons.info_outline_rounded,
-      ),
-      (
-        label: 'Technical Specs',
-        icon: Icons.science_outlined,
-      ),
-      (
-        label: 'Application Guide',
-        icon: Icons.water_drop_outlined,
+        label: 'Description & Specifications',
+        icon: Icons.article_outlined,
       ),
       (
         label: 'Farmer Reviews ($_totalReviewsCount)',
@@ -1570,7 +1498,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             size: 16,
                             color: _activeTabIndex == i
                                 ? Colors.white
-                                : (i == 3 ? AppColors.ratingAmber : AppColors.textSecondary),
+                                : (i == 1 ? AppColors.ratingAmber : AppColors.textSecondary),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -1603,179 +1531,552 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Widget _buildActiveTabContent({required bool isMobile}) {
     switch (_activeTabIndex) {
       case 0:
-        return _buildOverviewContent(isMobile: isMobile);
+        return _buildProductDescriptionAndSpecs(isMobile: isMobile);
       case 1:
-        return _buildTechnicalSpecsContent(isMobile: isMobile);
-      case 2:
-        return _buildApplicationGuideContent(isMobile: isMobile);
-      case 3:
       default:
         return _buildReviewsContent(isMobile: isMobile);
     }
   }
 
-  Widget _buildOverviewContent({required bool isMobile}) {
+  /// Authentic Product Details: Real Description from MongoDB + Verified Specifications Table
+  Widget _buildProductDescriptionAndSpecs({required bool isMobile}) {
+    final rawDescription = widget.product.description?.trim() ?? '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'About ${widget.product.title}',
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 14.5 : 16,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          '${widget.product.title} is a premium agricultural formulation manufactured by ${widget.product.vendor} and distributed directly through EBS Essential BioCrop Science. Engineered for Indian climatic and soil conditions, it provides dependable crop protection and enhanced yield vitality.',
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 12.5 : 13.5,
-            color: AppColors.textSecondary,
-            height: 1.5,
-          ),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          'Key Benefits:',
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 13 : 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildBulletPoint('Rapid systemic action and extended residual efficacy in all growing seasons.', isMobile),
-        _buildBulletPoint('Safe for beneficial insects when used according to standard label recommendations.', isMobile),
-        _buildBulletPoint('100% genuine batch authenticated with EBS lab purity certification.', isMobile),
-        _buildBulletPoint('Compatible with common tank-mix combinations without phytotoxicity risks.', isMobile),
-      ],
-    );
-  }
-
-  Widget _buildTechnicalSpecsContent({required bool isMobile}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Technical Specifications & Composition',
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 14.5 : 16,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 12),
-        _buildSpecRow('Active Ingredient', widget.product.technicalName, isMobile),
-        _buildSpecRow('Formulation Category', widget.product.category, isMobile),
-        _buildSpecRow('Manufacturer', widget.product.vendor, isMobile),
-        _buildSpecRow('Recommended Dosage', '1.5 - 2.0 ml / gm per liter of water (or 150-200 Ltr/acre)', isMobile),
-        _buildSpecRow('Target Crops', 'Cotton, Paddy, Chili, Tomato, Sugarcane, Soybean, Pulses, Fruits', isMobile),
-        _buildSpecRow('Pre-Harvest Interval (PHI)', '7 - 14 Days depending on crop stage', isMobile),
-      ],
-    );
-  }
-
-  Widget _buildApplicationGuideContent({required bool isMobile}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'How to Apply & Safety Guidelines',
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 14.5 : 16,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        _buildBulletPoint('Spray during cool morning or late afternoon hours to maximize leaf absorption.', isMobile),
-        _buildBulletPoint('Use clean water free from mud or heavy organic sediment for tank preparation.', isMobile),
-        _buildBulletPoint('Wear protective gloves and mask while handling chemical concentrates.', isMobile),
-        _buildBulletPoint('Store in original container away from direct sunlight and children.', isMobile),
-      ],
-    );
-  }
-
-  Widget _buildBulletPoint(String text, bool isMobile) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.check_circle_rounded, size: 15, color: AppColors.primaryGreen),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 12 : 13,
-                color: AppColors.textSecondary,
-                height: 1.45,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSpecRow(String label, String value, bool isMobile) {
-    if (isMobile) {
-      return Container(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        // Description Header
+        Row(
           children: [
-            Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.lightGreen,
+                borderRadius: BorderRadius.circular(6),
               ),
+              child: const Icon(Icons.description_rounded, size: 16, color: AppColors.primaryDarkGreen),
             ),
-            const SizedBox(height: 2),
-            Text(
-              value,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: AppColors.textSecondary,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Product Description',
+                style: GoogleFonts.poppins(
+                  fontSize: isMobile ? 14 : 17,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
               ),
             ),
           ],
         ),
-      );
+        const SizedBox(height: 12),
+
+        // Rich Product Description Content
+        if (rawDescription.isNotEmpty)
+          _buildRichDescription(rawDescription, isMobile: isMobile)
+        else
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF9FAFB),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: Text(
+              'Authentic product formulation provided by ${widget.product.vendor}. For technical dosage guidelines, contact EBS Agronomy Helpline at ${AppConstants.orderCallNumber}.',
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 12 : 13,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+          ),
+
+        const SizedBox(height: 24),
+        const Divider(color: Color(0xFFE5E7EB), height: 1),
+        const SizedBox(height: 20),
+
+        // Specifications Header
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Icon(Icons.fact_check_outlined, size: 16, color: Color(0xFF1D4ED8)),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Product Specifications & Details',
+                style: GoogleFonts.poppins(
+                  fontSize: isMobile ? 14 : 17,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Specifications Table (Authentic product data)
+        _buildProductSpecificationsTable(isMobile: isMobile),
+      ],
+    );
+  }
+
+  Widget _buildRichDescription(String rawContent, {required bool isMobile}) {
+    final cleaned = _cleanAndDecodeHtml(rawContent);
+
+    // If it contains HTML markup, parse into rich blocks
+    if (cleaned.contains('<') && cleaned.contains('>')) {
+      return _renderHtmlBlocks(cleaned, isMobile: isMobile);
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFF3F4F6))),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 200,
+    // Otherwise render plain text paragraphs with list detection
+    return _renderPlainText(cleaned, isMobile: isMobile);
+  }
+
+  String _cleanAndDecodeHtml(String text) {
+    var s = text.replaceAll(RegExp(r'<!--[\s\S]*?-->'), '');
+    s = s.replaceAll(RegExp(r'<script[\s\S]*?</script>', caseSensitive: false), '');
+    s = s.replaceAll(RegExp(r'<style[\s\S]*?</style>', caseSensitive: false), '');
+    s = s
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&bull;', '•')
+        .replaceAll('&deg;', '°');
+    return s.trim();
+  }
+
+  Widget _renderPlainText(String text, {required bool isMobile}) {
+    final lines = text.split('\n');
+    final List<Widget> widgets = [];
+
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+
+      if (line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) {
+        final cleanText = line.replaceFirst(RegExp(r'^[•\-\*]\s*'), '');
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 3),
+                  child: Icon(Icons.check_circle_rounded, size: 14, color: AppColors.primaryGreen),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    cleanText,
+                    style: GoogleFonts.poppins(
+                      fontSize: isMobile ? 12 : 13,
+                      color: AppColors.textSecondary,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else if (line.endsWith(':') && line.length < 60) {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 4),
             child: Text(
-              label,
+              line,
               style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+                fontSize: isMobile ? 13.5 : 14.5,
+                fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
           ),
-          Expanded(
+        );
+      } else {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              value,
-              style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary),
+              line,
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 12.5 : 13.5,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
             ),
           ),
+        );
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widgets,
+    );
+  }
+
+  Widget _renderHtmlBlocks(String html, {required bool isMobile}) {
+    final List<Widget> widgets = [];
+    final blockRegex = RegExp(
+      r'<(table|h[1-6]|[uo]l|p|div)[^>]*>([\s\S]*?)</\1>|<br\s*/?>',
+      caseSensitive: false,
+    );
+
+    int lastEnd = 0;
+    final matches = blockRegex.allMatches(html).toList();
+
+    void addTrailingText(String text) {
+      final stripped = text.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+      if (stripped.isNotEmpty) {
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              stripped,
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 12.5 : 13.5,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    if (matches.isEmpty) {
+      return _renderPlainText(
+        html.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n'),
+        isMobile: isMobile,
+      );
+    }
+
+    for (final match in matches) {
+      if (match.start > lastEnd) {
+        addTrailingText(html.substring(lastEnd, match.start));
+      }
+      lastEnd = match.end;
+
+      final matchedFull = match.group(0)!;
+      if (matchedFull.toLowerCase().startsWith('<br')) {
+        widgets.add(const SizedBox(height: 6));
+        continue;
+      }
+
+      final tag = match.group(1)!.toLowerCase();
+      final inner = match.group(2) ?? '';
+
+      if (tag.startsWith('h')) {
+        final headingText = inner.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+        if (headingText.isNotEmpty) {
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 6),
+              child: Text(
+                headingText,
+                style: GoogleFonts.poppins(
+                  fontSize: isMobile ? 14 : 15.5,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          );
+        }
+      } else if (tag == 'ul' || tag == 'ol') {
+        final liRegex = RegExp(r'<li[^>]*>([\s\S]*?)</li>', caseSensitive: false);
+        final liMatches = liRegex.allMatches(inner).toList();
+        if (liMatches.isNotEmpty) {
+          for (int idx = 0; idx < liMatches.length; idx++) {
+            final liContent = liMatches[idx].group(1) ?? '';
+            final cleanLi = liContent.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+            if (cleanLi.isNotEmpty) {
+              widgets.add(
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 3),
+                        child: tag == 'ol'
+                            ? Text(
+                                '${idx + 1}.',
+                                style: GoogleFonts.poppins(
+                                  fontSize: isMobile ? 11.5 : 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryGreen,
+                                ),
+                              )
+                            : const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.primaryGreen),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildInlineRichText(liContent, isMobile: isMobile),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+        }
+      } else if (tag == 'table') {
+        final tableWidget = _renderHtmlTable(inner, isMobile: isMobile);
+        if (tableWidget != null) {
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: tableWidget,
+            ),
+          );
+        }
+      } else {
+        // p or div
+        final stripped = inner.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+        if (stripped.isNotEmpty) {
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _buildInlineRichText(inner, isMobile: isMobile),
+            ),
+          );
+        }
+      }
+    }
+
+    if (lastEnd < html.length) {
+      addTrailingText(html.substring(lastEnd));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: widgets,
+    );
+  }
+
+  Widget? _renderHtmlTable(String tableInnerHtml, {required bool isMobile}) {
+    final trRegex = RegExp(r'<tr[^>]*>([\s\S]*?)</tr>', caseSensitive: false);
+    final trMatches = trRegex.allMatches(tableInnerHtml).toList();
+    if (trMatches.isEmpty) return null;
+
+    final List<TableRow> tableRows = [];
+    for (final trMatch in trMatches) {
+      final rowHtml = trMatch.group(1) ?? '';
+      final cellRegex = RegExp(r'<(th|td)[^>]*>([\s\S]*?)</\1>', caseSensitive: false);
+      final cellMatches = cellRegex.allMatches(rowHtml).toList();
+      if (cellMatches.isEmpty) continue;
+
+      final List<Widget> cells = [];
+      for (final cellMatch in cellMatches) {
+        final isTh = cellMatch.group(1)!.toLowerCase() == 'th';
+        final cellContent = (cellMatch.group(2) ?? '').replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+        cells.add(
+          Container(
+            color: isTh ? const Color(0xFFF1F5F9) : Colors.white,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 8 : 12,
+              vertical: isMobile ? 6 : 9,
+            ),
+            child: Text(
+              cellContent,
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 11 : 12.5,
+                fontWeight: isTh ? FontWeight.w700 : FontWeight.w400,
+                color: isTh ? AppColors.textPrimary : AppColors.textSecondary,
+              ),
+            ),
+          ),
+        );
+      }
+      tableRows.add(TableRow(children: cells));
+    }
+
+    if (tableRows.isEmpty) return null;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Table(
+        border: TableBorder.all(
+          color: const Color(0xFFE2E8F0),
+          width: 1,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        defaultColumnWidth: const IntrinsicColumnWidth(),
+        children: tableRows,
+      ),
+    );
+  }
+
+  Widget _buildInlineRichText(String htmlFragment, {required bool isMobile}) {
+    final inlineRegex = RegExp(r'<(b|strong|i|em)>([\s\S]*?)</\1>', caseSensitive: false);
+    final matches = inlineRegex.allMatches(htmlFragment).toList();
+
+    if (matches.isEmpty) {
+      final cleanText = htmlFragment.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+      return Text(
+        cleanText,
+        style: GoogleFonts.poppins(
+          fontSize: isMobile ? 12.5 : 13.5,
+          color: AppColors.textSecondary,
+          height: 1.5,
+        ),
+      );
+    }
+
+    final List<InlineSpan> spans = [];
+    int last = 0;
+    for (final m in matches) {
+      if (m.start > last) {
+        final textBefore = htmlFragment.substring(last, m.start).replaceAll(RegExp(r'<[^>]*>'), '');
+        if (textBefore.isNotEmpty) {
+          spans.add(
+            TextSpan(
+              text: textBefore,
+              style: GoogleFonts.poppins(
+                fontSize: isMobile ? 12.5 : 13.5,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+          );
+        }
+      }
+      last = m.end;
+      final tag = m.group(1)!.toLowerCase();
+      final inner = (m.group(2) ?? '').replaceAll(RegExp(r'<[^>]*>'), '');
+      final isBold = tag == 'b' || tag == 'strong';
+      spans.add(
+        TextSpan(
+          text: inner,
+          style: GoogleFonts.poppins(
+            fontSize: isMobile ? 12.5 : 13.5,
+            fontWeight: isBold ? FontWeight.w700 : FontWeight.normal,
+            fontStyle: !isBold ? FontStyle.italic : FontStyle.normal,
+            color: isBold ? AppColors.textPrimary : AppColors.textSecondary,
+            height: 1.5,
+          ),
+        ),
+      );
+    }
+
+    if (last < htmlFragment.length) {
+      final trailing = htmlFragment.substring(last).replaceAll(RegExp(r'<[^>]*>'), '');
+      if (trailing.isNotEmpty) {
+        spans.add(
+          TextSpan(
+            text: trailing,
+            style: GoogleFonts.poppins(
+              fontSize: isMobile ? 12.5 : 13.5,
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
+          ),
+        );
+      }
+    }
+
+    return Text.rich(
+      TextSpan(children: spans),
+    );
+  }
+
+  Widget _buildProductSpecificationsTable({required bool isMobile}) {
+    final specs = <MapEntry<String, String>>[];
+
+    specs.add(MapEntry('Product Name', widget.product.title));
+    if (widget.product.technicalName.isNotEmpty &&
+        widget.product.technicalName != widget.product.title) {
+      specs.add(MapEntry('Active Ingredient / Formula', widget.product.technicalName));
+    }
+    if (widget.product.vendor.isNotEmpty) {
+      specs.add(MapEntry('Brand / Manufacturer', widget.product.vendor));
+    }
+    if (widget.product.category.isNotEmpty) {
+      specs.add(MapEntry('Category', widget.product.category));
+    }
+    if (widget.product.sku != null && widget.product.sku!.trim().isNotEmpty) {
+      specs.add(MapEntry('SKU Code', widget.product.sku!.trim()));
+    }
+    if (widget.product.hsnCode != null && widget.product.hsnCode!.trim().isNotEmpty) {
+      specs.add(MapEntry('HSN Code', widget.product.hsnCode!.trim()));
+    }
+    if (widget.product.variants.isNotEmpty) {
+      final packSizes = widget.product.variants.map((v) => v.label).join(', ');
+      specs.add(MapEntry('Available Pack Sizes', packSizes));
+    } else if (widget.product.packSize.isNotEmpty) {
+      specs.add(MapEntry('Pack Size', widget.product.packSize));
+    }
+    if (widget.product.productWeight != null && widget.product.productWeight! > 0) {
+      final unit = widget.product.productWeightUnit ?? 'kg';
+      specs.add(MapEntry('Net Weight', '${widget.product.productWeight} $unit'));
+    }
+    if (widget.product.refundPolicy != null && widget.product.refundPolicy!.trim().isNotEmpty) {
+      specs.add(MapEntry('Return & Replacement Policy', widget.product.refundPolicy!.trim()));
+    } else {
+      specs.add(const MapEntry('Return & Replacement Policy', 'Standard 7-day replacement for damaged or incorrect deliveries'));
+    }
+    specs.add(const MapEntry('Authenticity Guarantee', '100% Genuine Lab Tested Agri-Input'));
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (int i = 0; i < specs.length; i++)
+            Container(
+              color: i.isEven ? const Color(0xFFF8FAFC) : Colors.white,
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 12 : 16,
+                vertical: isMobile ? 9 : 11,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: isMobile ? 130 : 220,
+                    child: Text(
+                      specs[i].key,
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 11.5 : 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      specs[i].value,
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 11.5 : 12.5,
+                        color: AppColors.textSecondary,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -1840,7 +2141,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Based on $_totalReviewsCount verified farmer reviews',
+                              _totalReviewsCount > 0
+                                  ? 'Based on $_totalReviewsCount verified farmer reviews'
+                                  : 'No customer reviews yet • Be the first to review',
                               style: GoogleFonts.poppins(
                                 fontSize: isMobile ? 11 : 12,
                                 fontWeight: FontWeight.w500,

@@ -18,10 +18,8 @@ class CategoryState extends Equatable {
     this.errorMessage,
   });
 
-  /// Returns the active list of categories, falling back to `CategoryItem.sampleCategories`
-  /// during initial 0ms render or when offline.
-  List<CategoryItem> get effectiveCategories =>
-      categories.isNotEmpty ? categories : CategoryItem.sampleCategories;
+  /// Returns the active list of categories loaded from the backend API.
+  List<CategoryItem> get effectiveCategories => categories;
 
   CategoryItem? findCategory(String idOrSlugOrName) {
     if (idOrSlugOrName.isEmpty || idOrSlugOrName == 'all') return null;

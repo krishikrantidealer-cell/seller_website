@@ -86,13 +86,12 @@ class CategoryController extends ChangeNotifier {
   static final CategoryController instance = CategoryController._internal();
   CategoryController._internal();
 
-  List<CategoryItem> _categories = CategoryItem.sampleCategories;
+  List<CategoryItem> _categories = const [];
   bool _isLoading = false;
   bool _hasLoadedFromApi = false;
   String? _errorMessage;
 
-  /// Current active 3-tier category hierarchy (defaults to `CategoryItem.sampleCategories`
-  /// until the backend response resolves, or if offline).
+  /// Current active 3-tier category hierarchy loaded from `GET /api/v1/categories`.
   List<CategoryItem> get categories => _categories;
   bool get isLoading => _isLoading;
   bool get hasLoadedFromApi => _hasLoadedFromApi;
@@ -190,10 +189,8 @@ class CategoryController extends ChangeNotifier {
       }
 
       final builtTree = buildCategoryHierarchy(allRecords);
-      if (builtTree.isNotEmpty) {
-        _categories = builtTree;
-        _hasLoadedFromApi = true;
-      }
+      _categories = builtTree;
+      _hasLoadedFromApi = true;
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
@@ -268,7 +265,7 @@ class CategoryController extends ChangeNotifier {
             id: l1.id,
             slug: l1.slug,
             name: l1.name,
-            icon: CategoryItem.iconForSubcategory(l1.name, parentName: l0.name),
+            icon: null,
             categoryImageUrl: l1.categoryImageUrl,
             sortOrder: l1.sortOrder,
             subcategories: subItems.map((s) => s.name).toList(),
@@ -283,7 +280,7 @@ class CategoryController extends ChangeNotifier {
           backendId: l0.id,
           slug: l0.slug,
           name: l0.name,
-          icon: CategoryItem.iconForMajorCategory(l0.name),
+          icon: '',
           categoryImageUrl: l0.categoryImageUrl,
           bannerImage: l0.bannerImage,
           bannerTitle: l0.bannerTitle,
@@ -298,7 +295,6 @@ class CategoryController extends ChangeNotifier {
 
   /// Synchronizes the controller state when `CategoryBloc` emits new categories.
   void syncFromBloc(List<CategoryItem> items) {
-    if (items.isEmpty) return;
     _categories = items;
     _hasLoadedFromApi = true;
     _isLoading = false;

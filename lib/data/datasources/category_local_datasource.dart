@@ -14,7 +14,7 @@ class CategoryLocalDataSourceImpl implements CategoryLocalDataSource {
 
   CategoryLocalDataSourceImpl([this.prefs]);
 
-  static const String _categoriesCacheKey = 'seller_website_cached_categories_v1';
+  static const String _categoriesCacheKey = 'seller_website_live_categories_v3';
 
   @override
   Future<List<ApiCategoryRecord>?> getCachedRecords() async {
