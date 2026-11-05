@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
+import '../sell_with_us/sell_with_us_view.dart';
+import '../be_a_partner/be_a_partner_view.dart';
 
 class TopInfoBar extends StatelessWidget {
   const TopInfoBar({super.key});
@@ -90,11 +92,27 @@ class TopInfoBar extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _navLink('Ask EBS Experts', fontSize: fontSize),
+                      _navLink(
+                        'Be a Partner',
+                        fontSize: fontSize,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const BeAPartnerView()),
+                          );
+                        },
+                      ),
                       SizedBox(width: itemGap),
-                      _navLink('Be a Partner', fontSize: fontSize),
-                      SizedBox(width: itemGap),
-                      _navLink('Sell with Us', fontSize: fontSize),
+                      _navLink(
+                        'Sell with Us',
+                        fontSize: fontSize,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SellWithUsView()),
+                          );
+                        },
+                      ),
                       SizedBox(width: itemGap),
                       Container(width: 1, height: 12, color: Colors.white.withValues(alpha: 0.4)),
                       SizedBox(width: itemGap),
@@ -124,15 +142,19 @@ class TopInfoBar extends StatelessWidget {
     );
   }
 
-  Widget _navLink(String label, {double fontSize = 12.0}) {
+  Widget _navLink(String label, {double fontSize = 12.0, VoidCallback? onTap}) {
     return InkWell(
-      onTap: () {},
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          color: Colors.white,
-          fontSize: fontSize,
-          fontWeight: FontWeight.w500,
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: fontSize,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

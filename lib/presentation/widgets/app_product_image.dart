@@ -52,18 +52,24 @@ class _AppProductImageState extends State<AppProductImage> {
 
   void _recomputeCandidates() {
     final list = <String>[];
-    final primary = widget.imageUrl.trim();
-    if (primary.isNotEmpty &&
-        (primary.startsWith('http://') || primary.startsWith('https://'))) {
-      list.add(primary);
-    }
-    for (final fb in widget.fallbackUrls) {
-      final trimmed = fb.trim();
+    void add(String? url) {
+      final trimmed = url?.trim() ?? '';
       if (trimmed.isNotEmpty &&
           (trimmed.startsWith('http://') || trimmed.startsWith('https://')) &&
           !list.contains(trimmed)) {
         list.add(trimmed);
+        if (trimmed.contains('storage.googleapis.com') && trimmed.contains('?')) {
+          final clean = trimmed.split('?').first;
+          if (!list.contains(clean)) {
+            list.add(clean);
+          }
+        }
       }
+    }
+
+    add(widget.imageUrl);
+    for (final fb in widget.fallbackUrls) {
+      add(fb);
     }
     _candidates = list;
     _candidateIndex = 0;

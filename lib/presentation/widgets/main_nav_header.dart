@@ -526,31 +526,35 @@ class _MainNavHeaderState extends State<MainNavHeader> {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
           child: Image.asset(
-            'assets/images/company_logo.png',
+            'assets/images/ebs_logo.png',
             height: logoHeight,
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
-            errorBuilder: (_, _, _) => Container(
-              height: logoHeight,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 6),
-                  Text(
-                    'BioCrop',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+            errorBuilder: (_, _, _) => FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Container(
+                height: logoHeight,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      'BioCrop',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

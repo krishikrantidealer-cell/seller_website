@@ -18,8 +18,25 @@
 
   <title>EBS Essential BioCrop Science | Agriculture E-Commerce</title>
   <link rel="manifest" href="manifest.json">
+  <script>
+    // Automatically purge old service workers and CacheStorage from previous builds
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (var registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (var name of names) {
+          caches.delete(name);
+        }
+      });
+    }
+  </script>
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter_bootstrap.js?v=20261105" async></script>
 </body>
 </html>

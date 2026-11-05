@@ -35,11 +35,22 @@ class ProductRepositoryImpl implements ProductRepository {
       }
     }
 
-    final products = _resolveWithCategories(await remoteDataSource.getProducts());
-    _memoryCache = products;
-    await localDataSource?.cacheProducts(products);
-    ProductController.instance.syncFromBloc(products);
-    return products;
+    try {
+      final products = _resolveWithCategories(await remoteDataSource.getProducts());
+      _memoryCache = products;
+      await localDataSource?.cacheProducts(products);
+      ProductController.instance.syncFromBloc(products);
+      return products;
+    } catch (_) {
+      final cached = await getCachedProducts();
+      if (cached != null && cached.isNotEmpty) {
+        return cached;
+      }
+      final fallback = _resolveWithCategories(ProductItem.sampleProducts);
+      _memoryCache = fallback;
+      ProductController.instance.syncFromBloc(fallback);
+      return fallback;
+    }
   }
 
   void _syncInBackground() async {

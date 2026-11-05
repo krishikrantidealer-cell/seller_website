@@ -23,9 +23,10 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
       return _memoryCache;
     }
 
-    final jsonString = _prefs?.getString(_cacheKey);
-    if (jsonString != null && jsonString.isNotEmpty) {
-      try {
+    try {
+      final store = _prefs ?? await SharedPreferences.getInstance();
+      final jsonString = store.getString(_cacheKey);
+      if (jsonString != null && jsonString.isNotEmpty) {
         final List<dynamic> decoded = jsonDecode(jsonString);
         final categories = CategoryController.instance.categories;
         _memoryCache = decoded
@@ -38,10 +39,10 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
             )
             .toList();
         return _memoryCache;
-      } catch (_) {
-        await clearCache();
-        return null;
       }
+    } catch (_) {
+      await clearCache();
+      return null;
     }
     return null;
   }
@@ -49,15 +50,19 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   @override
   Future<void> cacheProducts(List<ProductItem> products) async {
     _memoryCache = products;
-    if (_prefs != null) {
+    try {
+      final store = _prefs ?? await SharedPreferences.getInstance();
       final jsonString = jsonEncode(products.map((p) => p.toJson()).toList());
-      await _prefs.setString(_cacheKey, jsonString);
-    }
+      await store.setString(_cacheKey, jsonString);
+    } catch (_) {}
   }
 
   @override
   Future<void> clearCache() async {
     _memoryCache = null;
-    await _prefs?.remove(_cacheKey);
+    try {
+      final store = _prefs ?? await SharedPreferences.getInstance();
+      await store.remove(_cacheKey);
+    } catch (_) {}
   }
 }

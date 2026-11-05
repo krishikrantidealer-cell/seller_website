@@ -193,6 +193,9 @@ class CategoryController extends ChangeNotifier {
       _hasLoadedFromApi = true;
     } catch (e) {
       _errorMessage = e.toString();
+      if (_categories.isEmpty) {
+        _categories = CategoryItem.sampleCategories;
+      }
     } finally {
       if (shouldCloseClient) {
         httpClient.close();

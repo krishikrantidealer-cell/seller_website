@@ -73,11 +73,10 @@ class _HomeViewState extends State<HomeView> {
   }
 
   List<ProductItem> _getFilteredProducts(List<ProductItem> allProducts, List<CategoryItem> categories) {
-    final hasAnyBestSeller = allProducts.any((p) => p.isBestSeller);
     return allProducts.where((p) {
       if (!p.isAvailable) return false;
-      final matchesBestSeller = _selectedCategory == 'all'
-          ? (hasAnyBestSeller ? p.isBestSeller : true)
+      final matchesBestSeller = (_selectedCategory == 'all' && _searchFilter.isEmpty)
+          ? p.isBestSeller
           : true;
       final currentCategoryItem = categories.cast<CategoryItem?>().firstWhere(
         (c) => c?.id == _selectedCategory || c?.backendId == _selectedCategory,
@@ -184,15 +183,12 @@ class _HomeViewState extends State<HomeView> {
         ? productBloc!.state.products
         : ProductController.instance.products;
 
-    final isCatalogLoading = (categoryBloc?.state.status == CategoryStatus.loading ||
-            productBloc?.state.status == ProductStatus.loading) &&
-        categories.isEmpty &&
-        allProducts.isEmpty;
-
     final isCatalogError = (categoryBloc?.state.status == CategoryStatus.error ||
             productBloc?.state.status == ProductStatus.error) &&
         categories.isEmpty &&
         allProducts.isEmpty;
+
+    final isCatalogLoading = categories.isEmpty && !isCatalogError;
 
     final filtered = _getFilteredProducts(allProducts, categories);
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -285,10 +281,6 @@ class _HomeViewState extends State<HomeView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Modern Best Sellers Section Header
-                          _buildBestSellersHeader(filtered, isMobile),
-                          SizedBox(height: isMobile ? 10 : 14),
-
                           // Loading State
                           if (isCatalogLoading)
                             Container(
@@ -368,7 +360,7 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'The website is attempting to load live categories and products from:\n${AppConstants.apiBaseUrl}\n\nPlease start the Spring Boot backend server (ebs_biocrop_backend) on port 8080.',
+                                    'The website is attempting to load live categories and products from:\n${AppConstants.apiBaseUrl}\n\nPlease check network connectivity or retry in a few moments.',
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.poppins(
                                       fontSize: 12.5,
@@ -415,51 +407,63 @@ class _HomeViewState extends State<HomeView> {
                                 ],
                               ),
                             )
-                          // Empty Search Results
-                          else if (filtered.isEmpty)
-                            Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(isMobile ? 24 : 48),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.border),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textMuted),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    allProducts.isEmpty
-                                        ? 'No products available in the database yet.'
-                                        : 'No agricultural products found matching your search.',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                          // Active Search or Category Filter View
+                          else if (_selectedCategory != 'all' || _searchFilter.isNotEmpty) ...[
+                            _buildBestSellersHeader(filtered, isMobile),
+                            SizedBox(height: isMobile ? 10 : 14),
+                            if (filtered.isEmpty)
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(isMobile ? 24 : 48),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textMuted),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      allProducts.isEmpty
+                                          ? 'No products available in the database yet.'
+                                          : 'No agricultural products found matching your search.',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 12),
-                                  if (allProducts.isNotEmpty)
-                                    OutlinedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _selectedCategory = 'all';
-                                          _searchFilter = '';
-                                        });
-                                      },
-                                      child: const Text('Reset Filters'),
-                                    ),
-                                ],
-                              ),
-                            )
-                          else
+                                    const SizedBox(height: 12),
+                                    if (allProducts.isNotEmpty)
+                                      OutlinedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedCategory = 'all';
+                                            _selectedSubcategory = null;
+                                            _searchFilter = '';
+                                          });
+                                        },
+                                        child: const Text('Reset Filters'),
+                                      ),
+                                  ],
+                                ),
+                              )
+                            else
+                              _buildProductGrid(filtered, constraints),
+                          ]
+                          // Default Home Screen: Only display Best Sellers if products are explicitly flagged as isBestSeller
+                          else if (filtered.isNotEmpty) ...[
+                            _buildBestSellersHeader(filtered, isMobile),
+                            SizedBox(height: isMobile ? 10 : 14),
                             _buildProductGrid(filtered, constraints, maxItems: 6),
+                            SizedBox(height: isMobile ? 16 : 28),
+                          ],
 
                           // Level 0 Major Category Sections rendered one by one
-                          if (!isCatalogLoading && !isCatalogError)
+                          if (!isCatalogLoading && !isCatalogError && _selectedCategory == 'all' && _searchFilter.isEmpty)
                             ..._buildAllLevel0CategorySections(categories, allProducts, isMobile, constraints),
                         ],
                       ),
@@ -561,7 +565,8 @@ class _HomeViewState extends State<HomeView> {
 
     for (final category in categories) {
       final categoryProducts = _getProductsForLevel0Category(category, allProducts);
-      if (_searchFilter.isNotEmpty && categoryProducts.isEmpty) {
+      // Hide categories that have no products on the home screen
+      if (categoryProducts.isEmpty) {
         continue;
       }
 
@@ -578,41 +583,7 @@ class _HomeViewState extends State<HomeView> {
                 isMobile,
               ),
               SizedBox(height: isMobile ? 10 : 14),
-              if (categoryProducts.isNotEmpty)
-                _buildProductGrid(categoryProducts, constraints, maxItems: 6)
-              else
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 16 : 24,
-                    vertical: isMobile ? 18 : 24,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'New ${category.name} products are being stocked for this season.',
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 12 : 13.5,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      OutlinedButton(
-                        onPressed: () => _openCategoryDetail(category.id, null),
-                        child: const Text('Explore Category'),
-                      ),
-                    ],
-                  ),
-                ),
+              _buildProductGrid(categoryProducts, constraints, maxItems: 6),
             ],
           ),
         ),
@@ -804,6 +775,14 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildBestSellersHeader(List<ProductItem> filtered, bool isMobile) {
     final bool isFiltered = _selectedCategory != 'all' || _selectedSubcategory != null || _searchFilter.isNotEmpty;
+    final String title;
+    if (_searchFilter.isNotEmpty) {
+      title = 'Search Results';
+    } else if (_selectedCategory != 'all') {
+      title = _getCategoryTitle(_selectedCategory);
+    } else {
+      title = 'Best Sellers';
+    }
 
     return Container(
       width: double.infinity,
@@ -840,7 +819,7 @@ class _HomeViewState extends State<HomeView> {
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
-                              'Best Sellers',
+                              title,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -916,7 +895,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Best Sellers',
+                  title,
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../category/category_detail_view.dart';
 import '../wishlist/wishlist_view.dart';
 import '../orders/my_orders_view.dart';
+import '../sell_with_us/sell_with_us_view.dart';
+import '../be_a_partner/be_a_partner_view.dart';
 
 class WebFooter extends StatelessWidget {
   const WebFooter({super.key});
@@ -455,7 +458,24 @@ class WebFooter extends StatelessWidget {
           },
         ),
         _footerLink('About EBS Essential BioCrop Science'),
-        _footerLink('Seller & Distributor Hub'),
+        _footerLink(
+          'Be a Partner',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const BeAPartnerView()),
+            );
+          },
+        ),
+        _footerLink(
+          'Sell with Us (Seller Hub)',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SellWithUsView()),
+            );
+          },
+        ),
         _footerLink('Agronomist Consultation'),
         _footerLink('Research & Formulations'),
       ],
@@ -550,11 +570,13 @@ enum SocialPlatform {
   facebook(
     name: 'Facebook',
     tooltip: 'Follow BioCrop on Facebook',
+    url: AppConstants.facebookUrl,
     color: Color(0xFF1877F2),
   ),
   instagram(
     name: 'Instagram',
     tooltip: 'Follow BioCrop on Instagram',
+    url: AppConstants.instagramUrl,
     gradient: LinearGradient(
       begin: Alignment.bottomLeft,
       end: Alignment.topRight,
@@ -570,17 +592,20 @@ enum SocialPlatform {
   youtube(
     name: 'YouTube',
     tooltip: 'Subscribe to BioCrop on YouTube',
+    url: AppConstants.youtubeUrl,
     color: Color(0xFFFF0000),
   );
 
   final String name;
   final String tooltip;
+  final String url;
   final Color? color;
   final Gradient? gradient;
 
   const SocialPlatform({
     required this.name,
     required this.tooltip,
+    required this.url,
     this.color,
     this.gradient,
   });
@@ -635,7 +660,7 @@ class _SocialIconButtonState extends State<SocialIconButton> {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: widget.onTap ??
-              () {
+              () async {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -648,6 +673,10 @@ class _SocialIconButtonState extends State<SocialIconButton> {
                     duration: const Duration(seconds: 2),
                   ),
                 );
+                final uri = Uri.parse(widget.platform.url);
+                try {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                } catch (_) {}
               },
           child: AnimatedScale(
             scale: _isHovered ? 1.12 : 1.0,

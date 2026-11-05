@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/auth_state.dart';
 import '../widgets/cart_drawer.dart';
@@ -1388,13 +1389,13 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Calling Krishi Helpline: 1800-203-1425 (Toll-Free)'),
+                      content: Text('Calling Krishi Helpline: ${AppConstants.helplineNumber}'),
                       backgroundColor: AppColors.primaryGreen,
                     ),
                   );
                 },
                 icon: const Icon(Icons.phone_in_talk_rounded, size: 16),
-                label: const Text('Call: 1800-203-1425'),
+                label: Text('Call: ${AppConstants.helplineNumber}'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primaryDarkGreen,
                   side: const BorderSide(color: AppColors.primaryGreen),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
@@ -6,6 +7,7 @@ import '../../data/models/cart_state.dart';
 import '../../data/models/wishlist_state.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/services/product_api_service.dart';
+import '../../logic/product/product_bloc.dart';
 import '../widgets/app_product_image.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
@@ -33,6 +35,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   int _activeTabIndex = 0;
   int _selectedImageIndex = 0;
   final Set<int> _expandedMobileSections = {0};
+  bool _isDescriptionExpanded = false;
 
   // Farmer Reviews State
   late List<FarmerReviewItem> _reviews;
@@ -65,6 +68,20 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     super.initState();
     _selectedVariant = widget.product.defaultVariant;
     _initReviews();
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductDetailView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.id != widget.product.id) {
+      setState(() {
+        _selectedVariant = widget.product.defaultVariant;
+        _selectedQuantity = 1;
+        _selectedImageIndex = 0;
+        _isDescriptionExpanded = false;
+        _initReviews();
+      });
+    }
   }
 
   void _initReviews() {
@@ -114,7 +131,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobileScreen = screenWidth < 700;
 
-    final allProducts = ProductController.instance.products;
+    final productBloc = context.watch<ProductBloc?>();
+    final allProducts = productBloc?.state.products.isNotEmpty == true
+        ? productBloc!.state.products
+        : ProductController.instance.products;
     final categoryMatches = allProducts
         .where((p) => p.id != widget.product.id && p.category.toLowerCase() == widget.product.category.toLowerCase())
         .toList();
@@ -219,7 +239,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
             const SizedBox(height: 28),
 
-            // Tabs: Overview, Specifications & Dosage, Safety, Reviews
+            // Tabs: Description & Specifications (Side-by-Side on desktop), Farmer Reviews
             Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1680),
@@ -234,10 +254,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ),
             ),
 
-            const SizedBox(height: 36),
-
-            // Similar Products Section
-            if (similarProducts.isNotEmpty)
+            // Similar Products Section (only shown when similar products actually exist)
+            if (similarProducts.isNotEmpty) ...[
+              const SizedBox(height: 36),
               Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1680),
@@ -247,6 +266,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   ),
                 ),
               ),
+            ],
 
             const SizedBox(height: 48),
 
@@ -616,44 +636,105 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           ),
         ],
 
-        const SizedBox(height: 14),
-
-        // Guarantee Strip under gallery (Responsive wrap)
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF3F4F6),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: Wrap(
-            alignment: WrapAlignment.spaceAround,
-            spacing: 12,
-            runSpacing: 8,
-            children: [
-              _buildMicroFeature(Icons.shield_outlined, '100% Genuine', isMobile),
-              _buildMicroFeature(Icons.local_shipping_outlined, 'Fast Dispatch', isMobile),
-              _buildMicroFeature(Icons.support_agent_outlined, 'Agronomist Help', isMobile),
-            ],
-          ),
-        ),
+        // Authentic EBS Quality & Delivery Assurances (balances desktop gallery with purchase card)
+        if (!isMobile) ...[
+          const SizedBox(height: 14),
+          _buildDesktopAssurancesCard(),
+        ],
       ],
     );
   }
 
-  Widget _buildMicroFeature(IconData icon, String label, bool isMobile) {
+  Widget _buildDesktopAssurancesCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGreen,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.verified_user_rounded, size: 15, color: AppColors.primaryGreen),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'EBS BioCrop Quality Assurances',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _buildAssuranceRow(
+            Icons.biotech_outlined,
+            'Lab Tested Potency',
+            'Certified pure formulation with active bio-inoculants.',
+          ),
+          const SizedBox(height: 10),
+          _buildAssuranceRow(
+            Icons.local_shipping_outlined,
+            'Safe Agri-Transit Guarantee',
+            'Tamper-evident packaging dispatched directly from seller hub.',
+          ),
+          const SizedBox(height: 10),
+          _buildAssuranceRow(
+            Icons.published_with_changes_rounded,
+            '7-Day Return & Replacement',
+            'Hassle-free replacement for any transit damage or discrepancies.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAssuranceRow(IconData icon, String title, String subtitle) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: isMobile ? 14 : 16, color: AppColors.primaryGreen),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: isMobile ? 10.5 : 11.5,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+        Icon(icon, size: 17, color: AppColors.primaryGreen),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                  height: 1.35,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -1137,7 +1218,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         ),
                       ),
                       Text(
-                        'Speak with an EBS certified agronomist toll-free: ${AppConstants.orderCallNumber}',
+                        'Speak with an EBS certified agronomist: ${AppConstants.orderCallNumber}',
                         style: GoogleFonts.poppins(
                           fontSize: isMobile ? 10.5 : 11.5,
                           color: const Color(0xFF15803D),
@@ -1542,7 +1623,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Widget _buildProductDescriptionAndSpecs({required bool isMobile}) {
     final rawDescription = widget.product.description?.trim() ?? '';
 
-    return Column(
+    final descriptionSection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Description Header
@@ -1592,11 +1673,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ),
             ),
           ),
+      ],
+    );
 
-        const SizedBox(height: 24),
-        const Divider(color: Color(0xFFE5E7EB), height: 1),
-        const SizedBox(height: 20),
-
+    final specsSection = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         // Specifications Header
         Row(
           children: [
@@ -1627,18 +1709,120 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         _buildProductSpecificationsTable(isMobile: isMobile),
       ],
     );
+
+    if (!isMobile) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 5, child: descriptionSection),
+          const SizedBox(width: 32),
+          Expanded(flex: 6, child: specsSection),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        descriptionSection,
+        const SizedBox(height: 24),
+        const Divider(color: Color(0xFFE5E7EB), height: 1),
+        const SizedBox(height: 20),
+        specsSection,
+      ],
+    );
   }
 
   Widget _buildRichDescription(String rawContent, {required bool isMobile}) {
     final cleaned = _cleanAndDecodeHtml(rawContent);
 
     // If it contains HTML markup, parse into rich blocks
-    if (cleaned.contains('<') && cleaned.contains('>')) {
-      return _renderHtmlBlocks(cleaned, isMobile: isMobile);
-    }
+    final Widget descriptionContent = (cleaned.contains('<') && cleaned.contains('>'))
+        ? _renderHtmlBlocks(cleaned, isMobile: isMobile)
+        : _renderPlainText(cleaned, isMobile: isMobile);
 
-    // Otherwise render plain text paragraphs with list detection
-    return _renderPlainText(cleaned, isMobile: isMobile);
+    // Standard 4 lines of Poppins 13/13.5 with 1.5 line height = ~80-92px
+    final double collapsedHeight = isMobile ? 88.0 : 96.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRect(
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: _isDescriptionExpanded
+                  ? const BoxConstraints()
+                  : BoxConstraints(maxHeight: collapsedHeight),
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: descriptionContent,
+                  ),
+                  if (!_isDescriptionExpanded)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: 42,
+                      child: IgnorePointer(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.white.withValues(alpha: 0.0),
+                                Colors.white,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: () {
+            setState(() {
+              _isDescriptionExpanded = !_isDescriptionExpanded;
+            });
+          },
+          borderRadius: BorderRadius.circular(6),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _isDescriptionExpanded ? 'Show Less' : 'Show More',
+                  style: GoogleFonts.poppins(
+                    fontSize: isMobile ? 12.5 : 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  _isDescriptionExpanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  size: 18,
+                  color: AppColors.primaryGreen,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   String _cleanAndDecodeHtml(String text) {
@@ -3852,6 +4036,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   Widget _buildSimilarProductsSection(List<ProductItem> similarProducts, bool isMobile) {
+    if (similarProducts.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

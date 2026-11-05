@@ -14,6 +14,8 @@ import '../profile/farmer_profile_view.dart';
 import '../orders/my_orders_view.dart';
 import '../technical/technical_search_view.dart';
 import '../wishlist/wishlist_view.dart';
+import '../sell_with_us/sell_with_us_view.dart';
+import '../be_a_partner/be_a_partner_view.dart';
 
 class MobileNavigationDrawer extends StatelessWidget {
   final String selectedCategoryId;
@@ -74,6 +76,80 @@ class MobileNavigationDrawer extends StatelessWidget {
                     children: [
                       // Quick Actions Bar (Orders, Wishlist, Technical, Profile)
                       _buildQuickActionBar(context),
+
+                      // Be a Partner Banner
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const BeAPartnerView()));
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEF2F2),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFFECACA)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.handshake_rounded, size: 18, color: AppColors.primaryCrimson),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Be a Partner',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryCrimson,
+                                    ),
+                                  ),
+                                ),
+                                const Icon(Icons.chevron_right_rounded, size: 16, color: AppColors.primaryCrimson),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Sell With Us Banner
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => const SellWithUsView()));
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF0FDF4),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFBBF7D0)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.storefront_rounded, size: 18, color: AppColors.primaryDarkGreen),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Sell with Us (Seller & Dealer Hub)',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF166534),
+                                    ),
+                                  ),
+                                ),
+                                const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF166534)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
                       const SizedBox(height: 4),
 
@@ -453,7 +529,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.all(3),
                       child: Image.asset(
-                        'assets/images/company_logo.png',
+                        'assets/images/ebs_logo.png',
                         fit: BoxFit.contain,
                         errorBuilder: (_, _, _) => const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 18),
                       ),

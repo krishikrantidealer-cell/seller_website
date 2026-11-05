@@ -34,6 +34,8 @@ import 'package:seller_website/presentation/widgets/main_nav_header.dart';
 import 'package:seller_website/presentation/technical/technical_search_view.dart';
 import 'package:seller_website/data/models/wishlist_state.dart';
 import 'package:seller_website/presentation/wishlist/wishlist_view.dart';
+import 'package:seller_website/presentation/sell_with_us/sell_with_us_view.dart';
+import 'package:seller_website/presentation/be_a_partner/be_a_partner_view.dart';
 import 'package:seller_website/presentation/category/category_detail_view.dart';
 import 'package:seller_website/presentation/home/home_view.dart';
 import 'package:seller_website/presentation/widgets/app_product_image.dart';
@@ -742,6 +744,16 @@ void main() {
     expect(find.text('High yield enhancement'), findsOneWidget);
     expect(find.text('Soil microbial boost'), findsOneWidget);
 
+    // Verify 4-line clamping with Show More / Show Less toggle
+    expect(find.text('Show More'), findsOneWidget);
+    await tester.ensureVisible(find.text('Show More'));
+    await tester.tap(find.text('Show More'));
+    await tester.pumpAndSettle();
+    expect(find.text('Show Less'), findsOneWidget);
+    await tester.tap(find.text('Show Less'));
+    await tester.pumpAndSettle();
+    expect(find.text('Show More'), findsOneWidget);
+
     // Verify authentic specifications table
     expect(find.text('Product Specifications & Details'), findsOneWidget);
     expect(find.text('Active Ingredient / Formula'), findsOneWidget);
@@ -750,6 +762,18 @@ void main() {
     expect(find.text('SKU-ACT-1L'), findsOneWidget);
     expect(find.text('HSN Code'), findsOneWidget);
     expect(find.text('31010099'), findsOneWidget);
+
+    // Verify desktop layout: Description and Specifications are rendered side-by-side inside the card
+    final descPos = tester.getTopLeft(find.text('Product Description'));
+    final specsPos = tester.getTopLeft(find.text('Product Specifications & Details'));
+    expect(descPos.dx < specsPos.dx, isTrue, reason: 'Description should be on the left and Specs on the right side-by-side');
+
+    // Verify desktop assurances card balances the gallery height with purchase section
+    expect(find.text('EBS BioCrop Quality Assurances'), findsOneWidget);
+
+    // Verify Similar Products displays genuine non-empty count (never 0 items)
+    expect(find.textContaining('Similar Products'), findsOneWidget);
+    expect(find.text('0 items'), findsNothing);
   });
 
   testWidgets('Mobile view header uses single clean menu bar with drawer and no duplicate category bar', (WidgetTester tester) async {
@@ -1753,6 +1777,8 @@ void main() {
     // 4. Verify Level 0 category sections are rendered one by one on HomeView with their products
     expect(find.byKey(const ValueKey('home_level0_section_crop-protection')), findsOneWidget);
     expect(find.byKey(const ValueKey('home_level0_section_seeds')), findsOneWidget);
+    // Categories with 0 products must NOT be shown on HomeView
+    expect(find.byKey(const ValueKey('home_level0_section_fertilizers')), findsNothing);
     expect(find.text('Pralaya Super Cypermethrin 25% EC'), findsWidgets);
     expect(find.text('EBS Hybrid Arka Rakshak Tomato Seeds'), findsWidgets);
 
@@ -1774,6 +1800,126 @@ void main() {
     expect(categories.first.icon, isEmpty);
     expect(categories.first.groups.first.icon, isNull);
     expect(find.byType(AppProductImage), findsWidgets);
+  });
+
+  testWidgets('ProductDetailView does not render removed guarantee strip under image gallery and keeps assurances card', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final product = ProductItem.sampleProducts.first;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ProductDetailView(product: product),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify removed guarantee strip items are NOT rendered under the gallery
+    expect(find.text('Fast Dispatch'), findsNothing);
+    expect(find.text('Agronomist Help'), findsNothing);
+
+    // Verify desktop quality assurances card is rendered
+    expect(find.text('EBS BioCrop Quality Assurances'), findsOneWidget);
+    expect(find.text('Lab Tested Potency'), findsOneWidget);
+    expect(find.text('Safe Agri-Transit Guarantee'), findsOneWidget);
+  });
+
+  testWidgets('SellWithUsView renders hero banner, benefits, 4-step process, FAQ accordion, seller helpline, and partner CTA without registration form', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: SellWithUsView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify Hero Banner
+    expect(find.text('Grow Your Agri Business Across India'), findsOneWidget);
+    expect(find.text('EBS DIRECT SELLER & PARTNER NETWORK'), findsOneWidget);
+    expect(find.text('Be a Partner'), findsWidgets);
+
+    // Verify Benefits (Why Sell with Us)
+    expect(find.text('WHY SELL ON EBS BIOCROP?'), findsOneWidget);
+    expect(find.text('Lakhs of Farmer Customers'), findsOneWidget);
+    expect(find.text('No Fixed Costs. Pay When You Sell'), findsOneWidget);
+
+    // Verify 4-step process
+    expect(find.text('How to Sell on Essential BioCrop Science'), findsOneWidget);
+    expect(find.text('Set-up your Seller Account'), findsOneWidget);
+    expect(find.text('List Your Products'), findsOneWidget);
+    expect(find.text('Ship Orders'), findsOneWidget);
+    expect(find.text('Get Paid on Time'), findsOneWidget);
+
+    // Verify Seller Support Number
+    expect(find.textContaining('9098544263'), findsWidgets);
+
+    // Verify Registration Form is NOT present
+    expect(find.text('Seller & Partner Registration Form'), findsNothing);
+    expect(find.text('REGISTER AS SELLER'), findsNothing);
+
+    // Verify Ready to Partner CTA Section
+    expect(find.text('Ready to Partner with Us?'), findsOneWidget);
+  });
+
+  testWidgets('BeAPartnerView renders welcome letter, all input fields and validates on submit', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: BeAPartnerView(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Verify Welcome Letter
+    expect(find.text('Dear Partner,'), findsOneWidget);
+    expect(find.text('Have a bright future ahead!!!'), findsOneWidget);
+    expect(find.text("Thanks for visiting India's fast growing e-commerce website/application."), findsOneWidget);
+    expect(find.text('If you are interested to be a part of Agribegri Tradelink Private Limited then fill up following detail.'), findsOneWidget);
+    expect(find.text('Our top management and commerce department will contact you.'), findsOneWidget);
+    expect(find.text('Thanks again.'), findsOneWidget);
+    expect(find.text('Team Agribegri.'), findsOneWidget);
+
+    // Verify Form Fields
+    expect(find.text('Name'), findsOneWidget);
+    expect(find.text('Phone Number'), findsOneWidget);
+    expect(find.text('Email'), findsOneWidget);
+    expect(find.text('City'), findsOneWidget);
+    expect(find.text('Country'), findsOneWidget);
+    expect(find.text('Company Name'), findsOneWidget);
+    expect(find.text('Web Address'), findsOneWidget);
+    expect(find.text('Company Activities'), findsOneWidget);
+    expect(find.text('SUBMIT'), findsOneWidget);
+
+    // Fill form fields
+    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your Name'), 'Rajesh Patel');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your Phone Number'), '9876543210');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your Email Address'), 'rajesh@patelagro.com');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your city name'), 'Indore');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your Company Name'), 'Patel Agro Industries');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Enter your Company Activities'), 'Manufacturing organic bio-fertilizers');
+    await tester.pumpAndSettle();
+
+    // Tap SUBMIT
+    final submitBtn = find.text('SUBMIT');
+    await tester.ensureVisible(submitBtn);
+    await tester.tap(submitBtn);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    // Verify submission confirmation
+    expect(find.text('Partner Application Submitted!'), findsOneWidget);
   });
 }
 

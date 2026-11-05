@@ -246,33 +246,31 @@ class ProductItem {
           return orderA.compareTo(orderB);
         });
       for (final img in sortedImages) {
-        String? bestUrl;
         final mid = img['midUrl']?.toString().trim();
-        final orig = img['originalUrl']?.toString().trim();
         final low = img['lowUrl']?.toString().trim();
+        final orig = img['originalUrl']?.toString().trim();
         final plain = img['url']?.toString().trim();
         final midObj = img['midObjectName']?.toString().trim();
         final origObj = img['originalObjectName']?.toString().trim();
         final lowObj = img['lowObjectName']?.toString().trim();
 
-        if (mid != null && mid.isNotEmpty) {
-          bestUrl = mid;
-        } else if (orig != null && orig.isNotEmpty) {
-          bestUrl = orig;
-        } else if (low != null && low.isNotEmpty) {
-          bestUrl = low;
-        } else if (plain != null && plain.isNotEmpty) {
-          bestUrl = plain;
-        } else if (midObj != null && midObj.isNotEmpty) {
-          bestUrl = midObj.startsWith('http') ? midObj : '$gcsBucketBase/$midObj';
-        } else if (origObj != null && origObj.isNotEmpty) {
-          bestUrl = origObj.startsWith('http') ? origObj : '$gcsBucketBase/$origObj';
-        } else if (lowObj != null && lowObj.isNotEmpty) {
-          bestUrl = lowObj.startsWith('http') ? lowObj : '$gcsBucketBase/$lowObj';
-        }
+        final candidates = <String?>[
+          mid,
+          low,
+          orig,
+          plain,
+          (midObj != null && midObj.isNotEmpty) ? (midObj.startsWith('http') ? midObj : '$gcsBucketBase/$midObj') : null,
+          (origObj != null && origObj.isNotEmpty) ? (origObj.startsWith('http') ? origObj : '$gcsBucketBase/$origObj') : null,
+          (lowObj != null && lowObj.isNotEmpty) ? (lowObj.startsWith('http') ? lowObj : '$gcsBucketBase/$lowObj') : null,
+        ];
 
-        if (bestUrl != null && bestUrl.isNotEmpty && !extractedImages.contains(bestUrl)) {
-          extractedImages.add(bestUrl);
+        for (final cand in candidates) {
+          if (cand != null && cand.isNotEmpty) {
+            addCandidate(cand);
+            if (cand.contains('storage.googleapis.com') && cand.contains('?')) {
+              addCandidate(cand.split('?').first);
+            }
+          }
         }
       }
     }

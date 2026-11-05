@@ -140,6 +140,9 @@ class ProductController extends ChangeNotifier {
       _hasLoadedFromApi = true;
     } catch (e) {
       _errorMessage = e.toString();
+      if (_products.isEmpty) {
+        _products = ProductItem.sampleProducts;
+      }
     } finally {
       if (shouldCloseClient) {
         httpClient.close();
