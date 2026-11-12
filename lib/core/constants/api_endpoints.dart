@@ -2,7 +2,7 @@ class ApiEndpoints {
   /// Base URL for the backend API, configurable via `--dart-define=API_BASE_URL=https://...`
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:8080',
+    defaultValue: 'https://ebs-biocrop-backend-925275374871.asia-south1.run.app',
   );
 
   /// Authentication (OTP & Password)
@@ -27,4 +27,11 @@ class ApiEndpoints {
   static const String cart = '/api/v1/cart';
   static const String wishlist = '/api/v1/wishlist';
   static const String orders = '/api/v1/orders';
+
+  /// Shiprocket Logistics & Razorpay Payments
+  static const String checkoutServiceability = '/api/v1/checkout/serviceability';
+  static const String checkoutSummary = '/api/v1/checkout/summary';
+  static const String checkoutInitiatePayment = '/api/v1/checkout/initiate-payment';
+  static const String checkoutConfirmOrder = '/api/v1/checkout/confirm-order';
+  static String checkoutTrack(String orderId) => '/api/v1/checkout/track/$orderId';
 }
