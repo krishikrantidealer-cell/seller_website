@@ -216,7 +216,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
           const SizedBox(height: 16),
           Text(
             'Collection Unavailable',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 18 : 22,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -226,7 +226,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
           const SizedBox(height: 8),
           Text(
             'This collection is no longer active on the storefront.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 13 : 14,
               color: AppColors.textSecondary,
             ),
@@ -238,7 +238,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
             icon: const Icon(Icons.storefront_outlined, size: 18),
             label: Text(
               'Back to Store',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: GoogleFonts.mukta(fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryDarkGreen,
@@ -273,7 +273,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
                 const SizedBox(width: 4),
                 Text(
                   'Home',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 12 : 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryDarkGreen,
@@ -287,7 +287,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
             size: 16, color: AppColors.textMuted),
         Text(
           col.name,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: isMobile ? 12 : 13,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -333,7 +333,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
               children: [
                 Text(
                   col.name,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 18 : 24,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -343,7 +343,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
                   const SizedBox(height: 3),
                   Text(
                     col.description,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 12 : 13,
                       color: AppColors.textSecondary,
                     ),
@@ -362,7 +362,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
                   ),
                   child: Text(
                     '${col.subCollections.length} Sub-Collections',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryDarkGreen,
@@ -412,7 +412,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
             const SizedBox(width: 8),
             Text(
               'All ${col.name} ($visibleCount)',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 16 : 19,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -426,7 +426,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
             onChanged: (val) => setState(() => _searchQuery = val),
             decoration: InputDecoration(
               hintText: 'Filter ${col.name.toLowerCase()}...',
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: GoogleFonts.mukta(
                   fontSize: 13, color: AppColors.textMuted),
               prefixIcon: const Icon(Icons.search_rounded,
                   size: 19, color: AppColors.textMuted),
@@ -461,126 +461,173 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
     BoxConstraints constraints,
     bool isMobile,
   ) {
+    final int maxCols = constraints.maxWidth >= 1100
+        ? 8
+        : (constraints.maxWidth >= 750
+            ? 6
+            : (constraints.maxWidth >= 450 ? 4 : 3));
+    final double circleSize = isMobile ? 68.0 : 84.0;
+
+    Widget buildSubCircleTile(StoreSubCollection sub) {
+      final subLiveCount = availableProducts
+          .where((p) => col.matchesSubCollection(p, sub))
+          .length;
+      final subDisplayCount =
+          subLiveCount > 0 ? subLiveCount : sub.productCount;
+
+      return InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SubCollectionDetailView(
+                collection: col,
+                subCollection: sub,
+              ),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: circleSize,
+                    height: circleSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFFF0FDF4),
+                      border: Border.all(
+                        color: AppColors.primaryGreen.withValues(alpha: 0.25),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: (sub.image != null && sub.image!.isNotEmpty)
+                          ? AppProductImage(
+                              imageUrl: sub.image!,
+                              fit: BoxFit.cover,
+                            )
+                          : const Icon(
+                              Icons.eco_rounded,
+                              color: AppColors.primaryGreen,
+                              size: 24,
+                            ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -2,
+                    right: -4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: subDisplayCount > 0
+                            ? const Color(0xFFF0FDF4)
+                            : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: subDisplayCount > 0
+                              ? AppColors.primaryGreen.withValues(alpha: 0.35)
+                              : const Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      child: Text(
+                        '$subDisplayCount',
+                        style: GoogleFonts.mukta(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: subDisplayCount > 0
+                              ? AppColors.primaryDarkGreen
+                              : AppColors.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                sub.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.mukta(
+                  fontSize: isMobile ? 11 : 12,
+                  fontWeight: FontWeight.w600,
+                  height: 1.15,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (isMobile) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: subs
+              .map(
+                (sub) => Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: SizedBox(
+                    width: 84,
+                    child: buildSubCircleTile(sub),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      );
+    }
+
+    if (subs.length <= maxCols) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: subs
+            .map(
+              (sub) => Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 6),
+                  child: buildSubCircleTile(sub),
+                ),
+              ),
+            )
+            .toList(),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: subs.length,
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: isMobile ? 140 : 165,
-        mainAxisExtent: isMobile ? 114 : 126,
-        crossAxisSpacing: isMobile ? 10 : 12,
-        mainAxisSpacing: isMobile ? 10 : 12,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: maxCols,
+        mainAxisExtent: isMobile ? 92 : 132,
+        crossAxisSpacing: isMobile ? 8 : 12,
+        mainAxisSpacing: isMobile ? 10 : 14,
       ),
-      itemBuilder: (context, index) {
-        final sub = subs[index];
-        final subLiveCount = availableProducts
-            .where((p) => col.matchesSubCollection(p, sub))
-            .length;
-        final subDisplayCount =
-            subLiveCount > 0 ? subLiveCount : sub.productCount;
-
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => SubCollectionDetailView(
-                  collection: col,
-                  subCollection: sub,
-                ),
-              ),
-            );
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            width: isMobile ? 42 : 48,
-                            height: isMobile ? 42 : 48,
-                            color: const Color(0xFFF0FDF4),
-                            child: (sub.image != null && sub.image!.isNotEmpty)
-                                ? AppProductImage(
-                                    imageUrl: sub.image!,
-                                    fit: BoxFit.cover,
-                                  )
-                                : const Icon(
-                                    Icons.eco_rounded,
-                                    color: AppColors.primaryGreen,
-                                    size: 22,
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          sub.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: isMobile ? 12 : 12.5,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: subDisplayCount > 0
-                          ? const Color(0xFFF0FDF4)
-                          : const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: subDisplayCount > 0
-                            ? AppColors.primaryGreen.withValues(alpha: 0.3)
-                            : const Color(0xFFE2E8F0),
-                      ),
-                    ),
-                    child: Text(
-                      '$subDisplayCount',
-                      style: GoogleFonts.poppins(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        color: subDisplayCount > 0
-                            ? AppColors.primaryDarkGreen
-                            : AppColors.textMuted,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      itemBuilder: (context, index) => buildSubCircleTile(subs[index]),
     );
   }
 
@@ -596,7 +643,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
       child: Center(
         child: Text(
           'No sub-collections match "$_searchQuery"',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,

@@ -167,7 +167,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                           ? Badge(
                                               label: Text(
                                                 count.toString(),
-                                                style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                                style: GoogleFonts.mukta(fontSize: 10, fontWeight: FontWeight.bold),
                                               ),
                                               backgroundColor: AppColors.primaryCrimson,
                                               child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 22),
@@ -192,7 +192,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                         ? Badge(
                                             label: Text(
                                               count.toString(),
-                                              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                              style: GoogleFonts.mukta(fontSize: 10, fontWeight: FontWeight.bold),
                                             ),
                                             backgroundColor: AppColors.primaryCrimson,
                                             child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
@@ -246,14 +246,14 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               onChanged: _handleSearchChanged,
                               onSubmitted: widget.onSearch,
                               textAlignVertical: TextAlignVertical.center,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 color: AppColors.textPrimary,
                                 fontSize: 13,
                               ),
                               decoration: InputDecoration(
                                 isDense: true,
                                 hintText: 'Search seeds, pesticides, fertilizers...',
-                                hintStyle: GoogleFonts.poppins(
+                                hintStyle: GoogleFonts.mukta(
                                   color: AppColors.textMuted,
                                   fontSize: 12,
                                 ),
@@ -317,7 +317,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 const SizedBox(width: 4),
                                 Text(
                                   'Technical',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryDarkGreen,
@@ -361,14 +361,14 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                   onChanged: _handleSearchChanged,
                                   onSubmitted: widget.onSearch,
                                   textAlignVertical: TextAlignVertical.center,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     color: AppColors.textPrimary,
                                     fontSize: 13.5,
                                   ),
                                   decoration: InputDecoration(
                                     isDense: true,
                                     hintText: 'Search for seeds, pesticides, fertilizers...',
-                                    hintStyle: GoogleFonts.poppins(
+                                    hintStyle: GoogleFonts.mukta(
                                       color: AppColors.textMuted,
                                       fontSize: 13,
                                     ),
@@ -427,7 +427,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               icon: const Icon(Icons.science_outlined, size: 17),
                               label: Text(
                                 isCompactBtn ? 'Technical' : 'Search by Technical',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12.5,
                                 ),
@@ -489,7 +489,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                     Badge(
                                       label: Text(
                                         count.toString(),
-                                        style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
+                                        style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.bold),
                                       ),
                                       backgroundColor: AppColors.primaryCrimson,
                                       child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 24),
@@ -499,7 +499,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                   const SizedBox(width: 6),
                                   Text(
                                     'Wishlist',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: count > 0 ? AppColors.primaryCrimson : AppColors.textPrimary,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13.5,
@@ -528,7 +528,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                   Badge(
                                     label: Text(
                                       count.toString(),
-                                      style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.bold),
                                     ),
                                     backgroundColor: AppColors.primaryCrimson,
                                     child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
@@ -536,7 +536,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                   const SizedBox(width: 6),
                                   Text(
                                     'Cart',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: AppColors.textPrimary,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13.5,
@@ -564,7 +564,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             icon: const Icon(Icons.person_outline_rounded, size: 18, color: AppColors.primaryGreen),
                             label: Text(
                               'Login / My Account',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 color: AppColors.primaryGreen,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
@@ -627,7 +627,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     const SizedBox(width: 6),
                     Text(
                       'BioCrop',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -660,7 +660,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             const SizedBox(width: 6),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
                 fontSize: 13,
@@ -711,7 +711,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: isDestructive ? AppColors.primaryCrimson : AppColors.textPrimary,
@@ -720,7 +720,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                   const SizedBox(height: 1),
                   Text(
                     subtitle,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 10,
                       fontWeight: FontWeight.w400,
                       color: AppColors.textMuted,
@@ -778,7 +778,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 child: (auth.currentUser?.name != null && auth.currentUser!.name!.trim().isNotEmpty)
                     ? Text(
                         auth.currentUser!.name!.trim()[0].toUpperCase(),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
@@ -799,7 +799,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             (auth.currentUser?.name != null && auth.currentUser!.name!.trim().isNotEmpty)
                                 ? auth.currentUser!.name!.trim()
                                 : (auth.currentUser?.formattedPhone ?? phoneDisplay),
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -816,7 +816,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           ),
                           child: Text(
                             'VERIFIED',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 8.5,
                               fontWeight: FontWeight.w800,
                               color: AppColors.primaryDarkGreen,
@@ -831,7 +831,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                       (auth.currentUser?.villageOrTown != null && auth.currentUser!.villageOrTown!.trim().isNotEmpty)
                           ? '${auth.currentUser!.villageOrTown!.trim()}, ${((auth.currentUser?.district != null && auth.currentUser!.district!.isNotEmpty) ? auth.currentUser!.district : auth.currentUser?.state) ?? ''}'
                           : (auth.currentUser?.location ?? 'Verified Farmer • EBS Direct'),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 10.5,
                         color: AppColors.textMuted,
                       ),
@@ -917,7 +917,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     const SizedBox(width: 8),
                     Text(
                       'Signed out successfully',
-                      style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.5),
+                      style: GoogleFonts.mukta(color: Colors.white, fontSize: 12.5),
                     ),
                   ],
                 ),
@@ -983,7 +983,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 Flexible(
                   child: Text(
                     shortPhone,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w700,
                       fontSize: 10.5,
@@ -1063,7 +1063,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                   children: [
                     Text(
                       'Farmer Account',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textMuted,
@@ -1083,7 +1083,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 ),
                 Text(
                   phoneDisplay,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w700,
                     fontSize: 12,

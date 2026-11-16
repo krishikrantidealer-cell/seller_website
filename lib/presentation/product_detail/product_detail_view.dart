@@ -170,7 +170,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 Text(
                   'This product is currently unavailable',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF111827),
@@ -180,7 +180,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 Text(
                   'This item has been removed or marked unavailable. Please explore other available products.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13.5,
                     color: const Color(0xFF6B7280),
                     height: 1.5,
@@ -192,7 +192,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   icon: const Icon(Icons.arrow_back_rounded, size: 18),
                   label: Text(
                     'Browse Other Products',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                    style: GoogleFonts.mukta(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,
@@ -228,7 +228,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       SnackBar(
         content: Text(
           'Added 1 x ${widget.product.title} (${_selectedVariant.label}) to cart!',
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+          style: GoogleFonts.mukta(color: Colors.white, fontWeight: FontWeight.w500),
         ),
         backgroundColor: AppColors.primaryDarkGreen,
         duration: const Duration(seconds: 2),
@@ -486,7 +486,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               children: [
                 Text(
                   '₹${_selectedVariant.displayRate.toInt()}',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryGreen,
@@ -494,7 +494,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
                 Text(
                   _selectedVariant.label,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 10,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
@@ -524,7 +524,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   ),
                   label: Text(
                     'Buy Now',
-                    style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700),
+                    style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -569,7 +569,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             const SizedBox(width: 5),
                             Text(
                               'Back',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primaryGreen,
@@ -584,7 +584,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       onTap: () => Navigator.of(context).pop(),
                       child: Text(
                         'Home',
-                        style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                        style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -592,14 +592,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     const SizedBox(width: 6),
                     Text(
                       widget.product.category,
-                      style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                      style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
                     ),
                     const SizedBox(width: 6),
                     const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
                     const SizedBox(width: 6),
                     Text(
                       widget.product.title,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -685,7 +685,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     ),
                     child: Text(
                       '$discount% OFF',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         color: Colors.white,
                         fontSize: isMobile ? 10.5 : 12,
                         fontWeight: FontWeight.w800,
@@ -710,7 +710,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       const SizedBox(width: 4),
                       Text(
                         'EBS Certified',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           color: Colors.white,
                           fontSize: isMobile ? 10 : 11,
                           fontWeight: FontWeight.w700,
@@ -750,7 +750,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                   Expanded(
                                     child: Text(
                                       added ? 'Added to wishlist!' : 'Removed from wishlist',
-                                      style: GoogleFonts.poppins(fontSize: 13),
+                                      style: GoogleFonts.mukta(fontSize: 13),
                                     ),
                                   ),
                                 ],
@@ -879,7 +879,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               const SizedBox(width: 8),
               Text(
                 'EBS BioCrop Quality Assurances',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -922,7 +922,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             children: [
               Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -930,7 +930,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ),
               Text(
                 subtitle,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 11,
                   color: AppColors.textSecondary,
                   height: 1.35,
@@ -979,7 +979,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
                 child: Text(
                   widget.product.category.toUpperCase(),
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryDarkGreen,
@@ -996,7 +996,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     child: Text(
                       'Brand: ${widget.product.vendor}',
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
@@ -1013,7 +1013,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // Main Product Title
           Text(
             widget.product.title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 17 : 21,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -1050,7 +1050,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   Flexible(
                     child: Text(
                       'Active Composition: ${widget.product.technicalName}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 11 : 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryCrimson,
@@ -1089,7 +1089,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     const SizedBox(width: 3),
                     Text(
                       _averageRating.toStringAsFixed(1),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFFB45309),
@@ -1113,7 +1113,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 borderRadius: BorderRadius.circular(4),
                 child: Text(
                   '$_totalReviewsCount Verified Reviews',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryGreen,
@@ -1124,7 +1124,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               const Text('•', style: TextStyle(color: AppColors.textMuted)),
               Text(
                 '100% Quality Verified',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 11.5,
                   color: AppColors.textMuted,
                 ),
@@ -1140,7 +1140,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // PROMINENT PACK SIZE / VARIANT SELECTOR
           Text(
             'Select Pack Size / Quantity Variant:',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -1197,7 +1197,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           const SizedBox(width: 5),
                           Text(
                             v.label,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: isMobile ? 11.5 : 12.5,
                               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                               color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -1211,7 +1211,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         children: [
                       Text(
                         '₹${v.displayRate.toStringAsFixed(0)}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: isMobile ? 12.5 : 13.5,
                           fontWeight: FontWeight.w800,
                           color: AppColors.primaryGreen,
@@ -1221,7 +1221,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         const SizedBox(width: 5),
                         Text(
                           '₹${v.printedMrp.toStringAsFixed(0)}',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 10,
                             color: AppColors.textMuted,
                             decoration: TextDecoration.lineThrough,
@@ -1232,7 +1232,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             const SizedBox(width: 5),
                             Text(
                               '$varDiscount% OFF',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.discountRed,
@@ -1269,7 +1269,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   children: [
                     Text(
                       '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 24 : 28,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryGreen,
@@ -1278,7 +1278,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
                       Text(
                         'MRP: ₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: isMobile ? 12.5 : 14,
                           color: AppColors.textMuted,
                           decoration: TextDecoration.lineThrough,
@@ -1295,7 +1295,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           discount > 0
                               ? 'Save ₹${savings.toStringAsFixed(0)} ($discount% OFF)'
                               : 'Save ₹${savings.toStringAsFixed(0)}',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: isMobile ? 11 : 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.discountRed,
@@ -1307,7 +1307,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 const SizedBox(height: 5),
                 Text(
                   'Inclusive of all taxes • FREE Pan-India Delivery on orders above ₹500',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 11 : 12,
                     color: AppColors.textSecondary,
                   ),
@@ -1334,7 +1334,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ),
               Text(
                 'In Stock',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF065F46),
@@ -1343,7 +1343,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               const Text('•', style: TextStyle(color: AppColors.textMuted)),
               Text(
                 'Ready to dispatch from EBS Central Hub',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 11.5 : 12.5,
                   color: AppColors.textSecondary,
                 ),
@@ -1351,39 +1351,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          if (!isMobile) ...[
+            const SizedBox(height: 16),
 
-          // Add to Cart (Converts to Quantity Stepper when in cart) + Buy Now
-          if (isMobile) ...[
-            // Mobile: Row of 2 equal-width responsive action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCartActionButton(isMobile: true),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 46,
-                    child: ElevatedButton.icon(
-                      onPressed: _onBuyNow,
-                      icon: const Icon(Icons.bolt_rounded, size: 18),
-                      label: Text(
-                        'Buy Now',
-                        style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w700),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
             // Desktop: Add to Cart (converts to quantity stepper) + Buy Now
             Row(
               children: [
@@ -1399,7 +1369,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       icon: const Icon(Icons.bolt_rounded, size: 20),
                       label: Text(
                         'Buy Now',
-                        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
@@ -1434,7 +1404,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     children: [
                       Text(
                         'Need Agronomy Advisory or Dosage Guidance?',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: isMobile ? 11.5 : 12.5,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF166534),
@@ -1442,7 +1412,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ),
                       Text(
                         'Speak with an EBS certified agronomist: ${AppConstants.orderCallNumber}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: isMobile ? 10.5 : 11.5,
                           color: const Color(0xFF15803D),
                         ),
@@ -1493,7 +1463,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       'Add to Cart',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 12 : 14,
                         fontWeight: FontWeight.w700,
                       ),
@@ -1551,7 +1521,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     isMobile ? '$qty in cart' : '$qty in cart',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 11.5 : 14,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -1617,7 +1587,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               Expanded(
                 child: Text(
                   'Product Information & Guidance',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -1644,7 +1614,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             ),
             child: Text(
               widget.product.category,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryDarkGreen,
@@ -1674,7 +1644,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 const SizedBox(width: 3),
                 Text(
                   _averageRating.toStringAsFixed(1),
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF92400E),
@@ -1757,7 +1727,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       children: [
                         Text(
                           title,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
                             color: isExpanded ? AppColors.primaryGreen : AppColors.textPrimary,
@@ -1765,7 +1735,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         ),
                         Text(
                           subtitle,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 11,
                             color: AppColors.textMuted,
                           ),
@@ -1886,7 +1856,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           const SizedBox(width: 6),
                           Text(
                             tabItems[i].label,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 13.5,
                               fontWeight: _activeTabIndex == i ? FontWeight.w700 : FontWeight.w500,
                               color: _activeTabIndex == i ? Colors.white : AppColors.textPrimary,
@@ -1943,7 +1913,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             Expanded(
               child: Text(
                 'Product Description',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 14 : 17,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -1968,7 +1938,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             ),
             child: Text(
               'Authentic product formulation provided by ${widget.product.vendor}. For technical dosage guidelines, contact EBS Agronomy Helpline at ${AppConstants.orderCallNumber}.',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 12 : 13,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -1996,7 +1966,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             Expanded(
               child: Text(
                 'Product Specifications & Details',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 14 : 17,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -2105,7 +2075,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               children: [
                 Text(
                   _isDescriptionExpanded ? 'Show Less' : 'Show More',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 12.5 : 13.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryGreen,
@@ -2167,7 +2137,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 Expanded(
                   child: Text(
                     cleanText,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 12 : 13,
                       color: AppColors.textSecondary,
                       height: 1.45,
@@ -2184,7 +2154,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             padding: const EdgeInsets.only(top: 10, bottom: 4),
             child: Text(
               line,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 13.5 : 14.5,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -2198,7 +2168,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               line,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 12.5 : 13.5,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -2233,7 +2203,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               stripped,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 12.5 : 13.5,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -2274,7 +2244,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               padding: const EdgeInsets.only(top: 12, bottom: 6),
               child: Text(
                 headingText,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 14 : 15.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -2302,7 +2272,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         child: tag == 'ol'
                             ? Text(
                                 '${idx + 1}.',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: isMobile ? 11.5 : 12.5,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primaryGreen,
@@ -2381,7 +2351,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             ),
             child: Text(
               cellContent,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 11 : 12.5,
                 fontWeight: isTh ? FontWeight.w700 : FontWeight.w400,
                 color: isTh ? AppColors.textPrimary : AppColors.textSecondary,
@@ -2417,7 +2387,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       final cleanText = htmlFragment.replaceAll(RegExp(r'<[^>]*>'), '').trim();
       return Text(
         cleanText,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.mukta(
           fontSize: isMobile ? 12.5 : 13.5,
           color: AppColors.textSecondary,
           height: 1.5,
@@ -2434,7 +2404,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           spans.add(
             TextSpan(
               text: textBefore,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 12.5 : 13.5,
                 color: AppColors.textSecondary,
                 height: 1.5,
@@ -2450,7 +2420,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       spans.add(
         TextSpan(
           text: inner,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: isMobile ? 12.5 : 13.5,
             fontWeight: isBold ? FontWeight.w700 : FontWeight.normal,
             fontStyle: !isBold ? FontStyle.italic : FontStyle.normal,
@@ -2467,7 +2437,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         spans.add(
           TextSpan(
             text: trailing,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 12.5 : 13.5,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -2543,7 +2513,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     width: isMobile ? 130 : 220,
                     child: Text(
                       specs[i].key,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 11.5 : 12.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -2553,7 +2523,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   Expanded(
                     child: Text(
                       specs[i].value,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 11.5 : 12.5,
                         color: AppColors.textSecondary,
                         height: 1.35,
@@ -2606,7 +2576,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     children: [
                       Text(
                         _averageRating.toStringAsFixed(1),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: isMobile ? 26 : 32,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textPrimary,
@@ -2630,7 +2600,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                               _totalReviewsCount > 0
                                   ? 'Based on $_totalReviewsCount verified farmer reviews'
                                   : 'No customer reviews yet • Be the first to review',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: isMobile ? 11 : 12,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textSecondary,
@@ -2651,7 +2621,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     ),
                     label: Text(
                       _isWritingReview ? 'Close Form' : 'Write a Review',
-                      style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _isWritingReview ? const Color(0xFF64748B) : AppColors.primaryGreen,
@@ -2674,7 +2644,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   Expanded(
                     child: Text(
                       '100% Authenticated field purchases by Indian farmers & agronomists',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryDarkGreen,
@@ -2741,12 +2711,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 const SizedBox(height: 10),
                 Text(
                   'No reviews matching this filter.',
-                  style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                  style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   'Be the first to share your field experience!',
-                  style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textMuted),
+                  style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -2817,7 +2787,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             Flexible(
               child: Text(
                 label,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 11.5,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -2872,7 +2842,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   children: [
                     Text(
                       'Share Your Field Experience',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 14 : 16,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -2880,7 +2850,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     ),
                     Text(
                       'Provide crop details, dosage, results, photos, and video demonstration',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 11,
                         color: AppColors.textMuted,
                       ),
@@ -2910,7 +2880,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   Expanded(
                     child: Text(
                       _formValidationError!,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF991B1B),
@@ -2925,7 +2895,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // Section 1: Rating Selection
           Text(
             'Overall Rating *',
-            style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+            style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 6),
           Wrap(
@@ -2958,7 +2928,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
                 child: Text(
                   _getRatingLabel(_newReviewRating),
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF92400E),
@@ -3014,7 +2984,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // Section 3: Target Crop Selector
           Text(
             'Target Crop Treated:',
-            style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+            style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
           ),
           const SizedBox(height: 6),
           Wrap(
@@ -3032,7 +3002,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       });
                     }
                   },
-                  labelStyle: GoogleFonts.poppins(
+                  labelStyle: GoogleFonts.mukta(
                     fontSize: 11,
                     fontWeight: _newReviewCrop == crop ? FontWeight.w700 : FontWeight.w500,
                     color: _newReviewCrop == crop ? Colors.white : AppColors.textPrimary,
@@ -3080,7 +3050,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   const SizedBox(width: 6),
                   Text(
                     'Upload Field Photos',
-                    style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                    style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                   ),
                 ],
               ),
@@ -3092,7 +3062,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
                 child: Text(
                   '${_newReviewImages.length} / 5 photos',
-                  style: GoogleFonts.poppins(fontSize: 10.5, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
+                  style: GoogleFonts.mukta(fontSize: 10.5, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
                 ),
               ),
             ],
@@ -3175,7 +3145,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           const SizedBox(height: 4),
                           Text(
                             '+ Add Photo',
-                            style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
+                            style: GoogleFonts.mukta(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
                           ),
                         ],
                       ),
@@ -3202,13 +3172,13 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   const SizedBox(width: 6),
                   Text(
                     'Upload Field Video Demonstration',
-                    style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                    style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                   ),
                 ],
               ),
               Text(
                 'MP4 (max 50MB)',
-                style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
               ),
             ],
           ),
@@ -3243,11 +3213,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         children: [
                           Text(
                             '+ Attach Crop Spray or Trial Video',
-                            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                            style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                           ),
                           Text(
                             'Click to select recorded field demonstration or efficacy result video',
-                            style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                            style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                           ),
                         ],
                       ),
@@ -3313,7 +3283,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             Expanded(
                               child: Text(
                                 _newReviewVideo!['name']!,
-                                style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                                style: GoogleFonts.mukta(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -3322,7 +3292,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         ),
                         Text(
                           '${_newReviewVideo!['duration']} • ${_newReviewVideo!['size']} • Tap preview',
-                          style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                          style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                         ),
                       ],
                     ),
@@ -3361,7 +3331,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 ),
                 child: Text(
                   'Cancel',
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                  style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                 ),
               ),
               const SizedBox(width: 10),
@@ -3370,7 +3340,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
                 label: Text(
                   'Submit Verified Review',
-                  style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700),
+                  style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
@@ -3400,16 +3370,16 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+          style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
         ),
         const SizedBox(height: 5),
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textPrimary),
+          style: GoogleFonts.mukta(fontSize: 12.5, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textMuted),
+            hintStyle: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textMuted),
             prefixIcon: Icon(icon, size: 18, color: AppColors.textSecondary),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
@@ -3498,7 +3468,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             Expanded(
               child: Text(
                 'Thank you $author! Your verified review and media have been published.',
-                style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+                style: GoogleFonts.mukta(color: Colors.white, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -3553,7 +3523,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   const SizedBox(width: 10),
                   Text(
                     'Attach Field Photos',
-                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w700),
+                    style: GoogleFonts.mukta(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -3566,7 +3536,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     children: [
                       Text(
                         'Select representative crop photos to attach to your review:',
-                        style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                        style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 12),
                       for (final photo in samplePhotos) ...[
@@ -3610,7 +3580,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 Expanded(
                                   child: Text(
                                     photo.title,
-                                    style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                                    style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                                   ),
                                 ),
                                 if (_newReviewImages.contains(photo.url))
@@ -3625,7 +3595,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       const SizedBox(height: 10),
                       Text(
                         'Or Custom Photo Link:',
-                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                        style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                       ),
                       const SizedBox(height: 6),
                       Row(
@@ -3633,7 +3603,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           Expanded(
                             child: TextField(
                               controller: customUrlController,
-                              style: GoogleFonts.poppins(fontSize: 12),
+                              style: GoogleFonts.mukta(fontSize: 12),
                               decoration: InputDecoration(
                                 hintText: 'https://...',
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -3657,7 +3627,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
-                            child: Text('Attach', style: GoogleFonts.poppins(fontSize: 12)),
+                            child: Text('Attach', style: GoogleFonts.mukta(fontSize: 12)),
                           ),
                         ],
                       ),
@@ -3668,7 +3638,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text('Close', style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+                  child: Text('Close', style: GoogleFonts.mukta(color: AppColors.textSecondary)),
                 ),
               ],
             );
@@ -3722,7 +3692,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               const SizedBox(width: 10),
               Text(
                 'Upload Field Demonstration Video',
-                style: GoogleFonts.poppins(fontSize: 15.5, fontWeight: FontWeight.w700),
+                style: GoogleFonts.mukta(fontSize: 15.5, fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -3734,7 +3704,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               children: [
                 Text(
                   'Select a field video clip recording crop trial or application results:',
-                  style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                  style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 12),
                 for (final vid in sampleVideos) ...[
@@ -3792,11 +3762,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                               children: [
                                 Text(
                                   vid.title,
-                                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                                  style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                                 ),
                                 Text(
                                   '${vid.file} • ${vid.duration} (${vid.size})',
-                                  style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                                  style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                                 ),
                               ],
                             ),
@@ -3813,7 +3783,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text('Cancel', style: GoogleFonts.poppins(color: AppColors.textSecondary)),
+              child: Text('Cancel', style: GoogleFonts.mukta(color: AppColors.textSecondary)),
             ),
           ],
         );
@@ -3852,7 +3822,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             const SizedBox(width: 6),
                             Text(
                               caption,
-                              style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700),
                             ),
                           ],
                         ),
@@ -3930,7 +3900,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 const SizedBox(width: 8),
                                 Text(
                                   videoName,
-                                  style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
+                                  style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
                                 ),
                               ],
                             ),
@@ -4000,7 +3970,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                     const SizedBox(width: 8),
                                     Text(
                                       '0:18 / $duration',
-                                      style: GoogleFonts.poppins(fontSize: 10.5, color: Colors.white),
+                                      style: GoogleFonts.mukta(fontSize: 10.5, color: Colors.white),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
@@ -4036,7 +4006,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             Expanded(
                               child: Text(
                                 'Field trial demonstration recorded by $author • Verified EBS Batch Purchase',
-                                style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFFCBD5E1)),
+                                style: GoogleFonts.mukta(fontSize: 11, color: const Color(0xFFCBD5E1)),
                               ),
                             ),
                           ],
@@ -4078,7 +4048,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 backgroundColor: AppColors.lightGreen,
                 child: Text(
                   initials.isEmpty ? 'F' : initials,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryDarkGreen,
@@ -4100,7 +4070,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             children: [
                               Text(
                                 item.authorName,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: isMobile ? 12.5 : 13.5,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -4108,7 +4078,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                               ),
                               Text(
                                 item.authorRole,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 11,
                                   color: AppColors.textMuted,
                                 ),
@@ -4131,7 +4101,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             const SizedBox(height: 2),
                             Text(
                               item.date,
-                              style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+                              style: GoogleFonts.mukta(fontSize: 10, color: AppColors.textMuted),
                             ),
                           ],
                         ),
@@ -4157,7 +4127,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 const SizedBox(width: 3),
                                 Text(
                                   'Verified Buyer',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: 9.5,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.primaryDarkGreen,
@@ -4175,7 +4145,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             ),
                             child: Text(
                               '🌾 ${item.cropType}',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textSecondary,
@@ -4195,7 +4165,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // Review Title
           Text(
             item.title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 12.5 : 13.5,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -4207,7 +4177,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // Review Comment Text
           Text(
             item.comment,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 11.5 : 12.5,
               color: AppColors.textSecondary,
               height: 1.45,
@@ -4219,7 +4189,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             const SizedBox(height: 10),
             Text(
               'Field Photos (${item.imageUrls.length}):',
-              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+              style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 6),
             SingleChildScrollView(
@@ -4311,7 +4281,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                               Expanded(
                                 child: Text(
                                   item.videoName!,
-                                  style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                                  style: GoogleFonts.mukta(fontSize: 11.5, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -4319,7 +4289,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           ),
                           Text(
                             '${item.videoDuration ?? "0:45 min"} • Verified field demonstration video',
-                            style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+                            style: GoogleFonts.mukta(fontSize: 10, color: AppColors.textMuted),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -4379,7 +4349,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             const SizedBox(width: 8),
                             Text(
                               'Similar Products',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -4395,7 +4365,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           ),
                           child: Text(
                             '${similarProducts.length} items',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryDarkGreen,
@@ -4407,7 +4377,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     const SizedBox(height: 4),
                     Text(
                       'Matches ${widget.product.category}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 10.5,
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
@@ -4435,7 +4405,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         const SizedBox(width: 8),
                         Text(
                           'Similar Products',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 16.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -4450,7 +4420,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           ),
                           child: Text(
                             '${similarProducts.length} items',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryDarkGreen,
@@ -4462,7 +4432,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     Flexible(
                       child: Text(
                         'Matches ${widget.product.category}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 12,
                           color: AppColors.textMuted,
                           fontWeight: FontWeight.w500,
@@ -4541,7 +4511,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                             Expanded(
                               child: Text(
                                 'Added ${p.title} (${v.label}) to cart',
-                                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                                style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w500),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),

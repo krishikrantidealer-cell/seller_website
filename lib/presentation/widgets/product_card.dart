@@ -122,7 +122,7 @@ class _ProductCardState extends State<ProductCard> {
                                   ),
                                   child: Text(
                                     '$discount% OFF',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: Colors.white,
                                       fontSize: isCompact ? 9.5 : 11,
                                       fontWeight: FontWeight.bold,
@@ -158,7 +158,7 @@ class _ProductCardState extends State<ProductCard> {
                                                 added
                                                     ? 'Added ${widget.product.title} to wishlist!'
                                                     : 'Removed from wishlist',
-                                                style: GoogleFonts.poppins(fontSize: 12.5),
+                                                style: GoogleFonts.mukta(fontSize: 12.5),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
@@ -220,7 +220,7 @@ class _ProductCardState extends State<ProductCard> {
                                       const SizedBox(width: 4),
                                       Text(
                                         isCompact ? '$totalProductQty' : '$totalProductQty in cart',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.mukta(
                                           color: Colors.white,
                                           fontSize: isCompact ? 9 : 10,
                                           fontWeight: FontWeight.w700,
@@ -250,7 +250,7 @@ class _ProductCardState extends State<ProductCard> {
                             children: [
                               Text(
                                 widget.product.category.toUpperCase(),
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   color: AppColors.textMuted,
                                   fontSize: isCompact ? 8.5 : 10,
                                   fontWeight: FontWeight.w700,
@@ -260,7 +260,7 @@ class _ProductCardState extends State<ProductCard> {
                               Flexible(
                                 child: Text(
                                   widget.product.vendor,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     color: AppColors.textSecondary,
                                     fontSize: isCompact ? 8.5 : 10,
                                     fontWeight: FontWeight.w500,
@@ -275,7 +275,7 @@ class _ProductCardState extends State<ProductCard> {
                           // Product Title
                           Text(
                             widget.product.title,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: isCompact ? 11.5 : 13,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
@@ -289,7 +289,7 @@ class _ProductCardState extends State<ProductCard> {
                           // Technical Name
                           Text(
                             widget.product.technicalName,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               color: AppColors.primaryCrimson,
                               fontSize: isCompact ? 9.5 : 11,
                               fontWeight: FontWeight.w500,
@@ -315,7 +315,7 @@ class _ProductCardState extends State<ProductCard> {
                                     const SizedBox(width: 2),
                                     Text(
                                       widget.product.rating.toString(),
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.mukta(
                                         fontSize: isCompact ? 9.5 : 11,
                                         fontWeight: FontWeight.bold,
                                         color: const Color(0xFFB45309),
@@ -327,7 +327,7 @@ class _ProductCardState extends State<ProductCard> {
                               const SizedBox(width: 4),
                               Text(
                                 '(${widget.product.reviewsCount})',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: isCompact ? 9.5 : 11,
                                   color: AppColors.textMuted,
                                 ),
@@ -348,7 +348,7 @@ class _ProductCardState extends State<ProductCard> {
                                   Flexible(
                                     child: Text(
                                       _selectedVariant.label,
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.mukta(
                                         fontSize: isCompact ? 10 : 11,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.primaryDarkGreen,
@@ -378,7 +378,7 @@ class _ProductCardState extends State<ProductCard> {
                             children: [
                               Text(
                                 '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: isCompact ? 15 : 18,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.primaryGreen,
@@ -388,7 +388,7 @@ class _ProductCardState extends State<ProductCard> {
                               if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
                                 Text(
                                   '₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: isCompact ? 10 : 12,
                                     color: AppColors.textMuted,
                                     decoration: TextDecoration.lineThrough,
@@ -474,7 +474,7 @@ class _ProductCardState extends State<ProductCard> {
                     child: Text(
                       'Qty: $qty',
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isCompact ? 11 : 12,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryDarkGreen,
@@ -519,7 +519,7 @@ class _ProductCardState extends State<ProductCard> {
         icon: Icon(Icons.add_shopping_cart_rounded, size: isCompact ? 14 : 16),
         label: Text(
           'Add to Cart',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: isCompact ? 11 : 12,
             fontWeight: FontWeight.w700,
           ),

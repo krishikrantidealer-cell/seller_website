@@ -14,6 +14,9 @@ import 'floating_whatsapp_button.dart';
 class WebFooter extends StatelessWidget {
   const WebFooter({super.key});
 
+  static const Color _borderHairline = Color(0xFF2D2A28);
+  static const Color _mutedText = Color(0xFF9CA3AF);
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -24,62 +27,97 @@ class WebFooter extends StatelessWidget {
       color: AppColors.footerBackground,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1680),
+          constraints: const BoxConstraints(maxWidth: 1440),
           child: Padding(
-            padding: EdgeInsets.only(
-              top: isMobile ? 24 : 36,
-              bottom: isMobile ? 20 : 28,
-              left: isMobile ? 16 : 24,
-              right: isMobile ? 16 : 24,
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 16 : 32,
+              vertical: isMobile ? 24 : 36,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Integrated Trust Badges (Top tier of footer)
                 _buildTrustBadgesSection(context),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: isMobile ? 20 : 28),
+                  child: const Divider(color: _borderHairline, height: 1),
+                ),
 
-                const SizedBox(height: 32),
-                const Divider(color: Color(0xFF2E2A28), height: 1),
-                const SizedBox(height: 36),
-
-                // Main Footer Columns
+                // Main Footer Columns (Desktop 4-col, Tablet 2x2, Mobile Brand + 2-col links + Support)
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    final isWide = constraints.maxWidth >= 900;
-                    if (!isWide) {
-                      return Column(
+                    final w = constraints.maxWidth;
+                    if (w >= 960) {
+                      return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _brandColumn(context),
-                          const SizedBox(height: 32),
-                          _categoriesColumn(context),
-                          const SizedBox(height: 32),
-                          _quickLinksColumn(context),
-                          const SizedBox(height: 32),
-                          _supportColumn(context),
+                          Expanded(flex: 3, child: _brandColumn(context)),
+                          const SizedBox(width: 40),
+                          Expanded(flex: 2, child: _categoriesColumn(context)),
+                          const SizedBox(width: 32),
+                          Expanded(flex: 2, child: _quickLinksColumn(context)),
+                          const SizedBox(width: 40),
+                          Expanded(flex: 3, child: _supportColumn(context)),
                         ],
                       );
                     }
-                    return Row(
+                    if (w >= 600) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _brandColumn(context)),
+                              const SizedBox(width: 32),
+                              Expanded(child: _supportColumn(context)),
+                            ],
+                          ),
+                          const SizedBox(height: 28),
+                          const Divider(color: _borderHairline, height: 1),
+                          const SizedBox(height: 24),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _categoriesColumn(context)),
+                              const SizedBox(width: 32),
+                              Expanded(child: _quickLinksColumn(context)),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(flex: 3, child: _brandColumn(context)),
-                        const SizedBox(width: 48),
-                        Expanded(flex: 2, child: _categoriesColumn(context)),
-                        const SizedBox(width: 48),
-                        Expanded(flex: 2, child: _quickLinksColumn(context)),
-                        const SizedBox(width: 48),
-                        Expanded(flex: 3, child: _supportColumn(context)),
+                        _brandColumn(context),
+                        const SizedBox(height: 24),
+                        const Divider(color: _borderHairline, height: 1),
+                        const SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _categoriesColumn(context)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _quickLinksColumn(context)),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        const Divider(color: _borderHairline, height: 1),
+                        const SizedBox(height: 20),
+                        _supportColumn(context),
                       ],
                     );
                   },
                 ),
 
-                const SizedBox(height: 40),
-                const Divider(color: Color(0xFF2E2A28), height: 1),
-                const SizedBox(height: 24),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: isMobile ? 24 : 36,
+                    bottom: isMobile ? 16 : 20,
+                  ),
+                  child: const Divider(color: _borderHairline, height: 1),
+                ),
 
-                // Bottom Copyright & Legal Links with proper spacing
                 _buildBottomLegalRow(context),
               ],
             ),
@@ -89,140 +127,132 @@ class WebFooter extends StatelessWidget {
     );
   }
 
-  /// Integrated Trust Badges Tier inside the footer
+  /// Minimal horizontal trust strip (no heavy card boxes)
   Widget _buildTrustBadgesSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final badges = [
-          _TrustBadgeItem(
-            icon: Icons.price_check_rounded,
-            iconColor: AppColors.primaryCrimson,
-            iconBgColor: AppColors.primaryCrimson.withValues(alpha: 0.18),
-            title: 'Guaranteed Authentic Value',
-            subtitle: 'Direct from EBS Essential BioCrop Science',
-          ),
-          _TrustBadgeItem(
-            icon: Icons.local_shipping_rounded,
+          const _TrustBadgeItem(
+            icon: Icons.verified_outlined,
             iconColor: AppColors.primaryGreen,
-            iconBgColor: AppColors.primaryGreen.withValues(alpha: 0.18),
+            iconBgColor: Colors.transparent,
+            title: 'Guaranteed Authentic Value',
+            subtitle: 'Direct from ${AppConstants.appName}',
+          ),
+          const _TrustBadgeItem(
+            icon: Icons.local_shipping_outlined,
+            iconColor: AppColors.primaryGreen,
+            iconBgColor: Colors.transparent,
             title: 'FREE Pan-India Shipping',
             subtitle: 'Reliable doorstep parcel dispatch',
           ),
-          _TrustBadgeItem(
-            icon: Icons.shield_rounded,
-            iconColor: AppColors.primaryCrimson,
-            iconBgColor: AppColors.primaryCrimson.withValues(alpha: 0.18),
+          const _TrustBadgeItem(
+            icon: Icons.science_outlined,
+            iconColor: AppColors.primaryGreen,
+            iconBgColor: Colors.transparent,
             title: 'CERTIFIED Lab Quality',
             subtitle: '100% genuine agri-inputs verified',
           ),
-          _TrustBadgeItem(
-            icon: Icons.assignment_return_rounded,
+          const _TrustBadgeItem(
+            icon: Icons.support_agent_outlined,
             iconColor: AppColors.primaryGreen,
-            iconBgColor: AppColors.primaryGreen.withValues(alpha: 0.18),
+            iconBgColor: Colors.transparent,
             title: 'EASY Returns & Advisory',
             subtitle: 'Agronomist consultation included',
           ),
         ];
 
-        // Mobile (< 650px): vertical full-width stack with responsive cards
-        if (constraints.maxWidth < 650) {
+        if (constraints.maxWidth < 560) {
           return Column(
             children: [
               for (int i = 0; i < badges.length; i++) ...[
-                if (i > 0) const SizedBox(height: 10),
-                _buildBadgeCard(badges[i], isFullWidth: true),
+                if (i > 0)
+                  const Divider(color: _borderHairline, height: 16),
+                _buildBadgeItem(badges[i]),
               ],
             ],
           );
         }
 
-        // Tablet (650px to 1050px): clean 2x2 grid
-        if (constraints.maxWidth < 1050) {
+        if (constraints.maxWidth < 1024) {
           return Column(
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _buildBadgeCard(badges[0])),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildBadgeCard(badges[1])),
+                  Expanded(child: _buildBadgeItem(badges[0])),
+                  const SizedBox(width: 20),
+                  Expanded(child: _buildBadgeItem(badges[1])),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _buildBadgeCard(badges[2])),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildBadgeCard(badges[3])),
+                  Expanded(child: _buildBadgeItem(badges[2])),
+                  const SizedBox(width: 20),
+                  Expanded(child: _buildBadgeItem(badges[3])),
                 ],
               ),
             ],
           );
         }
 
-        // Desktop (>= 1050px): 4 badges in a single row
-        return Row(
-          children: [
-            for (int i = 0; i < badges.length; i++) ...[
-              if (i > 0) const SizedBox(width: 16),
-              Expanded(child: _buildBadgeCard(badges[i])),
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              for (int i = 0; i < badges.length; i++) ...[
+                if (i > 0)
+                  const VerticalDivider(
+                    color: _borderHairline,
+                    width: 28,
+                    thickness: 1,
+                  ),
+                Expanded(child: _buildBadgeItem(badges[i])),
+              ],
             ],
-          ],
+          ),
         );
       },
     );
   }
 
-  Widget _buildBadgeCard(_TrustBadgeItem item, {double? width, bool isFullWidth = false}) {
-    return Container(
-      width: isFullWidth ? double.infinity : width,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF24201E),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF332D29)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(9),
-            decoration: BoxDecoration(
-              color: item.iconBgColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(item.icon, color: item.iconColor, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  item.title,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+  Widget _buildBadgeItem(_TrustBadgeItem item) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(item.icon, color: item.iconColor, size: 22),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                item.title,
+                style: GoogleFonts.mukta(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  item.subtitle,
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: const Color(0xFF9CA3AF),
-                    height: 1.3,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                item.subtitle,
+                style: GoogleFonts.mukta(
+                  fontSize: 11.5,
+                  color: _mutedText,
+                  height: 1.25,
                 ),
-              ],
-            ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -233,22 +263,22 @@ class WebFooter extends StatelessWidget {
         alignment: WrapAlignment.spaceBetween,
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: 24,
-        runSpacing: 14,
+        runSpacing: 10,
         children: [
           Text(
-            '© 2026 EBS Essential BioCrop Science. All rights reserved.',
-            style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
+            '© 2026 ${AppConstants.appName}. All rights reserved.',
+            style: GoogleFonts.mukta(color: _mutedText, fontSize: 12),
           ),
           Wrap(
             spacing: 20,
-            runSpacing: 8,
+            runSpacing: 6,
             children: [
               _footerLink(
                 'Privacy Policy',
                 onTap: () => _showPolicyDialog(
                   context,
                   'Privacy Policy',
-                  'At EBS Essential BioCrop Science, we prioritize customer confidentiality. We only collect essential contact, shipping, and order details necessary to fulfill agricultural product deliveries. Your personal information is never sold or shared with unauthorized third parties. All online payments are encrypted through PCI-DSS compliant secure gateways.',
+                  'At ${AppConstants.appName}, we prioritize customer confidentiality. We only collect essential contact, shipping, and order details necessary to fulfill agricultural product deliveries. Your personal information is never sold or shared with unauthorized third parties. All online payments are encrypted through PCI-DSS compliant secure gateways.',
                 ),
               ),
               _footerLink(
@@ -256,7 +286,7 @@ class WebFooter extends StatelessWidget {
                 onTap: () => _showPolicyDialog(
                   context,
                   'Terms & Conditions',
-                  'All agricultural inputs, seeds, bio-fertilizers, and crop protection products listed on EBS Essential BioCrop Science are 100% genuine and verified. Recommendations, dosages, and application methods provided on this site are for general guidance; farmers are advised to adhere to product packaging instructions according to local soil and crop conditions.',
+                  'All agricultural inputs, seeds, bio-fertilizers, and crop protection products listed on ${AppConstants.appName} are 100% genuine and verified. Recommendations, dosages, and application methods provided on this site are for general guidance; farmers are advised to adhere to product packaging instructions according to local soil and crop conditions.',
                 ),
               ),
               _footerLink(
@@ -264,7 +294,7 @@ class WebFooter extends StatelessWidget {
                 onTap: () => _showPolicyDialog(
                   context,
                   'Refund & Cancellation Policy',
-                  'We ensure complete peace of mind with our 7-day Easy Replacement & Refund guarantee for damaged, leaked, or incorrect shipments. Orders can be cancelled prior to warehouse dispatch through My Orders or by contacting our Farmer Support Helpline at +91 9098544263.',
+                  'We ensure complete peace of mind with our 7-day Easy Replacement & Refund guarantee for damaged, leaked, or incorrect shipments. Orders can be cancelled prior to warehouse dispatch through My Orders or by contacting our Farmer Support Helpline at ${AppConstants.helplineNumber}.',
                 ),
               ),
             ],
@@ -280,31 +310,24 @@ class WebFooter extends StatelessWidget {
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.primaryGreen,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
-            ),
-            const SizedBox(width: 10),
+            const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 22),
+            const SizedBox(width: 8),
             Expanded(
               child: RichText(
                 text: TextSpan(
                   children: [
                     TextSpan(
                       text: 'EBS ',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
+                      style: GoogleFonts.mukta(
+                        fontSize: 19,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryCrimson,
                       ),
                     ),
                     TextSpan(
-                      text: 'Essential BioCrop Science',
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
+                      text: 'Krishi Dukaan',
+                      style: GoogleFonts.mukta(
+                        fontSize: 19,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                       ),
@@ -315,48 +338,22 @@ class WebFooter extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 10),
         Text(
-          'Pioneering agricultural biotechnology, advanced crop nutrition, certified organic inputs, and science-backed farming solutions delivered nationwide.',
-          style: GoogleFonts.poppins(
-            color: const Color(0xFF9CA3AF),
+          'Science-backed crop nutrition, certified organic inputs, and genuine agricultural supplies delivered across India.',
+          style: GoogleFonts.mukta(
+            color: _mutedText,
             fontSize: 13,
             height: 1.5,
           ),
         ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: const Color(0xFF374151),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.verified_rounded, color: AppColors.primaryGreen, size: 18),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  '100% Genuine Certified Products',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 18),
         Text(
           'Connect With Us:',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             color: Colors.white,
             fontSize: 12.5,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 10),
@@ -543,18 +540,15 @@ class WebFooter extends StatelessWidget {
               await launchUrl(uri);
             } catch (_) {}
           },
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(6),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.16),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.call_rounded, color: AppColors.primaryGreen, size: 18),
+                const Padding(
+                  padding: EdgeInsets.only(top: 2),
+                  child: Icon(Icons.phone_outlined, color: AppColors.primaryGreen, size: 16),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -563,17 +557,15 @@ class WebFooter extends StatelessWidget {
                     children: [
                       Text(
                         AppConstants.helplineNumber,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           color: Colors.white,
-                          fontSize: 16.5,
+                          fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
-                        'Mon - Sat: 9:00 AM - 7:00 PM',
-                        style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 11),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        'Mon – Sat, 9:00 AM – 7:00 PM',
+                        style: GoogleFonts.mukta(color: _mutedText, fontSize: 11.5),
                       ),
                     ],
                   ),
@@ -582,104 +574,85 @@ class WebFooter extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
-        // Dedicated WhatsApp Chat Support Card
+        // WhatsApp Support Row (clean list style matching other contact rows)
         InkWell(
           onTap: () async {
             final clean = AppConstants.helplineNumber.replaceAll(RegExp(r'[^0-9]'), '');
-            final uri = Uri.parse('https://wa.me/$clean?text=Hello%20EBS%20BioCrop%20Science%2C%20I%20need%20support%20with%20my%20order%20or%20products.');
+            final uri = Uri.parse(
+              'https://wa.me/$clean?text=Hello%20EBS%20Krishi%20Dukaan%2C%20I%20need%20support%20with%20my%20order%20or%20products.',
+            );
             try {
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             } catch (_) {}
           },
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-            decoration: BoxDecoration(
-              color: const Color(0xFF221E1C),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.45)),
-            ),
+          borderRadius: BorderRadius.circular(6),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 30,
-                  height: 30,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF25D366),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: CustomPaint(
-                      size: Size(16, 16),
-                      painter: WhatsAppIconPainter(color: Colors.white),
-                    ),
-                  ),
+                const CustomPaint(
+                  size: Size(16, 16),
+                  painter: WhatsAppIconPainter(color: Color(0xFF25D366)),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Chat on WhatsApp',
-                        style: GoogleFonts.poppins(
+                        'WhatsApp Advisory',
+                        style: GoogleFonts.mukta(
                           color: Colors.white,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        'Instant Farmer Advisory • 24/7',
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF86EFAC),
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        'Quick crop & order support',
+                        style: GoogleFonts.mukta(color: _mutedText, fontSize: 11.5),
                       ),
                     ],
                   ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Color(0xFF9CA3AF),
-                  size: 12,
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
 
         // Click-to-email Row
         InkWell(
           onTap: () async {
-            final uri = Uri.parse('mailto:support@ebsbiocrop.com?subject=EBS%20BioCrop%20Inquiry');
+            final uri = Uri.parse(
+              'mailto:${AppConstants.supportEmail}?subject=EBS%20Krishi%20Dukaan%20Inquiry',
+            );
             try {
               await launchUrl(uri);
             } catch (_) {}
           },
-          child: Row(
-            children: [
-              const Icon(Icons.email_outlined, color: AppColors.textMuted, size: 15),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  'support@ebsbiocrop.com',
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF9CA3AF),
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
+          borderRadius: BorderRadius.circular(6),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                const Icon(Icons.mail_outline_rounded, color: _mutedText, size: 16),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    AppConstants.supportEmail,
+                    style: GoogleFonts.mukta(
+                      color: const Color(0xFFD1D5DB),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -722,7 +695,7 @@ class WebFooter extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
@@ -735,7 +708,7 @@ class WebFooter extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 480),
           child: Text(
             content,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               color: const Color(0xFFCBD5E1),
               fontSize: 13,
               height: 1.6,
@@ -747,7 +720,7 @@ class WebFooter extends StatelessWidget {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               'Close',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 color: AppColors.primaryGreen,
                 fontWeight: FontWeight.w600,
               ),
@@ -763,7 +736,7 @@ class WebFooter extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         title,
-        style: GoogleFonts.poppins(
+        style: GoogleFonts.mukta(
           color: Colors.white,
           fontSize: 15,
           fontWeight: FontWeight.w700,
@@ -802,7 +775,7 @@ class _FooterLinkWidgetState extends State<_FooterLinkWidget> {
           onTap: widget.onTap,
           child: AnimatedDefaultTextStyle(
             duration: const Duration(milliseconds: 160),
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               color: _isHovered ? Colors.white : const Color(0xFF9CA3AF),
               fontSize: 13,
               fontWeight: _isHovered ? FontWeight.w600 : FontWeight.w400,
@@ -926,7 +899,7 @@ class _SocialIconButtonState extends State<SocialIconButton> {
                   SnackBar(
                     content: Text(
                       'Opening ${widget.platform.name}...',
-                      style: GoogleFonts.poppins(fontSize: 12.5),
+                      style: GoogleFonts.mukta(fontSize: 12.5),
                     ),
                     backgroundColor: AppColors.primaryDarkGreen,
                     behavior: SnackBarBehavior.floating,

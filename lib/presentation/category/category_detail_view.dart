@@ -165,7 +165,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             Expanded(
               child: Text(
                 'Added ${product.title} (${variant.label}) to cart',
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -355,7 +355,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                   const SizedBox(width: 4),
                   Text(
                     'Back to Home',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 11 : 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryGreen,
@@ -407,7 +407,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
               onChanged: (val) {
                 if (val != null) setState(() => _sortBy = val);
               },
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 10.5 : 12.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -434,7 +434,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           Expanded(
             child: RichText(
               text: TextSpan(
-                style: GoogleFonts.poppins(fontSize: 13, color: AppColors.primaryDarkGreen),
+                style: GoogleFonts.mukta(fontSize: 13, color: AppColors.primaryDarkGreen),
                 children: [
                   const TextSpan(text: 'Showing all brands formulated with: '),
                   TextSpan(
@@ -462,7 +462,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
                 children: [
                   Text(
                     'Clear',
-                    style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
+                    style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
                   ),
                   const SizedBox(width: 4),
                   const Icon(Icons.close_rounded, size: 14, color: AppColors.primaryDarkGreen),
@@ -641,7 +641,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             ],
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 11.5 : 12,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected ? Colors.white : AppColors.textPrimary,
@@ -672,7 +672,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           ),
           child: Text(
             sub,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 10.5 : 11,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               color: isSelected ? Colors.white : AppColors.textSecondary,
@@ -699,7 +699,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             children: [
               Text(
                 'Subcategories: ',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -731,7 +731,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         children: [
           Text(
             'Subcategories: ',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 11.5,
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
@@ -759,7 +759,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           const SizedBox(height: 12),
           Text(
             'No products found matching your filter criteria.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,

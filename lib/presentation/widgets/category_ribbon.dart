@@ -302,7 +302,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                   const SizedBox(width: 6),
                                   Text(
                                     'ALL CATEGORIES',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: Colors.white,
                                       fontSize: allCatFontSize,
                                       fontWeight: FontWeight.w700,
@@ -539,7 +539,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                     widget.selectedSubcategory != null
                                         ? '${activeCat.name} › ${widget.selectedSubcategory}'
                                         : activeCat.name,
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: Colors.white,
                                       fontSize: 12.5,
                                       fontWeight: FontWeight.w700,
@@ -551,7 +551,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 Flexible(
                                   child: Text(
                                     'All Categories',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: Colors.white,
                                       fontSize: 12.5,
                                       fontWeight: FontWeight.w700,
@@ -581,7 +581,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 children: [
                                   Text(
                                     'Clear',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: Colors.white,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
@@ -606,7 +606,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                             children: [
                               Text(
                                 'Browse',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   color: Colors.white,
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w600,
@@ -706,7 +706,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     ],
                     Text(
                       cat.name,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         color: Colors.white,
                         fontSize: fontSize,
                         fontWeight: isCategorySelected ? FontWeight.w700 : FontWeight.w500,
@@ -765,7 +765,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                   const SizedBox(width: 8),
                   Text(
                     'All Product Categories',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -784,7 +784,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
               leading: const Icon(Icons.storefront_rounded, color: AppColors.primaryGreen),
               title: Text(
                 'Show All Products',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14),
+                style: GoogleFonts.mukta(fontWeight: FontWeight.w600, fontSize: 14),
               ),
               trailing: widget.selectedCategoryId == 'all'
                   ? const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 20)
@@ -818,7 +818,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                             : null),
                     title: Text(
                       cat.name,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
                         fontSize: 14,
                         color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -830,7 +830,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 32),
                         title: Text(
                           'All in ${cat.name}',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryGreen,
                             fontSize: 13,
@@ -851,7 +851,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 : null,
                             title: Text(
                               group.name,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textPrimary,
@@ -864,7 +864,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 leading: const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
                                 title: Text(
                                   'All ${group.name}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryGreen,
@@ -879,7 +879,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 (sub) => ListTile(
                                   dense: true,
                                   contentPadding: const EdgeInsets.only(left: 48, right: 16),
-                                  title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
+                                  title: Text(sub, style: GoogleFonts.mukta(fontSize: 12.5)),
                                   trailing: (isCatSelected && widget.selectedSubcategory == sub)
                                       ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
                                       : null,
@@ -897,7 +897,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                           (sub) => ListTile(
                             dense: true,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 32),
-                            title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
+                            title: Text(sub, style: GoogleFonts.mukta(fontSize: 13)),
                             trailing: (isCatSelected && widget.selectedSubcategory == sub)
                                 ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
                                 : null,
@@ -969,7 +969,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     Expanded(
                       child: Text(
                         cat.name,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryDarkGreen,
@@ -987,7 +987,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.check_circle_outline, color: AppColors.primaryGreen),
-                title: Text('All in ${cat.name}', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                title: Text('All in ${cat.name}', style: GoogleFonts.mukta(fontWeight: FontWeight.w600, fontSize: 13.5)),
                 onTap: () {
                   Navigator.pop(ctx);
                   widget.onCategorySelected?.call(cat.id, null);
@@ -1005,11 +1005,11 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                               : null,
                           title: Text(
                             group.name,
-                            style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.mukta(fontSize: 13.5, fontWeight: FontWeight.w600),
                           ),
                           subtitle: Text(
                             '${group.subcategories.length} subcategories',
-                            style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                            style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted),
                           ),
                           children: [
                             ListTile(
@@ -1018,7 +1018,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                               leading: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryGreen),
                               title: Text(
                                 'View All ${group.name}',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primaryGreen,
@@ -1034,7 +1034,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 dense: true,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 28),
                                 leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 16, color: AppColors.textMuted),
-                                title: Text(sub, style: GoogleFonts.poppins(fontSize: 12.5)),
+                                title: Text(sub, style: GoogleFonts.mukta(fontSize: 12.5)),
                                 trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
                                     ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
                                     : null,
@@ -1051,7 +1051,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                       ...cat.subcategories.map(
                         (sub) => ListTile(
                           leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: AppColors.textMuted),
-                          title: Text(sub, style: GoogleFonts.poppins(fontSize: 13)),
+                          title: Text(sub, style: GoogleFonts.mukta(fontSize: 13)),
                           trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
                               ? const Icon(Icons.check, size: 18, color: AppColors.primaryCrimson)
                               : null,
@@ -1199,7 +1199,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                           Expanded(
                             child: Text(
                               'All Products',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primaryCrimson,
@@ -1217,7 +1217,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                     padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
                     child: Text(
                       'MAJOR CATEGORIES',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textMuted,
@@ -1279,7 +1279,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                     Expanded(
                                       child: Text(
                                         cat.name,
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.mukta(
                                           fontSize: 12.5,
                                           fontWeight: (isHovered || isSelected)
                                               ? FontWeight.w700
@@ -1330,7 +1330,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                           Expanded(
                             child: Text(
                               'All ${_hoveredCategory.name}',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primaryDarkGreen,
@@ -1349,7 +1349,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                     padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
                     child: Text(
                       'CATEGORIES',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textMuted,
@@ -1398,7 +1398,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                     Expanded(
                                       child: Text(
                                         group.name,
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.mukta(
                                           fontSize: 12,
                                           fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
                                           color: isHovered ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -1445,7 +1445,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                               children: [
                                 Text(
                                   activeGroup.name,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
@@ -1454,7 +1454,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                 ),
                                 Text(
                                   '${activeGroup.subcategories.length} Subcategories',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: 11,
                                     color: AppColors.textMuted,
                                   ),
@@ -1474,7 +1474,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                             ),
                             child: Text(
                               'View All',
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700),
                             ),
                           ),
                         ],
@@ -1515,7 +1515,7 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                       Center(
                         child: Text(
                           'No subcategories available',
-                          style: GoogleFonts.poppins(color: AppColors.textMuted),
+                          style: GoogleFonts.mukta(color: AppColors.textMuted),
                         ),
                       ),
                   ],
@@ -1583,7 +1583,7 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
               Expanded(
                 child: Text(
                   widget.title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12.5,
                     fontWeight: (widget.isSelected || _isHovered)
                         ? FontWeight.w600
@@ -1708,7 +1708,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                             Expanded(
                               child: Text(
                                 'All ${widget.category.name}',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: (widget.isSelected && widget.selectedSubcategory == null)
@@ -1803,7 +1803,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                   Expanded(
                     child: Text(
                       'All ${widget.category.name}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: (widget.isSelected && widget.selectedSubcategory == null)
@@ -1826,7 +1826,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
           child: Text(
             'CATEGORIES',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 9.5,
               fontWeight: FontWeight.w700,
               color: AppColors.textMuted,
@@ -1875,7 +1875,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                           Expanded(
                             child: Text(
                               group.name,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 12.5,
                                 fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
                                 color: isHovered
@@ -1923,7 +1923,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               const SizedBox(height: 12),
               Text(
                 'Explore ${widget.category.name}',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -1933,7 +1933,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               const SizedBox(height: 4),
               Text(
                 'Hover over any category to view subcategories',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 11.5,
                   color: AppColors.textMuted,
                 ),
@@ -1945,7 +1945,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                 icon: const Icon(Icons.arrow_forward_rounded, size: 14),
                 label: Text(
                   'View All Products',
-                  style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600),
+                  style: GoogleFonts.mukta(fontSize: 11.5, fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
@@ -1972,7 +1972,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               const SizedBox(height: 8),
               Text(
                 'Explore all ${activeGroup.name} products',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w500,
@@ -2014,7 +2014,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                 children: [
                   Text(
                     activeGroup.name,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -2023,7 +2023,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                   ),
                   Text(
                     '${activeGroup.subcategories.length} Subcategories',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 11,
                       color: AppColors.textMuted,
                     ),
@@ -2043,7 +2043,7 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               ),
               child: Text(
                 'View All',
-                style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700),
+                style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700),
               ),
             ),
           ],

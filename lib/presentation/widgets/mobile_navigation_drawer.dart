@@ -100,7 +100,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     'Be a Partner',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.primaryCrimson,
@@ -137,7 +137,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     'Sell with Us (Seller & Dealer Hub)',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w600,
                                       color: const Color(0xFF166534),
@@ -161,7 +161,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                           children: [
                             Text(
                               'CATEGORIES',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textMuted,
@@ -176,7 +176,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                               ),
                               child: Text(
                                 '${categories.length} Categories',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 9.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textSecondary,
@@ -221,7 +221,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                             ),
                             title: Text(
                               'All Products',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontWeight: selectedCategoryId == 'all' ? FontWeight.w700 : FontWeight.w600,
                                 fontSize: 12.5,
                                 color: selectedCategoryId == 'all' ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -298,7 +298,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                 ),
                                 title: Text(
                                   cat.name,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
                                     fontSize: 12.5,
                                     color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -336,7 +336,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                 children: [
                                                   Text(
                                                     'All in ${cat.name}',
-                                                    style: GoogleFonts.poppins(
+                                                    style: GoogleFonts.mukta(
                                                       fontWeight: FontWeight.w600,
                                                       fontSize: 11.5,
                                                       color: isCatSelected && selectedSubcategory == null
@@ -381,7 +381,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                           : null,
                                                       title: Text(
                                                         group.name,
-                                                        style: GoogleFonts.poppins(
+                                                        style: GoogleFonts.mukta(
                                                           fontSize: 11.5,
                                                           fontWeight: FontWeight.w600,
                                                           color: selectedSubcategory == group.name
@@ -400,7 +400,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                                 contentPadding: const EdgeInsets.only(left: 24, right: 10),
                                                                 title: Text(
                                                                   'All ${group.name}',
-                                                                  style: GoogleFonts.poppins(
+                                                                  style: GoogleFonts.mukta(
                                                                     fontSize: 11,
                                                                     fontWeight: FontWeight.w600,
                                                                     color: AppColors.primaryGreen,
@@ -421,7 +421,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                                     contentPadding: const EdgeInsets.only(left: 24, right: 10),
                                                                     title: Text(
                                                                       sub,
-                                                                      style: GoogleFonts.poppins(
+                                                                      style: GoogleFonts.mukta(
                                                                         fontSize: 11,
                                                                         fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
                                                                         color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
@@ -456,7 +456,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                                                   contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
                                                   title: Text(
                                                     sub,
-                                                    style: GoogleFonts.poppins(
+                                                    style: GoogleFonts.mukta(
                                                       fontSize: 11.5,
                                                       fontWeight: isSubSelected ? FontWeight.w700 : FontWeight.w500,
                                                       color: isSubSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
@@ -543,7 +543,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                         children: [
                           Text(
                             'EBS BioCrop',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -552,7 +552,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                           ),
                           Text(
                             'Direct Farmer Store • Authentic Inputs',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 9.5,
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFFBBF7D0),
@@ -623,7 +623,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                             children: [
                               Text(
                                 'Namaste, $name',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   color: Colors.white,
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w700,
@@ -632,7 +632,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                               ),
                               Text(
                                 'Verified Farmer • Tap for profile & orders',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   color: const Color(0xFFBBF7D0),
                                   fontSize: 9,
                                 ),
@@ -672,7 +672,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                           children: [
                             Text(
                               'Login / Register with Mobile',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 color: Colors.white,
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w700,
@@ -682,7 +682,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                             ),
                             Text(
                               'Get Kisan discounts & live order tracking',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 color: const Color(0xFFBBF7D0),
                                 fontSize: 9,
                               ),
@@ -701,7 +701,7 @@ class MobileNavigationDrawer extends StatelessWidget {
                         ),
                         child: Text(
                           'SIGN IN',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primaryDarkGreen,
@@ -815,7 +815,7 @@ class MobileNavigationDrawer extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,

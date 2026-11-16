@@ -164,7 +164,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                       ),
                       child: Text(
                         product.category.toUpperCase(),
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryDarkGreen,
@@ -175,7 +175,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                     Expanded(
                       child: Text(
                         'By ${product.vendor}',
-                        style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textSecondary),
+                        style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textSecondary),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -185,7 +185,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   product.title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -197,7 +197,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   product.technicalName,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w500,
                     color: AppColors.primaryCrimson,
@@ -259,7 +259,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             '$productItemsInCart in Cart (₹${productSubtotal.toInt()})',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryDarkGreen,
@@ -269,12 +269,12 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                       ),
                       Text(
                         'Total Cart Value: ₹${cart.subtotal.toInt()}',
-                        style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                        style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                       ),
                     ] else ...[
                       Text(
                         'Select a pack size above',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -282,7 +282,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                       ),
                       Text(
                         '100% Genuine EBS certified batch',
-                        style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                        style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                       ),
                     ],
                   ],
@@ -295,7 +295,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                   icon: const Icon(Icons.shopping_bag_rounded, size: 15),
                   label: Text(
                     'View Cart (${cart.totalCount})',
-                    style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700),
+                    style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryDarkGreen,
@@ -315,7 +315,7 @@ class _ProductVariantsSheetContent extends StatelessWidget {
                   ),
                   child: Text(
                     'Done',
-                    style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                    style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                   ),
                 ),
             ],
@@ -400,7 +400,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                             ),
                             child: Text(
                               product.category.toUpperCase(),
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primaryDarkGreen,
@@ -411,7 +411,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                           Expanded(
                             child: Text(
                               'Brand: ${product.vendor}',
-                              style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
+                              style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textSecondary),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -421,7 +421,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         product.title,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
@@ -431,7 +431,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                       ),
                       Text(
                         product.technicalName,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
                           color: AppColors.primaryCrimson,
@@ -469,7 +469,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                       Flexible(
                         child: Text(
                           'Select Pack Size / Variant',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -484,7 +484,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   '${product.variants.length} Options Available',
-                  style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -541,7 +541,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                         productItemsInCart > 0
                             ? '$productItemsInCart pack(s) in cart (₹${productSubtotal.toInt()})'
                             : '100% Genuine formulation authenticated directly from manufacturer',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 11.5,
                           fontWeight: productItemsInCart > 0 ? FontWeight.w700 : FontWeight.w500,
                           color: productItemsInCart > 0 ? AppColors.primaryDarkGreen : AppColors.textSecondary,
@@ -565,7 +565,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                     ),
                     child: Text(
                       'Done',
-                      style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                      style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                     ),
                   ),
                   if (cart.totalCount > 0) ...[
@@ -575,7 +575,7 @@ class _ProductVariantsDialogContent extends StatelessWidget {
                       icon: const Icon(Icons.shopping_bag_rounded, size: 16),
                       label: Text(
                         'View Cart (${cart.totalCount})',
-                        style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
@@ -658,7 +658,7 @@ class _VariantsList extends StatelessWidget {
                   children: [
                     Text(
                       variant.label,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -674,7 +674,7 @@ class _VariantsList extends StatelessWidget {
                         ),
                         child: Text(
                           '$discount% OFF',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
@@ -693,7 +693,7 @@ class _VariantsList extends StatelessWidget {
                   children: [
                     Text(
                       '₹${variant.displayRate.toStringAsFixed(0)}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryGreen,
@@ -703,7 +703,7 @@ class _VariantsList extends StatelessWidget {
                     if (variant.printedMrp > variant.displayRate) ...[
                       Text(
                         'MRP ₹${variant.printedMrp.toStringAsFixed(0)}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 11,
                           color: AppColors.textMuted,
                           decoration: TextDecoration.lineThrough,
@@ -713,7 +713,7 @@ class _VariantsList extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           '(Save ₹${savings.toStringAsFixed(0)})',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 10.5,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryDarkGreen,
@@ -731,7 +731,7 @@ class _VariantsList extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       'In Stock • Ships in 24 hrs',
-                      style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+                      style: GoogleFonts.mukta(fontSize: 10, color: AppColors.textMuted),
                     ),
                   ],
                 ),
@@ -772,7 +772,7 @@ class _VariantsList extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       '$qty',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryDarkGreen,
@@ -806,7 +806,7 @@ class _VariantsList extends StatelessWidget {
                 icon: const Icon(Icons.add_shopping_cart_rounded, size: 15),
                 label: Text(
                   'Add',
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700),
+                  style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,

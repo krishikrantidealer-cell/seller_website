@@ -33,20 +33,20 @@ class _WishlistViewState extends State<WishlistView> {
             const SizedBox(width: 8),
             Text(
               'Clear Wishlist?',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 17),
+              style: GoogleFonts.mukta(fontWeight: FontWeight.w700, fontSize: 17),
             ),
           ],
         ),
         content: Text(
           'Are you sure you want to remove all saved products from your wishlist?',
-          style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary),
+          style: GoogleFonts.mukta(fontSize: 13, color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancel',
-              style: GoogleFonts.poppins(color: AppColors.textMuted, fontWeight: FontWeight.w600),
+              style: GoogleFonts.mukta(color: AppColors.textMuted, fontWeight: FontWeight.w600),
             ),
           ),
           ElevatedButton(
@@ -55,7 +55,7 @@ class _WishlistViewState extends State<WishlistView> {
               WishlistController.instance.clear();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Wishlist cleared', style: GoogleFonts.poppins()),
+                  content: Text('Wishlist cleared', style: GoogleFonts.mukta()),
                   backgroundColor: AppColors.primaryDarkGreen,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -66,7 +66,7 @@ class _WishlistViewState extends State<WishlistView> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: Text('Clear All', style: GoogleFonts.poppins(fontWeight: FontWeight.w700)),
+            child: Text('Clear All', style: GoogleFonts.mukta(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -88,7 +88,7 @@ class _WishlistViewState extends State<WishlistView> {
             Expanded(
               child: Text(
                 'Added ${product.title} (${variant.label}) to cart!',
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -180,7 +180,7 @@ class _WishlistViewState extends State<WishlistView> {
                 const SizedBox(width: 4),
                 Text(
                   'Back',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryGreen,
@@ -196,7 +196,7 @@ class _WishlistViewState extends State<WishlistView> {
             onTap: () => Navigator.pop(context),
             child: Text(
               'Home',
-              style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
+              style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted),
             ),
           ),
           const SizedBox(width: 6),
@@ -204,7 +204,7 @@ class _WishlistViewState extends State<WishlistView> {
           const SizedBox(width: 6),
           Text(
             'My Wishlist',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -243,7 +243,7 @@ class _WishlistViewState extends State<WishlistView> {
                 children: [
                   Text(
                     'My Wishlist',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 18 : 24,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
@@ -252,7 +252,7 @@ class _WishlistViewState extends State<WishlistView> {
                   ),
                   Text(
                     count == 1 ? '1 product saved' : '$count products saved',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 11.5,
                       color: AppColors.textMuted,
                       fontWeight: FontWeight.w500,
@@ -271,7 +271,7 @@ class _WishlistViewState extends State<WishlistView> {
                 icon: const Icon(Icons.delete_outline_rounded, size: 14),
                 label: Text(
                   isMobile ? 'Clear' : 'Clear Wishlist',
-                  style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600),
+                  style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primaryCrimson,
@@ -323,7 +323,7 @@ class _WishlistViewState extends State<WishlistView> {
             const SizedBox(height: 20),
             Text(
               'Your Wishlist is Empty',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -335,7 +335,7 @@ class _WishlistViewState extends State<WishlistView> {
               child: Text(
                 'Explore top-performing seeds, crop protection, fertilizers, and farm equipment. Tap the heart ❤️ icon on any product to save it here for fast access and reordering.',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 13,
                   color: AppColors.textSecondary,
                   height: 1.5,
@@ -348,7 +348,7 @@ class _WishlistViewState extends State<WishlistView> {
               icon: const Icon(Icons.storefront_rounded, size: 18),
               label: Text(
                 'Explore Store',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 13.5),
+                style: GoogleFonts.mukta(fontWeight: FontWeight.w700, fontSize: 13.5),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
@@ -504,7 +504,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                       ),
                       child: Text(
                         '$discount% OFF',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -524,7 +524,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Removed ${widget.product.title} from wishlist', style: GoogleFonts.poppins()),
+                            content: Text('Removed ${widget.product.title} from wishlist', style: GoogleFonts.mukta()),
                             duration: const Duration(seconds: 2),
                             behavior: SnackBarBehavior.floating,
                           ),
@@ -573,7 +573,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                   children: [
                     Text(
                       widget.product.category,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 10.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryDarkGreen,
@@ -582,7 +582,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                     Flexible(
                       child: Text(
                         widget.product.vendor,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 10,
                           color: AppColors.textMuted,
                         ),
@@ -607,7 +607,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                     widget.product.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -622,7 +622,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                   widget.product.technicalName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
@@ -637,7 +637,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                   children: [
                     Text(
                       '₹${_selectedVariant.displayRate.toInt()}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
@@ -647,7 +647,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                     if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
                       Text(
                         '₹${_selectedVariant.printedMrp.toInt()}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 11,
                           decoration: TextDecoration.lineThrough,
                           color: AppColors.textMuted,
@@ -673,13 +673,13 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                         isDense: true,
                         isExpanded: true,
                         icon: const Icon(Icons.arrow_drop_down, size: 18),
-                        style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textPrimary),
+                        style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textPrimary),
                         items: variants.map((v) {
                           return DropdownMenuItem<ProductVariant>(
                             value: v,
                             child: Text(
                               '${v.label} - ₹${v.displayRate.toInt()}',
-                              style: GoogleFonts.poppins(fontSize: 11),
+                              style: GoogleFonts.mukta(fontSize: 11),
                             ),
                           );
                         }).toList(),
@@ -699,7 +699,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                     ),
                     child: Text(
                       'Pack: ${_selectedVariant.label}',
-                      style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textSecondary),
+                      style: GoogleFonts.mukta(fontSize: 10, color: AppColors.textSecondary),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -714,7 +714,7 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
                     icon: const Icon(Icons.add_shopping_cart_rounded, size: 14),
                     label: Text(
                       'Add to Cart',
-                      style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.mukta(fontSize: 11.5, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,
@@ -808,7 +808,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                             Flexible(
                               child: Text(
                                 product.category,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primaryDarkGreen,
@@ -834,7 +834,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                           product.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: isVeryNarrow ? 11.5 : 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -845,7 +845,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                           product.technicalName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 10,
                             color: AppColors.textMuted,
                           ),
@@ -860,7 +860,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                             children: [
                               Text(
                                 '₹${variant.displayRate.toInt()}',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 13.5,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.textPrimary,
@@ -870,7 +870,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   variant.label,
-                                  style: GoogleFonts.poppins(fontSize: 9.5, color: AppColors.textMuted),
+                                  style: GoogleFonts.mukta(fontSize: 9.5, color: AppColors.textMuted),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -885,7 +885,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                               icon: const Icon(Icons.add_shopping_cart_rounded, size: 12),
                               label: Text(
                                 'Add to Cart',
-                                style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w700),
+                                style: GoogleFonts.mukta(fontSize: 10, fontWeight: FontWeight.w700),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryGreen,
@@ -907,7 +907,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                             children: [
                               Text(
                                 '₹${variant.displayRate.toInt()}',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.textPrimary,
@@ -915,7 +915,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                               ),
                               Text(
                                 variant.label,
-                                style: GoogleFonts.poppins(fontSize: 10, color: AppColors.textMuted),
+                                style: GoogleFonts.mukta(fontSize: 10, color: AppColors.textMuted),
                               ),
                             ],
                           ),
@@ -924,7 +924,7 @@ class _WishlistHorizontalCard extends StatelessWidget {
                             icon: const Icon(Icons.add_shopping_cart_rounded, size: 13),
                             label: Text(
                               'Add to Cart',
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryGreen,

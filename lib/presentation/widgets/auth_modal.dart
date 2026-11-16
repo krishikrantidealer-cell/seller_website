@@ -79,7 +79,7 @@ Future<bool?> showSignOutConfirmationDialog(BuildContext context) {
               // Title
               Text(
                 'Sign Out from BioCrop?',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -91,7 +91,7 @@ Future<bool?> showSignOutConfirmationDialog(BuildContext context) {
               // Subtitle
               Text(
                 'Are you sure you want to sign out? You will need to verify your mobile number with OTP to access your orders and profile again.',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12.5,
                   color: AppColors.textSecondary,
                   height: 1.5,
@@ -115,7 +115,7 @@ Future<bool?> showSignOutConfirmationDialog(BuildContext context) {
                       ),
                       child: Text(
                         'Cancel',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSecondary,
@@ -138,7 +138,7 @@ Future<bool?> showSignOutConfirmationDialog(BuildContext context) {
                       ),
                       child: Text(
                         'Yes, Sign Out',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                         ),
@@ -302,7 +302,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                         children: [
                           Text(
                             'Farmer Login / Register',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -312,7 +312,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                           ),
                           Text(
                             'EBS BioCrop Krishi Portal',
-                            style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                            style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -334,7 +334,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
           // Subtitle
           Text(
             'Enter your 10-digit mobile number',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -343,7 +343,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
           const SizedBox(height: 4),
           Text(
             'We will send a one-time OTP verification code to verify your phone number without any password.',
-            style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary, height: 1.4),
+            style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textSecondary, height: 1.4),
           ),
           const SizedBox(height: 16),
 
@@ -367,11 +367,11 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                   ),
                   child: Row(
                     children: [
-                      Text('🇮🇳', style: GoogleFonts.poppins(fontSize: 16)),
+                      Text('🇮🇳', style: GoogleFonts.mukta(fontSize: 16)),
                       const SizedBox(width: 6),
                       Text(
                         '+91',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
@@ -389,7 +389,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                     maxLength: 10,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     onSubmitted: (_) => _submit(),
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
@@ -398,7 +398,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                     decoration: InputDecoration(
                       hintText: 'Enter Mobile Number',
                       counterText: '',
-                      hintStyle: GoogleFonts.poppins(
+                      hintStyle: GoogleFonts.mukta(
                         fontSize: 13,
                         fontWeight: FontWeight.normal,
                         color: AppColors.textMuted,
@@ -435,7 +435,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                 Expanded(
                   child: Text(
                     auth.errorMessage!,
-                    style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
+                    style: GoogleFonts.mukta(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -465,7 +465,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                   Expanded(
                     child: Text(
                       'Quick Test: Tap to fill demo number (9876543210)',
-                      style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryDarkGreen, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.mukta(fontSize: 11, color: AppColors.primaryDarkGreen, fontWeight: FontWeight.w600),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -497,7 +497,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                     )
                   : Text(
                       'Get OTP via SMS',
-                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.mukta(fontSize: 14, fontWeight: FontWeight.w700),
                     ),
             ),
           ),
@@ -515,7 +515,7 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
                 Flexible(
                   child: Text(
                     '100% Secure • Authenticated Directly via OTP',
-                    style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                    style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -596,7 +596,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
         SnackBar(
           content: Text(
             '✓ Login Successful! Welcome to EBS BioCrop.',
-            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+            style: GoogleFonts.mukta(color: Colors.white, fontWeight: FontWeight.w600),
           ),
           backgroundColor: AppColors.primaryDarkGreen,
           duration: const Duration(seconds: 3),
@@ -646,7 +646,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                     Expanded(
                       child: Text(
                         'Verify Mobile OTP',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
@@ -673,17 +673,17 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
             children: [
               Text(
                 'Enter 6-digit code sent to ',
-                style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
               ),
               Text(
                 '+91 $phone ',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
               ),
               InkWell(
                 onTap: () => AuthController.instance.editPhoneNumber(),
                 child: Text(
                   'Edit',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryGreen,
@@ -713,7 +713,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                       textAlign: TextAlign.center,
                       maxLength: 1,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: widget.isMobile ? 18 : 20,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryDarkGreen,
@@ -774,7 +774,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                 Flexible(
                   child: Text(
                     auth.errorMessage!,
-                    style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
+                    style: GoogleFonts.mukta(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -804,7 +804,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                     Flexible(
                       child: Text(
                         'Test Mode: Tap to auto-verify with demo OTP (123456)',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 11,
                           color: AppColors.primaryDarkGreen,
                           fontWeight: FontWeight.w700,
@@ -841,7 +841,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                     )
                   : Text(
                       'Verify & Sign In',
-                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.mukta(fontSize: 14, fontWeight: FontWeight.w700),
                     ),
             ),
           ),
@@ -853,7 +853,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
             child: _secondsRemaining > 0
                 ? Text(
                     'Resend code in ${_secondsRemaining}s',
-                    style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
+                    style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted),
                   )
                 : TextButton.icon(
                     onPressed: () async {
@@ -869,7 +869,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                     icon: const Icon(Icons.refresh_rounded, size: 16, color: AppColors.primaryGreen),
                     label: Text(
                       'Resend OTP via SMS',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryGreen,
@@ -930,7 +930,7 @@ class _AccountProfileView extends StatelessWidget {
                             (user?.name != null && user!.name!.trim().isNotEmpty)
                                 ? user.name!.trim()
                                 : (user?.formattedPhone ?? ''),
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -948,7 +948,7 @@ class _AccountProfileView extends StatelessWidget {
                           ),
                           child: Text(
                             'VERIFIED',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 9,
                               fontWeight: FontWeight.w800,
                               color: AppColors.primaryDarkGreen,
@@ -961,7 +961,7 @@ class _AccountProfileView extends StatelessWidget {
                       (user?.villageOrTown != null && user!.villageOrTown!.trim().isNotEmpty)
                           ? '${user.villageOrTown!.trim()}, ${((user.district != null && user.district!.isNotEmpty) ? user.district : user.state) ?? ''}'
                           : (user?.location ?? 'Punjab & Haryana Agricultural Belt'),
-                      style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                      style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1038,7 +1038,7 @@ class _AccountProfileView extends StatelessWidget {
                           const SizedBox(width: 8),
                           Text(
                             'Signed out successfully',
-                            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12.5),
+                            style: GoogleFonts.mukta(color: Colors.white, fontSize: 12.5),
                           ),
                         ],
                       ),
@@ -1053,7 +1053,7 @@ class _AccountProfileView extends StatelessWidget {
               icon: const Icon(Icons.logout_rounded, size: 16, color: AppColors.primaryCrimson),
               label: Text(
                 'Sign Out / Logout',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryCrimson,
@@ -1100,7 +1100,7 @@ class _AccountProfileView extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -1108,7 +1108,7 @@ class _AccountProfileView extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                    style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                   ),
                 ],
               ),

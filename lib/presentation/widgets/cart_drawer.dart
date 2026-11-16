@@ -88,7 +88,7 @@ class QuickCartDrawer extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 'My Cart',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -103,7 +103,7 @@ class QuickCartDrawer extends StatelessWidget {
                 ),
                 child: Text(
                   '${cart.totalCount} items',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primaryGreen,
@@ -147,7 +147,7 @@ class QuickCartDrawer extends StatelessWidget {
                   cart.hasFreeShipping
                       ? 'Congratulations! You unlocked FREE Pan-India Shipping'
                       : 'Add ₹${cart.amountNeededForFreeShipping.toStringAsFixed(0)} more for FREE Delivery',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: cart.hasFreeShipping
@@ -207,7 +207,7 @@ class QuickCartDrawer extends StatelessWidget {
             children: [
               Text(
                 item.product.title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
@@ -228,7 +228,7 @@ class QuickCartDrawer extends StatelessWidget {
                     ),
                     child: Text(
                       item.variant.label,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
@@ -248,7 +248,7 @@ class QuickCartDrawer extends StatelessWidget {
                     children: [
                       Text(
                         '₹${item.totalRate.toStringAsFixed(0)}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryGreen,
@@ -258,7 +258,7 @@ class QuickCartDrawer extends StatelessWidget {
                       if (item.totalMrp > item.totalRate)
                         Text(
                           '₹${item.totalMrp.toStringAsFixed(0)}',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 11,
                             color: AppColors.textMuted,
                             decoration: TextDecoration.lineThrough,
@@ -296,7 +296,7 @@ class QuickCartDrawer extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
                             '${item.quantity}',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -348,7 +348,7 @@ class QuickCartDrawer extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Your Cart is Empty',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -358,7 +358,7 @@ class QuickCartDrawer extends StatelessWidget {
             Text(
               'Explore our certified agricultural nutrition and bio-products to start shopping.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 13,
                 color: AppColors.textSecondary,
               ),
@@ -374,7 +374,7 @@ class QuickCartDrawer extends StatelessWidget {
               ),
               child: Text(
                 'Explore Products',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                style: GoogleFonts.mukta(fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -418,7 +418,7 @@ class QuickCartDrawer extends StatelessWidget {
                   Expanded(
                     child: Text(
                       'You are saving ₹${cart.totalSavings.toStringAsFixed(0)} on this order!',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryDarkGreen,
@@ -440,7 +440,7 @@ class QuickCartDrawer extends StatelessWidget {
                 children: [
                   Text(
                     'Total Payable',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
@@ -448,7 +448,7 @@ class QuickCartDrawer extends StatelessWidget {
                   ),
                   Text(
                     '₹${cart.subtotal.toStringAsFixed(0)}',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primaryCrimson,
@@ -491,7 +491,7 @@ class QuickCartDrawer extends StatelessWidget {
                     icon: const Icon(Icons.lock_rounded, size: 16),
                     label: Text(
                       'PROCEED TO BUY',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.5,

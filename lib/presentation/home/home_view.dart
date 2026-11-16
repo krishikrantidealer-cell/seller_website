@@ -164,7 +164,7 @@ class _HomeViewState extends State<HomeView> {
             Expanded(
               child: Text(
                 'Added ${product.title} (${variant.label}) to cart',
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500),
+                style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -341,7 +341,7 @@ class _HomeViewState extends State<HomeView> {
                                   const SizedBox(height: 18),
                                   Text(
                                     'Loading EBS BioCrop Catalog & Categories...',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textPrimary,
@@ -351,7 +351,7 @@ class _HomeViewState extends State<HomeView> {
                                   const SizedBox(height: 6),
                                   Text(
                                     'Connecting to live MongoDB database...',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                     ),
@@ -387,7 +387,7 @@ class _HomeViewState extends State<HomeView> {
                                   const SizedBox(height: 14),
                                   Text(
                                     'Backend Server Offline or Unreachable',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
                                       color: const Color(0xFF991B1B),
@@ -398,7 +398,7 @@ class _HomeViewState extends State<HomeView> {
                                   Text(
                                     'The website is attempting to load live categories and products from:\n${AppConstants.apiBaseUrl}\n\nPlease check network connectivity or retry in a few moments.',
                                     textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       fontSize: 12.5,
                                       color: const Color(0xFF7F1D1D),
                                       height: 1.4,
@@ -423,7 +423,7 @@ class _HomeViewState extends State<HomeView> {
                                     icon: const Icon(Icons.refresh_rounded, size: 18),
                                     label: Text(
                                       'Retry Connection',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.mukta(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -474,7 +474,7 @@ class _HomeViewState extends State<HomeView> {
                                       allProducts.isEmpty
                                           ? 'No products available in the database yet.'
                                           : 'No agricultural products found matching your search.',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.mukta(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
@@ -719,7 +719,7 @@ class _HomeViewState extends State<HomeView> {
                 Flexible(
                   child: Text(
                     category.name,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 15 : 20,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -742,7 +742,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   child: Text(
                     isMobile ? '$productCount' : '$productCount Products',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 10.5 : 11.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryDarkGreen,
@@ -756,7 +756,7 @@ class _HomeViewState extends State<HomeView> {
                       category.groups.isNotEmpty
                           ? '• ${category.groups.length} Subcategories • 100% Genuine EBS Agricultural Inputs'
                           : '• 100% Genuine Lab Tested EBS Agricultural Inputs',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12.5,
                         color: AppColors.textSecondary,
                       ),
@@ -812,7 +812,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               Text(
                 'See All',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 11 : 12,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -886,7 +886,7 @@ class _HomeViewState extends State<HomeView> {
                           Flexible(
                             child: Text(
                               title,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -904,7 +904,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             child: Text(
                               '${filtered.length}',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primaryDarkGreen,
@@ -925,7 +925,7 @@ class _HomeViewState extends State<HomeView> {
                       Expanded(
                         child: Text(
                           'Filtered by: ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}',
-                          style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
+                          style: GoogleFonts.mukta(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -939,7 +939,7 @@ class _HomeViewState extends State<HomeView> {
                         },
                         child: Text(
                           'Reset',
-                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryCrimson),
+                          style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryCrimson),
                         ),
                       ),
                     ],
@@ -962,7 +962,7 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -990,7 +990,7 @@ class _HomeViewState extends State<HomeView> {
                       const SizedBox(width: 5),
                       Text(
                         '${filtered.length} Products',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryDarkGreen,
@@ -1005,7 +1005,7 @@ class _HomeViewState extends State<HomeView> {
                     isFiltered
                         ? '• Showing ${_getCategoryTitle(_selectedCategory)}${_selectedSubcategory != null ? ' > $_selectedSubcategory' : ''}'
                         : '• 100% Genuine Lab Tested EBS Bio-Inputs with Nationwide Delivery',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12.5,
                       color: AppColors.textSecondary,
                     ),
@@ -1038,7 +1038,7 @@ class _HomeViewState extends State<HomeView> {
                           const SizedBox(width: 4),
                           Text(
                             'Clear Filter',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 11.5,
                               fontWeight: FontWeight.w600,
                               color: AppColors.primaryCrimson,
@@ -1100,7 +1100,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               Text(
                 'View All',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 11.5 : 12.5,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -1191,7 +1191,7 @@ class _HomeViewState extends State<HomeView> {
                           Flexible(
                             child: Text(
                               col.name,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: isMobile ? 15 : 20,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -1214,7 +1214,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             child: Text(
                               isMobile ? '$totalCount' : '$totalCount Products',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: isMobile ? 10.5 : 11.5,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.primaryDarkGreen,
@@ -1230,7 +1230,7 @@ class _HomeViewState extends State<HomeView> {
                                     : (col.description.isNotEmpty
                                         ? '• ${col.description}'
                                         : '• 100% Genuine EBS Agricultural Inputs'),
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 12.5,
                                   color: AppColors.textSecondary,
                                 ),
@@ -1282,7 +1282,7 @@ class _HomeViewState extends State<HomeView> {
                             children: [
                               Text(
                                 'See All',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: isMobile ? 11 : 12,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -1314,119 +1314,185 @@ class _HomeViewState extends State<HomeView> {
                     padding: EdgeInsets.symmetric(vertical: isMobile ? 10 : 14),
                     child: const Divider(height: 1, color: Color(0xFFF1F5F9)),
                   ),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: visibleSubs.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: constraints.maxWidth >= 900
-                          ? 6
-                          : (constraints.maxWidth >= 420 ? 3 : 2),
-                      mainAxisExtent: isMobile ? 84 : 94,
-                      crossAxisSpacing: isMobile ? 8 : 10,
-                      mainAxisSpacing: isMobile ? 8 : 10,
-                    ),
-                    itemBuilder: (context, index) {
-                      final sub = visibleSubs[index];
-                      final subLiveCount = availableProducts
-                          .where((p) => col.matchesSubCollection(p, sub))
-                          .length;
-                      final subDisplayCount = subLiveCount > 0 ? subLiveCount : sub.productCount;
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => SubCollectionDetailView(
-                                collection: col,
-                                subCollection: sub,
+                  Builder(
+                    builder: (context) {
+                      final int maxCols = constraints.maxWidth >= 1100
+                          ? 8
+                          : (constraints.maxWidth >= 750
+                              ? 6
+                              : (constraints.maxWidth >= 450 ? 4 : 3));
+                      final double circleSize = isMobile ? 68.0 : 88.0;
+
+                      Widget buildSubCircleTile(StoreSubCollection sub) {
+                        final subLiveCount = availableProducts
+                            .where((p) => col.matchesSubCollection(p, sub))
+                            .length;
+                        final subDisplayCount =
+                            subLiveCount > 0 ? subLiveCount : sub.productCount;
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SubCollectionDetailView(
+                                  collection: col,
+                                  subCollection: sub,
+                                ),
                               ),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 4,
                             ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFC),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                          ),
-                          child: Stack(
-                            children: [
-                              Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Container(
-                                          width: isMobile ? 32 : 38,
-                                          height: isMobile ? 32 : 38,
-                                          color: const Color(0xFFF0FDF4),
-                                          child: (sub.image != null && sub.image!.isNotEmpty)
-                                              ? AppProductImage(
-                                                  imageUrl: sub.image!,
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : const Icon(
-                                                  Icons.eco_rounded,
-                                                  color: AppColors.primaryGreen,
-                                                  size: 18,
-                                                ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Container(
+                                      width: circleSize,
+                                      height: circleSize,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: const Color(0xFFF0FDF4),
+                                        border: Border.all(
+                                          color: AppColors.primaryGreen
+                                              .withValues(alpha: 0.25),
+                                          width: 1.5,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withValues(alpha: 0.04),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipOval(
+                                        child: (sub.image != null &&
+                                                sub.image!.isNotEmpty)
+                                            ? AppProductImage(
+                                                imageUrl: sub.image!,
+                                                fit: BoxFit.cover,
+                                              )
+                                            : const Icon(
+                                                Icons.eco_rounded,
+                                                color: AppColors.primaryGreen,
+                                                size: 22,
+                                              ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: -2,
+                                      right: -4,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 5,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: subDisplayCount > 0
+                                              ? const Color(0xFFF0FDF4)
+                                              : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: subDisplayCount > 0
+                                                ? AppColors.primaryGreen
+                                                    .withValues(alpha: 0.35)
+                                                : const Color(0xFFE2E8F0),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '$subDisplayCount',
+                                          style: GoogleFonts.mukta(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: subDisplayCount > 0
+                                                ? AppColors.primaryDarkGreen
+                                                : AppColors.textMuted,
+                                          ),
                                         ),
                                       ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        sub.name,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: isMobile ? 11 : 11.5,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textPrimary,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  sub.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.mukta(
+                                    fontSize: isMobile ? 10.5 : 12.5,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.15,
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 5,
-                                    vertical: 1,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: subDisplayCount > 0
-                                        ? const Color(0xFFF0FDF4)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: subDisplayCount > 0
-                                          ? AppColors.primaryGreen.withValues(alpha: 0.3)
-                                          : const Color(0xFFE2E8F0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    '$subDisplayCount',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: subDisplayCount > 0
-                                          ? AppColors.primaryDarkGreen
-                                          : AppColors.textMuted,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        );
+                      }
+
+                      if (isMobile) {
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          clipBehavior: Clip.none,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: visibleSubs
+                                .map(
+                                  (sub) => Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: SizedBox(
+                                      width: 84,
+                                      child: buildSubCircleTile(sub),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        );
+                      }
+
+                      if (visibleSubs.length <= maxCols) {
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: visibleSubs
+                              .map(
+                                (sub) => Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isMobile ? 4 : 6,
+                                    ),
+                                    child: buildSubCircleTile(sub),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        );
+                      }
+
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: visibleSubs.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: maxCols,
+                          mainAxisExtent: isMobile ? 88 : 134,
+                          crossAxisSpacing: isMobile ? 8 : 12,
+                          mainAxisSpacing: isMobile ? 10 : 14,
                         ),
+                        itemBuilder: (context, index) =>
+                            buildSubCircleTile(visibleSubs[index]),
                       );
                     },
                   ),
@@ -1497,7 +1563,7 @@ class _HomeViewState extends State<HomeView> {
                 Expanded(
                   child: Text(
                     col.name,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 17 : 22,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -1513,7 +1579,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   child: Text(
                     '${filtered.length} Products',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: AppColors.primaryDarkGreen,
@@ -1526,7 +1592,7 @@ class _HomeViewState extends State<HomeView> {
               const SizedBox(height: 8),
               Text(
                 col.description,
-                style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary),
+                style: GoogleFonts.mukta(fontSize: 13, color: AppColors.textSecondary),
               ),
             ],
             if (col.subCollections.isNotEmpty) ...[
@@ -1566,7 +1632,7 @@ class _HomeViewState extends State<HomeView> {
           child: Center(
             child: Text(
               'No products assigned to this collection yet.',
-              style: GoogleFonts.poppins(fontSize: 14, color: AppColors.textSecondary),
+              style: GoogleFonts.mukta(fontSize: 14, color: AppColors.textSecondary),
             ),
           ),
         )

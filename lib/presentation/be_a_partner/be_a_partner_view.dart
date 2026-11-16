@@ -132,7 +132,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(width: 6),
                 Text(
                   'Home',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     color: AppColors.primaryGreen,
                     fontWeight: FontWeight.w600,
@@ -146,7 +146,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
           const SizedBox(width: 8),
           Text(
             'Be a Partner',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 13,
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -177,7 +177,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
               const SizedBox(width: 10),
               Text(
                 'Be a Partner',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 22 : 26,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -201,7 +201,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
               children: [
                 Text(
                   'Dear Partner,',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF166534),
@@ -210,7 +210,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(height: 8),
                 Text(
                   'Have a bright future ahead!!!',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF15803D),
@@ -219,7 +219,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(height: 8),
                 Text(
                   "Thanks for visiting India's fast growing e-commerce website/application.",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     color: const Color(0xFF166534),
                     height: 1.4,
@@ -228,7 +228,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(height: 8),
                 Text(
                   'If you are interested to be a part of Agribegri Tradelink Private Limited then fill up following detail.',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     color: const Color(0xFF166534),
                     height: 1.4,
@@ -237,7 +237,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(height: 8),
                 Text(
                   'Our top management and commerce department will contact you.',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF15803D),
@@ -246,7 +246,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(height: 12),
                 Text(
                   'Thanks again.',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     color: const Color(0xFF166534),
                   ),
@@ -254,7 +254,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                 const SizedBox(height: 2),
                 Text(
                   'Team Agribegri.',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF166534),
@@ -513,7 +513,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
                     )
                   : Text(
                       'SUBMIT',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.0,
@@ -544,7 +544,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
           Text(
             'Partner Application Submitted!',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 20 : 24,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
@@ -554,7 +554,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
           Text(
             'Thank you for your interest in partnering with us.\nOur top management and commerce department will review your details and contact you shortly.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 13.5,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -583,7 +583,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -601,7 +601,7 @@ class _BeAPartnerViewState extends State<BeAPartnerView> {
   InputDecoration _inputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.poppins(fontSize: 13, color: AppColors.textMuted),
+      hintStyle: GoogleFonts.mukta(fontSize: 13, color: AppColors.textMuted),
       prefixIcon: Icon(icon, size: 18, color: AppColors.textSecondary),
       filled: true,
       fillColor: const Color(0xFFF8FAFC),

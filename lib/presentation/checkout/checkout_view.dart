@@ -252,7 +252,7 @@ class _CheckoutViewState extends State<CheckoutView> {
           children: [
             Text(
               'Secure Checkout',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -273,7 +273,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   const SizedBox(width: 4),
                   Text(
                     'Razorpay & Shiprocket Protected',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF2563EB),
@@ -340,7 +340,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   Expanded(
                     child: Text(
                       _orderErrorMessage!,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 13,
                         color: const Color(0xFF991B1B),
                       ),
@@ -397,7 +397,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   children: [
                     Text(
                       '1. Farm Delivery Address',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -405,7 +405,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                     ),
                     Text(
                       'Where should Shiprocket couriers deliver your farm inputs?',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -531,7 +531,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   Expanded(
                     child: Text(
                       _serviceabilityError!,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: const Color(0xFF991B1B),
@@ -573,7 +573,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                       _serviceabilityResult!.serviceable
                           ? 'Courier Available: ${_serviceabilityResult!.courierName} • Delivery in ${_serviceabilityResult!.estimatedDeliveryDays} days (Shiprocket Verified)'
                           : 'Pincode not reachable by standard couriers',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: _serviceabilityResult!.serviceable
@@ -677,7 +677,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   children: [
                     Text(
                       '2. Select Payment Option',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -685,7 +685,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                     ),
                     Text(
                       'Powered by Razorpay • UPI, Cards, Netbanking & Partial Payment',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -752,7 +752,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           children: [
                             Text(
                               'Pay Online (100% Prepaid via Razorpay)',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -766,7 +766,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                               ),
                               child: Text(
                                 'RECOMMENDED',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -778,7 +778,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                         const SizedBox(height: 4),
                         Text(
                           'UPI (Google Pay, PhonePe, Paytm), Debit/Credit Cards, Netbanking. Zero COD fees & priority dispatch.',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 12,
                             color: AppColors.textSecondary,
                           ),
@@ -788,7 +788,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   ),
                   Text(
                     '₹${total.toStringAsFixed(0)}',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primaryGreen,
@@ -853,7 +853,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           children: [
                             Text(
                               'Partial Advance via Razorpay + Remaining on Delivery',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -862,7 +862,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                             const SizedBox(height: 4),
                             Text(
                               'Pay a token booking advance online now to book stock; pay balance in cash/UPI to courier at farm gate.',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 12,
                                 color: AppColors.textSecondary,
                               ),
@@ -877,7 +877,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                     const Divider(height: 20),
                     Text(
                       'Choose Advance Amount to Pay Now:',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -893,7 +893,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           child: ChoiceChip(
                             label: Text(
                               '${pct.toInt()}% (₹${amount.toStringAsFixed(0)})',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 12,
                                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                                 color: isSelected ? Colors.white : AppColors.textPrimary,
@@ -926,7 +926,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                         children: [
                           Text(
                             'Pay Online Now: ₹${advanceDue.toStringAsFixed(0)}',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF92400E),
@@ -934,7 +934,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           ),
                           Text(
                             'Pay to Courier on Delivery: ₹${codBalance.toStringAsFixed(0)}',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF92400E),
@@ -978,7 +978,7 @@ class _CheckoutViewState extends State<CheckoutView> {
         children: [
           Text(
             'Order Items (${cart.totalCount})',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -1009,7 +1009,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                         children: [
                           Text(
                             item.product.title,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
@@ -1019,7 +1019,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           ),
                           Text(
                             '${item.variant.label} × ${item.quantity}',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 11,
                               color: AppColors.textSecondary,
                             ),
@@ -1029,7 +1029,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                     ),
                     Text(
                       '₹${item.totalRate.toStringAsFixed(0)}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -1046,8 +1046,8 @@ class _CheckoutViewState extends State<CheckoutView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text('Total MRP', style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary))),
-              Text('₹${totalMrp.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary)),
+              Expanded(child: Text('Total MRP', style: GoogleFonts.mukta(fontSize: 13, color: AppColors.textSecondary))),
+              Text('₹${totalMrp.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 13, color: AppColors.textSecondary)),
             ],
           ),
           const SizedBox(height: 8),
@@ -1055,8 +1055,8 @@ class _CheckoutViewState extends State<CheckoutView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: Text('Agri Discount', style: GoogleFonts.poppins(fontSize: 13, color: AppColors.primaryGreen))),
-                Text('-₹${savings.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primaryGreen)),
+                Expanded(child: Text('Agri Discount', style: GoogleFonts.mukta(fontSize: 13, color: AppColors.primaryGreen))),
+                Text('-₹${savings.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primaryGreen)),
               ],
             ),
             const SizedBox(height: 8),
@@ -1064,8 +1064,8 @@ class _CheckoutViewState extends State<CheckoutView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text('Express Logistics (Shiprocket)', style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary))),
-              Text('FREE', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
+              Expanded(child: Text('Express Logistics (Shiprocket)', style: GoogleFonts.mukta(fontSize: 13, color: AppColors.textSecondary))),
+              Text('FREE', style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
             ],
           ),
           const Divider(height: 20),
@@ -1077,12 +1077,12 @@ class _CheckoutViewState extends State<CheckoutView> {
               Expanded(
                 child: Text(
                   'Total Order Value',
-                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                 ),
               ),
               Text(
                 '₹${total.toStringAsFixed(0)}',
-                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
+                style: GoogleFonts.mukta(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
               ),
             ],
           ),
@@ -1095,12 +1095,12 @@ class _CheckoutViewState extends State<CheckoutView> {
                 Expanded(
                   child: Text(
                     'Amount Due Now (${_partialAdvancePercentage.toInt()}%)',
-                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFFD97706)),
+                    style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFFD97706)),
                   ),
                 ),
                 Text(
                   '₹${amountToPayNow.toStringAsFixed(0)}',
-                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w800, color: const Color(0xFFD97706)),
+                  style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w800, color: const Color(0xFFD97706)),
                 ),
               ],
             ),
@@ -1129,13 +1129,13 @@ class _CheckoutViewState extends State<CheckoutView> {
                       const SizedBox(width: 12),
                       Text(
                         'Processing Payment...',
-                        style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontSize: 14, fontWeight: FontWeight.w700),
                       ),
                     ],
                   )
                 : Text(
                     'PAY ₹${amountToPayNow.toStringAsFixed(0)} VIA RAZORPAY',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
@@ -1154,7 +1154,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                 child: Text(
                   '100% Genuine Agri-inputs • Secure Razorpay Payment',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
+                  style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textSecondary),
                 ),
               ),
             ],
@@ -1173,7 +1173,7 @@ class _CheckoutViewState extends State<CheckoutView> {
         elevation: 1,
         title: Text(
           'Order Placed Successfully',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -1219,7 +1219,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   Text(
                     'Kisan Bhai, Your Order is Confirmed!',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: AppColors.textPrimary,
@@ -1229,7 +1229,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   Text(
                     'Thank you for trusting EBS Essential BioCrop Science. Your order has been registered and dispatched to Shiprocket for rapid express shipping to your farm.',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                       height: 1.5,
@@ -1281,7 +1281,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                             icon: const Icon(Icons.local_shipping_outlined, size: 16),
                             label: Text(
                               'Track on Shiprocket',
-                              style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+                              style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700),
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primaryGreen,
@@ -1309,7 +1309,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                           ),
                           child: Text(
                             'View My Orders',
-                            style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+                            style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -1331,7 +1331,7 @@ class _CheckoutViewState extends State<CheckoutView> {
         Expanded(
           child: Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -1340,7 +1340,7 @@ class _CheckoutViewState extends State<CheckoutView> {
         const SizedBox(width: 8),
         Text(
           value,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 13,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,

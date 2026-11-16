@@ -4,6 +4,7 @@ class AppConstants {
   static const String appName = 'EBS Krishi Dukaan';
   static const String appTagline = 'Pioneering Agricultural Excellence & Crop Nutrition';
   static const String websiteUrl = 'https://ebskrishidukaan.com';
+  static const String supportEmail = 'support@ebskrishidukaan.com';
   static const String helplineNumber = '+91 9098544263';
   static const String orderCallNumber = '+91 9098544263';
   static const String sellerPortalUrl = 'https://abadmin.agribegri.com/sellerpanel/login.php';

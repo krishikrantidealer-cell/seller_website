@@ -9,7 +9,6 @@ class ProductVariant {
   final String? shippedBy;
   final String? shippingThrough;
   final double displayRate;
-  final double? perUnitPrice;
   final double printedMrp;
   final double? courierCharges;
   final double? codCharge;
@@ -32,7 +31,6 @@ class ProductVariant {
     this.shippedBy,
     this.shippingThrough,
     required this.displayRate,
-    this.perUnitPrice,
     required this.printedMrp,
     this.courierCharges,
     this.codCharge,
@@ -120,7 +118,6 @@ class ProductVariant {
       shippedBy: json['shippedBy']?.toString(),
       shippingThrough: json['shippingThrough']?.toString(),
       displayRate: displayRate,
-      perUnitPrice: json['perUnitPrice'] is num ? (json['perUnitPrice'] as num).toDouble() : null,
       printedMrp: printedMrp > 0 ? printedMrp : displayRate,
       courierCharges: json['courierCharges'] is num ? (json['courierCharges'] as num).toDouble() : null,
       codCharge: json['codCharge'] is num ? (json['codCharge'] as num).toDouble() : null,
@@ -148,7 +145,6 @@ class ProductVariant {
       'shippedBy': shippedBy,
       if (shippingThrough != null) 'shippingThrough': shippingThrough,
       'displayRate': displayRate,
-      if (perUnitPrice != null) 'perUnitPrice': perUnitPrice,
       'printedMrp': printedMrp,
       if (courierCharges != null) 'courierCharges': courierCharges,
       if (codCharge != null) 'codCharge': codCharge,
@@ -176,7 +172,6 @@ class ProductItem {
   final String imageUrl;
   final List<String> imageUrls;
   final double displayRate;
-  final double? perUnitPrice;
   final double printedMrp;
   final double? courierCharges;
   final double rating;
@@ -206,7 +201,6 @@ class ProductItem {
     required this.imageUrl,
     this.imageUrls = const [],
     required this.displayRate,
-    this.perUnitPrice,
     required this.printedMrp,
     this.courierCharges,
     this.rating = 4.8,
@@ -426,7 +420,6 @@ class ProductItem {
       imageUrl: primaryImageUrl,
       imageUrls: extractedImages,
       displayRate: displayRate,
-      perUnitPrice: json['perUnitPrice'] is num ? (json['perUnitPrice'] as num).toDouble() : null,
       printedMrp: printedMrp > 0 ? printedMrp : displayRate,
       courierCharges: json['courierCharges'] is num ? (json['courierCharges'] as num).toDouble() : null,
       rating: rating,
@@ -459,7 +452,6 @@ class ProductItem {
       'imageUrl': imageUrl,
       'imageUrls': imageUrls,
       'displayRate': displayRate,
-      if (perUnitPrice != null) 'perUnitPrice': perUnitPrice,
       'printedMrp': printedMrp,
       if (courierCharges != null) 'courierCharges': courierCharges,
       'averageRating': rating,

@@ -260,7 +260,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                                   isMobile
                                       ? '$totalCount Formulations'
                                       : 'Showing $totalCount Technical Formulations',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: isMobile ? 13 : 15,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
@@ -297,7 +297,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                                   _expandedLetters.length >= grouped.length
                                       ? 'Collapse All'
                                       : 'Expand All',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: isMobile ? 11.5 : 13,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryGreen,
@@ -371,7 +371,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 const SizedBox(width: 4),
                 Text(
                   isMobile ? 'Home' : 'Back to Home',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 11 : 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryGreen,
@@ -384,13 +384,13 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
         const SizedBox(width: 8),
         Text(
           '/',
-          style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 12),
+          style: GoogleFonts.mukta(color: AppColors.textMuted, fontSize: 12),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             isMobile ? 'Technical Directory' : 'Search by Technical Name',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 11 : 12,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -443,7 +443,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 Expanded(
                   child: Text(
                     'ACTIVE INGREDIENT & CHEMICAL DIRECTORY',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w700,
                       color: Colors.white.withValues(alpha: 0.95),
@@ -457,7 +457,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
             const SizedBox(height: 6),
             Text(
               'Search Products By Technical Name',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -467,7 +467,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
             const SizedBox(height: 4),
             Text(
               'Find and compare formulations by scientific composition and active salts.',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 11,
                 color: Colors.white.withValues(alpha: 0.9),
                 height: 1.35,
@@ -523,7 +523,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 ),
                 child: Text(
                   'ACTIVE INGREDIENT & CHEMICAL DIRECTORY',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -536,7 +536,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           const SizedBox(height: 14),
           Text(
             'Search Products By Technical Name',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 28,
               fontWeight: FontWeight.w800,
               color: Colors.white,
@@ -546,7 +546,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           const SizedBox(height: 8),
           Text(
             'Farmers and agronomists can search agricultural crop protection chemicals and fertilizers by their active scientific/technical compositions rather than commercial brand names. Compare brands and prices for the exact chemical formulation you need.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 14,
               color: Colors.white.withValues(alpha: 0.9),
               height: 1.5,
@@ -604,7 +604,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 hintText: isMobile
                     ? 'Search technical names (e.g. Imidacloprid)...'
                     : 'Search technical names (e.g. Chlorantraniliprole, Imidacloprid, Mancozeb)...',
-                hintStyle: GoogleFonts.poppins(fontSize: isMobile ? 11.5 : 13, color: AppColors.textMuted),
+                hintStyle: GoogleFonts.mukta(fontSize: isMobile ? 11.5 : 13, color: AppColors.textMuted),
                 prefixIcon: Icon(Icons.search, color: AppColors.primaryGreen, size: isMobile ? 18 : 22),
                 prefixIconConstraints: BoxConstraints(minWidth: isMobile ? 36 : 44, minHeight: isMobile ? 42 : 48),
                 suffixIconConstraints: BoxConstraints(minWidth: isMobile ? 36 : 44, minHeight: isMobile ? 42 : 48),
@@ -654,7 +654,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         ),
                         child: Text(
                           cat == 'All' ? 'All Categories' : cat,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 11,
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                             color: isSelected ? Colors.white : AppColors.textSecondary,
@@ -688,7 +688,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     ),
                     child: Text(
                       cat == 'All' ? 'All Categories' : cat,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                         color: isSelected ? Colors.white : AppColors.textSecondary,
@@ -751,7 +751,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                   ),
                   child: Text(
                     letter,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 11 : 12,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                       color: isSelected ? Colors.white : AppColors.textSecondary,
@@ -826,7 +826,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     ),
                     child: Text(
                       letter,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 15 : 20,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -839,7 +839,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       isMobile
                           ? 'Technical Formulations ("$letter")'
                           : 'Technical Formulations Starting With "$letter"',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 12.5 : 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -859,7 +859,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     ),
                     child: Text(
                       '${items.length} ${items.length == 1 ? 'Item' : 'Items'}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 10 : 11,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -936,7 +936,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       Expanded(
                         child: Text(
                           item.name,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -953,7 +953,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         ),
                         child: Text(
                           item.category,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 9.5,
                             fontWeight: FontWeight.w700,
                             color: badgeColor,
@@ -968,7 +968,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       item.description,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary, height: 1.3),
+                      style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textSecondary, height: 1.3),
                     ),
                   ],
                   const SizedBox(height: 8),
@@ -985,7 +985,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                             ),
                             child: Text(
                               '✓ $matchingProductsCount Products',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF047857),
@@ -1000,7 +1000,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                         icon: const Icon(Icons.arrow_forward, size: 12),
                         label: Text(
                           matchingProductsCount > 0 ? 'View Products' : 'Explore',
-                          style: GoogleFonts.poppins(fontSize: 10.5, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.mukta(fontSize: 10.5, fontWeight: FontWeight.w600),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: matchingProductsCount > 0
@@ -1033,7 +1033,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                                 item.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -1050,7 +1050,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                               ),
                               child: Text(
                                 item.category,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: badgeColor,
@@ -1063,7 +1063,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                           const SizedBox(height: 4),
                           Text(
                             item.description,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                             ),
@@ -1083,7 +1083,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       ),
                       child: Text(
                         '✓ $matchingProductsCount Products in Store',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF047857),
@@ -1096,7 +1096,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     icon: const Icon(Icons.arrow_forward_rounded, size: 14),
                     label: Text(
                       matchingProductsCount > 0 ? 'View Products' : 'Explore Brands',
-                      style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: matchingProductsCount > 0
@@ -1136,7 +1136,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
           const SizedBox(height: 16),
           Text(
             'No Technical Formulations Found',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -1148,7 +1148,7 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                 ? 'No technical formulations matched "$_searchQuery". Try searching by another active ingredient like "Chlorpyrifos" or "Imidacloprid".'
                 : 'No formulations found for the selected filter.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textSecondary),
+            style: GoogleFonts.mukta(fontSize: 13, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
           ElevatedButton(

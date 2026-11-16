@@ -38,7 +38,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
           children: [
             const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
             const SizedBox(width: 8),
-            Text(message, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(message, style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w500)),
           ],
         ),
         backgroundColor: AppColors.primaryGreen,
@@ -62,7 +62,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
             Expanded(
               child: Text(
                 'All items from Order #${order.id} re-added to your farm cart!',
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+                style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -81,7 +81,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
       SnackBar(
         content: Text(
           'Added ${item.product.title} to your cart!',
-          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+          style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w600),
         ),
         backgroundColor: AppColors.primaryGreen,
         behavior: SnackBarBehavior.floating,
@@ -129,7 +129,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                               const SizedBox(width: 8),
                               Text(
                                 'EBS BioCrop Science',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.primaryGreen,
@@ -140,7 +140,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           const SizedBox(height: 4),
                           Text(
                             'Tax Invoice & Farm Delivery Receipt',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 12,
                               color: AppColors.textMuted,
                               fontWeight: FontWeight.w500,
@@ -174,18 +174,18 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Invoice No:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
-                          Text('INV-${order.id}', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700)),
+                          Text('Invoice No:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
+                          Text('INV-${order.id}', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700)),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Date of Order:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
+                          Text('Date of Order:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
                           Text(
                             '${order.orderDate.day} Oct ${order.orderDate.year}',
-                            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -193,8 +193,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Payment Mode:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
-                          Text(order.paymentMethod, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
+                          Text('Payment Mode:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
+                          Text(order.paymentMethod, style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ],
@@ -205,20 +205,20 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 // Farmer & Depot Address
                 Text(
                   'Delivered To Farm Depot:',
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                  style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   order.recipientName,
-                  style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
                 ),
                 Text(
                   order.recipientPhone,
-                  style: GoogleFonts.poppins(fontSize: 12, color: AppColors.primaryDarkGreen, fontWeight: FontWeight.w600),
+                  style: GoogleFonts.mukta(fontSize: 12, color: AppColors.primaryDarkGreen, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   order.deliveryAddress,
-                  style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary, height: 1.4),
+                  style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textSecondary, height: 1.4),
                 ),
                 const SizedBox(height: 16),
 
@@ -235,7 +235,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                         flex: 5,
                         child: Text(
                           'Product Description',
-                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                          style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                         ),
                       ),
                       Expanded(
@@ -243,7 +243,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                         child: Text(
                           'Qty',
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                          style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                         ),
                       ),
                       Expanded(
@@ -251,7 +251,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                         child: Text(
                           'Amount',
                           textAlign: TextAlign.right,
-                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                          style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                         ),
                       ),
                     ],
@@ -273,11 +273,11 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                             children: [
                               Text(
                                 item.product.title,
-                                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                                style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                               ),
                               Text(
                                 'Pack: ${item.variant.label}',
-                                style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                                style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                               ),
                             ],
                           ),
@@ -287,7 +287,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           child: Text(
                             '${item.quantity}',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ),
                         Expanded(
@@ -295,7 +295,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           child: Text(
                             '₹${item.totalPrice.toStringAsFixed(0)}',
                             textAlign: TextAlign.right,
-                            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                            style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                           ),
                         ),
                       ],
@@ -310,8 +310,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Subtotal:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary)),
-                    Text('₹${order.subtotal.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
+                    Text('Subtotal:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary)),
+                    Text('₹${order.subtotal.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600)),
                   ],
                 ),
                 if (order.discount > 0) ...[
@@ -319,8 +319,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Kisan Subsidy / Discount:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.primaryGreen)),
-                      Text('-₹${order.discount.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
+                      Text('Kisan Subsidy / Discount:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.primaryGreen)),
+                      Text('-₹${order.discount.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
                     ],
                   ),
                 ],
@@ -328,8 +328,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Farm Shipping & Logistics:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary)),
-                    Text('FREE', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
+                    Text('Farm Shipping & Logistics:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary)),
+                    Text('FREE', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -338,8 +338,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Total Amount Payable:', style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w800)),
-                    Text('₹${order.totalAmount.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primaryGreen)),
+                    Text('Total Amount Payable:', style: GoogleFonts.mukta(fontSize: 14, fontWeight: FontWeight.w800)),
+                    Text('₹${order.totalAmount.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primaryGreen)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -354,7 +354,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           _copyToClipboard('INV-${order.id}', 'Invoice reference copied!');
                         },
                         icon: const Icon(Icons.copy_rounded, size: 16),
-                        label: Text('Copy INV Ref', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
+                        label: Text('Copy INV Ref', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.textPrimary,
                           side: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -377,7 +377,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           );
                         },
                         icon: const Icon(Icons.download_rounded, size: 16),
-                        label: Text('Download PDF', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700)),
+                        label: Text('Download PDF', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryGreen,
                           foregroundColor: Colors.white,
@@ -424,11 +424,11 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                     children: [
                       Text(
                         'Need Help with Order #${order.id}?',
-                        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                       Text(
                         'Direct Kisan Logistics Desk Support',
-                        style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textMuted),
+                        style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textMuted),
                       ),
                     ],
                   ),
@@ -438,7 +438,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
             const SizedBox(height: 18),
             Text(
               'For parcel delivery rescheduling, farm depot landmark guidance, or urgent crop input advice, our team is available 7 AM - 9 PM.',
-              style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
+              style: GoogleFonts.mukta(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
             ),
             const SizedBox(height: 16),
             ListTile(
@@ -447,8 +447,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 backgroundColor: Color(0xFFF0FDF4),
                 child: Icon(Icons.phone_rounded, color: AppColors.primaryGreen),
               ),
-              title: Text('Call Toll-Free Kisan Helpline', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13.5)),
-              subtitle: Text(AppConstants.helplineNumber, style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
+              title: Text('Call Toll-Free Kisan Helpline', style: GoogleFonts.mukta(fontWeight: FontWeight.w600, fontSize: 13.5)),
+              subtitle: Text(AppConstants.helplineNumber, style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
               trailing: ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
                 style: ElevatedButton.styleFrom(
@@ -467,8 +467,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                   backgroundColor: Color(0xFFEFF6FF),
                   child: Icon(Icons.two_wheeler_rounded, color: Color(0xFF2563EB)),
                 ),
-                title: Text('Assigned Rural Delivery Rider', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13.5)),
-                subtitle: Text('${order.deliveryAgentName ?? "Rider"} • ${order.deliveryAgentPhone}', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
+                title: Text('Assigned Rural Delivery Rider', style: GoogleFonts.mukta(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                subtitle: Text('${order.deliveryAgentName ?? "Rider"} • ${order.deliveryAgentPhone}', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
                 trailing: OutlinedButton(
                   onPressed: () => Navigator.pop(ctx),
                   style: OutlinedButton.styleFrom(
@@ -625,7 +625,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 const SizedBox(width: 6),
                 Text(
                   'Back to My Orders',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 11.5 : 12.5,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryDarkGreen,
@@ -639,7 +639,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
         Expanded(
           child: Text(
             'Order Details #${order.id}',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 12 : 13,
               color: AppColors.textMuted,
               fontWeight: FontWeight.w500,
@@ -705,7 +705,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                         const SizedBox(width: 6),
                         Text(
                           order.id,
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: isMobile ? 12.5 : 15,
                             fontWeight: FontWeight.w800,
                             color: AppColors.textPrimary,
@@ -721,7 +721,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                   ),
                   Text(
                     '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
-                    style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12.5, color: AppColors.textMuted),
+                    style: GoogleFonts.mukta(fontSize: isMobile ? 11 : 12.5, color: AppColors.textMuted),
                   ),
                 ],
               ),
@@ -741,7 +741,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                     const SizedBox(width: 6),
                     Text(
                       order.status.displayName,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 11.5 : 12.5,
                         fontWeight: FontWeight.w700,
                         color: statusColor,
@@ -765,7 +765,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               OutlinedButton.icon(
                 onPressed: () => _showInvoiceDialog(context, order),
                 icon: const Icon(Icons.receipt_rounded, size: 16),
-                label: Text('Tax Invoice', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
+                label: Text('Tax Invoice', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.textPrimary,
                   side: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -776,7 +776,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               ElevatedButton.icon(
                 onPressed: () => _repeatOrder(order),
                 icon: const Icon(Icons.repeat_rounded, size: 16),
-                label: Text('Buy All Again', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700)),
+                label: Text('Buy All Again', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
@@ -787,7 +787,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               TextButton.icon(
                 onPressed: () => _showHelpModal(context, order),
                 icon: const Icon(Icons.help_outline_rounded, size: 16, color: AppColors.textMuted),
-                label: Text('Need Help?', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                label: Text('Need Help?', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -832,7 +832,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                   children: [
                     Text(
                       'Live Courier Shipment Tracking',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: isMobile ? 13.5 : 15,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -840,7 +840,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                     ),
                     Text(
                       '${order.courierName} • Expected: ${order.estimatedDelivery}',
-                      style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textMuted),
+                      style: GoogleFonts.mukta(fontSize: isMobile ? 11 : 12, color: AppColors.textMuted),
                     ),
                   ],
                 ),
@@ -867,11 +867,11 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                     children: [
                       Text(
                         'AWB: ',
-                        style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
+                        style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted),
                       ),
                       Text(
                         order.awbNumber,
-                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryDarkGreen),
+                        style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryDarkGreen),
                       ),
                     ],
                   ),
@@ -888,7 +888,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                             const SizedBox(width: 4),
                             Text(
                               'Copy AWB',
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
+                              style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
                             ),
                           ],
                         ),
@@ -907,7 +907,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                             const SizedBox(width: 4),
                             Text(
                               'Track on Shiprocket',
-                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2563EB)),
+                              style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2563EB)),
                             ),
                           ],
                         ),
@@ -971,7 +971,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           children: [
                             Text(
                               cp.title,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: isMobile ? 12 : 13,
                                 fontWeight: cp.isCurrent ? FontWeight.w800 : FontWeight.w600,
                                 color: cp.isCurrent ? const Color(0xFF1E40AF) : AppColors.textPrimary,
@@ -979,14 +979,14 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                             ),
                             Text(
                               '${cp.date} • ${cp.time}',
-                              style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
+                              style: GoogleFonts.mukta(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
                             ),
                           ],
                         ),
                         const SizedBox(height: 3),
                         Text(
                           cp.description,
-                          style: GoogleFonts.poppins(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary),
+                          style: GoogleFonts.mukta(fontSize: isMobile ? 11 : 12, color: AppColors.textSecondary),
                         ),
                         if (cp.location.isNotEmpty) ...[
                           const SizedBox(height: 2),
@@ -997,7 +997,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                               Expanded(
                                 child: Text(
                                   cp.location,
-                                  style: GoogleFonts.poppins(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
+                                  style: GoogleFonts.mukta(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
                                 ),
                               ),
                             ],
@@ -1031,11 +1031,11 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                       children: [
                         Text(
                           'Assigned Rural Delivery Rider',
-                          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1E40AF)),
+                          style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF1E40AF)),
                         ),
                         Text(
                           '${order.deliveryAgentName} (${order.deliveryAgentPhone})',
-                          style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
+                          style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textSecondary),
                         ),
                       ],
                     ),
@@ -1081,7 +1081,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
         children: [
           Text(
             'Ordered Products (${order.totalItemCount} items)',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 14 : 16,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -1148,7 +1148,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                                     },
                                     child: Text(
                                       item.product.title,
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.mukta(
                                         fontSize: 12.5,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.textPrimary,
@@ -1158,14 +1158,14 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                                   const SizedBox(height: 2),
                                   Text(
                                     '${item.product.technicalName} • ${item.product.vendor}',
-                                    style: GoogleFonts.poppins(fontSize: 10.5, color: AppColors.textMuted),
+                                    style: GoogleFonts.mukta(fontSize: 10.5, color: AppColors.textMuted),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Pack: ${item.variant.label} • Qty: ${item.quantity}',
-                                    style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
+                                    style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textSecondary),
                                   ),
                                 ],
                               ),
@@ -1178,7 +1178,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           children: [
                             Text(
                               '₹${item.totalPrice.toStringAsFixed(0)}',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
@@ -1189,7 +1189,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                               icon: const Icon(Icons.repeat_rounded, size: 13, color: AppColors.primaryGreen),
                               label: Text(
                                 'Buy Again',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primaryGreen,
@@ -1254,7 +1254,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                                 },
                                 child: Text(
                                   item.product.title,
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.textPrimary,
@@ -1264,7 +1264,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                               const SizedBox(height: 2),
                               Text(
                                 '${item.product.technicalName} • ${item.product.vendor}',
-                                style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textMuted),
+                                style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -1282,12 +1282,12 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                                     ),
                                     child: Text(
                                       'Pack: ${item.variant.label}',
-                                      style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                                      style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                                     ),
                                   ),
                                   Text(
                                     'Qty: ${item.quantity} × ₹${item.unitPrice.toStringAsFixed(0)}',
-                                    style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
+                                    style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textSecondary),
                                   ),
                                 ],
                               ),
@@ -1302,7 +1302,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                           children: [
                             Text(
                               '₹${item.totalPrice.toStringAsFixed(0)}',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.textPrimary,
@@ -1314,7 +1314,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                               icon: const Icon(Icons.repeat_rounded, size: 13, color: AppColors.primaryGreen),
                               label: Text(
                                 'Buy Again',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primaryGreen,
@@ -1362,7 +1362,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               Expanded(
                 child: Text(
                   'Farm Delivery Depot Address',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 13.5 : 14.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -1374,17 +1374,17 @@ class _OrderDetailViewState extends State<OrderDetailView> {
           const SizedBox(height: 12),
           Text(
             order.recipientName,
-            style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+            style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 2),
           Text(
             'Contact: ${order.recipientPhone}',
-            style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
+            style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primaryDarkGreen),
           ),
           const SizedBox(height: 6),
           Text(
             order.deliveryAddress,
-            style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary, height: 1.4),
+            style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary, height: 1.4),
           ),
           const SizedBox(height: 10),
           Container(
@@ -1401,7 +1401,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 Expanded(
                   child: Text(
                     'Direct Kisan Farm Delivery with Gate Verification',
-                    style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.primaryDarkGreen),
+                    style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w500, color: AppColors.primaryDarkGreen),
                   ),
                 ),
               ],
@@ -1439,7 +1439,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               Expanded(
                 child: Text(
                   'Payment Details',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 13.5 : 14.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -1453,13 +1453,13 @@ class _OrderDetailViewState extends State<OrderDetailView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Mode:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
+              Text('Mode:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   order.paymentMethod,
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600),
+                  style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -1469,13 +1469,13 @@ class _OrderDetailViewState extends State<OrderDetailView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Status:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted)),
+              Text('Status:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   order.isPaid ? 'Paid Online' : 'Pay on Delivery',
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: order.isPaid ? AppColors.primaryGreen : const Color(0xFFD97706),
@@ -1491,14 +1491,14 @@ class _OrderDetailViewState extends State<OrderDetailView> {
           // Pricing Breakdown
           Text(
             'Order Calculation Summary',
-            style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+            style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text('Items Subtotal:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary))),
-              Text('₹${order.subtotal.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600)),
+              Expanded(child: Text('Items Subtotal:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary))),
+              Text('₹${order.subtotal.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
           if (order.discount > 0) ...[
@@ -1506,8 +1506,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(child: Text('Kisan Subsidy / Discount:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.primaryGreen))),
-                Text('-₹${order.discount.toStringAsFixed(0)}', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
+                Expanded(child: Text('Kisan Subsidy / Discount:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.primaryGreen))),
+                Text('-₹${order.discount.toStringAsFixed(0)}', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
               ],
             ),
           ],
@@ -1515,8 +1515,8 @@ class _OrderDetailViewState extends State<OrderDetailView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: Text('Farm Delivery & Logistics:', style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary))),
-              Text('FREE', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
+              Expanded(child: Text('Farm Delivery & Logistics:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary))),
+              Text('FREE', style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.primaryGreen)),
             ],
           ),
           const SizedBox(height: 10),
@@ -1525,13 +1525,13 @@ class _OrderDetailViewState extends State<OrderDetailView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total Amount Paid:', style: GoogleFonts.poppins(fontSize: isMobile ? 13 : 14, fontWeight: FontWeight.w800)),
+              Text('Total Amount Paid:', style: GoogleFonts.mukta(fontSize: isMobile ? 13 : 14, fontWeight: FontWeight.w800)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   '₹${order.totalAmount.toStringAsFixed(0)}',
                   textAlign: TextAlign.right,
-                  style: GoogleFonts.poppins(fontSize: isMobile ? 16 : 18, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
+                  style: GoogleFonts.mukta(fontSize: isMobile ? 16 : 18, fontWeight: FontWeight.w800, color: AppColors.primaryGreen),
                 ),
               ),
             ],
@@ -1560,7 +1560,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
               Expanded(
                 child: Text(
                   'Kisan Support Desk',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 13 : 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -1572,7 +1572,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
           const SizedBox(height: 8),
           Text(
             'Need to change delivery timings, cancel or return? Our agricultural dispatch specialists are here to assist.',
-            style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary, height: 1.4),
+            style: GoogleFonts.mukta(fontSize: 11.5, color: AppColors.textSecondary, height: 1.4),
           ),
           const SizedBox(height: 12),
           Row(
@@ -1581,7 +1581,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                 child: OutlinedButton.icon(
                   onPressed: () => _showHelpModal(context, order),
                   icon: const Icon(Icons.phone_rounded, size: 14),
-                  label: Text('Call Support', style: GoogleFonts.poppins(fontSize: 11.5, fontWeight: FontWeight.w600)),
+                  label: Text('Call Support', style: GoogleFonts.mukta(fontSize: 11.5, fontWeight: FontWeight.w600)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primaryDarkGreen,
                     side: const BorderSide(color: Color(0xFFCBD5E1)),

@@ -38,7 +38,7 @@ class TopInfoBar extends StatelessWidget {
                               Flexible(
                                 child: Text(
                                   '${langCtrl.tr('call_to_order')}: ${AppConstants.orderCallNumber}',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     color: Colors.white,
                                     fontSize: 10.5,
                                     fontWeight: FontWeight.w600,
@@ -52,7 +52,7 @@ class TopInfoBar extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Text(
                                   langCtrl.tr('free_delivery'),
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.mukta(
                                     color: Colors.white,
                                     fontSize: 10.5,
                                     fontWeight: FontWeight.w500,
@@ -83,7 +83,7 @@ class TopInfoBar extends StatelessWidget {
                           const SizedBox(width: 5),
                           Text(
                             '${langCtrl.tr('call_to_order')}: ${AppConstants.orderCallNumber}',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               color: Colors.white,
                               fontSize: fontSize,
                               fontWeight: FontWeight.w600,
@@ -94,7 +94,7 @@ class TopInfoBar extends StatelessWidget {
                           SizedBox(width: itemGap),
                           Text(
                             '${langCtrl.tr('helpline')}: ${AppConstants.helplineNumber}',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               color: Colors.white,
                               fontSize: fontSize,
                               fontWeight: FontWeight.w500,
@@ -182,7 +182,7 @@ class TopInfoBar extends StatelessWidget {
                   width: 28,
                   child: Text(
                     lang.shortCode,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: isSelected ? AppColors.primaryCrimson : AppColors.textSecondary,
@@ -193,7 +193,7 @@ class TopInfoBar extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '${lang.nativeName} (${lang.name})',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12.5,
                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                       color: isSelected ? AppColors.primaryCrimson : AppColors.textPrimary,
@@ -222,7 +222,7 @@ class TopInfoBar extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               langCtrl.current.shortCode,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 color: Colors.white,
                 fontSize: fontSize,
                 fontWeight: FontWeight.bold,
@@ -244,7 +244,7 @@ class TopInfoBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
         child: Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             color: Colors.white,
             fontSize: fontSize,
             fontWeight: FontWeight.w500,

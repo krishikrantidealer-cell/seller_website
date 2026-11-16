@@ -4,10 +4,11 @@ import 'app_colors.dart';
 
 class AppTheme {
   static ThemeData get lightTheme {
-    final baseTextTheme = GoogleFonts.poppinsTextTheme();
+    final baseTextTheme = GoogleFonts.muktaTextTheme();
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: GoogleFonts.mukta().fontFamily,
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryGreen,
         primary: AppColors.primaryGreen,
@@ -53,7 +54,7 @@ class AppTheme {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: GoogleFonts.poppins(
+          textStyle: GoogleFonts.mukta(
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),

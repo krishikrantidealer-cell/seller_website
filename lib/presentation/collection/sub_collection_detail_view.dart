@@ -6,7 +6,6 @@ import '../../data/models/catalog_models.dart';
 import '../../data/services/collection_api_service.dart';
 import '../../data/services/product_api_service.dart';
 import '../product_detail/product_detail_view.dart';
-import '../widgets/app_product_image.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/mobile_navigation_drawer.dart';
@@ -138,7 +137,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
             Expanded(
               child: Text(
                 'Added ${product.title} (${variant.label}) to cart',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                     fontSize: 13, fontWeight: FontWeight.w500),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -233,10 +232,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       _buildBreadcrumbBar(isMobile),
-                                      SizedBox(height: isMobile ? 12 : 18),
-                                      _buildSubCollectionHeader(
-                                          products.length, isMobile),
-                                      SizedBox(height: isMobile ? 14 : 20),
+                                      SizedBox(height: isMobile ? 12 : 16),
                                       _buildFilterAndSortRow(isMobile),
                                       SizedBox(height: isMobile ? 16 : 22),
                                       if (products.isEmpty)
@@ -292,7 +288,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
           const SizedBox(height: 16),
           Text(
             'Collection Unavailable',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 18 : 22,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -302,7 +298,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
           const SizedBox(height: 8),
           Text(
             'This collection is no longer active on the storefront.',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: isMobile ? 13 : 14,
               color: AppColors.textSecondary,
             ),
@@ -314,7 +310,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
             icon: const Icon(Icons.storefront_outlined, size: 18),
             label: Text(
               'Back to Store',
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+              style: GoogleFonts.mukta(fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryDarkGreen,
@@ -349,7 +345,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
                 const SizedBox(width: 4),
                 Text(
                   'Home',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 12 : 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryDarkGreen,
@@ -368,7 +364,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Text(
               widget.collection.name,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 12 : 13,
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryDarkGreen,
@@ -380,7 +376,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
             size: 16, color: AppColors.textMuted),
         Text(
           widget.subCollection.name,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: isMobile ? 12 : 13,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -390,166 +386,140 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
     );
   }
 
-  Widget _buildSubCollectionHeader(int count, bool isMobile) {
-    final sub = widget.subCollection;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(isMobile ? 14 : 20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFF0FDF4), Color(0xFFECFDF5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildFilterAndSortRow(bool isMobile) {
+    final searchField = TextField(
+      onChanged: (val) => setState(() => _searchFilter = val),
+      decoration: InputDecoration(
+        hintText: 'Search products in ${widget.subCollection.name}...',
+        hintStyle: GoogleFonts.mukta(fontSize: 13, color: AppColors.textMuted),
+        prefixIcon: const Icon(Icons.search_rounded,
+            size: 19, color: AppColors.textMuted),
+        filled: true,
+        fillColor: Colors.white,
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: AppColors.primaryGreen.withValues(alpha: 0.22),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              width: isMobile ? 54 : 68,
-              height: isMobile ? 54 : 68,
-              color: Colors.white,
-              child: (sub.image != null && sub.image!.isNotEmpty)
-                  ? AppProductImage(imageUrl: sub.image!, fit: BoxFit.cover)
-                  : const Icon(Icons.eco_rounded,
-                      color: AppColors.primaryGreen, size: 30),
-            ),
-          ),
-          SizedBox(width: isMobile ? 12 : 18),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.collection.name.toUpperCase(),
-                  style: GoogleFonts.poppins(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                    color: AppColors.primaryDarkGreen,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  sub.name,
-                  style: GoogleFonts.poppins(
-                    fontSize: isMobile ? 18 : 24,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '$count ${count == 1 ? 'Product' : 'Products'} available',
-                  style: GoogleFonts.poppins(
-                    fontSize: isMobile ? 12 : 13,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (!isMobile)
-            OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.arrow_back_rounded, size: 16),
-              label: const Text('Back'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primaryDarkGreen,
-                side: BorderSide(
-                    color: AppColors.primaryGreen.withValues(alpha: 0.4)),
-              ),
-            ),
-        ],
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.primaryGreen),
+        ),
       ),
     );
-  }
 
-  Widget _buildFilterAndSortRow(bool isMobile) {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 10,
-      alignment: WrapAlignment.spaceBetween,
-      crossAxisAlignment: WrapCrossAlignment.center,
+    const sortOptions = <MapEntry<String, String>>[
+      MapEntry('featured', 'Sort: Featured'),
+      MapEntry('price_low', 'Price: Low to High'),
+      MapEntry('price_high', 'Price: High to Low'),
+      MapEntry('rating', 'Top Rated'),
+    ];
+
+    final isCustomSort = _sortBy != 'featured';
+    final sortIconButton = PopupMenuButton<String>(
+      tooltip: 'Sort products',
+      initialValue: _sortBy,
+      onSelected: (val) => setState(() => _sortBy = val),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      itemBuilder: (context) => sortOptions
+          .map(
+            (opt) => PopupMenuItem<String>(
+              value: opt.key,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      opt.value,
+                      style: GoogleFonts.mukta(
+                        fontSize: 13,
+                        fontWeight: _sortBy == opt.key
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: _sortBy == opt.key
+                            ? AppColors.primaryGreen
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  if (_sortBy == opt.key)
+                    const Icon(Icons.check_rounded,
+                        size: 16, color: AppColors.primaryGreen),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: isCustomSort ? const Color(0xFFF0FDF4) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isCustomSort ? AppColors.primaryGreen : AppColors.border,
+          ),
+        ),
+        child: Icon(
+          Icons.sort_rounded,
+          size: 20,
+          color: isCustomSort ? AppColors.primaryGreen : AppColors.textPrimary,
+        ),
+      ),
+    );
+
+    return Row(
       children: [
-        SizedBox(
-          width: isMobile ? double.infinity : 320,
-          child: TextField(
-            onChanged: (val) => setState(() => _searchFilter = val),
-            decoration: InputDecoration(
-              hintText: 'Search products in ${widget.subCollection.name}...',
-              hintStyle: GoogleFonts.poppins(
-                  fontSize: 13, color: AppColors.textMuted),
-              prefixIcon: const Icon(Icons.search_rounded,
-                  size: 19, color: AppColors.textMuted),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.border),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.border),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.primaryGreen),
-              ),
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _sortBy,
-              icon: const Icon(Icons.sort_rounded, size: 18),
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-              items: const [
-                DropdownMenuItem(value: 'featured', child: Text('Sort: Featured')),
-                DropdownMenuItem(
-                    value: 'price_low', child: Text('Price: Low to High')),
-                DropdownMenuItem(
-                    value: 'price_high', child: Text('Price: High to Low')),
-                DropdownMenuItem(value: 'rating', child: Text('Top Rated')),
-              ],
-              onChanged: (val) {
-                if (val != null) setState(() => _sortBy = val);
-              },
-            ),
-          ),
-        ),
+        if (isMobile)
+          Expanded(child: searchField)
+        else ...[
+          SizedBox(width: 320, child: searchField),
+          const Spacer(),
+        ],
+        const SizedBox(width: 10),
+        sortIconButton,
       ],
     );
   }
 
   Widget _buildProductGrid(
       List<ProductItem> products, BoxConstraints constraints) {
-    final width = constraints.maxWidth;
-    final crossAxisCount = width >= 1100
-        ? 4
-        : width >= 800
-            ? 3
-            : 2;
-    final childAspectRatio = width < 500 ? 0.58 : 0.68;
+    int crossAxisCount = 5;
+    double childAspectRatio = 0.76;
+    double crossAxisSpacing = 14;
+    double mainAxisSpacing = 14;
+
+    if (constraints.maxWidth < 600) {
+      crossAxisCount = 2;
+      childAspectRatio = 0.68;
+      crossAxisSpacing = 8;
+      mainAxisSpacing = 8;
+    } else if (constraints.maxWidth < 850) {
+      crossAxisCount = 3;
+      childAspectRatio = 0.72;
+      crossAxisSpacing = 10;
+      mainAxisSpacing = 10;
+    } else if (constraints.maxWidth < 1180) {
+      crossAxisCount = 4;
+      childAspectRatio = 0.74;
+      crossAxisSpacing = 12;
+      mainAxisSpacing = 12;
+    } else if (constraints.maxWidth < 1520) {
+      crossAxisCount = 5;
+      childAspectRatio = 0.76;
+      crossAxisSpacing = 14;
+      mainAxisSpacing = 14;
+    } else {
+      crossAxisCount = 6;
+      childAspectRatio = 0.78;
+      crossAxisSpacing = 16;
+      mainAxisSpacing = 16;
+    }
 
     return GridView.builder(
       shrinkWrap: true,
@@ -557,8 +527,8 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
       itemCount: products.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        crossAxisSpacing: width < 650 ? 10 : 16,
-        mainAxisSpacing: width < 650 ? 12 : 18,
+        crossAxisSpacing: crossAxisSpacing,
+        mainAxisSpacing: mainAxisSpacing,
         childAspectRatio: childAspectRatio,
       ),
       itemBuilder: (context, index) {
@@ -609,7 +579,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
                 ? 'No products match "$_searchFilter"'
                 : 'No products in ${widget.subCollection.name} yet',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
@@ -619,7 +589,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
           Text(
             'Explore other ${widget.collection.name.toLowerCase()} options or return to the collection.',
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),

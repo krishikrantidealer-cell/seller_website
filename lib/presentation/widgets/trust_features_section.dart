@@ -130,7 +130,7 @@ class TrustFeaturesSection extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -141,7 +141,7 @@ class TrustFeaturesSection extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   item.subtitle,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),

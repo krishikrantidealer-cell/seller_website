@@ -181,7 +181,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
             Expanded(
               child: Text(
                 'Farmer profile and farm delivery address saved successfully!',
-                style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
+                style: GoogleFonts.mukta(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -330,7 +330,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                   const SizedBox(width: 6),
                   Text(
                     'Back',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
@@ -341,21 +341,21 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
             ),
           ),
           const SizedBox(width: 10),
-          Text('/', style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 13)),
+          Text('/', style: GoogleFonts.mukta(color: AppColors.textMuted, fontSize: 13)),
           const SizedBox(width: 10),
           InkWell(
             onTap: () => Navigator.pop(context),
             child: Text(
               'Home',
-              style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textSecondary),
+              style: GoogleFonts.mukta(fontSize: 12.5, color: AppColors.textSecondary),
             ),
           ),
           const SizedBox(width: 8),
-          Text('/', style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 13)),
+          Text('/', style: GoogleFonts.mukta(color: AppColors.textMuted, fontSize: 13)),
           const SizedBox(width: 8),
           Text(
             'Farmer Profile & Delivery Address',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: AppColors.primaryGreen,
@@ -412,7 +412,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
             alignment: Alignment.center,
             child: Text(
               initial,
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: isMobile ? 24 : 30,
                 fontWeight: FontWeight.w800,
                 color: AppColors.primaryDarkGreen,
@@ -433,7 +433,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                   children: [
                     Text(
                       displayName,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         color: Colors.white,
                         fontSize: isMobile ? 18 : 22,
                         fontWeight: FontWeight.w800,
@@ -454,7 +454,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                           const SizedBox(width: 4),
                           Text(
                             'VERIFIED FARMER',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               color: Colors.white,
                               fontSize: 9.5,
                               fontWeight: FontWeight.w700,
@@ -469,7 +469,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                 const SizedBox(height: 4),
                 Text(
                   'Primary Mobile: $displayPhone • Member Since ${user?.memberSince ?? 'Oct 2026'}',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     color: Colors.white.withValues(alpha: 0.88),
                     fontSize: isMobile ? 11.5 : 13,
                     fontWeight: FontWeight.w400,
@@ -478,7 +478,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                 const SizedBox(height: 4),
                 Text(
                   'Farm Depot: ${user?.location ?? 'Punjab & Haryana Agricultural Belt'}',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     color: Colors.white.withValues(alpha: 0.82),
                     fontSize: isMobile ? 11 : 12,
                   ),
@@ -763,7 +763,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
             // Address Type selector
             Text(
               'Delivery Address Tag:',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -806,7 +806,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
 
             Text(
               'Major Crops Sown this Season:',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.mukta(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
@@ -828,7 +828,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                     color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
                     width: isSelected ? 1.4 : 1,
                   ),
-                  labelStyle: GoogleFonts.poppins(
+                  labelStyle: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
@@ -863,7 +863,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                         : const Icon(Icons.check_circle_outline_rounded, size: 20),
                     label: Text(
                       _isSaving ? 'Saving Profile...' : 'Save Profile & Delivery Address',
-                      style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.mukta(fontSize: 14, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryGreen,
@@ -905,7 +905,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
             children: [
               Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -914,7 +914,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   color: AppColors.textMuted,
                 ),
@@ -939,7 +939,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -950,10 +950,10 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
-          style: GoogleFonts.poppins(fontSize: 13.5, color: AppColors.textPrimary),
+          style: GoogleFonts.mukta(fontSize: 13.5, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(fontSize: 13, color: AppColors.textMuted),
+            hintStyle: GoogleFonts.mukta(fontSize: 13, color: AppColors.textMuted),
             prefixIcon: Icon(icon, size: 18, color: AppColors.textSecondary),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
@@ -987,7 +987,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -1008,7 +1008,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
               Expanded(
                 child: Text(
                   value,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -1028,7 +1028,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                     const SizedBox(width: 3),
                     Text(
                       badge,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryDarkGreen,
@@ -1056,7 +1056,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -1072,7 +1072,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
               child: Text(
                 item.toString(),
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(fontSize: 13.5, color: AppColors.textPrimary),
+                style: GoogleFonts.mukta(fontSize: 13.5, color: AppColors.textPrimary),
               ),
             );
           }).toList(),
@@ -1128,7 +1128,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
         ),
         child: Text(
           label,
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.mukta(
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? Colors.white : AppColors.textPrimary,
@@ -1191,7 +1191,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                       child: Text(
                         'Live Parcel Dispatch Preview',
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryDarkGreen,
@@ -1207,7 +1207,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                       ),
                       child: Text(
                         'EBS EXPRESS',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           color: Colors.white,
                           fontSize: 9,
                           fontWeight: FontWeight.w800,
@@ -1229,7 +1229,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                       children: [
                         Text(
                           'Deliver To:',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 11,
                             color: AppColors.textMuted,
                             fontWeight: FontWeight.w600,
@@ -1244,7 +1244,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                           ),
                           child: Text(
                             _selectedAddressType,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF92400E),
@@ -1256,7 +1256,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                     const SizedBox(height: 6),
                     Text(
                       name,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -1265,7 +1265,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                     const SizedBox(height: 2),
                     Text(
                       '$phone ${altPhone.isNotEmpty ? '• $altPhone' : ''}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryDarkGreen,
@@ -1275,19 +1275,19 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                     const Divider(height: 12),
                     Text(
                       addressLine,
-                      style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textPrimary),
+                      style: GoogleFonts.mukta(fontSize: 12.5, color: AppColors.textPrimary),
                     ),
                     if (village.isNotEmpty || taluka.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
                         [if (village.isNotEmpty) village, if (taluka.isNotEmpty) taluka].join(', '),
-                        style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.textPrimary),
+                        style: GoogleFonts.mukta(fontSize: 12.5, color: AppColors.textPrimary),
                       ),
                     ],
                     const SizedBox(height: 2),
                     Text(
                       '$district, $state - $pin',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -1309,7 +1309,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                           Expanded(
                             child: Text(
                               'Tamper-Proof BioCrop Packaging & Insured Farm Transit',
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textSecondary,
@@ -1357,7 +1357,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                       children: [
                         Text(
                           'Krishi Expert Advisory',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -1365,7 +1365,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
                         ),
                         Text(
                           'Toll-Free Helpline for Farmers',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.mukta(
                             fontSize: 11,
                             color: AppColors.textMuted,
                           ),
@@ -1378,7 +1378,7 @@ class _FarmerProfileViewState extends State<FarmerProfileView> {
               const SizedBox(height: 12),
               Text(
                 'Need guidance on choosing the right bio-fertilizer formulation for your soil or crop schedule? Our certified agricultural scientists are ready to assist.',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                   height: 1.4,

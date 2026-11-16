@@ -147,7 +147,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                       const SizedBox(width: 5),
                       Text(
                         'Back',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryGreen,
@@ -162,7 +162,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 onTap: () => Navigator.of(context).pop(),
                 child: Text(
                   'Home',
-                  style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
+                  style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ),
               const SizedBox(width: 6),
@@ -170,7 +170,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               const SizedBox(width: 6),
               Text(
                 'Sell with Us',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryDarkGreen,
@@ -218,7 +218,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                     const SizedBox(width: 8),
                     Text(
                       'EBS DIRECT SELLER & PARTNER NETWORK',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         color: Colors.white,
                         fontSize: isMobile ? 10.5 : 12,
                         fontWeight: FontWeight.w700,
@@ -234,7 +234,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               Text(
                 'Grow Your Agri Business Across India',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 26 : 42,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
@@ -249,7 +249,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 child: Text(
                   'Reach lakhs of active farmers, dealers, and FPOs across India. List your pesticides, fertilizers, bio-stimulants, and seeds with zero upfront listing costs.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 13 : 16.5,
                     color: const Color(0xFFE2E8F0),
                     height: 1.6,
@@ -274,7 +274,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                     icon: const Icon(Icons.handshake_rounded, size: 20),
                     label: Text(
                       'Be a Partner',
-                      style: GoogleFonts.poppins(fontSize: 14.5, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.mukta(fontSize: 14.5, fontWeight: FontWeight.w700),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -289,7 +289,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                     icon: const Icon(Icons.phone_in_talk_rounded, size: 19, color: Colors.white),
                     label: Text(
                       'Seller Support: ${AppConstants.helplineNumber}',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -343,7 +343,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
             children: [
               Text(
                 title,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   color: Colors.white,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
@@ -351,7 +351,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               ),
               Text(
                 subtitle,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   color: const Color(0xFFCBD5E1),
                   fontSize: 10,
                   fontWeight: FontWeight.w400,
@@ -414,7 +414,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
             children: [
               Text(
                 'WHY SELL ON EBS BIOCROP?',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryGreen,
@@ -425,7 +425,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               Text(
                 'Built to Supercharge Your Agri-Business',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 22 : 32,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -479,7 +479,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                             const SizedBox(height: 14),
                             Text(
                               item.title,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary,
@@ -489,7 +489,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                             Expanded(
                               child: Text(
                                 item.desc,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   fontSize: 12.5,
                                   color: AppColors.textSecondary,
                                   height: 1.45,
@@ -549,7 +549,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
             children: [
               Text(
                 'SIMPLE 4-STEP PROCESS',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryGreen,
@@ -560,7 +560,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               Text(
                 'How to Sell on Essential BioCrop Science',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 22 : 32,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -614,7 +614,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 alignment: Alignment.center,
                 child: Text(
                   s.step,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -627,7 +627,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
           const SizedBox(height: 18),
           Text(
             s.title,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppColors.textPrimary,
@@ -636,7 +636,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
           const SizedBox(height: 8),
           Text(
             s.desc,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               fontSize: 12.5,
               color: AppColors.textSecondary,
               height: 1.5,
@@ -659,7 +659,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
             children: [
               Text(
                 'WHAT WE GUARANTEE FOR EVERY SELLER',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF86EFAC),
@@ -670,7 +670,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               Text(
                 'Be Smart, Relax and Sell with Essential BioCrop Science',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 20 : 28,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
@@ -711,7 +711,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
           const SizedBox(width: 8),
           Text(
             label,
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.mukta(
               color: Colors.white,
               fontSize: 12.5,
               fontWeight: FontWeight.w600,
@@ -761,7 +761,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 Text(
                   'Ready to Partner with Us?',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 22 : 30,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -773,7 +773,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                   child: Text(
                     "Join India's fast-growing agricultural network. Fill up our partner form and our top management and commerce department will contact you directly.",
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.mukta(
                       fontSize: isMobile ? 13 : 15.5,
                       color: const Color(0xFFDCFCE7),
                       height: 1.5,
@@ -796,7 +796,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                       icon: const Icon(Icons.description_rounded, size: 19),
                       label: Text(
                         'Be a Partner',
-                        style: GoogleFonts.poppins(fontSize: 14.5, fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontSize: 14.5, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -811,7 +811,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                       icon: const Icon(Icons.phone_in_talk_rounded, size: 19, color: Colors.white),
                       label: Text(
                         'Call: ${AppConstants.helplineNumber}',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.mukta(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -852,7 +852,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               children: [
                 Text(
                   '24x7 DEDICATED SELLER SUPPORT',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF166534),
@@ -863,7 +863,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 Text(
                   'Have Questions About Partnering With Us?',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: isMobile ? 18 : 24,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textPrimary,
@@ -873,7 +873,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 Text(
                   'Our Seller Helpdesk is ready to assist you with registration, logistics, and account verification.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),
@@ -889,7 +889,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                       icon: const Icon(Icons.phone_in_talk_rounded, size: 18),
                       label: Text(
                         AppConstants.helplineNumber,
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF166534),
@@ -903,7 +903,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                       icon: const Icon(Icons.chat_rounded, size: 18),
                       label: Text(
                         'WhatsApp: ${AppConstants.helplineNumber}',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
+                        style: GoogleFonts.mukta(fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF25D366),
@@ -917,7 +917,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                       icon: const Icon(Icons.email_outlined, size: 18),
                       label: Text(
                         'sales@ebsbiocrop.com',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF166534)),
+                        style: GoogleFonts.mukta(fontWeight: FontWeight.w600, color: const Color(0xFF166534)),
                       ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF166534)),
@@ -969,7 +969,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
             children: [
               Text(
                 'FREQUENTLY ASKED QUESTIONS',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryGreen,
@@ -980,7 +980,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
               Text(
                 'Everything You Need to Know About Selling',
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.mukta(
                   fontSize: isMobile ? 20 : 28,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textPrimary,
@@ -1036,7 +1036,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                   Expanded(
                     child: Text(
                       question,
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.mukta(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                         color: isExpanded ? const Color(0xFF166534) : AppColors.textPrimary,
@@ -1061,7 +1061,7 @@ class _SellWithUsViewState extends State<SellWithUsView> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   answer,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.mukta(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                     height: 1.55,

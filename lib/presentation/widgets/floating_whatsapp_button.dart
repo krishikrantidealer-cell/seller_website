@@ -219,7 +219,7 @@ class _FloatingWhatsAppButtonState extends State<FloatingWhatsAppButton>
                             children: [
                               Text(
                                 'Chat with us',
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.mukta(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 13,
@@ -242,7 +242,7 @@ class _FloatingWhatsAppButtonState extends State<FloatingWhatsAppButton>
                                   const SizedBox(width: 4),
                                   Text(
                                     'Online • Agri Support',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.mukta(
                                       color: Colors.white.withValues(alpha: 0.95),
                                       fontWeight: FontWeight.w500,
                                       fontSize: 10.5,

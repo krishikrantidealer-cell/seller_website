@@ -282,7 +282,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                             ),
                             child: Text(
                               banner.tag,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 color: Colors.white,
                                 fontSize: isMobile ? 9 : 11,
                                 fontWeight: FontWeight.bold,
@@ -293,7 +293,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                           SizedBox(height: isMobile ? 6 : 12),
                           Text(
                             banner.title,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               color: Colors.white,
                               fontSize: isMobile ? 17 : (isTablet ? 22 : 30),
                               fontWeight: FontWeight.w800,
@@ -312,7 +312,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                           SizedBox(height: isMobile ? 4 : 8),
                           Text(
                             banner.subtitle,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.mukta(
                               color: Colors.white.withValues(alpha: 0.95),
                               fontSize: isMobile ? 11 : (isTablet ? 13 : 15),
                               fontWeight: FontWeight.w400,
@@ -335,7 +335,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                             ),
                             child: Text(
                               banner.buttonText,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.mukta(
                                 fontWeight: FontWeight.w700,
                                 fontSize: isMobile ? 11 : 14,
                               ),
