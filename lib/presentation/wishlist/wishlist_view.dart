@@ -430,6 +430,16 @@ class _WishlistVerticalCardState extends State<_WishlistVerticalCard> {
   }
 
   @override
+  void didUpdateWidget(covariant _WishlistVerticalCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.id != widget.product.id ||
+        !widget.product.variants.any((v) => v.id == _selectedVariant.id) ||
+        oldWidget.product.defaultVariant.id != widget.product.defaultVariant.id) {
+      _selectedVariant = widget.product.defaultVariant;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final variants = widget.product.variants.isNotEmpty
         ? widget.product.variants

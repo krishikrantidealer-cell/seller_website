@@ -8,12 +8,14 @@ import '../../data/models/wishlist_state.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/services/product_api_service.dart';
 import '../../logic/product/product_bloc.dart';
+import '../../core/payment/fastrr_checkout_gateway.dart';
 import '../widgets/app_product_image.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/product_card.dart';
 import '../widgets/web_footer.dart';
+import '../technical/technical_search_view.dart';
 
 class ProductDetailView extends StatefulWidget {
   final ProductItem product;
@@ -31,7 +33,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _tabsScrollController = ScrollController();
   late ProductVariant _selectedVariant;
-  int _selectedQuantity = 1;
   int _activeTabIndex = 0;
   int _selectedImageIndex = 0;
   final Set<int> _expandedMobileSections = {0};
@@ -68,6 +69,13 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     super.initState();
     _selectedVariant = widget.product.defaultVariant;
     _initReviews();
+    ProductController.instance.addListener(_onCatalogUpdated);
+  }
+
+  void _onCatalogUpdated() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -76,10 +84,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     if (oldWidget.product.id != widget.product.id) {
       setState(() {
         _selectedVariant = widget.product.defaultVariant;
-        _selectedQuantity = 1;
         _selectedImageIndex = 0;
         _isDescriptionExpanded = false;
         _initReviews();
+      });
+    } else if (oldWidget.product.defaultVariant.id != widget.product.defaultVariant.id &&
+        _selectedVariant.id == oldWidget.product.defaultVariant.id) {
+      setState(() {
+        _selectedVariant = widget.product.defaultVariant;
       });
     }
   }
@@ -90,6 +102,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   @override
   void dispose() {
+    ProductController.instance.removeListener(_onCatalogUpdated);
     _tabsScrollController.dispose();
     _reviewAuthorController.dispose();
     _reviewRoleController.dispose();
@@ -104,13 +117,117 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     });
   }
 
+  bool _isProductCurrentlyAvailable([ProductBloc? productBloc]) {
+    if (!widget.product.isAvailable) return false;
+    final bloc = productBloc ?? context.read<ProductBloc?>();
+    final hasLiveCatalog = ProductController.instance.hasLoadedFromApi ||
+        (bloc != null && bloc.state.products.isNotEmpty);
+    if (!hasLiveCatalog) return true;
+
+    final liveProducts = (bloc != null &&
+            (bloc.state.products.isNotEmpty || ProductController.instance.hasLoadedFromApi))
+        ? bloc.state.products
+        : ProductController.instance.products;
+
+    for (final p in liveProducts) {
+      if (p.id == widget.product.id) {
+        return p.isAvailable;
+      }
+    }
+    return false;
+  }
+
+  Widget _buildUnavailableProductState(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 64),
+          child: Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(32),
+                  ),
+                  child: const Icon(
+                    Icons.inventory_2_outlined,
+                    size: 32,
+                    color: Color(0xFFDC2626),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'This product is currently unavailable',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'This item has been removed or marked unavailable. Please explore other available products.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13.5,
+                    color: const Color(0xFF6B7280),
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                  label: Text(
+                    'Browse Other Products',
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _onAddToCart() {
-    CartController.instance.addItem(widget.product, _selectedVariant, _selectedQuantity);
+    if (!_isProductCurrentlyAvailable()) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This product is currently unavailable.'),
+          backgroundColor: Color(0xFFDC2626),
+        ),
+      );
+      return;
+    }
+    CartController.instance.addItem(widget.product, _selectedVariant, 1);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Added $_selectedQuantity x ${widget.product.title} (${_selectedVariant.label}) to cart!',
+          'Added 1 x ${widget.product.title} (${_selectedVariant.label}) to cart!',
           style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
         ),
         backgroundColor: AppColors.primaryDarkGreen,
@@ -126,12 +243,65 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
+  void _onBuyNow() async {
+    if (!_isProductCurrentlyAvailable()) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This product is currently unavailable.'),
+          backgroundColor: Color(0xFFDC2626),
+        ),
+      );
+      return;
+    }
+    final qty = CartController.instance.getQuantity(widget.product.id, _selectedVariant.id);
+    final buyQty = qty > 0 ? qty : 1;
+
+    final items = [
+      {
+        'id': widget.product.id,
+        'variantId': _selectedVariant.id,
+        'name': widget.product.title,
+        'variant': _selectedVariant.label,
+        'price': _selectedVariant.displayRate,
+        'quantity': buyQty,
+      }
+    ];
+
+    final result = await FastrrCheckoutGateway.instance.openCheckout(
+      storeKey: '12910235',
+      items: items,
+      totalAmount: _selectedVariant.displayRate * buyQty,
+    );
+
+    if (result.success) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Order placed successfully with Shiprocket Checkout!'),
+            backgroundColor: AppColors.primaryGreen,
+          ),
+        );
+      }
+    } else if (result.errorMessage != null && !result.errorMessage!.contains('dismissed')) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.errorMessage!),
+            backgroundColor: AppColors.primaryDarkGreen,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobileScreen = screenWidth < 700;
 
     final productBloc = context.watch<ProductBloc?>();
+    final isProductAvailable = _isProductCurrentlyAvailable(productBloc);
     final allProducts = productBloc?.state.products.isNotEmpty == true
         ? productBloc!.state.products
         : ProductController.instance.products;
@@ -147,7 +317,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF9FAFB),
       endDrawer: const QuickCartDrawer(),
-      bottomNavigationBar: isMobileScreen ? _buildMobileStickyBottomBar() : null,
+      bottomNavigationBar: (isMobileScreen && isProductAvailable) ? _buildMobileStickyBottomBar() : null,
       body: Column(
         children: [
           // Sticky Top Navigation Header with Drop Shadow
@@ -183,7 +353,17 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           // Scrollable Product Detail Content
           Expanded(
-            child: SingleChildScrollView(
+            child: !isProductAvailable
+                ? SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildBreadcrumbBar(context, isMobileScreen),
+                        _buildUnavailableProductState(context),
+                        const WebFooter(),
+                      ],
+                    ),
+                  )
+                : SingleChildScrollView(
               child: Column(
                 children: [
                   // Breadcrumbs & Back link (Responsive)
@@ -307,7 +487,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 Text(
                   '₹${_selectedVariant.displayRate.toInt()}',
                   style: GoogleFonts.poppins(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primaryGreen,
                   ),
@@ -315,20 +495,26 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 Text(
                   _selectedVariant.label,
                   style: GoogleFonts.poppins(
-                    fontSize: 11,
+                    fontSize: 10,
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildCartActionButton(isMobile: true, height: 42),
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: SizedBox(
-                height: 44,
+                height: 42,
                 child: ElevatedButton.icon(
-                  onPressed: _onAddToCart,
-                  icon: const Icon(Icons.shopping_cart_outlined, size: 17),
+                  onPressed: _onBuyNow,
+                  icon: const Icon(Icons.bolt_rounded, size: 16),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryGreen,
                     foregroundColor: Colors.white,
@@ -337,8 +523,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     padding: EdgeInsets.zero,
                   ),
                   label: Text(
-                    'Add to Cart',
-                    style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w700),
+                    'Buy Now',
+                    style: GoogleFonts.poppins(fontSize: 12.5, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -433,6 +619,22 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final discount = _selectedVariant.discountPercent;
     final imageHeight = isMobile ? 280.0 : 420.0;
 
+    // Deduplicate images so that identical URLs / sizes don't create duplicate thumbnails
+    final List<String> distinctImages = [];
+    final Set<String> seenImageKeys = {};
+    for (final raw in widget.product.imageUrls) {
+      final trimmed = raw.trim();
+      if (trimmed.isEmpty) continue;
+      final key = trimmed.contains('?') ? trimmed.split('?').first : trimmed;
+      if (!seenImageKeys.contains(key)) {
+        seenImageKeys.add(key);
+        distinctImages.add(trimmed);
+      }
+    }
+    if (distinctImages.isEmpty && widget.product.imageUrl.trim().isNotEmpty) {
+      distinctImages.add(widget.product.imageUrl.trim());
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -459,11 +661,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 child: Padding(
                   padding: EdgeInsets.all(isMobile ? 16.0 : 28.0),
                   child: AppProductImage(
-                    imageUrl: widget.product.imageUrls.isNotEmpty &&
-                            _selectedImageIndex < widget.product.imageUrls.length
-                        ? widget.product.imageUrls[_selectedImageIndex]
+                    imageUrl: distinctImages.isNotEmpty &&
+                            _selectedImageIndex < distinctImages.length
+                        ? distinctImages[_selectedImageIndex]
                         : widget.product.imageUrl,
-                    fallbackUrls: widget.product.imageUrls,
+                    fallbackUrls: distinctImages,
                     fit: BoxFit.contain,
                     fallbackIcon: Icons.agriculture_rounded,
                     fallbackIconSize: 80,
@@ -593,14 +795,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           ),
         ),
 
-        // Thumbnail selectors (only show if the product has multiple genuine images)
-        if (widget.product.imageUrls.length > 1) ...[
+        // Thumbnail selectors (only show if the product has more than 1 image)
+        if (distinctImages.length > 1) ...[
           const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                for (int i = 0; i < widget.product.imageUrls.length; i++) ...[
+                for (int i = 0; i < distinctImages.length; i++) ...[
                   if (i > 0) const SizedBox(width: 10),
                   InkWell(
                     onTap: () {
@@ -622,8 +824,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       ),
                       padding: const EdgeInsets.all(5),
                       child: AppProductImage(
-                        imageUrl: widget.product.imageUrls[i],
-                        fallbackUrls: widget.product.imageUrls,
+                        imageUrl: distinctImages[i],
+                        fallbackUrls: distinctImages,
                         fit: BoxFit.contain,
                         fallbackIcon: Icons.image,
                         fallbackIconSize: 24,
@@ -743,7 +945,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   Widget _buildPurchaseSection(BuildContext context, {required bool isMobile}) {
     final discount = _selectedVariant.discountPercent;
-    final savings = _selectedVariant.printedMrp - _selectedVariant.displayRate;
+    final savings = _selectedVariant.discountAmount;
 
     return Container(
       padding: EdgeInsets.all(isMobile ? 14 : 22),
@@ -821,19 +1023,47 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           const SizedBox(height: 6),
 
-          // Technical Name / Active Formula
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
-            decoration: BoxDecoration(
-              color: AppColors.primaryCrimson.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              'Active Composition: ${widget.product.technicalName}',
-              style: GoogleFonts.poppins(
-                fontSize: isMobile ? 11 : 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryCrimson,
+          // Technical Name / Active Formula (clickable to search matching products)
+          InkWell(
+            onTap: widget.product.technicalName.trim().isEmpty
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TechnicalSearchView(
+                          initialQuery: widget.product.technicalName.trim(),
+                        ),
+                      ),
+                    );
+                  },
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3.5),
+              decoration: BoxDecoration(
+                color: AppColors.primaryCrimson.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'Active Composition: ${widget.product.technicalName}',
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 11 : 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryCrimson,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    Icons.search_rounded,
+                    size: isMobile ? 13 : 14,
+                    color: AppColors.primaryCrimson,
+                  ),
+                ],
               ),
             ),
           ),
@@ -979,25 +1209,25 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            '₹${v.displayRate.toInt()}',
-                            style: GoogleFonts.poppins(
-                              fontSize: isMobile ? 12.5 : 13.5,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.primaryGreen,
-                            ),
+                      Text(
+                        '₹${v.displayRate.toStringAsFixed(0)}',
+                        style: GoogleFonts.poppins(
+                          fontSize: isMobile ? 12.5 : 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                      if (v.printedMrp > v.displayRate) ...[
+                        const SizedBox(width: 5),
+                        Text(
+                          '₹${v.printedMrp.toStringAsFixed(0)}',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: AppColors.textMuted,
+                            decoration: TextDecoration.lineThrough,
                           ),
-                          if (v.printedMrp > v.displayRate) ...[
-                            const SizedBox(width: 5),
-                            Text(
-                              '₹${v.printedMrp.toInt()}',
-                              style: GoogleFonts.poppins(
-                                fontSize: 10,
-                                color: AppColors.textMuted,
-                                decoration: TextDecoration.lineThrough,
-                              ),
-                            ),
-                          ],
+                        ),
+                      ],
                           if (varDiscount > 0) ...[
                             const SizedBox(width: 5),
                             Text(
@@ -1038,22 +1268,23 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   runSpacing: 6,
                   children: [
                     Text(
-                      '₹${_selectedVariant.displayRate.toInt()}',
+                      '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
                       style: GoogleFonts.poppins(
                         fontSize: isMobile ? 24 : 28,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryGreen,
                       ),
                     ),
-                    if (_selectedVariant.printedMrp > _selectedVariant.displayRate) ...[
+                    if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
                       Text(
-                        'MRP: ₹${_selectedVariant.printedMrp.toInt()}',
+                        'MRP: ₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
                         style: GoogleFonts.poppins(
                           fontSize: isMobile ? 12.5 : 14,
                           color: AppColors.textMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
+                    if (discount > 0 || savings >= 1)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
@@ -1061,7 +1292,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          'Save ₹${savings.toInt()} ($discount% OFF)',
+                          discount > 0
+                              ? 'Save ₹${savings.toStringAsFixed(0)} ($discount% OFF)'
+                              : 'Save ₹${savings.toStringAsFixed(0)}',
                           style: GoogleFonts.poppins(
                             fontSize: isMobile ? 11 : 12,
                             fontWeight: FontWeight.w700,
@@ -1069,7 +1302,6 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           ),
                         ),
                       ),
-                    ],
                   ],
                 ),
                 const SizedBox(height: 5),
@@ -1121,35 +1353,24 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           const SizedBox(height: 16),
 
-          // Quantity Stepper + Purchase Action Buttons (Responsive Layout)
+          // Add to Cart (Converts to Quantity Stepper when in cart) + Buy Now
           if (isMobile) ...[
-            // Mobile: Row 1 Stepper, Row 2 Dual Full-Width Action Buttons
+            // Mobile: Row of 2 equal-width responsive action buttons
             Row(
               children: [
-                Text(
-                  'Quantity:',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+                Expanded(
+                  child: _buildCartActionButton(isMobile: true),
                 ),
-                const SizedBox(width: 12),
-                _buildQuantityControl(),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
+                const SizedBox(width: 10),
                 Expanded(
                   child: SizedBox(
                     height: 46,
                     child: ElevatedButton.icon(
-                      onPressed: _onAddToCart,
-                      icon: const Icon(Icons.shopping_cart_outlined, size: 17),
+                      onPressed: _onBuyNow,
+                      icon: const Icon(Icons.bolt_rounded, size: 18),
                       label: Text(
-                        'Add to Cart',
-                        style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700),
+                        'Buy Now',
+                        style: GoogleFonts.poppins(fontSize: 13.5, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryGreen,
@@ -1163,19 +1384,21 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               ],
             ),
           ] else ...[
-            // Desktop: Single horizontal row
+            // Desktop: Add to Cart (converts to quantity stepper) + Buy Now
             Row(
               children: [
-                _buildQuantityControl(),
-                const SizedBox(width: 14),
+                Expanded(
+                  child: _buildCartActionButton(isMobile: false),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: SizedBox(
                     height: 48,
                     child: ElevatedButton.icon(
-                      onPressed: _onAddToCart,
-                      icon: const Icon(Icons.shopping_cart_outlined, size: 18),
+                      onPressed: _onBuyNow,
+                      icon: const Icon(Icons.bolt_rounded, size: 20),
                       label: Text(
-                        'Add to Cart',
+                        'Buy Now',
                         style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -1235,54 +1458,133 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildQuantityControl() {
-    return Container(
-      height: 42,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border, width: 1.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.remove_rounded, size: 16),
-            color: _selectedQuantity > 1 ? AppColors.textPrimary : AppColors.textMuted,
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            constraints: const BoxConstraints(),
-            onPressed: _selectedQuantity > 1
-                ? () {
-                    setState(() {
-                      _selectedQuantity--;
-                    });
-                  }
-                : null,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              '$_selectedQuantity',
-              style: GoogleFonts.poppins(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+  Widget _buildCartActionButton({required bool isMobile, double? height}) {
+    final btnHeight = height ?? (isMobile ? 46.0 : 48.0);
+
+    return AnimatedBuilder(
+      animation: CartController.instance,
+      builder: (context, _) {
+        final cartKey = '${widget.product.id}_${_selectedVariant.id}';
+        final qty = CartController.instance.getQuantity(widget.product.id, _selectedVariant.id);
+
+        if (qty <= 0) {
+          // State 1: "Add to Cart" Button
+          return SizedBox(
+            height: btnHeight,
+            child: OutlinedButton(
+              onPressed: _onAddToCart,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primaryGreen,
+                side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isMobile) ...[
+                    const Icon(Icons.shopping_cart_outlined, size: 18),
+                    const SizedBox(width: 6),
+                  ],
+                  Flexible(
+                    child: Text(
+                      'Add to Cart',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: isMobile ? 12 : 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+          );
+        }
+
+        // State 2: Converted into Quantity Stepper [- qty +]
+        return Container(
+          height: btnHeight,
+          decoration: BoxDecoration(
+            color: AppColors.primaryGreen,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryGreen.withValues(alpha: 0.2),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.add_rounded, size: 16),
-            color: AppColors.textPrimary,
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            constraints: const BoxConstraints(),
-            onPressed: () {
-              setState(() {
-                _selectedQuantity++;
-              });
-            },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Decrement / Delete
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                  onTap: () {
+                    CartController.instance.decrement(cartKey);
+                  },
+                  child: SizedBox(
+                    width: isMobile ? 32 : 44,
+                    height: double.infinity,
+                    child: Center(
+                      child: Icon(
+                        qty == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
+                        size: isMobile ? 16 : 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Quantity counter
+              Expanded(
+                child: Center(
+                  child: Text(
+                    isMobile ? '$qty in cart' : '$qty in cart',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      fontSize: isMobile ? 11.5 : 14,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Increment
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(8)),
+                  onTap: () {
+                    CartController.instance.increment(cartKey);
+                  },
+                  child: SizedBox(
+                    width: isMobile ? 32 : 44,
+                    height: double.infinity,
+                    child: Center(
+                      child: Icon(
+                        Icons.add_rounded,
+                        size: isMobile ? 18 : 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

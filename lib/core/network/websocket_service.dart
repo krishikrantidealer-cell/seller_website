@@ -19,6 +19,7 @@ class WebSocketService {
   StreamSubscription? _subscription;
   bool _isConnected = false;
   bool _isConnecting = false;
+  bool _isPublicChannel = false;
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
   int _retryCount = 0;
@@ -47,32 +48,40 @@ class WebSocketService {
     _tokenStorage = storage;
   }
 
-  /// Connects to the WebSocket server when authenticated credentials are available.
-  Future<void> connect({String? customUrl, String? token, String? userId}) async {
+  /// Connects to the WebSocket server:
+  /// - Authenticated users connect to `/ws?userId=...&token=...`
+  /// - Anonymous storefront visitors connect to `/ws/public` for real-time catalog updates.
+  Future<void> connect({String? customUrl, String? token, String? userId, bool forceReconnect = false}) async {
     if (!enabled || _isTestEnvironment) return;
-    if (_isConnected || _isConnecting) return;
+
+    final storage = _tokenStorage ?? TokenStorage();
+    final effectiveToken = token ?? await storage.getAccessToken();
+    final effectiveUserId = userId ?? await storage.getUserId();
+    final hasAuth = effectiveToken != null &&
+        effectiveToken.isNotEmpty &&
+        effectiveUserId != null &&
+        effectiveUserId.isNotEmpty;
+
+    // Upgrade guest /ws/public connection to authenticated /ws when credentials become available.
+    if ((_isConnected || _isConnecting) && !forceReconnect) {
+      if (_isPublicChannel && hasAuth) {
+        disconnect();
+      } else {
+        return;
+      }
+    } else if (forceReconnect) {
+      disconnect();
+    }
 
     _isConnecting = true;
 
     try {
-      final storage = _tokenStorage ?? TokenStorage();
-      final effectiveToken = token ?? await storage.getAccessToken();
-      final effectiveUserId = userId ?? await storage.getUserId();
-
-      // Backend WebSocketAuthInterceptor requires userId & token query params
-      if ((customUrl == null || customUrl.isEmpty) &&
-          (effectiveToken == null ||
-              effectiveToken.isEmpty ||
-              effectiveUserId == null ||
-              effectiveUserId.isEmpty)) {
-        _isConnecting = false;
-        return;
-      }
-
+      _isPublicChannel = (customUrl == null || customUrl.isEmpty) && !hasAuth;
       final wsUri = _resolveWebSocketUri(
         customUrl: customUrl,
-        token: effectiveToken,
-        userId: effectiveUserId,
+        token: hasAuth ? effectiveToken : null,
+        userId: hasAuth ? effectiveUserId : null,
+        publicOnly: _isPublicChannel,
       );
 
       debugPrint('[SellerWebsite WS] Connecting to $wsUri');
@@ -105,7 +114,12 @@ class WebSocketService {
     return WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding');
   }
 
-  Uri _resolveWebSocketUri({String? customUrl, String? token, String? userId}) {
+  Uri _resolveWebSocketUri({
+    String? customUrl,
+    String? token,
+    String? userId,
+    bool publicOnly = false,
+  }) {
     if (customUrl != null && customUrl.isNotEmpty) {
       return Uri.parse(customUrl);
     }
@@ -121,14 +135,16 @@ class WebSocketService {
     final wsHost = cleanUrl.replaceFirst(RegExp(r'https?://'), '');
 
     final queryParams = <String, String>{};
-    if (userId != null && userId.isNotEmpty) queryParams['userId'] = userId;
-    if (token != null && token.isNotEmpty) queryParams['token'] = token;
+    if (!publicOnly) {
+      if (userId != null && userId.isNotEmpty) queryParams['userId'] = userId;
+      if (token != null && token.isNotEmpty) queryParams['token'] = token;
+    }
 
     return Uri(
       scheme: wsProtocol,
       host: wsHost.split(':').first,
       port: wsHost.contains(':') ? int.tryParse(wsHost.split(':').last) : null,
-      path: '/ws',
+      path: publicOnly ? '/ws/public' : '/ws',
       queryParameters: queryParams.isNotEmpty ? queryParams : null,
     );
   }

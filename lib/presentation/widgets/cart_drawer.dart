@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/payment/fastrr_checkout_gateway.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
 import 'app_product_image.dart';
@@ -459,24 +460,33 @@ class QuickCartDrawer extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      onCheckout?.call();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(Icons.check_circle_rounded, color: Colors.white),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Proceeding to Secure Checkout...',
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
-                          backgroundColor: AppColors.primaryGreen,
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                    onPressed: () async {
+                      if (onCheckout != null) {
+                        onCheckout!();
+                        return;
+                      }
+                      Navigator.of(context).maybePop();
+                      final cart = CartController.instance;
+                      if (cart.isEmpty) return;
+
+                      final items = cart.items.map((item) => {
+                        'id': item.product.id,
+                        'variantId': item.variant.id,
+                        'name': item.product.title,
+                        'variant': item.variant.label,
+                        'price': item.variant.displayRate,
+                        'quantity': item.quantity,
+                      }).toList();
+
+                      final result = await FastrrCheckoutGateway.instance.openCheckout(
+                        storeKey: '12910235',
+                        items: items,
+                        totalAmount: cart.subtotal,
                       );
+
+                      if (result.success) {
+                        cart.clear();
+                      }
                     },
                     icon: const Icon(Icons.lock_rounded, size: 16),
                     label: Text(

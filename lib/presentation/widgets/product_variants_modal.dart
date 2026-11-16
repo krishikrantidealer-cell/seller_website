@@ -626,7 +626,7 @@ class _VariantsList extends StatelessWidget {
   Widget _buildVariantRow(BuildContext context, CartController cart, ProductVariant variant) {
     final qty = cart.getQuantity(product.id, variant.id);
     final discount = variant.discountPercent;
-    final savings = variant.printedMrp - variant.displayRate;
+    final savings = variant.discountAmount;
     final isInCart = qty > 0;
     final itemKey = '${product.id}_${variant.id}';
 
@@ -692,7 +692,7 @@ class _VariantsList extends StatelessWidget {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      '₹${variant.displayRate.toInt()}',
+                      '₹${variant.displayRate.toStringAsFixed(0)}',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
@@ -702,22 +702,24 @@ class _VariantsList extends StatelessWidget {
                     const SizedBox(width: 6),
                     if (variant.printedMrp > variant.displayRate) ...[
                       Text(
-                        'MRP ₹${variant.printedMrp.toInt()}',
+                        'MRP ₹${variant.printedMrp.toStringAsFixed(0)}',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           color: AppColors.textMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '(Save ₹${savings.toInt()})',
-                        style: GoogleFonts.poppins(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryDarkGreen,
+                      if (savings >= 1) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          '(Save ₹${savings.toStringAsFixed(0)})',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryDarkGreen,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ],
                 ),

@@ -7,8 +7,15 @@ class ProductVariant {
   final String? packSizeUnit;
   final int? packQuantity;
   final String? shippedBy;
+  final String? shippingThrough;
   final double displayRate;
+  final double? perUnitPrice;
   final double printedMrp;
+  final double? courierCharges;
+  final double? codCharge;
+  final String? paymentMethod;
+  final double? discountOnMrpRs;
+  final double? discountPercentage;
   final double? gstPercentage;
   final int? stock;
   final bool inStock;
@@ -23,8 +30,15 @@ class ProductVariant {
     this.packSizeUnit,
     this.packQuantity,
     this.shippedBy,
+    this.shippingThrough,
     required this.displayRate,
+    this.perUnitPrice,
     required this.printedMrp,
+    this.courierCharges,
+    this.codCharge,
+    this.paymentMethod,
+    this.discountOnMrpRs,
+    this.discountPercentage,
     this.gstPercentage,
     this.stock,
     this.inStock = true,
@@ -32,8 +46,23 @@ class ProductVariant {
   });
 
   int get discountPercent {
-    if (printedMrp <= 0 || displayRate >= printedMrp) return 0;
-    return (((printedMrp - displayRate) / printedMrp) * 100).round();
+    if (printedMrp > 0 && displayRate < printedMrp) {
+      return (((printedMrp - displayRate) / printedMrp) * 100).round();
+    }
+    if (discountPercentage != null && discountPercentage! > 0) {
+      return discountPercentage!.round();
+    }
+    return 0;
+  }
+
+  double get discountAmount {
+    if (printedMrp > 0 && displayRate < printedMrp) {
+      return printedMrp - displayRate;
+    }
+    if (discountOnMrpRs != null && discountOnMrpRs! > 0) {
+      return discountOnMrpRs!;
+    }
+    return 0.0;
   }
 
   factory ProductVariant.fromPublicJson(Map<String, dynamic> json) {
@@ -54,12 +83,25 @@ class ProductVariant {
 
     final displayRateRaw = json['displayRate'];
     final printedMrpRaw = json['printedMrp'];
+    final discountOnMrpRsRaw = json['discountOnMrpRs'] ?? json['discountRs'];
+    final discountPercentageRaw = json['discountPercentage'];
     final displayRate = displayRateRaw is num
         ? displayRateRaw.toDouble()
         : (double.tryParse(displayRateRaw?.toString() ?? '') ?? 0.0);
-    final printedMrp = printedMrpRaw is num
+    final discountOnMrpRs = discountOnMrpRsRaw is num
+        ? discountOnMrpRsRaw.toDouble()
+        : double.tryParse(discountOnMrpRsRaw?.toString() ?? '');
+    final discountPercentage = discountPercentageRaw is num
+        ? discountPercentageRaw.toDouble()
+        : double.tryParse(discountPercentageRaw?.toString() ?? '');
+    final parsedMrp = printedMrpRaw is num
         ? printedMrpRaw.toDouble()
-        : (double.tryParse(printedMrpRaw?.toString() ?? '') ?? displayRate);
+        : double.tryParse(printedMrpRaw?.toString() ?? '');
+    final double printedMrp = (parsedMrp != null && parsedMrp > 0)
+        ? parsedMrp
+        : ((discountOnMrpRs != null && discountOnMrpRs > 0 && displayRate > 0)
+            ? (displayRate + discountOnMrpRs)
+            : displayRate);
 
     final stockRaw = json['stock'];
     final stock = stockRaw is num ? stockRaw.toInt() : int.tryParse(stockRaw?.toString() ?? '');
@@ -76,12 +118,21 @@ class ProductVariant {
       packSizeUnit: packSizeUnit,
       packQuantity: json['packQuantity'] is num ? (json['packQuantity'] as num).toInt() : null,
       shippedBy: json['shippedBy']?.toString(),
+      shippingThrough: json['shippingThrough']?.toString(),
       displayRate: displayRate,
+      perUnitPrice: json['perUnitPrice'] is num ? (json['perUnitPrice'] as num).toDouble() : null,
       printedMrp: printedMrp > 0 ? printedMrp : displayRate,
+      courierCharges: json['courierCharges'] is num ? (json['courierCharges'] as num).toDouble() : null,
+      codCharge: json['codCharge'] is num ? (json['codCharge'] as num).toDouble() : null,
+      paymentMethod: json['paymentMethod']?.toString(),
+      discountOnMrpRs: discountOnMrpRs,
+      discountPercentage: discountPercentage,
       gstPercentage: json['gstPercentage'] is num ? (json['gstPercentage'] as num).toDouble() : null,
       stock: stock,
       inStock: inStock,
-      isDefault: json['isDefault'] == true,
+      isDefault: json['isDefault'] == true ||
+          json['default'] == true ||
+          json['is_default'] == true,
     );
   }
 
@@ -95,8 +146,15 @@ class ProductVariant {
       'packSizeUnit': packSizeUnit,
       'packQuantity': packQuantity,
       'shippedBy': shippedBy,
+      if (shippingThrough != null) 'shippingThrough': shippingThrough,
       'displayRate': displayRate,
+      if (perUnitPrice != null) 'perUnitPrice': perUnitPrice,
       'printedMrp': printedMrp,
+      if (courierCharges != null) 'courierCharges': courierCharges,
+      if (codCharge != null) 'codCharge': codCharge,
+      if (paymentMethod != null) 'paymentMethod': paymentMethod,
+      if (discountOnMrpRs != null) 'discountOnMrpRs': discountOnMrpRs,
+      if (discountPercentage != null) 'discountPercentage': discountPercentage,
       'gstPercentage': gstPercentage,
       'stock': stock,
       'inStock': inStock,
@@ -118,7 +176,9 @@ class ProductItem {
   final String imageUrl;
   final List<String> imageUrls;
   final double displayRate;
+  final double? perUnitPrice;
   final double printedMrp;
+  final double? courierCharges;
   final double rating;
   final int reviewsCount;
   final String category;
@@ -146,7 +206,9 @@ class ProductItem {
     required this.imageUrl,
     this.imageUrls = const [],
     required this.displayRate,
+    this.perUnitPrice,
     required this.printedMrp,
+    this.courierCharges,
     this.rating = 4.8,
     this.reviewsCount = 42,
     required this.category,
@@ -163,6 +225,9 @@ class ProductItem {
   });
 
   int get discountPercent {
+    if (variants.isNotEmpty) {
+      return defaultVariant.discountPercent;
+    }
     if (printedMrp <= 0 || displayRate >= printedMrp) return 0;
     return (((printedMrp - displayRate) / printedMrp) * 100).round();
   }
@@ -227,12 +292,17 @@ class ProductItem {
     final rawVendor = (json['sellerName'] ?? json['vendor'] ?? '').toString().trim();
     final vendor = rawVendor.isNotEmpty ? rawVendor : 'EBS BioCrop Science';
 
-    // Extract images from `productImages` (`midUrl`, `lowUrl`, `originalUrl`, or GCS object names)
+    // Extract images from `productImages` (1 best resolution URL per distinct image)
     const gcsBucketBase = 'https://storage.googleapis.com/sellerhub-prod-media-us';
     final List<String> extractedImages = [];
+    final Set<String> seenNormalized = {};
+
     void addCandidate(String? rawUrl) {
       final trimmed = rawUrl?.trim() ?? '';
-      if (trimmed.isNotEmpty && !extractedImages.contains(trimmed)) {
+      if (trimmed.isEmpty) return;
+      final cleanUrl = trimmed.contains('?') ? trimmed.split('?').first : trimmed;
+      if (!seenNormalized.contains(cleanUrl)) {
+        seenNormalized.add(cleanUrl);
         extractedImages.add(trimmed);
       }
     }
@@ -246,30 +316,28 @@ class ProductItem {
           return orderA.compareTo(orderB);
         });
       for (final img in sortedImages) {
-        final mid = img['midUrl']?.toString().trim();
-        final low = img['lowUrl']?.toString().trim();
         final orig = img['originalUrl']?.toString().trim();
+        final mid = img['midUrl']?.toString().trim();
         final plain = img['url']?.toString().trim();
-        final midObj = img['midObjectName']?.toString().trim();
         final origObj = img['originalObjectName']?.toString().trim();
+        final midObj = img['midObjectName']?.toString().trim();
+        final low = img['lowUrl']?.toString().trim();
         final lowObj = img['lowObjectName']?.toString().trim();
 
         final candidates = <String?>[
-          mid,
-          low,
           orig,
+          mid,
           plain,
-          (midObj != null && midObj.isNotEmpty) ? (midObj.startsWith('http') ? midObj : '$gcsBucketBase/$midObj') : null,
           (origObj != null && origObj.isNotEmpty) ? (origObj.startsWith('http') ? origObj : '$gcsBucketBase/$origObj') : null,
+          (midObj != null && midObj.isNotEmpty) ? (midObj.startsWith('http') ? midObj : '$gcsBucketBase/$midObj') : null,
+          low,
           (lowObj != null && lowObj.isNotEmpty) ? (lowObj.startsWith('http') ? lowObj : '$gcsBucketBase/$lowObj') : null,
         ];
 
         for (final cand in candidates) {
           if (cand != null && cand.isNotEmpty) {
             addCandidate(cand);
-            if (cand.contains('storage.googleapis.com') && cand.contains('?')) {
-              addCandidate(cand.split('?').first);
-            }
+            break; // Keep only the best single URL representation for this image
           }
         }
       }
@@ -358,7 +426,9 @@ class ProductItem {
       imageUrl: primaryImageUrl,
       imageUrls: extractedImages,
       displayRate: displayRate,
+      perUnitPrice: json['perUnitPrice'] is num ? (json['perUnitPrice'] as num).toDouble() : null,
       printedMrp: printedMrp > 0 ? printedMrp : displayRate,
+      courierCharges: json['courierCharges'] is num ? (json['courierCharges'] as num).toDouble() : null,
       rating: rating,
       reviewsCount: reviewsCount,
       category: categoryName,
@@ -389,7 +459,9 @@ class ProductItem {
       'imageUrl': imageUrl,
       'imageUrls': imageUrls,
       'displayRate': displayRate,
+      if (perUnitPrice != null) 'perUnitPrice': perUnitPrice,
       'printedMrp': printedMrp,
+      if (courierCharges != null) 'courierCharges': courierCharges,
       'averageRating': rating,
       'totalReviews': reviewsCount,
       'category': category,

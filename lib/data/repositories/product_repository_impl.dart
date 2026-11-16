@@ -15,9 +15,12 @@ class ProductRepositoryImpl implements ProductRepository {
     this.localDataSource,
   });
 
-  List<ProductItem> _resolveWithCategories(List<ProductItem> items) {
+  List<ProductItem> _resolveAvailableWithCategories(List<ProductItem> items) {
     final categories = CategoryController.instance.categories;
-    return items.map((p) => p.withResolvedCategory(categories)).toList();
+    return items
+        .where((p) => p.isAvailable)
+        .map((p) => p.withResolvedCategory(categories))
+        .toList();
   }
 
   @override
@@ -25,18 +28,18 @@ class ProductRepositoryImpl implements ProductRepository {
     if (!forceRefresh) {
       if (_memoryCache != null && _memoryCache!.isNotEmpty) {
         _syncInBackground();
-        return _resolveWithCategories(_memoryCache!);
+        return _resolveAvailableWithCategories(_memoryCache!);
       }
       final cached = await localDataSource?.getCachedProducts();
       if (cached != null && cached.isNotEmpty) {
-        _memoryCache = _resolveWithCategories(cached);
+        _memoryCache = _resolveAvailableWithCategories(cached);
         _syncInBackground();
         return _memoryCache!;
       }
     }
 
     try {
-      final products = _resolveWithCategories(await remoteDataSource.getProducts());
+      final products = _resolveAvailableWithCategories(await remoteDataSource.getProducts());
       _memoryCache = products;
       await localDataSource?.cacheProducts(products);
       ProductController.instance.syncFromBloc(products);
@@ -46,7 +49,7 @@ class ProductRepositoryImpl implements ProductRepository {
       if (cached != null && cached.isNotEmpty) {
         return cached;
       }
-      final fallback = _resolveWithCategories(ProductItem.sampleProducts);
+      final fallback = _resolveAvailableWithCategories(ProductItem.sampleProducts);
       _memoryCache = fallback;
       ProductController.instance.syncFromBloc(fallback);
       return fallback;
@@ -55,23 +58,21 @@ class ProductRepositoryImpl implements ProductRepository {
 
   void _syncInBackground() async {
     try {
-      final fresh = _resolveWithCategories(await remoteDataSource.getProducts());
-      if (fresh.isNotEmpty) {
-        _memoryCache = fresh;
-        await localDataSource?.cacheProducts(fresh);
-        ProductController.instance.syncFromBloc(fresh);
-      }
+      final fresh = _resolveAvailableWithCategories(await remoteDataSource.getProducts());
+      _memoryCache = fresh;
+      await localDataSource?.cacheProducts(fresh);
+      ProductController.instance.syncFromBloc(fresh);
     } catch (_) {}
   }
 
   @override
   Future<List<ProductItem>?> getCachedProducts() async {
     if (_memoryCache != null && _memoryCache!.isNotEmpty) {
-      return _resolveWithCategories(_memoryCache!);
+      return _resolveAvailableWithCategories(_memoryCache!);
     }
     final cached = await localDataSource?.getCachedProducts();
     if (cached != null && cached.isNotEmpty) {
-      _memoryCache = _resolveWithCategories(cached);
+      _memoryCache = _resolveAvailableWithCategories(cached);
       return _memoryCache;
     }
     return null;
@@ -86,12 +87,12 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<List<ProductItem>> getProductsByCategory(String categoryId) async {
     final products = await remoteDataSource.getProductsByCategory(categoryId);
-    return _resolveWithCategories(products);
+    return _resolveAvailableWithCategories(products);
   }
 
   @override
   Future<List<ProductItem>> searchProducts(String query) async {
     final products = await remoteDataSource.searchProducts(query);
-    return _resolveWithCategories(products);
+    return _resolveAvailableWithCategories(products);
   }
 }

@@ -531,6 +531,8 @@ class MobileNavigationDrawer extends StatelessWidget {
                       child: Image.asset(
                         'assets/images/ebs_logo.png',
                         fit: BoxFit.contain,
+                        filterQuality: FilterQuality.medium,
+                        isAntiAlias: true,
                         errorBuilder: (_, _, _) => const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 18),
                       ),
                     ),

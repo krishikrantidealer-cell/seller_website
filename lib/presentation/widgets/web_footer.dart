@@ -8,6 +8,8 @@ import '../wishlist/wishlist_view.dart';
 import '../orders/my_orders_view.dart';
 import '../sell_with_us/sell_with_us_view.dart';
 import '../be_a_partner/be_a_partner_view.dart';
+import '../technical/technical_search_view.dart';
+import 'floating_whatsapp_button.dart';
 
 class WebFooter extends StatelessWidget {
   const WebFooter({super.key});
@@ -241,9 +243,30 @@ class WebFooter extends StatelessWidget {
             spacing: 20,
             runSpacing: 8,
             children: [
-              _footerLink('Privacy Policy'),
-              _footerLink('Terms & Conditions'),
-              _footerLink('Refund & Cancellation'),
+              _footerLink(
+                'Privacy Policy',
+                onTap: () => _showPolicyDialog(
+                  context,
+                  'Privacy Policy',
+                  'At EBS Essential BioCrop Science, we prioritize customer confidentiality. We only collect essential contact, shipping, and order details necessary to fulfill agricultural product deliveries. Your personal information is never sold or shared with unauthorized third parties. All online payments are encrypted through PCI-DSS compliant secure gateways.',
+                ),
+              ),
+              _footerLink(
+                'Terms & Conditions',
+                onTap: () => _showPolicyDialog(
+                  context,
+                  'Terms & Conditions',
+                  'All agricultural inputs, seeds, bio-fertilizers, and crop protection products listed on EBS Essential BioCrop Science are 100% genuine and verified. Recommendations, dosages, and application methods provided on this site are for general guidance; farmers are advised to adhere to product packaging instructions according to local soil and crop conditions.',
+                ),
+              ),
+              _footerLink(
+                'Refund & Cancellation',
+                onTap: () => _showPolicyDialog(
+                  context,
+                  'Refund & Cancellation Policy',
+                  'We ensure complete peace of mind with our 7-day Easy Replacement & Refund guarantee for damaged, leaked, or incorrect shipments. Orders can be cancelled prior to warehouse dispatch through My Orders or by contacting our Farmer Support Helpline at +91 9098544263.',
+                ),
+              ),
             ],
           ),
         ],
@@ -457,7 +480,14 @@ class WebFooter extends StatelessWidget {
             );
           },
         ),
-        _footerLink('About EBS Essential BioCrop Science'),
+        _footerLink(
+          'About EBS Essential BioCrop Science',
+          onTap: () => _showPolicyDialog(
+            context,
+            'About EBS Essential BioCrop Science',
+            'EBS Essential BioCrop Science is dedicated to pioneering agricultural biotechnology, high-yield crop nutrition, certified organic inputs, and verified hybrid seeds for farmers across India. With scientific rigor and farmer-first values, we deliver lab-certified solutions directly to your farm.',
+          ),
+        ),
         _footerLink(
           'Be a Partner',
           onTap: () {
@@ -476,8 +506,25 @@ class WebFooter extends StatelessWidget {
             );
           },
         ),
-        _footerLink('Agronomist Consultation'),
-        _footerLink('Research & Formulations'),
+        _footerLink(
+          'Agronomist Consultation',
+          onTap: () async {
+            final clean = AppConstants.helplineNumber.replaceAll(RegExp(r'[^0-9]'), '');
+            final uri = Uri.parse('https://wa.me/$clean?text=Hello%20EBS%20Agronomist%2C%20I%20need%20expert%20consultation%20for%20my%20crops.');
+            try {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } catch (_) {}
+          },
+        ),
+        _footerLink(
+          'Research & Formulations',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TechnicalSearchView()),
+            );
+          },
+        ),
       ],
     );
   }
@@ -487,50 +534,227 @@ class WebFooter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _columnTitle('Farmer & Dealer Support'),
-        Row(
-          children: [
-            const Icon(Icons.support_agent_rounded, color: AppColors.primaryGreen, size: 24),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppConstants.helplineNumber,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+        // Click-to-call Phone Row
+        InkWell(
+          onTap: () async {
+            final clean = AppConstants.helplineNumber.replaceAll(RegExp(r'[^0-9]'), '');
+            final uri = Uri.parse('tel:$clean');
+            try {
+              await launchUrl(uri);
+            } catch (_) {}
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.call_rounded, color: AppColors.primaryGreen, size: 18),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppConstants.helplineNumber,
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'Mon - Sat: 9:00 AM - 7:00 PM',
+                        style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 11),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Dedicated WhatsApp Chat Support Card
+        InkWell(
+          onTap: () async {
+            final clean = AppConstants.helplineNumber.replaceAll(RegExp(r'[^0-9]'), '');
+            final uri = Uri.parse('https://wa.me/$clean?text=Hello%20EBS%20BioCrop%20Science%2C%20I%20need%20support%20with%20my%20order%20or%20products.');
+            try {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } catch (_) {}
+          },
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+            decoration: BoxDecoration(
+              color: const Color(0xFF221E1C),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.45)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF25D366),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: CustomPaint(
+                      size: Size(16, 16),
+                      painter: WhatsAppIconPainter(color: Colors.white),
                     ),
                   ),
-                  Text(
-                    'Mon - Sat: 9:00 AM - 7:00 PM',
-                    style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 11),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Chat on WhatsApp',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'Instant Farmer Advisory • 24/7',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF86EFAC),
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Color(0xFF9CA3AF),
+                  size: 12,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-        const SizedBox(height: 14),
-        Text(
-          'Email Support: support@ebsbiocrop.com',
-          style: GoogleFonts.poppins(color: const Color(0xFF9CA3AF), fontSize: 13),
+        const SizedBox(height: 12),
+
+        // Click-to-email Row
+        InkWell(
+          onTap: () async {
+            final uri = Uri.parse('mailto:support@ebsbiocrop.com?subject=EBS%20BioCrop%20Inquiry');
+            try {
+              await launchUrl(uri);
+            } catch (_) {}
+          },
+          child: Row(
+            children: [
+              const Icon(Icons.email_outlined, color: AppColors.textMuted, size: 15),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  'support@ebsbiocrop.com',
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF9CA3AF),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget _buildSocialMediaRow(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      spacing: 10,
+      runSpacing: 8,
       children: const [
+        SocialIconButton(platform: SocialPlatform.whatsapp),
         SocialIconButton(platform: SocialPlatform.facebook),
-        SizedBox(width: 12),
         SocialIconButton(platform: SocialPlatform.instagram),
-        SizedBox(width: 12),
         SocialIconButton(platform: SocialPlatform.youtube),
       ],
+    );
+  }
+
+  void _showPolicyDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        actionsPadding: const EdgeInsets.all(16),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.shield_outlined, color: AppColors.primaryGreen, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Text(
+            content,
+            style: GoogleFonts.poppins(
+              color: const Color(0xFFCBD5E1),
+              fontSize: 13,
+              height: 1.6,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Close',
+              style: GoogleFonts.poppins(
+                color: AppColors.primaryGreen,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -549,16 +773,41 @@ class WebFooter extends StatelessWidget {
   }
 
   Widget _footerLink(String label, {VoidCallback? onTap}) {
+    return _FooterLinkWidget(label: label, onTap: onTap);
+  }
+}
+
+class _FooterLinkWidget extends StatefulWidget {
+  final String label;
+  final VoidCallback? onTap;
+
+  const _FooterLinkWidget({required this.label, this.onTap});
+
+  @override
+  State<_FooterLinkWidget> createState() => _FooterLinkWidgetState();
+}
+
+class _FooterLinkWidgetState extends State<_FooterLinkWidget> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: onTap,
-        child: Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: const Color(0xFF9CA3AF),
-            fontSize: 13,
-            fontWeight: FontWeight.w400,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 160),
+            style: GoogleFonts.poppins(
+              color: _isHovered ? Colors.white : const Color(0xFF9CA3AF),
+              fontSize: 13,
+              fontWeight: _isHovered ? FontWeight.w600 : FontWeight.w400,
+            ),
+            child: Text(widget.label),
           ),
         ),
       ),
@@ -567,6 +816,12 @@ class WebFooter extends StatelessWidget {
 }
 
 enum SocialPlatform {
+  whatsapp(
+    name: 'WhatsApp',
+    tooltip: 'Chat with BioCrop on WhatsApp',
+    url: 'https://wa.me/919098544263?text=Hello%20EBS%20BioCrop%20Science%2C%20I%20have%20an%20inquiry%20about%20your%20products.',
+    color: Color(0xFF25D366),
+  ),
   facebook(
     name: 'Facebook',
     tooltip: 'Follow BioCrop on Facebook',
@@ -632,6 +887,12 @@ class _SocialIconButtonState extends State<SocialIconButton> {
   Widget build(BuildContext context) {
     Widget iconWidget;
     switch (widget.platform) {
+      case SocialPlatform.whatsapp:
+        iconWidget = const CustomPaint(
+          size: Size(18, 18),
+          painter: WhatsAppIconPainter(color: Colors.white),
+        );
+        break;
       case SocialPlatform.facebook:
         iconWidget = const CustomPaint(
           size: Size(18, 18),

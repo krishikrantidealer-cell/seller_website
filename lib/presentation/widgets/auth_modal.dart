@@ -542,9 +542,9 @@ class _OtpVerificationView extends StatefulWidget {
 }
 
 class _OtpVerificationViewState extends State<_OtpVerificationView> {
-  final List<TextEditingController> _controllers = List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
-  int _secondsRemaining = 30;
+  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  int _secondsRemaining = 60;
   Timer? _timer;
 
   @override
@@ -557,7 +557,8 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
   }
 
   void _startTimer() {
-    _secondsRemaining = 30;
+    final cooldown = AuthController.instance.cooldownSeconds;
+    _secondsRemaining = cooldown > 0 ? cooldown : 60;
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) return;
@@ -587,6 +588,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
 
   void _verify() async {
     final otp = _otp;
+    if (otp.length != 6) return;
     final success = await AuthController.instance.verifyOtp(otp);
     if (success && mounted) {
       Navigator.pop(context);
@@ -604,8 +606,8 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
   }
 
   void _fillDemoOtp() {
-    const demo = '1234';
-    for (int i = 0; i < 4; i++) {
+    const demo = '123456';
+    for (int i = 0; i < 6; i++) {
       _controllers[i].text = demo[i];
     }
     setState(() {});
@@ -670,7 +672,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                'Enter 4-digit code sent to ',
+                'Enter 6-digit code sent to ',
                 style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textSecondary),
               ),
               Text(
@@ -693,52 +695,72 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
           ),
           const SizedBox(height: 20),
 
-          // 4-box OTP Input
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(4, (index) {
-              return SizedBox(
-                width: widget.isMobile ? 54 : 64,
-                height: 56,
-                child: TextField(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  maxLength: 1,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primaryDarkGreen,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    filled: true,
-                    fillColor: const Color(0xFFF8FAFC),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+          // 6-box OTP Input
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final boxWidth = ((constraints.maxWidth - (5 * 8)) / 6).clamp(36.0, 56.0);
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(6, (index) {
+                  return Container(
+                    width: boxWidth,
+                    height: 52,
+                    margin: EdgeInsets.symmetric(horizontal: widget.isMobile ? 2.5 : 4),
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      style: GoogleFonts.poppins(
+                        fontSize: widget.isMobile ? 18 : 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryDarkGreen,
+                      ),
+                      decoration: InputDecoration(
+                        counterText: '',
+                        contentPadding: EdgeInsets.zero,
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val.length > 1) {
+                          final digits = val.replaceAll(RegExp(r'\D'), '');
+                          for (int i = 0; i < 6 && i < digits.length; i++) {
+                            _controllers[i].text = digits[i];
+                          }
+                          _focusNodes[5].requestFocus();
+                          setState(() {});
+                          if (_otp.length == 6) {
+                            _verify();
+                          }
+                          return;
+                        }
+
+                        if (val.isNotEmpty && index < 5) {
+                          _focusNodes[index + 1].requestFocus();
+                        } else if (val.isEmpty && index > 0) {
+                          _focusNodes[index - 1].requestFocus();
+                        }
+                        setState(() {});
+                        if (_otp.length == 6) {
+                          _verify();
+                        }
+                      },
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
-                    ),
-                  ),
-                  onChanged: (val) {
-                    if (val.isNotEmpty && index < 3) {
-                      _focusNodes[index + 1].requestFocus();
-                    } else if (val.isEmpty && index > 0) {
-                      _focusNodes[index - 1].requestFocus();
-                    }
-                    setState(() {});
-                    if (_otp.length == 4) {
-                      _verify();
-                    }
-                  },
-                ),
+                  );
+                }),
               );
-            }),
+            },
           ),
 
           // Error Message
@@ -749,9 +771,12 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
               children: [
                 const Icon(Icons.error_outline_rounded, size: 14, color: AppColors.primaryCrimson),
                 const SizedBox(width: 4),
-                Text(
-                  auth.errorMessage!,
-                  style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
+                Flexible(
+                  child: Text(
+                    auth.errorMessage!,
+                    style: GoogleFonts.poppins(fontSize: 11, color: AppColors.primaryCrimson, fontWeight: FontWeight.w500),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
@@ -778,7 +803,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                     const SizedBox(width: 4),
                     Flexible(
                       child: Text(
-                        'Test Mode: Tap to auto-verify with demo OTP (1234)',
+                        'Test Mode: Tap to auto-verify with demo OTP (123456)',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           color: AppColors.primaryDarkGreen,
@@ -801,7 +826,7 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
             width: double.infinity,
             height: 46,
             child: ElevatedButton(
-              onPressed: auth.isLoading || _otp.length < 4 ? null : _verify,
+              onPressed: auth.isLoading || _otp.length < 6 ? null : _verify,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
@@ -831,9 +856,15 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
                     style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
                   )
                 : TextButton.icon(
-                    onPressed: () {
-                      _startTimer();
-                      auth.resendOtp();
+                    onPressed: () async {
+                      for (final c in _controllers) {
+                        c.clear();
+                      }
+                      _focusNodes[0].requestFocus();
+                      final sent = await auth.resendOtp();
+                      if (sent) {
+                        _startTimer();
+                      }
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 16, color: AppColors.primaryGreen),
                     label: Text(

@@ -20,6 +20,7 @@ class ApiEndpoints {
   static String productById(String id) => '/api/v1/products/$id';
   static String productsByCategory(String categoryId) => '/api/v1/products/category/$categoryId';
   static const String productsSearch = '/api/v1/products/search';
+  static const String technicalNames = '/api/v1/technical-names';
   static const String collections = '/api/v1/collections';
   static String collectionById(String id) => '/api/v1/collections/$id';
 
@@ -33,5 +34,6 @@ class ApiEndpoints {
   static const String checkoutSummary = '/api/v1/checkout/summary';
   static const String checkoutInitiatePayment = '/api/v1/checkout/initiate-payment';
   static const String checkoutConfirmOrder = '/api/v1/checkout/confirm-order';
+  static const String fastrrCheckoutToken = '/api/v1/fastrr/checkout/token';
   static String checkoutTrack(String orderId) => '/api/v1/checkout/track/$orderId';
 }

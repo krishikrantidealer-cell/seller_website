@@ -14,6 +14,11 @@ class AppTheme {
         secondary: AppColors.primaryCrimson,
         surface: AppColors.surface,
       ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.primaryGreen,
+        selectionColor: AppColors.primaryGreen.withValues(alpha: 0.25),
+        selectionHandleColor: AppColors.primaryGreen,
+      ),
       scaffoldBackgroundColor: AppColors.background,
       textTheme: baseTextTheme.apply(
         bodyColor: AppColors.textPrimary,

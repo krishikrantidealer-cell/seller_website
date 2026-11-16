@@ -136,7 +136,7 @@ class ProductController extends ChangeNotifier {
         }
       }
 
-      _products = allProducts;
+      _products = allProducts.where((p) => p.isAvailable).toList();
       _hasLoadedFromApi = true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -157,7 +157,10 @@ class ProductController extends ChangeNotifier {
   /// Synchronizes the controller state when `ProductBloc` emits new products.
   void syncFromBloc(List<ProductItem> items) {
     final categories = CategoryController.instance.categories;
-    _products = items.map((p) => p.withResolvedCategory(categories)).toList();
+    _products = items
+        .where((p) => p.isAvailable)
+        .map((p) => p.withResolvedCategory(categories))
+        .toList();
     _hasLoadedFromApi = true;
     _isLoading = false;
     _errorMessage = null;

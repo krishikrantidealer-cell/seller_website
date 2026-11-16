@@ -7,11 +7,12 @@ import '../../domain/repositories/category_repository.dart';
 import 'category_event.dart';
 import 'category_state.dart';
 
-class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
+class CategoryBloc extends Bloc<CategoryEvent, CategoryState> with WidgetsBindingObserver {
   final CategoryRepository categoryRepository;
   final WebSocketService _webSocketService;
   StreamSubscription? _wsSubscription;
   VoidCallback? _controllerListener;
+  Timer? _syncTimer;
 
   CategoryBloc({
     required this.categoryRepository,
@@ -42,6 +43,15 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       }
     };
     CategoryController.instance.addListener(_controllerListener!);
+
+    if (!_isTestEnvironment) {
+      WidgetsBinding.instance.addObserver(this);
+      _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+        if (!isClosed) {
+          add(const FetchCategories(isRefresh: true, isBackground: true));
+        }
+      });
+    }
   }
 
   bool get _isTestEnvironment {
@@ -49,8 +59,19 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !isClosed) {
+      add(const FetchCategories(isRefresh: true, isBackground: true));
+    }
+  }
+
+  @override
   Future<void> close() {
     _wsSubscription?.cancel();
+    _syncTimer?.cancel();
+    if (!_isTestEnvironment) {
+      WidgetsBinding.instance.removeObserver(this);
+    }
     if (_controllerListener != null) {
       CategoryController.instance.removeListener(_controllerListener!);
     }
@@ -71,7 +92,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
           ),
         );
         if (!_isTestEnvironment) {
-          add(const FetchCategories(isBackground: true));
+          add(const FetchCategories(isRefresh: true, isBackground: true));
         }
         return;
       }

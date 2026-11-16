@@ -178,7 +178,7 @@ void main() {
     expect(find.widgetWithText(OutlinedButton, 'Login / My Account'), findsOneWidget);
   });
 
-  testWidgets('Best Sellers View All shows only Best Seller products', (WidgetTester tester) async {
+  testWidgets('HomeView does not render hardcoded Best Sellers section', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -187,25 +187,7 @@ void main() {
     await tester.pumpWidget(const SellerWebsiteApp());
     await tester.pump();
 
-    // Verify button says "View All" on desktop (not "View All Products")
-    expect(find.text('View All Products'), findsNothing);
-    final viewAllBtn = find.text('View All');
-    expect(viewAllBtn, findsOneWidget);
-
-    // Tap View All on Best Sellers section
-    await tester.tap(viewAllBtn);
-    await tester.pumpAndSettle();
-
-    // Verify CategoryDetailView opens in Best Sellers mode
-    expect(find.byType(CategoryDetailView), findsOneWidget);
-    expect(find.text('Back to Home'), findsOneWidget);
-    expect(find.text('Featured'), findsOneWidget);
-    // Categories filter chips should NOT be displayed in Best Sellers view
-    expect(find.text('All Products'), findsNothing);
-    expect(find.text('Insecticides'), findsNothing);
-    // Non-bestseller products should NOT be displayed
-    expect(find.textContaining('Nano Urea'), findsNothing);
-    expect(find.textContaining('Tata Rallis'), findsNothing);
+    expect(find.text('Best Sellers'), findsNothing);
   });
 
   testWidgets('Mobile view displays phone number and opens dropdown when tapped', (WidgetTester tester) async {
@@ -275,7 +257,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify we are back on the home page
-    expect(find.text('Best Sellers'), findsWidgets);
+    expect(find.byType(HomeView), findsOneWidget);
   });
 
   testWidgets('Major category hover opens categories and hovering category opens subcategories in the side', (WidgetTester tester) async {
@@ -832,9 +814,8 @@ void main() {
     await tester.tap(find.text('Back to Home'));
     await tester.pumpAndSettle();
 
-    // Verify back on home page with Best Sellers
+    // Verify back on home page
     expect(find.byType(HomeView), findsOneWidget);
-    expect(find.text('Best Sellers'), findsWidgets);
   });
 
   testWidgets('CategoryRibbon renders cleanly on narrow mobile screen without overflow', (WidgetTester tester) async {
@@ -1336,7 +1317,6 @@ void main() {
 
     // Verify on home screen
     expect(find.byType(HomeView), findsOneWidget);
-    expect(find.text('Best Sellers'), findsWidgets);
 
     // Click on 'Crop Protection' tab in category ribbon
     final cropProtectionTab = find.text('Crop Protection').first;
@@ -1384,7 +1364,6 @@ void main() {
 
     // Verify back on home screen
     expect(find.byType(HomeView), findsOneWidget);
-    expect(find.text('Best Sellers'), findsWidgets);
   });
 
   testWidgets('CategoryDetailView mobile view renders compact top bar with back button and filter button without major or sub category bars', (WidgetTester tester) async {
@@ -1920,6 +1899,36 @@ void main() {
 
     // Verify submission confirmation
     expect(find.text('Partner Application Submitted!'), findsOneWidget);
+  });
+
+  testWidgets('Already-open ProductDetailView switches to unavailable state when product is removed from live catalog', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+      ProductController.instance.resetToSampleProducts();
+    });
+
+    final product = ProductItem.sampleProducts.first;
+    ProductController.instance.setProductsForTesting([product]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ProductDetailView(product: product),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(product.title), findsWidgets);
+    expect(find.text('This product is currently unavailable'), findsNothing);
+
+    // Simulate product being marked unavailable on backend and synced out of catalog
+    ProductController.instance.setProductsForTesting([]);
+    await tester.pumpAndSettle();
+
+    expect(find.text('This product is currently unavailable'), findsOneWidget);
+    expect(find.text('Browse Other Products'), findsOneWidget);
   });
 }
 

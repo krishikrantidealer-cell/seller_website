@@ -38,8 +38,14 @@ class _ProductCardState extends State<ProductCard> {
   void didUpdateWidget(covariant ProductCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.product.id != widget.product.id ||
-        !widget.product.variants.any((v) => v.id == _selectedVariant.id)) {
+        !widget.product.variants.any((v) => v.id == _selectedVariant.id) ||
+        oldWidget.product.defaultVariant.id != widget.product.defaultVariant.id) {
       _selectedVariant = widget.product.defaultVariant;
+    } else if (widget.product.variants.isNotEmpty) {
+      _selectedVariant = widget.product.variants.firstWhere(
+        (v) => v.id == _selectedVariant.id,
+        orElse: () => widget.product.defaultVariant,
+      );
     }
   }
 

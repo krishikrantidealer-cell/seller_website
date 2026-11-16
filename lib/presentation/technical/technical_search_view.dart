@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/services/product_api_service.dart';
+import '../../data/services/technical_name_api_service.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
@@ -11,7 +12,9 @@ import '../widgets/web_footer.dart';
 import '../category/category_detail_view.dart';
 
 class TechnicalSearchView extends StatefulWidget {
-  const TechnicalSearchView({super.key});
+  final String? initialQuery;
+
+  const TechnicalSearchView({super.key, this.initialQuery});
 
   @override
   State<TechnicalSearchView> createState() => _TechnicalSearchViewState();
@@ -26,10 +29,64 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
   String? _selectedLetterFilter;
   final Set<String> _expandedLetters = {'A'}; // Only 'A' open by default
 
-  final List<TechnicalItem> _allTechnicals = TechnicalItem.sampleTechnicalItems;
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialQuery?.trim() ?? '';
+    if (initial.isNotEmpty) {
+      _searchQuery = initial;
+      _searchController.text = initial;
+    }
+    ProductController.instance.addListener(_onProductsUpdated);
+    TechnicalNameController.instance.addListener(_onProductsUpdated);
+    if (ProductController.instance.products.isEmpty &&
+        !ProductController.instance.hasLoadedFromApi) {
+      ProductController.instance.fetchProducts();
+    }
+    if (!TechnicalNameController.instance.hasLoadedFromApi) {
+      TechnicalNameController.instance.fetchTechnicalNames();
+    }
+  }
+
+  void _onProductsUpdated() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  List<TechnicalItem> get _allTechnicals {
+    final apiItems = TechnicalNameController.instance.items;
+    final List<TechnicalItem> items = List<TechnicalItem>.from(
+      apiItems.isNotEmpty ? apiItems : TechnicalItem.sampleTechnicalItems,
+    );
+    final seenNames = items.map((t) => t.name.trim().toLowerCase()).toSet();
+
+    for (final p in ProductController.instance.products) {
+      if (!p.isAvailable) continue;
+      final tech = p.technicalName.trim();
+      if (tech.isEmpty) continue;
+      final lowerTech = tech.toLowerCase();
+      final alreadyCovered = seenNames.any(
+        (existing) => existing.contains(lowerTech) || lowerTech.contains(existing),
+      );
+      if (!alreadyCovered) {
+        seenNames.add(lowerTech);
+        items.add(
+          TechnicalItem(
+            name: tech,
+            category: p.category.isNotEmpty ? p.category : 'Agricultural Input',
+            description: 'Available in ${p.title}${p.vendor.isNotEmpty ? ' by ${p.vendor}' : ''}',
+          ),
+        );
+      }
+    }
+    return items;
+  }
 
   @override
   void dispose() {
+    ProductController.instance.removeListener(_onProductsUpdated);
+    TechnicalNameController.instance.removeListener(_onProductsUpdated);
     _searchController.dispose();
     super.dispose();
   }
@@ -70,9 +127,13 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
 
   // Check how many products in our store share this technical formulation
   int _getProductCountForTechnical(String techName) {
+    final target = techName.trim().toLowerCase();
+    if (target.isEmpty) return 0;
     return ProductController.instance.products.where((p) {
-      return p.technicalName.toLowerCase().contains(techName.toLowerCase()) ||
-          techName.toLowerCase().contains(p.technicalName.toLowerCase());
+      if (!p.isAvailable) return false;
+      final prodTech = p.technicalName.trim().toLowerCase();
+      if (prodTech.isEmpty) return false;
+      return prodTech.contains(target) || target.contains(prodTech);
     }).length;
   }
 
@@ -125,6 +186,9 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                     setState(() {
                       _searchQuery = q;
                       _searchController.text = q;
+                      if (q.trim().isNotEmpty) {
+                        _expandedLetters.addAll(_groupedByLetter.keys);
+                      }
                     });
                   },
                 ),
@@ -964,12 +1028,16 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              item.name,
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                            Flexible(
+                              child: Text(
+                                item.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),

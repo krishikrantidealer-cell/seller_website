@@ -7,11 +7,12 @@ import '../../domain/repositories/product_repository.dart';
 import 'product_event.dart';
 import 'product_state.dart';
 
-class ProductBloc extends Bloc<ProductEvent, ProductState> {
+class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingObserver {
   final ProductRepository productRepository;
   final WebSocketService _webSocketService;
   StreamSubscription? _wsSubscription;
   VoidCallback? _controllerListener;
+  Timer? _syncTimer;
 
   ProductBloc({
     required this.productRepository,
@@ -20,7 +21,9 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         super(
           ProductState(
             status: ProductStatus.loaded,
-            products: ProductController.instance.products,
+            products: ProductController.instance.products
+                .where((p) => p.isAvailable)
+                .toList(),
           ),
         ) {
     on<InitializeProducts>(_onInitializeProducts);
@@ -43,6 +46,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       }
     };
     ProductController.instance.addListener(_controllerListener!);
+
+    if (!_isTestEnvironment) {
+      WidgetsBinding.instance.addObserver(this);
+      _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+        if (!isClosed) {
+          add(const FetchProducts(isRefresh: true, isBackground: true));
+        }
+      });
+    }
   }
 
   bool get _isTestEnvironment {
@@ -50,8 +62,19 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !isClosed) {
+      add(const FetchProducts(isRefresh: true, isBackground: true));
+    }
+  }
+
+  @override
   Future<void> close() {
     _wsSubscription?.cancel();
+    _syncTimer?.cancel();
+    if (!_isTestEnvironment) {
+      WidgetsBinding.instance.removeObserver(this);
+    }
     if (_controllerListener != null) {
       ProductController.instance.removeListener(_controllerListener!);
     }
@@ -72,7 +95,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           ),
         );
         if (!_isTestEnvironment) {
-          add(const FetchProducts(isBackground: true));
+          add(const FetchProducts(isRefresh: true, isBackground: true));
         }
         return;
       }
@@ -93,13 +116,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
 
     try {
-      final products = await productRepository.getProducts(
+      final fetched = await productRepository.getProducts(
         forceRefresh: event.isRefresh,
       );
+      final available = fetched.where((p) => p.isAvailable).toList();
+      final availableIds = available.map((p) => p.id).toSet();
       emit(
         state.copyWith(
           status: ProductStatus.loaded,
-          products: products,
+          products: available,
+          categoryProducts: state.categoryProducts
+              ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+              .toList(),
+          searchResults: state.searchResults
+              ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+              .toList(),
         ),
       );
     } catch (e) {
@@ -162,10 +193,18 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     ProductsExternalUpdated event,
     Emitter<ProductState> emit,
   ) {
+    final available = event.products.where((p) => p.isAvailable).toList();
+    final availableIds = available.map((p) => p.id).toSet();
     emit(
       state.copyWith(
         status: ProductStatus.loaded,
-        products: event.products,
+        products: available,
+        categoryProducts: state.categoryProducts
+            ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+            .toList(),
+        searchResults: state.searchResults
+            ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+            .toList(),
       ),
     );
   }

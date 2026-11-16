@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/cart_state.dart';
@@ -874,19 +875,44 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                       ),
                     ],
                   ),
-                  InkWell(
-                    onTap: () => _copyToClipboard(order.awbNumber, 'AWB tracking number copied!'),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.copy_rounded, size: 13, color: AppColors.primaryGreen),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Copy AWB',
-                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 4,
+                    children: [
+                      InkWell(
+                        onTap: () => _copyToClipboard(order.awbNumber, 'AWB tracking number copied!'),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.copy_rounded, size: 13, color: AppColors.primaryGreen),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Copy AWB',
+                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primaryGreen),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          final uri = Uri.parse('https://shiprocket.co/tracking/${order.awbNumber}');
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          }
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.open_in_new_rounded, size: 13, color: Color(0xFF2563EB)),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Track on Shiprocket',
+                              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2563EB)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

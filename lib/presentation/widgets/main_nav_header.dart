@@ -14,6 +14,7 @@ import '../wishlist/wishlist_view.dart';
 class MainNavHeader extends StatefulWidget {
   final int? cartItemCount;
   final ValueChanged<String>? onSearch;
+  final String? searchQuery;
   final VoidCallback? onCartTap;
   final VoidCallback? onTechnicalSearchTap;
 
@@ -23,6 +24,7 @@ class MainNavHeader extends StatefulWidget {
     super.key,
     this.cartItemCount,
     this.onSearch,
+    this.searchQuery,
     this.onCartTap,
     this.onTechnicalSearchTap,
     this.onMenuTap,
@@ -34,6 +36,36 @@ class MainNavHeader extends StatefulWidget {
 
 class _MainNavHeaderState extends State<MainNavHeader> {
   final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
+      _searchController.text = widget.searchQuery!;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant MainNavHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchQuery != null &&
+        widget.searchQuery != oldWidget.searchQuery &&
+        widget.searchQuery != _searchController.text &&
+        widget.searchQuery!.isEmpty) {
+      _searchController.clear();
+    }
+  }
+
+  void _handleSearchChanged(String value) {
+    setState(() {});
+    widget.onSearch?.call(value);
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {});
+    widget.onSearch?.call('');
+  }
 
   @override
   void dispose() {
@@ -146,7 +178,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 );
                               },
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 10),
                             AnimatedBuilder(
                               animation: CartController.instance,
                               builder: (context, _) {
@@ -156,19 +188,21 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                   borderRadius: BorderRadius.circular(8),
                                   child: Padding(
                                     padding: const EdgeInsets.all(4),
-                                    child: Badge(
-                                      label: Text(
-                                        count.toString(),
-                                        style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
-                                      ),
-                                      backgroundColor: AppColors.primaryCrimson,
-                                      child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
-                                    ),
+                                    child: count > 0
+                                        ? Badge(
+                                            label: Text(
+                                              count.toString(),
+                                              style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold),
+                                            ),
+                                            backgroundColor: AppColors.primaryCrimson,
+                                            child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
+                                          )
+                                        : const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 22),
                                   ),
                                 );
                               },
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 10),
                             AnimatedBuilder(
                               animation: AuthController.instance,
                               builder: (context, _) {
@@ -209,6 +243,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             ),
                             child: TextField(
                               controller: _searchController,
+                              onChanged: _handleSearchChanged,
                               onSubmitted: widget.onSearch,
                               textAlignVertical: TextAlignVertical.center,
                               style: GoogleFonts.poppins(
@@ -228,20 +263,36 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 contentPadding: EdgeInsets.zero,
-                                suffixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 40),
-                                suffixIcon: Container(
-                                  margin: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryCrimson,
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    icon: const Icon(Icons.search, color: Colors.white, size: 16),
-                                    onPressed: () {
-                                      widget.onSearch?.call(_searchController.text);
-                                    },
-                                  ),
+                                suffixIconConstraints: BoxConstraints(
+                                  minWidth: _searchController.text.isNotEmpty ? 68 : 36,
+                                  minHeight: 40,
+                                ),
+                                suffixIcon: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_searchController.text.isNotEmpty)
+                                      IconButton(
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 28, minHeight: 32),
+                                        icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 16),
+                                        tooltip: 'Clear search',
+                                        onPressed: _clearSearch,
+                                      ),
+                                    Container(
+                                      margin: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryCrimson,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(Icons.search, color: Colors.white, size: 16),
+                                        onPressed: () {
+                                          widget.onSearch?.call(_searchController.text);
+                                        },
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -307,6 +358,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 ),
                                 child: TextField(
                                   controller: _searchController,
+                                  onChanged: _handleSearchChanged,
                                   onSubmitted: widget.onSearch,
                                   textAlignVertical: TextAlignVertical.center,
                                   style: GoogleFonts.poppins(
@@ -326,19 +378,43 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                     enabledBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     contentPadding: EdgeInsets.zero,
-                                    suffixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 46),
-                                    suffixIcon: Container(
-                                      margin: const EdgeInsets.all(4),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryCrimson,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: IconButton(
-                                        icon: const Icon(Icons.search, color: Colors.white, size: 18),
-                                        onPressed: () {
-                                          widget.onSearch?.call(_searchController.text);
-                                        },
-                                      ),
+                                    suffixIconConstraints: BoxConstraints(
+                                      minWidth: _searchController.text.isNotEmpty ? 76 : 40,
+                                      minHeight: 46,
+                                    ),
+                                    suffixIcon: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (_searchController.text.isNotEmpty)
+                                          IconButton(
+                                            style: IconButton.styleFrom(
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              minimumSize: const Size(28, 36),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 18),
+                                            tooltip: 'Clear search',
+                                            onPressed: _clearSearch,
+                                          ),
+                                        Container(
+                                          margin: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryCrimson,
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: IconButton(
+                                            style: IconButton.styleFrom(
+                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              minimumSize: const Size(36, 36),
+                                              padding: EdgeInsets.zero,
+                                            ),
+                                            icon: const Icon(Icons.search, color: Colors.white, size: 18),
+                                            onPressed: () {
+                                              widget.onSearch?.call(_searchController.text);
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -514,22 +590,26 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   }
 
   Widget _buildLogo({bool isCompact = false, bool isSmallMobile = false}) {
-    final double logoHeight = isSmallMobile ? 38 : (isCompact ? 50 : 70);
+    final double logoHeight = isSmallMobile ? 46 : (isCompact ? 56 : 66);
+    final double maxLogoWidth = isSmallMobile ? 175 : (isCompact ? 215 : 255);
 
     return Tooltip(
-      message: 'EBS Essential BioCrop Science',
+      message: 'Ebs Krishi Dukaan',
       child: InkWell(
         onTap: () {
           Navigator.of(context).popUntil((route) => route.isFirst);
         },
         borderRadius: BorderRadius.circular(8),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
-          child: Image.asset(
-            'assets/images/ebs_logo.png',
-            height: logoHeight,
-            fit: BoxFit.contain,
-            filterQuality: FilterQuality.high,
+          padding: EdgeInsets.symmetric(vertical: 2, horizontal: isSmallMobile ? 0 : 4),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxLogoWidth),
+            child: Image.asset(
+              'assets/images/ebs_logo.png',
+              height: logoHeight,
+              fit: BoxFit.contain,
+              filterQuality: FilterQuality.medium,
+              isAntiAlias: true,
             errorBuilder: (_, _, _) => FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
@@ -557,6 +637,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 ),
               ),
             ),
+          ),
           ),
         ),
       ),

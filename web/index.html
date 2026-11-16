@@ -5,20 +5,151 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="EBS Essential BioCrop Science Seller Web Portal">
+  <meta name="description" content="EBS Krishi Dukaan - Essential BioCrop Science Online Agriculture & Farmer Store">
+  <link rel="canonical" href="https://ebskrishidukaan.com/">
+
+  <!-- OpenGraph Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="EBS Krishi Dukaan | Essential BioCrop Science">
+  <meta property="og:description" content="Buy 100% Genuine Agricultural Inputs, Crop Nutrition & Protection Direct from Essential BioCrop Science. Fast Delivery Across India.">
+  <meta property="og:url" content="https://ebskrishidukaan.com/">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Seller Website">
+  <meta name="apple-mobile-web-app-title" content="EBS Krishi Dukaan">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>EBS Essential BioCrop Science | Agriculture E-Commerce</title>
+  <title>EBS Krishi Dukaan | Essential BioCrop Science</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Razorpay Web Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Fastrr (Shiprocket 1-Click Checkout) Web SDK -->
+  <link rel="stylesheet" href="https://fastrr-boost-ui.pickrr.com/assets/styles/shopify.css">
+  <style>
+    #fastrr-main-container, #headless-container, .headless-modal {
+      z-index: 2147483647 !important;
+    }
+  </style>
+  <script id="fastrr-checkout-sdk" src="https://fastrr-boost-ui.pickrr.com/assets/js/channels/custom.js"></script>
   <script>
+    window.launchFastrrCheckout = function(optionsJson, onOrderSuccess, onDismiss, onFailure) {
+      try {
+        var options = typeof optionsJson === 'string' ? JSON.parse(optionsJson) : optionsJson;
+        console.log('Opening Fastrr (Shiprocket Checkout)...', options);
+
+        if (window.HeadlessCheckout && typeof window.HeadlessCheckout.addToCart === 'function' && options.token) {
+          var settled = false;
+          var cleanCurrentUrl = window.location.origin + window.location.pathname + window.location.hash;
+          var fallbackUrl = cleanCurrentUrl;
+          window.HeadlessCheckout.addToCart(
+            null,
+            options.token,
+            { fallbackUrl: fallbackUrl },
+            function(resp) {
+              settled = true;
+              if (resp && (resp.status === 'success' || resp.order_id || resp.orderId)) {
+                if (onOrderSuccess) onOrderSuccess(typeof resp === 'string' ? resp : JSON.stringify(resp));
+              } else {
+                if (onDismiss) onDismiss();
+              }
+            }
+          );
+
+          // Resolve onDismiss if user closes the Fastrr modal without triggering callback
+          var observer = new MutationObserver(function() {
+            if (!settled && !document.getElementById('headless-container')) {
+              settled = true;
+              observer.disconnect();
+              if (onDismiss) onDismiss();
+            }
+          });
+          setTimeout(function() {
+            var container = document.getElementById('fastrr-main-container') || document.body;
+            observer.observe(container, { childList: true, subtree: true });
+          }, 500);
+        } else if (window.fastrr && typeof window.fastrr.openCheckout === 'function') {
+          window.fastrr.openCheckout({
+            data: options,
+            onSuccess: function(resp) {
+              if (onOrderSuccess) onOrderSuccess(typeof resp === 'string' ? resp : JSON.stringify(resp));
+            },
+            onClose: function() {
+              if (onDismiss) onDismiss();
+            },
+            onError: function(err) {
+              if (onFailure) onFailure(err ? err.toString() : 'Fastrr Error');
+            }
+          });
+        } else if (window.FastrrCheckout && typeof window.FastrrCheckout.open === 'function') {
+          window.FastrrCheckout.open(options, {
+            onSuccess: function(resp) {
+              if (onOrderSuccess) onOrderSuccess(typeof resp === 'string' ? resp : JSON.stringify(resp));
+            },
+            onClose: function() {
+              if (onDismiss) onDismiss();
+            }
+          });
+        } else {
+          // Fallback or direct checkout trigger
+          console.warn('Fastrr SDK initialized. Modal opening or pending merchant API activation.');
+          if (onFailure) {
+            onFailure('Fastrr Checkout is awaiting merchant activation on your Shiprocket dashboard.');
+          }
+        }
+      } catch (err) {
+        console.error('Fastrr launch error:', err);
+        if (onFailure) onFailure(err.toString());
+      }
+    };
+
+    window.launchRazorpayCheckout = function(optionsJson, onPaymentSuccess, onPaymentDismiss, onPaymentFailure) {
+      try {
+        var options = typeof optionsJson === 'string' ? JSON.parse(optionsJson) : optionsJson;
+        options.handler = function(response) {
+          if (onPaymentSuccess) {
+            onPaymentSuccess(response.razorpay_payment_id, response.razorpay_order_id, response.razorpay_signature);
+          }
+        };
+        options.modal = {
+          ondismiss: function() {
+            if (onPaymentDismiss) {
+              onPaymentDismiss();
+            }
+          }
+        };
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function(resp) {
+          if (onPaymentFailure) {
+            onPaymentFailure(resp.error ? resp.error.description : 'Payment Failed');
+          }
+        });
+        rzp.open();
+      } catch (err) {
+        console.error('Razorpay launch error:', err);
+        if (onPaymentFailure) {
+          onPaymentFailure(err.toString());
+        }
+      }
+    };
+  </script>
+
+  <script>
+    // Strip stale Fastrr redirect query params from URL on load
+    (function() {
+      try {
+        if (window.location.search && window.location.search.indexOf('fastrr_redirect') !== -1) {
+          var cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
+          window.history.replaceState(null, '', cleanUrl);
+        }
+      } catch (e) {}
+    })();
+
     // Automatically purge old service workers and CacheStorage from previous builds
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -37,6 +168,7 @@
   </script>
 </head>
 <body>
+  <input type="hidden" id="sellerDomain" value="ebskrishidukaan.com">
   <script src="flutter_bootstrap.js?v=20261105" async></script>
 </body>
 </html>

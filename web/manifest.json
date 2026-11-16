@@ -1,11 +1,11 @@
 {
-    "name": "EBS Essential BioCrop Science Seller Website",
-    "short_name": "EBS BioCrop",
+    "name": "EBS Krishi Dukaan - Essential BioCrop Science",
+    "short_name": "EBS Krishi Dukaan",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#2F7D32",
     "theme_color": "#2F7D32",
-    "description": "EBS Essential BioCrop Science Web Application",
+    "description": "EBS Krishi Dukaan Online Agricultural Store",
     "orientation": "any",
     "prefer_related_applications": false,
     "icons": [

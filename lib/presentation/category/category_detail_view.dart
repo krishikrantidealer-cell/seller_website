@@ -107,8 +107,9 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
           p.technicalName.toLowerCase().contains(_selectedSubcategory!.toLowerCase());
 
       final matchesTechnical = _selectedTechnicalName == null ||
-          p.technicalName.toLowerCase().contains(_selectedTechnicalName!.toLowerCase()) ||
-          _selectedTechnicalName!.toLowerCase().contains(p.technicalName.toLowerCase());
+          (p.technicalName.trim().isNotEmpty &&
+              (p.technicalName.toLowerCase().contains(_selectedTechnicalName!.toLowerCase()) ||
+                  _selectedTechnicalName!.toLowerCase().contains(p.technicalName.toLowerCase())));
 
       final matchesSearch = _searchFilter.isEmpty ||
           p.title.toLowerCase().contains(_searchFilter.toLowerCase()) ||
