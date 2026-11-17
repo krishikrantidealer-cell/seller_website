@@ -92,7 +92,6 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
     final hasAnyBestSeller = _allProducts.any((p) => p.isBestSeller);
 
     final list = _allProducts.where((p) {
-      if (!p.isAvailable) return false;
       final matchesBestSeller = !_isBestSellersMode || (hasAnyBestSeller ? p.isBestSeller : true);
       final matchesCategory = _selectedCategory == 'all' ||
           (currentCategoryItem != null && currentCategoryItem.matchesProduct(p)) ||

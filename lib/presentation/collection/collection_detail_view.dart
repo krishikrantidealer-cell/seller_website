@@ -72,9 +72,7 @@ class _CollectionDetailViewState extends State<CollectionDetailView> {
   @override
   Widget build(BuildContext context) {
     final col = _collection;
-    final availableProducts = ProductController.instance.products
-        .where((p) => p.isAvailable)
-        .toList();
+    final availableProducts = List<ProductItem>.from(ProductController.instance.products);
     final query = _searchQuery.trim().toLowerCase();
     final filteredSubs = query.isEmpty
         ? col.subCollections

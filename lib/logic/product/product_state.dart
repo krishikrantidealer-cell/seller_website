@@ -24,14 +24,14 @@ class ProductState extends Equatable {
 
   /// Returns all available products belonging to [category] (Level 0 and its Level 1/2 subtree).
   List<ProductItem> productsForCategory(CategoryItem category) {
-    return products.where((p) => p.isAvailable && category.matchesProduct(p)).toList();
+    return products.where((p) => category.matchesProduct(p)).toList();
   }
 
   /// Returns featured / best-seller products.
   List<ProductItem> get bestSellerProducts {
-    final featured = products.where((p) => p.isAvailable && p.isBestSeller).toList();
+    final featured = products.where((p) => p.isBestSeller).toList();
     if (featured.isNotEmpty) return featured;
-    return products.where((p) => p.isAvailable).take(12).toList();
+    return products.take(12).toList();
   }
 
   ProductState copyWith({

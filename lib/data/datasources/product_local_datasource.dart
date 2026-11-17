@@ -37,7 +37,6 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
                 categories: categories,
               ),
             )
-            .where((p) => p.isAvailable)
             .toList();
         return _memoryCache;
       }
@@ -50,7 +49,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
 
   @override
   Future<void> cacheProducts(List<ProductItem> products) async {
-    final availableProducts = products.where((p) => p.isAvailable).toList();
+    final availableProducts = List<ProductItem>.from(products);
     _memoryCache = availableProducts;
     try {
       final store = _prefs ?? await SharedPreferences.getInstance();

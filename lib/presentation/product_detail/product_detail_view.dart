@@ -1,5 +1,8 @@
+import 'dart:math' as math;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
@@ -13,6 +16,7 @@ import '../widgets/app_product_image.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/cart_drawer.dart';
+import '../widgets/mobile_navigation_drawer.dart';
 import '../widgets/product_card.dart';
 import '../widgets/web_footer.dart';
 import '../technical/technical_search_view.dart';
@@ -37,6 +41,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   int _selectedImageIndex = 0;
   final Set<int> _expandedMobileSections = {0};
   bool _isDescriptionExpanded = false;
+  int _desktopDetailTabIndex = 0;
 
   // Farmer Reviews State
   late List<FarmerReviewItem> _reviews;
@@ -118,11 +123,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   bool _isProductCurrentlyAvailable([ProductBloc? productBloc]) {
-    if (!widget.product.isAvailable) return false;
     final bloc = productBloc ?? context.read<ProductBloc?>();
     final hasLiveCatalog = ProductController.instance.hasLoadedFromApi ||
         (bloc != null && bloc.state.products.isNotEmpty);
-    if (!hasLiveCatalog) return true;
+    if (!hasLiveCatalog) return widget.product.isAvailable;
 
     final liveProducts = (bloc != null &&
             (bloc.state.products.isNotEmpty || ProductController.instance.hasLoadedFromApi))
@@ -134,81 +138,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         return p.isAvailable;
       }
     }
-    return false;
-  }
-
-  Widget _buildUnavailableProductState(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 64),
-          child: Container(
-            padding: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFEF2F2),
-                    borderRadius: BorderRadius.circular(32),
-                  ),
-                  child: const Icon(
-                    Icons.inventory_2_outlined,
-                    size: 32,
-                    color: Color(0xFFDC2626),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'This product is currently unavailable',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.mukta(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'This item has been removed or marked unavailable. Please explore other available products.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.mukta(
-                    fontSize: 13.5,
-                    color: const Color(0xFF6B7280),
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                  label: Text(
-                    'Browse Other Products',
-                    style: GoogleFonts.mukta(fontWeight: FontWeight.w600),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    return widget.product.isAvailable;
   }
 
   void _onAddToCart() {
@@ -316,6 +246,15 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF9FAFB),
+      drawer: MobileNavigationDrawer(
+        selectedCategoryId: widget.product.categoryId ?? 'all',
+        onCategorySelected: (_, _) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
+        onAllProductsSelected: () {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        },
+      ),
       endDrawer: const QuickCartDrawer(),
       bottomNavigationBar: (isMobileScreen && isProductAvailable) ? _buildMobileStickyBottomBar() : null,
       body: Column(
@@ -342,6 +281,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   animation: CartController.instance,
                   builder: (context, _) {
                     return MainNavHeader(
+                      onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
                       cartItemCount: CartController.instance.totalCount,
                       onCartTap: () => _scaffoldKey.currentState?.openEndDrawer(),
                     );
@@ -353,17 +293,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           // Scrollable Product Detail Content
           Expanded(
-            child: !isProductAvailable
-                ? SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        _buildBreadcrumbBar(context, isMobileScreen),
-                        _buildUnavailableProductState(context),
-                        const WebFooter(),
-                      ],
-                    ),
-                  )
-                : SingleChildScrollView(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   // Breadcrumbs & Back link (Responsive)
@@ -994,7 +924,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      'Brand: ${widget.product.vendor}',
+                      'Brand: ${widget.product.brandName.isNotEmpty ? widget.product.brandName : widget.product.vendor}',
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.mukta(
                         fontSize: 11.5,
@@ -1137,252 +1067,306 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             child: Divider(color: AppColors.border, height: 1),
           ),
 
+          // Price, Per-Unit Rate & Savings (clean, no outer box)
+          Builder(
+            builder: (context) {
+              final perUnitText = _formatPerUnitPrice(_selectedVariant);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
+                        style: GoogleFonts.mukta(
+                          fontSize: isMobile ? 28 : 32,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1F3A2E),
+                          height: 1.1,
+                        ),
+                      ),
+                      if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
+                        Text(
+                          '₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
+                          style: GoogleFonts.mukta(
+                            fontSize: isMobile ? 20 : 22,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
+                            decoration: TextDecoration.lineThrough,
+                            height: 1.1,
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (perUnitText != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '($perUnitText)',
+                      style: GoogleFonts.mukta(
+                        fontSize: isMobile ? 14.5 : 15.5,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF1D4ED8),
+                      ),
+                    ),
+                  ],
+                  if (discount > 0 || savings >= 1) ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: RichText(
+                        text: TextSpan(
+                          style: GoogleFonts.mukta(
+                            fontSize: isMobile ? 12.5 : 13.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                          children: [
+                            TextSpan(text: '🎉 You Save ₹${savings.toStringAsFixed(0)}'),
+                            if (discount > 0)
+                              TextSpan(
+                                text: ' ($discount% OFF)',
+                                style: const TextStyle(
+                                  color: AppColors.discountRed,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 18),
+
           // PROMINENT PACK SIZE / VARIANT SELECTOR
           Text(
-            'Select Pack Size / Quantity Variant:',
+            'Select Variant',
             style: GoogleFonts.mukta(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w700,
+              fontSize: isMobile ? 16 : 17,
+              fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          // Variant Cards Grid (Responsive Wrap)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: widget.product.variants.map((v) {
-              final isSelected = v.id == _selectedVariant.id;
-              final varDiscount = v.discountPercent;
+          // Variant Cards Grid (Clean & Professional)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 10.0;
+              final columns = constraints.maxWidth >= 540 ? 3 : 2;
+              final cardWidth = (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
-              return InkWell(
-                onTap: () => _onVariantSelected(v),
-                borderRadius: BorderRadius.circular(8),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 10 : 13,
-                    vertical: isMobile ? 8 : 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.lightGreen : Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primaryGreen : AppColors.border,
-                      width: isSelected ? 2.0 : 1.0,
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: AppColors.primaryGreen.withValues(alpha: 0.12),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                            size: 15,
-                            color: isSelected ? AppColors.primaryGreen : AppColors.textMuted,
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: widget.product.variants.map((v) {
+                  final isSelected = v.id == _selectedVariant.id;
+
+                  return SizedBox(
+                    width: cardWidth,
+                    child: InkWell(
+                      onTap: () => _onVariantSelected(v),
+                      borderRadius: BorderRadius.circular(12),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 160),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: isSelected ? const Color(0xFFF2FBF6) : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
+                            width: isSelected ? 1.8 : 1.0,
                           ),
-                          const SizedBox(width: 5),
-                          Text(
-                            v.label,
-                            style: GoogleFonts.mukta(
-                              fontSize: isMobile ? 11.5 : 12.5,
-                              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                              color: isSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                      Text(
-                        '₹${v.displayRate.toStringAsFixed(0)}',
-                        style: GoogleFonts.mukta(
-                          fontSize: isMobile ? 12.5 : 13.5,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primaryGreen,
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primaryGreen.withValues(alpha: 0.10),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
                         ),
-                      ),
-                      if (v.printedMrp > v.displayRate) ...[
-                        const SizedBox(width: 5),
-                        Text(
-                          '₹${v.printedMrp.toStringAsFixed(0)}',
-                          style: GoogleFonts.mukta(
-                            fontSize: 10,
-                            color: AppColors.textMuted,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      ],
-                          if (varDiscount > 0) ...[
-                            const SizedBox(width: 5),
-                            Text(
-                              '$varDiscount% OFF',
-                              style: GoogleFonts.mukta(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.discountRed,
-                              ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Icon(
+                                    isSelected
+                                        ? Icons.check_circle_rounded
+                                        : Icons.radio_button_unchecked_rounded,
+                                    size: 16,
+                                    color: isSelected
+                                        ? AppColors.primaryGreen
+                                        : const Color(0xFFCBD5E1),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    v.label,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.mukta(
+                                      fontSize: isMobile ? 13.5 : 14.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: isSelected
+                                          ? AppColors.primaryDarkGreen
+                                          : AppColors.textPrimary,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 6,
+                              children: [
+                                Text(
+                                  '₹${v.displayRate.toStringAsFixed(0)}',
+                                  style: GoogleFonts.mukta(
+                                    fontSize: isMobile ? 15 : 16,
+                                    fontWeight: FontWeight.w800,
+                                    color: isSelected
+                                        ? AppColors.primaryDarkGreen
+                                        : AppColors.textPrimary,
+                                  ),
+                                ),
+                                if (v.printedMrp > v.displayRate)
+                                  Text(
+                                    '₹${v.printedMrp.toStringAsFixed(0)}',
+                                    style: GoogleFonts.mukta(
+                                      fontSize: 12,
+                                      color: AppColors.textMuted,
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Price Calculation & Savings Highlight Box (Responsive Wrap)
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(isMobile ? 12 : 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF9FAFB),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 10,
-                  runSpacing: 6,
-                  children: [
-                    Text(
-                      '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
-                      style: GoogleFonts.mukta(
-                        fontSize: isMobile ? 24 : 28,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryGreen,
+                        ),
                       ),
                     ),
-                    if (_selectedVariant.printedMrp > _selectedVariant.displayRate)
-                      Text(
-                        'MRP: ₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
-                        style: GoogleFonts.mukta(
-                          fontSize: isMobile ? 12.5 : 14,
-                          color: AppColors.textMuted,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    if (discount > 0 || savings >= 1)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: AppColors.discountRed.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          discount > 0
-                              ? 'Save ₹${savings.toStringAsFixed(0)} ($discount% OFF)'
-                              : 'Save ₹${savings.toStringAsFixed(0)}',
-                          style: GoogleFonts.mukta(
-                            fontSize: isMobile ? 11 : 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.discountRed,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  'Inclusive of all taxes • FREE Pan-India Delivery on orders above ₹500',
-                  style: GoogleFonts.mukta(
-                    fontSize: isMobile ? 11 : 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
+                  );
+                }).toList(),
+              );
+            },
           ),
 
           const SizedBox(height: 14),
 
-          // Stock Status & Dispatch indicator
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 6,
-            runSpacing: 4,
-            children: [
-              Container(
-                width: 9,
-                height: 9,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF10B981),
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Text(
-                'In Stock',
-                style: GoogleFonts.mukta(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF065F46),
-                ),
-              ),
-              const Text('•', style: TextStyle(color: AppColors.textMuted)),
-              Text(
-                'Ready to dispatch from EBS Central Hub',
-                style: GoogleFonts.mukta(
-                  fontSize: isMobile ? 11.5 : 12.5,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-
-          if (!isMobile) ...[
-            const SizedBox(height: 16),
-
-            // Desktop: Add to Cart (converts to quantity stepper) + Buy Now
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCartActionButton(isMobile: false),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      onPressed: _onBuyNow,
-                      icon: const Icon(Icons.bolt_rounded, size: 20),
-                      label: Text(
-                        'Buy Now',
-                        style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w700),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
+          // Stock Status (only shown when Out of Stock) & Purchase Actions
+          Builder(
+            builder: (context) {
+              final isInStock = _isProductCurrentlyAvailable() &&
+                  _selectedVariant.inStock &&
+                  (_selectedVariant.stock == null || _selectedVariant.stock! > 0);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (!isInStock)
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        Container(
+                          width: 9,
+                          height: 9,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF4444),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        Text(
+                          'Out of Stock',
+                          style: GoogleFonts.mukta(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFFB91C1C),
+                          ),
+                        ),
+                        const Text('•', style: TextStyle(color: AppColors.textMuted)),
+                        Text(
+                          'Currently unavailable for orders',
+                          style: GoogleFonts.mukta(
+                            fontSize: isMobile ? 11.5 : 12.5,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+                  if (!isMobile) ...[
+                    if (!isInStock) const SizedBox(height: 16),
+                    if (isInStock)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildCartActionButton(isMobile: false),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: SizedBox(
+                              height: 48,
+                              child: ElevatedButton.icon(
+                                onPressed: _onBuyNow,
+                                icon: const Icon(Icons.bolt_rounded, size: 20),
+                                label: Text(
+                                  'Buy Now',
+                                  style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w700),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryGreen,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      SizedBox(
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: null,
+                          style: OutlinedButton.styleFrom(
+                            disabledForegroundColor: const Color(0xFFB91C1C),
+                            backgroundColor: const Color(0xFFFEF2F2),
+                            side: const BorderSide(color: Color(0xFFFECACA)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: Text(
+                            'Out of Stock',
+                            style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                  ],
+                ],
+              );
+            },
+          ),
 
           const SizedBox(height: 18),
 
@@ -1598,29 +1582,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           ),
         ),
 
-        // 1. Description & Specifications Accordion Card (Open by default)
+        // 1. Product Description Accordion Card (Open by default)
         _buildAccordionCard(
           index: 0,
-          icon: Icons.article_outlined,
+          icon: Icons.description_outlined,
           iconColor: AppColors.primaryGreen,
-          title: 'Product Description & Specifications',
-          subtitle: 'Detailed description & verified product specifications',
-          trailingBadge: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.3)),
-            ),
-            child: Text(
-              widget.product.category,
-              style: GoogleFonts.mukta(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryDarkGreen,
-              ),
-            ),
-          ),
+          title: 'Product Description',
           content: _buildProductDescriptionAndSpecs(isMobile: true),
         ),
 
@@ -1665,7 +1632,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     required IconData icon,
     required Color iconColor,
     required String title,
-    required String subtitle,
+    String? subtitle,
     Widget? trailingBadge,
     required Widget content,
   }) {
@@ -1704,23 +1671,23 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             },
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               child: Row(
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: isExpanded ? AppColors.lightGreen : const Color(0xFFF1F5F9),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       icon,
-                      size: 18,
+                      size: 16,
                       color: isExpanded ? AppColors.primaryGreen : iconColor,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1728,18 +1695,19 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                         Text(
                           title,
                           style: GoogleFonts.mukta(
-                            fontSize: 13.5,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             color: isExpanded ? AppColors.primaryGreen : AppColors.textPrimary,
                           ),
                         ),
-                        Text(
-                          subtitle,
-                          style: GoogleFonts.mukta(
-                            fontSize: 11,
-                            color: AppColors.textMuted,
+                        if (subtitle != null && subtitle.isNotEmpty)
+                          Text(
+                            subtitle,
+                            style: GoogleFonts.mukta(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -1898,31 +1866,33 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final descriptionSection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Description Header
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.lightGreen,
-                borderRadius: BorderRadius.circular(6),
+        if (!isMobile) ...[
+          // Description Header (Desktop only — mobile accordion already shows single heading)
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGreen,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.description_rounded, size: 16, color: AppColors.primaryDarkGreen),
               ),
-              child: const Icon(Icons.description_rounded, size: 16, color: AppColors.primaryDarkGreen),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Product Description',
-                style: GoogleFonts.mukta(
-                  fontSize: isMobile ? 14 : 17,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Product Description',
+                  style: GoogleFonts.mukta(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
 
         // Rich Product Description Content
         if (rawDescription.isNotEmpty)
@@ -1951,31 +1921,33 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final specsSection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Specifications Header
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(6),
+        if (!isMobile) ...[
+          // Specifications Header (Desktop tab only)
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.fact_check_outlined, size: 16, color: Color(0xFF1D4ED8)),
               ),
-              child: const Icon(Icons.fact_check_outlined, size: 16, color: Color(0xFF1D4ED8)),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Product Specifications & Details',
-                style: GoogleFonts.mukta(
-                  fontSize: isMobile ? 14 : 17,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Product Specifications & Details',
+                  style: GoogleFonts.mukta(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
 
         // Specifications Table (Authentic product data)
         _buildProductSpecificationsTable(isMobile: isMobile),
@@ -1983,12 +1955,34 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
 
     if (!isMobile) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(flex: 5, child: descriptionSection),
-          const SizedBox(width: 32),
-          Expanded(flex: 6, child: specsSection),
+          Container(
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1.5)),
+            ),
+            child: Row(
+              children: [
+                _buildDesktopDetailTabButton(
+                  index: 0,
+                  label: 'Product Description',
+                  icon: Icons.description_rounded,
+                ),
+                const SizedBox(width: 8),
+                _buildDesktopDetailTabButton(
+                  index: 1,
+                  label: 'Specifications & Details',
+                  icon: Icons.fact_check_outlined,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (_desktopDetailTabIndex == 0)
+            descriptionSection
+          else
+            specsSection,
         ],
       );
     }
@@ -2005,13 +1999,227 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
+  Widget _buildDesktopDetailTabButton({
+    required int index,
+    required String label,
+    required IconData icon,
+  }) {
+    final isSelected = _desktopDetailTabIndex == index;
+    return InkWell(
+      onTap: () => setState(() => _desktopDetailTabIndex = index),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFF0FDF4) : Colors.transparent,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected ? AppColors.primaryGreen : Colors.transparent,
+              width: 2.5,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? AppColors.primaryDarkGreen : AppColors.textMuted,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.mukta(
+                fontSize: 14.5,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                color: isSelected ? AppColors.primaryDarkGreen : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildRichDescription(String rawContent, {required bool isMobile}) {
     final cleaned = _cleanAndDecodeHtml(rawContent);
+    final isHtml = cleaned.contains('<') && cleaned.contains('>');
+    // Match seller_hub AppHtmlEditor preview typography 1-to-1
+    final baseStyle = GoogleFonts.plusJakartaSans(
+      fontSize: 14,
+      height: 1.5,
+      letterSpacing: 0.1,
+      color: const Color(0xFF0F172A),
+    );
 
-    // If it contains HTML markup, parse into rich blocks
-    final Widget descriptionContent = (cleaned.contains('<') && cleaned.contains('>'))
-        ? _renderHtmlBlocks(cleaned, isMobile: isMobile)
-        : _renderPlainText(cleaned, isMobile: isMobile);
+    Map<String, String>? descStyles(dynamic element) {
+      switch (element.localName) {
+        case 'p':
+          final isOnlyBr = element.children.length == 1 && element.children.first.localName == 'br';
+          return {
+            'margin': isOnlyBr ? '0 0 14px 0' : '0 0 6px 0',
+            'line-height': '1.5',
+          };
+        case 'h1':
+          return {
+            'margin': '14px 0 6px 0',
+            'font-size': '22px',
+            'font-weight': '700',
+            'line-height': '1.3',
+          };
+        case 'h2':
+          return {
+            'margin': '12px 0 6px 0',
+            'font-size': '18px',
+            'font-weight': '700',
+            'line-height': '1.3',
+          };
+        case 'h3':
+          return {
+            'margin': '10px 0 4px 0',
+            'font-size': '16px',
+            'font-weight': '600',
+            'line-height': '1.35',
+          };
+        case 'h4':
+          return {
+            'margin': '8px 0 4px 0',
+            'font-weight': '700',
+          };
+        case 'ul':
+        case 'ol':
+          return {
+            'margin': '4px 0 6px 0',
+            'padding-left': '22px',
+            'line-height': '1.5',
+          };
+        case 'li':
+          return {
+            'margin': '2px 0',
+            'line-height': '1.5',
+          };
+        case 'blockquote':
+          return {
+            'margin': '8px 0',
+            'padding': '8px 14px',
+            'border-left': '3.5px solid #059669',
+            'background-color': '#F8FAFC',
+            'font-style': 'italic',
+            'line-height': '1.5',
+          };
+        case 'pre':
+          return {
+            'margin': '8px 0',
+            'padding': '10px 14px',
+            'background-color': '#F1F5F9',
+            'border-radius': '6px',
+            'font-family': 'monospace',
+            'font-size': '13px',
+            'line-height': '1.45',
+            'white-space': 'pre-wrap',
+          };
+        case 'code':
+          if (element.parent?.localName == 'pre') {
+            return {
+              'font-family': 'monospace',
+              'background-color': 'transparent',
+              'padding': '0',
+              'margin': '0',
+            };
+          }
+          return {
+            'padding': '2px 5px',
+            'background-color': '#F1F5F9',
+            'border-radius': '4px',
+            'font-family': 'monospace',
+            'font-size': '12.5px',
+          };
+        case 'table':
+          return {
+            'margin': '12px 0',
+            'border-collapse': 'collapse',
+          };
+        case 'th':
+          final thInline = (element.attributes['style'] ?? '').toLowerCase();
+          final trInline = (element.parent?.attributes['style'] ?? '').toLowerCase();
+          final theadInline = (element.parent?.parent?.attributes['style'] ?? '').toLowerCase();
+          final hasHeaderBg = thInline.contains('background-color') ||
+              thInline.contains('background:') ||
+              trInline.contains('background-color') ||
+              trInline.contains('background:') ||
+              theadInline.contains('background-color') ||
+              theadInline.contains('background:');
+          return {
+            if (!hasHeaderBg) 'background-color': '#F1F5F9',
+            'padding': '8px 12px',
+            if (!thInline.contains('border')) 'border': '1px solid #CBD5E1',
+            'font-weight': '700',
+            'font-size': '12px',
+            'text-align': 'left',
+            'white-space': 'nowrap',
+          };
+        case 'td':
+          final tdInline = (element.attributes['style'] ?? '').toLowerCase();
+          return {
+            'padding': '8px 12px',
+            if (!tdInline.contains('border')) 'border': '1px solid #CBD5E1',
+            'font-size': '12.5px',
+          };
+      }
+      return null;
+    }
+
+    final Widget descriptionContent = isHtml
+        ? HtmlWidget(
+            cleaned,
+            textStyle: baseStyle,
+            factoryBuilder: () => _ProductHtmlWidgetFactory(resolveFontStyle: _resolveHtmlFontStyle),
+            customStylesBuilder: descStyles,
+            customWidgetBuilder: (element) {
+              if (element.localName == 'table') {
+                // Strip inline/attribute width: 100% on <table> so wide tables keep readable column widths and scroll horizontally
+                var tableHtml = element.outerHtml.replaceAllMapped(
+                  RegExp(r'''(<table\b[^>]*\bstyle\s*=\s*["'][^"']*?)\bwidth\s*:\s*100%\s*;?''', caseSensitive: false),
+                  (m) => m.group(1) ?? '',
+                );
+                tableHtml = tableHtml.replaceAll(
+                  RegExp(r'''(<table\b[^>]*?)\s+width\s*=\s*["']100%["']''', caseSensitive: false),
+                  r'$1',
+                );
+
+                final firstRow = element.querySelector('tr');
+                final colCount = firstRow?.querySelectorAll('th, td').length ?? 0;
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final availableWidth = constraints.maxWidth.isFinite ? constraints.maxWidth : 360.0;
+                    final minTableWidth = colCount >= 2 ? colCount * 135.0 : availableWidth;
+                    final targetWidth = math.max(availableWidth, minTableWidth);
+
+                    return Scrollbar(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: SizedBox(
+                          width: targetWidth,
+                          child: HtmlWidget(
+                            tableHtml,
+                            textStyle: baseStyle,
+                            factoryBuilder: () => _ProductHtmlWidgetFactory(resolveFontStyle: _resolveHtmlFontStyle),
+                            customStylesBuilder: descStyles,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+              return null;
+            },
+          )
+        : _renderPlainText(_decodePlainTextEntities(cleaned), isMobile: isMobile);
 
     // Standard 4 lines of Poppins 13/13.5 with 1.5 line height = ~80-92px
     final double collapsedHeight = isMobile ? 88.0 : 96.0;
@@ -2101,7 +2309,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     var s = text.replaceAll(RegExp(r'<!--[\s\S]*?-->'), '');
     s = s.replaceAll(RegExp(r'<script[\s\S]*?</script>', caseSensitive: false), '');
     s = s.replaceAll(RegExp(r'<style[\s\S]*?</style>', caseSensitive: false), '');
-    s = s
+    return s.trim();
+  }
+
+  String _decodePlainTextEntities(String text) {
+    return text
         .replaceAll('&nbsp;', ' ')
         .replaceAll('&amp;', '&')
         .replaceAll('&lt;', '<')
@@ -2110,7 +2322,68 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         .replaceAll('&#39;', "'")
         .replaceAll('&bull;', '•')
         .replaceAll('&deg;', '°');
-    return s.trim();
+  }
+
+  TextStyle _resolveHtmlFontStyle(String fontName, {TextStyle? textStyle}) {
+    final clean = fontName
+        .replaceAll('"', '')
+        .replaceAll("'", '')
+        .replaceAll(RegExp(r'\s*\([^)]*\)'), '')
+        .replaceAll(RegExp(r'_\w+$'), '')
+        .trim();
+
+    if (clean.isEmpty || clean.toLowerCase() == 'clear' || clean.toLowerCase() == 'default') {
+      return textStyle ?? const TextStyle();
+    }
+
+    switch (clean.toLowerCase()) {
+      case 'poppins':
+        return GoogleFonts.poppins(textStyle: textStyle);
+      case 'montserrat':
+        return GoogleFonts.montserrat(textStyle: textStyle);
+      case 'open sans':
+        return GoogleFonts.openSans(textStyle: textStyle);
+      case 'lato':
+        return GoogleFonts.lato(textStyle: textStyle);
+      case 'inter':
+        return GoogleFonts.inter(textStyle: textStyle);
+      case 'merriweather':
+      case 'georgia':
+      case 'serif':
+        return GoogleFonts.merriweather(textStyle: textStyle);
+      case 'lora':
+        return GoogleFonts.lora(textStyle: textStyle);
+      case 'playfair display':
+        return GoogleFonts.playfairDisplay(textStyle: textStyle);
+      case 'pt serif':
+      case 'times new roman':
+      case 'times':
+      case 'tinos':
+        return GoogleFonts.ptSerif(textStyle: textStyle);
+      case 'courier prime':
+      case 'courier new':
+      case 'courier':
+      case 'monospace':
+        return GoogleFonts.courierPrime(textStyle: textStyle);
+      case 'inconsolata':
+        return GoogleFonts.inconsolata(textStyle: textStyle);
+      case 'oswald':
+        return GoogleFonts.oswald(textStyle: textStyle);
+      case 'caveat':
+        return GoogleFonts.caveat(textStyle: textStyle);
+      case 'roboto':
+      case 'arial':
+      case 'sans-serif':
+        return GoogleFonts.roboto(textStyle: textStyle);
+      default:
+        try {
+          return GoogleFonts.getFont(clean, textStyle: textStyle);
+        } catch (_) {
+          return textStyle != null
+              ? textStyle.copyWith(fontFamily: clean)
+              : TextStyle(fontFamily: clean);
+        }
+    }
   }
 
   Widget _renderPlainText(String text, {required bool isMobile}) {
@@ -2185,6 +2458,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
+  // ignore: unused_element
   Widget _renderHtmlBlocks(String html, {required bool isMobile}) {
     final List<Widget> widgets = [];
     final blockRegex = RegExp(
@@ -2460,8 +2734,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         widget.product.technicalName != widget.product.title) {
       specs.add(MapEntry('Active Ingredient / Formula', widget.product.technicalName));
     }
-    if (widget.product.vendor.isNotEmpty) {
-      specs.add(MapEntry('Brand / Manufacturer', widget.product.vendor));
+    final displayBrand = widget.product.brandName.isNotEmpty
+        ? widget.product.brandName
+        : widget.product.vendor;
+    if (displayBrand.isNotEmpty) {
+      specs.add(MapEntry('Brand / Manufacturer', displayBrand));
     }
     if (widget.product.category.isNotEmpty) {
       specs.add(MapEntry('Category', widget.product.category));
@@ -4326,122 +4603,67 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
-          child: isMobile
-              ? Column(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 4,
+                height: isMobile ? 28 : 34,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 3.5,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryGreen,
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Similar Products',
-                              style: GoogleFonts.mukta(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightGreen,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '${similarProducts.length} items',
-                            style: GoogleFonts.mukta(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryDarkGreen,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
                     Text(
-                      'Matches ${widget.product.category}',
+                      'Similar Products',
                       style: GoogleFonts.mukta(
-                        fontSize: 10.5,
-                        color: AppColors.textMuted,
+                        fontSize: isMobile ? 18 : 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        height: 1.15,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'More in ${widget.product.category}',
+                      style: GoogleFonts.mukta(
+                        fontSize: isMobile ? 12.5 : 13.5,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 3.5,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryGreen,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Similar Products',
-                          style: GoogleFonts.mukta(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightGreen,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '${similarProducts.length} items',
-                            style: GoogleFonts.mukta(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryDarkGreen,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Flexible(
-                      child: Text(
-                        'Matches ${widget.product.category}',
-                        style: GoogleFonts.mukta(
-                          fontSize: 12,
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
                 ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 10 : 12,
+                  vertical: isMobile ? 4 : 5,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFBBF7D0)),
+                ),
+                child: Text(
+                  '${similarProducts.length} items',
+                  style: GoogleFonts.mukta(
+                    fontSize: isMobile ? 11.5 : 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryDarkGreen,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 14),
         LayoutBuilder(
@@ -4577,4 +4799,94 @@ class FarmerReviewItem {
     this.videoSize,
     this.videoThumbnailUrl,
   });
+}
+
+String? _formatPerUnitPrice(ProductVariant variant) {
+  final rate = variant.displayRate;
+  if (rate <= 0) return null;
+
+  double? size = variant.packSizeValue;
+  String unit = (variant.packSizeUnit ?? variant.unit ?? '').trim().toLowerCase();
+  final int packQty = (variant.packQuantity != null && variant.packQuantity! > 1)
+      ? variant.packQuantity!
+      : 1;
+
+  if (size == null || size <= 0 || unit.isEmpty) {
+    final label = variant.label.trim();
+    final multiMatch = RegExp(
+      r'(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*([a-zA-Z]+)',
+      caseSensitive: false,
+    ).firstMatch(label);
+    if (multiMatch != null) {
+      final count = double.tryParse(multiMatch.group(1)!) ?? 1;
+      final each = double.tryParse(multiMatch.group(2)!) ?? 0;
+      size = count * each;
+      unit = multiMatch.group(3)!.toLowerCase();
+    } else {
+      final singleMatch = RegExp(
+        r'(\d+(?:\.\d+)?)\s*([a-zA-Z]+)',
+        caseSensitive: false,
+      ).firstMatch(label);
+      if (singleMatch != null) {
+        size = double.tryParse(singleMatch.group(1)!) ?? 0;
+        unit = singleMatch.group(2)!.toLowerCase();
+      }
+    }
+  } else {
+    size = size * packQty;
+  }
+
+  if (size == null || size <= 0 || unit.isEmpty) return null;
+
+  String fmt(double value) {
+    if ((value - value.roundToDouble()).abs() < 0.01) {
+      return value.round().toString();
+    }
+    return value.toStringAsFixed(2);
+  }
+
+  if (unit == 'g' || unit == 'gm' || unit == 'gms' || unit == 'gram' || unit == 'grams') {
+    return '₹${fmt(rate / size)} /1 gm';
+  }
+  if (unit == 'kg' || unit == 'kgs' || unit == 'kilogram' || unit == 'kilograms') {
+    final totalGrams = size * 1000.0;
+    return '₹${fmt(rate / totalGrams)} /1 gm';
+  }
+  if (unit == 'ml' || unit == 'millilitre' || unit == 'milliliter') {
+    return '₹${fmt(rate / size)} /1 ml';
+  }
+  if (unit == 'l' || unit == 'ltr' || unit == 'litre' || unit == 'litres' || unit == 'liter' || unit == 'liters') {
+    final totalMl = size * 1000.0;
+    return '₹${fmt(rate / totalMl)} /1 ml';
+  }
+  return '₹${fmt(rate / size)} /1 $unit';
+}
+
+class _ProductHtmlWidgetFactory extends WidgetFactory {
+  final TextStyle Function(String fontName, {TextStyle? textStyle}) resolveFontStyle;
+
+  _ProductHtmlWidgetFactory({required this.resolveFontStyle});
+
+  @override
+  InlineSpan? buildTextSpan({
+    List<InlineSpan>? children,
+    GestureRecognizer? recognizer,
+    TextStyle? style,
+    String? text,
+  }) {
+    TextStyle? effectiveStyle = style;
+    final family = style?.fontFamily;
+    if (family != null &&
+        family.isNotEmpty &&
+        !family.startsWith('PlusJakartaSans') &&
+        family.toLowerCase() != 'plus jakarta sans') {
+      effectiveStyle = resolveFontStyle(family, textStyle: style);
+    }
+    return super.buildTextSpan(
+      children: children,
+      recognizer: recognizer,
+      style: effectiveStyle,
+      text: text,
+    );
+  }
 }

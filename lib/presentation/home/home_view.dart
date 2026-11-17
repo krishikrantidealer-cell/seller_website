@@ -49,6 +49,7 @@ class _HomeViewState extends State<HomeView> {
     CategoryController.instance.addListener(_onCatalogUpdated);
     CollectionController.instance.addListener(_onCatalogUpdated);
     ProductController.instance.addListener(_onCatalogUpdated);
+    MainNavHeader.globalSearchNotifier.addListener(_onGlobalSearchChanged);
 
     CollectionController.instance.fetchCollections();
 
@@ -72,7 +73,21 @@ class _HomeViewState extends State<HomeView> {
     CategoryController.instance.removeListener(_onCatalogUpdated);
     CollectionController.instance.removeListener(_onCatalogUpdated);
     ProductController.instance.removeListener(_onCatalogUpdated);
+    MainNavHeader.globalSearchNotifier.removeListener(_onGlobalSearchChanged);
     super.dispose();
+  }
+
+  void _onGlobalSearchChanged() {
+    if (!mounted) return;
+    final next = MainNavHeader.globalSearchNotifier.value.trim();
+    if (_searchFilter == next) return;
+    setState(() {
+      _searchFilter = next;
+      if (_searchFilter.isNotEmpty) {
+        _selectedCollectionId = null;
+        _selectedSubCollectionId = null;
+      }
+    });
   }
 
   void _onCatalogUpdated() {
@@ -83,7 +98,6 @@ class _HomeViewState extends State<HomeView> {
 
   List<ProductItem> _getFilteredProducts(List<ProductItem> allProducts, List<CategoryItem> categories) {
     return allProducts.where((p) {
-      if (!p.isAvailable) return false;
       final trimmedQuery = _searchFilter.trim().toLowerCase();
       final currentCategoryItem = categories.cast<CategoryItem?>().firstWhere(
         (c) => c?.id == _selectedCategory || c?.backendId == _selectedCategory,
@@ -122,7 +136,6 @@ class _HomeViewState extends State<HomeView> {
   /// respecting any active search filter on the Home screen.
   List<ProductItem> _getProductsForLevel0Category(CategoryItem category, List<ProductItem> allProducts) {
     return allProducts.where((p) {
-      if (!p.isAvailable) return false;
       if (!category.matchesProduct(p)) return false;
       if (_searchFilter.isNotEmpty) {
         final q = _searchFilter.toLowerCase();
@@ -262,6 +275,7 @@ class _HomeViewState extends State<HomeView> {
                   },
                   searchQuery: _searchFilter,
                   onSearch: (query) {
+                    MainNavHeader.globalSearchNotifier.value = query.trim();
                     setState(() {
                       _searchFilter = query.trim();
                       if (_searchFilter.isNotEmpty) {
@@ -294,8 +308,12 @@ class _HomeViewState extends State<HomeView> {
                 }
                 return false;
               },
-              child: SingleChildScrollView(
-                child: Column(
+              child: RefreshIndicator(
+                color: AppColors.primaryGreen,
+                onRefresh: () => _refreshCatalog(context),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
                   children: [
                   // Hero Promotion Carousel
                   const HeroBannerCarousel(),
@@ -406,20 +424,7 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                   const SizedBox(height: 18),
                                   ElevatedButton.icon(
-                                    onPressed: () {
-                                      final catB = context.read<CategoryBloc?>();
-                                      final prodB = context.read<ProductBloc?>();
-                                      if (catB != null) {
-                                        catB.add(const FetchCategories(isRefresh: true));
-                                      } else {
-                                        CategoryController.instance.fetchCategories(forceRefresh: true);
-                                      }
-                                      if (prodB != null) {
-                                        prodB.add(const FetchProducts(isRefresh: true));
-                                      } else {
-                                        ProductController.instance.fetchProducts(forceRefresh: true);
-                                      }
-                                    },
+                                    onPressed: () => _refreshCatalog(context),
                                     icon: const Icon(Icons.refresh_rounded, size: 18),
                                     label: Text(
                                       'Retry Connection',
@@ -543,6 +548,7 @@ class _HomeViewState extends State<HomeView> {
             const WebFooter(),
           ],
         ),
+      ),
       ),
     ),
   ),
@@ -1133,7 +1139,7 @@ class _HomeViewState extends State<HomeView> {
     bool isMobile,
     BoxConstraints constraints,
   ) {
-    final availableProducts = allProducts.where((p) => p.isAvailable).toList();
+    final availableProducts = List<ProductItem>.from(allProducts);
     final List<Widget> widgets = [];
 
     for (final col in collections) {
@@ -1527,7 +1533,7 @@ class _HomeViewState extends State<HomeView> {
       ];
     }
 
-    final availableProducts = allProducts.where((p) => p.isAvailable).toList();
+    final availableProducts = List<ProductItem>.from(allProducts);
     final activeSub = _selectedSubCollectionId == null
         ? null
         : col.subCollections.where((s) => s.id == _selectedSubCollectionId).firstOrNull;
@@ -1639,6 +1645,38 @@ class _HomeViewState extends State<HomeView> {
       else
         _buildProductGrid(filtered, constraints, maxItems: filtered.length),
     ];
+  }
+
+  Future<void> _refreshCatalog(BuildContext context) async {
+    final catB = context.read<CategoryBloc?>();
+    final prodB = context.read<ProductBloc?>();
+
+    final futures = <Future<dynamic>>[
+      CollectionController.instance.fetchCollections(forceRefresh: true),
+    ];
+    if (catB != null) {
+      catB.add(const FetchCategories(isRefresh: true));
+      futures.add(
+        catB.stream
+            .firstWhere((s) => s.status != CategoryStatus.loading)
+            .timeout(const Duration(seconds: 8), onTimeout: () => catB.state),
+      );
+    } else {
+      futures.add(CategoryController.instance.fetchCategories(forceRefresh: true));
+    }
+
+    if (prodB != null) {
+      prodB.add(const FetchProducts(isRefresh: true));
+      futures.add(
+        prodB.stream
+            .firstWhere((s) => s.status != ProductStatus.loading)
+            .timeout(const Duration(seconds: 8), onTimeout: () => prodB.state),
+      );
+    } else {
+      futures.add(ProductController.instance.fetchProducts(forceRefresh: true));
+    }
+
+    await Future.wait(futures);
   }
 
   Widget _buildMobileNavigationDrawer(BuildContext context) {

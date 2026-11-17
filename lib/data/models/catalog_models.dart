@@ -67,7 +67,8 @@ class ProductVariant {
     final id = json['id']?.toString() ?? '';
     final packSizeRaw = json['packSize'];
     final packSizeVal = packSizeRaw is num ? packSizeRaw.toDouble() : double.tryParse(packSizeRaw?.toString() ?? '');
-    final packSizeUnit = json['packSizeUnit']?.toString() ?? json['unit']?.toString();
+    final unitValue = json['unit']?.toString() ?? json['packSizeUnit']?.toString();
+    final packSizeUnit = unitValue;
     String label = json['label']?.toString().trim() ?? '';
     if (label.isEmpty && packSizeVal != null) {
       final sizeStr = packSizeVal == packSizeVal.roundToDouble()
@@ -111,7 +112,7 @@ class ProductVariant {
       id: id.isNotEmpty ? id : label,
       sku: json['sku']?.toString(),
       label: label,
-      unit: json['unit']?.toString(),
+      unit: unitValue,
       packSizeValue: packSizeVal,
       packSizeUnit: packSizeUnit,
       packQuantity: json['packQuantity'] is num ? (json['packQuantity'] as num).toInt() : null,
@@ -166,6 +167,7 @@ class ProductItem {
   final String? productCode;
   final String? hsnCode;
   final String title;
+  final String brandName;
   final String technicalName;
   final String vendor;
   final String? description;
@@ -195,6 +197,7 @@ class ProductItem {
     this.productCode,
     this.hsnCode,
     required this.title,
+    this.brandName = '',
     required this.technicalName,
     required this.vendor,
     this.description,
@@ -253,6 +256,7 @@ class ProductItem {
       productCode: productCode,
       hsnCode: hsnCode,
       title: title,
+      brandName: brandName,
       technicalName: technicalName,
       vendor: vendor,
       description: description,
@@ -282,6 +286,7 @@ class ProductItem {
   }) {
     final id = (json['id'] ?? json['_id'] ?? '').toString();
     final title = (json['title'] ?? 'Agricultural Input').toString().trim();
+    final brandName = (json['brandName'] ?? json['brand'] ?? '').toString().trim();
     final technicalName = (json['technicalName'] ?? title).toString().trim();
     final rawVendor = (json['sellerName'] ?? json['vendor'] ?? '').toString().trim();
     final vendor = rawVendor.isNotEmpty ? rawVendor : 'EBS BioCrop Science';
@@ -414,6 +419,7 @@ class ProductItem {
       productCode: json['productCode']?.toString(),
       hsnCode: json['hsnCode']?.toString(),
       title: title,
+      brandName: brandName,
       technicalName: technicalName,
       vendor: vendor,
       description: json['description']?.toString(),
@@ -446,6 +452,7 @@ class ProductItem {
       'productCode': productCode,
       'hsnCode': hsnCode,
       'title': title,
+      'brandName': brandName,
       'technicalName': technicalName,
       'sellerName': vendor,
       'description': description,

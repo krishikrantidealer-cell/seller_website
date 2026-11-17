@@ -12,6 +12,8 @@ import '../technical/technical_search_view.dart';
 import '../wishlist/wishlist_view.dart';
 
 class MainNavHeader extends StatefulWidget {
+  static final ValueNotifier<String> globalSearchNotifier = ValueNotifier<String>('');
+
   final int? cartItemCount;
   final ValueChanged<String>? onSearch;
   final String? searchQuery;
@@ -50,9 +52,12 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     super.didUpdateWidget(oldWidget);
     if (widget.searchQuery != null &&
         widget.searchQuery != oldWidget.searchQuery &&
-        widget.searchQuery != _searchController.text &&
-        widget.searchQuery!.isEmpty) {
-      _searchController.clear();
+        widget.searchQuery != _searchController.text) {
+      if (widget.searchQuery!.isEmpty) {
+        _searchController.clear();
+      } else {
+        _searchController.text = widget.searchQuery!;
+      }
     }
   }
 
@@ -61,9 +66,22 @@ class _MainNavHeaderState extends State<MainNavHeader> {
     widget.onSearch?.call(value);
   }
 
+  void _handleSearchSubmitted(String value) {
+    if (widget.onSearch != null) {
+      widget.onSearch!(value);
+      return;
+    }
+    final trimmed = value.trim();
+    if (trimmed.isNotEmpty) {
+      MainNavHeader.globalSearchNotifier.value = trimmed;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+  }
+
   void _clearSearch() {
     _searchController.clear();
     setState(() {});
+    MainNavHeader.globalSearchNotifier.value = '';
     widget.onSearch?.call('');
   }
 
@@ -244,7 +262,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             child: TextField(
                               controller: _searchController,
                               onChanged: _handleSearchChanged,
-                              onSubmitted: widget.onSearch,
+                              onSubmitted: _handleSearchSubmitted,
                               textAlignVertical: TextAlignVertical.center,
                               style: GoogleFonts.mukta(
                                 color: AppColors.textPrimary,
@@ -359,7 +377,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 child: TextField(
                                   controller: _searchController,
                                   onChanged: _handleSearchChanged,
-                                  onSubmitted: widget.onSearch,
+                                  onSubmitted: _handleSearchSubmitted,
                                   textAlignVertical: TextAlignVertical.center,
                                   style: GoogleFonts.mukta(
                                     color: AppColors.textPrimary,
@@ -597,6 +615,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
       message: 'Ebs Krishi Dukaan',
       child: InkWell(
         onTap: () {
+          _clearSearch();
           Navigator.of(context).popUntil((route) => route.isFirst);
         },
         borderRadius: BorderRadius.circular(8),

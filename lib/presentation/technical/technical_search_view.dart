@@ -62,7 +62,6 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
     final seenNames = items.map((t) => t.name.trim().toLowerCase()).toSet();
 
     for (final p in ProductController.instance.products) {
-      if (!p.isAvailable) continue;
       final tech = p.technicalName.trim();
       if (tech.isEmpty) continue;
       final lowerTech = tech.toLowerCase();
@@ -130,7 +129,6 @@ class _TechnicalSearchViewState extends State<TechnicalSearchView> {
     final target = techName.trim().toLowerCase();
     if (target.isEmpty) return 0;
     return ProductController.instance.products.where((p) {
-      if (!p.isAvailable) return false;
       final prodTech = p.technicalName.trim().toLowerCase();
       if (prodTech.isEmpty) return false;
       return prodTech.contains(target) || target.contains(prodTech);

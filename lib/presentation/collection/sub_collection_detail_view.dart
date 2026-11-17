@@ -86,9 +86,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
 
   List<ProductItem> get _filteredProducts {
     final base = ProductController.instance.products
-        .where((p) =>
-            p.isAvailable &&
-            widget.collection.matchesSubCollection(p, widget.subCollection))
+        .where((p) => widget.collection.matchesSubCollection(p, widget.subCollection))
         .toList();
 
     final query = _searchFilter.trim().toLowerCase();

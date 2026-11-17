@@ -36,7 +36,7 @@ class ProductController extends ChangeNotifier {
   /// Returns all available products belonging to the given Level 0 [category]
   /// (including products assigned to its Level 1 subcategories or Level 2 nested categories).
   List<ProductItem> productsForCategory(CategoryItem category) {
-    return _products.where((p) => p.isAvailable && category.matchesProduct(p)).toList();
+    return _products.where((p) => category.matchesProduct(p)).toList();
   }
 
   /// Finds a product in memory by ID.
@@ -136,7 +136,7 @@ class ProductController extends ChangeNotifier {
         }
       }
 
-      _products = allProducts.where((p) => p.isAvailable).toList();
+      _products = allProducts;
       _hasLoadedFromApi = true;
     } catch (e) {
       _errorMessage = e.toString();
@@ -158,7 +158,6 @@ class ProductController extends ChangeNotifier {
   void syncFromBloc(List<ProductItem> items) {
     final categories = CategoryController.instance.categories;
     _products = items
-        .where((p) => p.isAvailable)
         .map((p) => p.withResolvedCategory(categories))
         .toList();
     _hasLoadedFromApi = true;

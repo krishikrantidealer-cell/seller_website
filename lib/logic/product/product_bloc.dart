@@ -21,9 +21,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingOb
         super(
           ProductState(
             status: ProductStatus.loaded,
-            products: ProductController.instance.products
-                .where((p) => p.isAvailable)
-                .toList(),
+            products: List.of(ProductController.instance.products),
           ),
         ) {
     on<InitializeProducts>(_onInitializeProducts);
@@ -119,17 +117,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingOb
       final fetched = await productRepository.getProducts(
         forceRefresh: event.isRefresh,
       );
-      final available = fetched.where((p) => p.isAvailable).toList();
-      final availableIds = available.map((p) => p.id).toSet();
+      final availableIds = fetched.map((p) => p.id).toSet();
       emit(
         state.copyWith(
           status: ProductStatus.loaded,
-          products: available,
+          products: fetched,
           categoryProducts: state.categoryProducts
-              ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+              ?.where((p) => availableIds.contains(p.id))
               .toList(),
           searchResults: state.searchResults
-              ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+              ?.where((p) => availableIds.contains(p.id))
               .toList(),
         ),
       );
@@ -193,17 +190,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingOb
     ProductsExternalUpdated event,
     Emitter<ProductState> emit,
   ) {
-    final available = event.products.where((p) => p.isAvailable).toList();
-    final availableIds = available.map((p) => p.id).toSet();
+    final availableIds = event.products.map((p) => p.id).toSet();
     emit(
       state.copyWith(
         status: ProductStatus.loaded,
-        products: available,
+        products: event.products,
         categoryProducts: state.categoryProducts
-            ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+            ?.where((p) => availableIds.contains(p.id))
             .toList(),
         searchResults: state.searchResults
-            ?.where((p) => p.isAvailable && availableIds.contains(p.id))
+            ?.where((p) => availableIds.contains(p.id))
             .toList(),
       ),
     );

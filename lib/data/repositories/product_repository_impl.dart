@@ -18,7 +18,6 @@ class ProductRepositoryImpl implements ProductRepository {
   List<ProductItem> _resolveAvailableWithCategories(List<ProductItem> items) {
     final categories = CategoryController.instance.categories;
     return items
-        .where((p) => p.isAvailable)
         .map((p) => p.withResolvedCategory(categories))
         .toList();
   }

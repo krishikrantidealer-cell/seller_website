@@ -105,6 +105,10 @@ class WebSocketService {
         onError: (_) => _handleDisconnect(),
         cancelOnError: false,
       );
+
+      // Await ready so handshake failures (e.g. WebSocketChannelException) are
+      // caught cleanly instead of leaking as unhandled zone errors.
+      await _channel!.ready;
     } catch (_) {
       _handleDisconnect();
     }

@@ -252,32 +252,34 @@ class _ProductCardState extends State<ProductCard> {
                                 widget.product.category.toUpperCase(),
                                 style: GoogleFonts.mukta(
                                   color: AppColors.textMuted,
-                                  fontSize: isCompact ? 8.5 : 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.6,
+                                  fontSize: isCompact ? 10 : 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                               Flexible(
                                 child: Text(
-                                  widget.product.vendor,
+                                  widget.product.brandName.isNotEmpty
+                                      ? widget.product.brandName
+                                      : widget.product.vendor,
                                   style: GoogleFonts.mukta(
                                     color: AppColors.textSecondary,
-                                    fontSize: isCompact ? 8.5 : 10,
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: isCompact ? 10 : 11,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
                           ),
-                          SizedBox(height: isCompact ? 3 : 6),
+                          SizedBox(height: isCompact ? 3 : 5),
 
                           // Product Title
                           Text(
                             widget.product.title,
                             style: GoogleFonts.mukta(
-                              fontSize: isCompact ? 11.5 : 13,
-                              fontWeight: FontWeight.w600,
+                              fontSize: isCompact ? 13 : 14.5,
+                              fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                               height: 1.25,
                             ),
@@ -291,8 +293,8 @@ class _ProductCardState extends State<ProductCard> {
                             widget.product.technicalName,
                             style: GoogleFonts.mukta(
                               color: AppColors.primaryCrimson,
-                              fontSize: isCompact ? 9.5 : 11,
-                              fontWeight: FontWeight.w500,
+                              fontSize: isCompact ? 11 : 12,
+                              fontWeight: FontWeight.w600,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -303,7 +305,7 @@ class _ProductCardState extends State<ProductCard> {
                           Row(
                             children: [
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: isCompact ? 4 : 6, vertical: 2),
+                                padding: EdgeInsets.symmetric(horizontal: isCompact ? 5 : 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: AppColors.ratingAmber.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
@@ -311,13 +313,13 @@ class _ProductCardState extends State<ProductCard> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.star_rounded, size: isCompact ? 12 : 14, color: AppColors.ratingAmber),
+                                    Icon(Icons.star_rounded, size: isCompact ? 13 : 14, color: AppColors.ratingAmber),
                                     const SizedBox(width: 2),
                                     Text(
                                       widget.product.rating.toString(),
                                       style: GoogleFonts.mukta(
-                                        fontSize: isCompact ? 9.5 : 11,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: isCompact ? 11 : 12,
+                                        fontWeight: FontWeight.w800,
                                         color: const Color(0xFFB45309),
                                       ),
                                     ),
@@ -328,7 +330,8 @@ class _ProductCardState extends State<ProductCard> {
                               Text(
                                 '(${widget.product.reviewsCount})',
                                 style: GoogleFonts.mukta(
-                                  fontSize: isCompact ? 9.5 : 11,
+                                  fontSize: isCompact ? 11 : 12,
+                                  fontWeight: FontWeight.w600,
                                   color: AppColors.textMuted,
                                 ),
                               ),
@@ -349,8 +352,8 @@ class _ProductCardState extends State<ProductCard> {
                                     child: Text(
                                       _selectedVariant.label,
                                       style: GoogleFonts.mukta(
-                                        fontSize: isCompact ? 10 : 11,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: isCompact ? 11.5 : 12.5,
+                                        fontWeight: FontWeight.w700,
                                         color: AppColors.primaryDarkGreen,
                                       ),
                                       maxLines: 1,
@@ -361,7 +364,7 @@ class _ProductCardState extends State<ProductCard> {
                                     const SizedBox(width: 2),
                                     const Icon(
                                       Icons.keyboard_arrow_down_rounded,
-                                      size: 14,
+                                      size: 16,
                                       color: AppColors.primaryGreen,
                                     ),
                                   ],
@@ -379,7 +382,7 @@ class _ProductCardState extends State<ProductCard> {
                               Text(
                                 '₹${_selectedVariant.displayRate.toStringAsFixed(0)}',
                                 style: GoogleFonts.mukta(
-                                  fontSize: isCompact ? 15 : 18,
+                                  fontSize: isCompact ? 16.5 : 19.5,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.primaryGreen,
                                 ),
@@ -389,7 +392,8 @@ class _ProductCardState extends State<ProductCard> {
                                 Text(
                                   '₹${_selectedVariant.printedMrp.toStringAsFixed(0)}',
                                   style: GoogleFonts.mukta(
-                                    fontSize: isCompact ? 10 : 12,
+                                    fontSize: isCompact ? 11.5 : 13,
+                                    fontWeight: FontWeight.w600,
                                     color: AppColors.textMuted,
                                     decoration: TextDecoration.lineThrough,
                                   ),
@@ -398,8 +402,12 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                           SizedBox(height: isCompact ? 6 : 10),
 
-                          // Action Buttons (Add to Cart / Stepper)
-                          if (currentQty > 0)
+                          // Action Buttons (Out of Stock / Add to Cart / Stepper)
+                          if (!widget.product.isAvailable ||
+                              !_selectedVariant.inStock ||
+                              (_selectedVariant.stock != null && _selectedVariant.stock! <= 0))
+                            _buildOutOfStockButton(isCompact: isCompact)
+                          else if (currentQty > 0)
                             _buildQuantityStepper(cart, isCompact: isCompact)
                           else
                             _buildAddToCartButton(cart, isCompact: isCompact),
@@ -504,6 +512,32 @@ class _ProductCardState extends State<ProductCard> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildOutOfStockButton({bool isCompact = false}) {
+    final btnHeight = isCompact ? 32.0 : 38.0;
+
+    return SizedBox(
+      height: btnHeight,
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: null,
+        style: OutlinedButton.styleFrom(
+          disabledForegroundColor: const Color(0xFFB91C1C),
+          backgroundColor: const Color(0xFFFEF2F2),
+          side: const BorderSide(color: Color(0xFFFECACA)),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        ),
+        child: Text(
+          'Out of Stock',
+          style: GoogleFonts.mukta(
+            fontSize: isCompact ? 11 : 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }
