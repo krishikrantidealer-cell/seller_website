@@ -1606,7 +1606,21 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           content: _buildProductDescriptionAndSpecs(isMobile: true),
         ),
 
-        // 2. Farmer Reviews Accordion Card
+        // 2. FAQs Accordion Card (shown when product description includes FAQs)
+        if (_splitDescriptionAndFaq(_product.description?.trim() ?? '').faq.isNotEmpty)
+          _buildAccordionCard(
+            index: 2,
+            icon: Icons.quiz_outlined,
+            iconColor: AppColors.primaryGreen,
+            title: 'FAQs',
+            subtitle: 'Common grower questions & answers',
+            content: _buildFaqSection(
+              _splitDescriptionAndFaq(_product.description?.trim() ?? '').faq,
+              isMobile: true,
+            ),
+          ),
+
+        // 3. Farmer Reviews Accordion Card
         _buildAccordionCard(
           index: 1,
           icon: Icons.star_rounded,
@@ -1876,7 +1890,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   /// Authentic Product Details: Real Description from MongoDB + Verified Specifications Table
   Widget _buildProductDescriptionAndSpecs({required bool isMobile}) {
-    final rawDescription = _product.description?.trim() ?? '';
+    final split = _splitDescriptionAndFaq(_product.description?.trim() ?? '');
+    final rawDescription = split.description;
+    final rawFaq = split.faq;
+    final hasFaq = rawFaq.isNotEmpty;
+    final effectiveTabIndex = (!hasFaq && _desktopDetailTabIndex == 2) ? 0 : _desktopDetailTabIndex;
 
     final descriptionSection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1990,14 +2008,24 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   label: 'Specifications & Details',
                   icon: Icons.fact_check_outlined,
                 ),
+                if (hasFaq) ...[
+                  const SizedBox(width: 8),
+                  _buildDesktopDetailTabButton(
+                    index: 2,
+                    label: 'FAQs',
+                    icon: Icons.quiz_outlined,
+                  ),
+                ],
               ],
             ),
           ),
           const SizedBox(height: 20),
-          if (_desktopDetailTabIndex == 0)
+          if (effectiveTabIndex == 0)
             descriptionSection
+          else if (effectiveTabIndex == 1)
+            specsSection
           else
-            specsSection,
+            _buildFaqSection(rawFaq, isMobile: isMobile),
         ],
       );
     }
@@ -2010,6 +2038,69 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         const Divider(color: Color(0xFFE5E7EB), height: 1),
         const SizedBox(height: 20),
         specsSection,
+      ],
+    );
+  }
+
+  ({String description, String faq}) _splitDescriptionAndFaq(String raw) {
+    if (raw.trim().isEmpty) return (description: '', faq: '');
+    final faqHeadingHtml = RegExp(
+      r'<(h[1-6]|p|div)(?:\s[^>]*)?>\s*(?:<(?:strong|b|span|u)(?:\s[^>]*)?>\s*)*(?:Frequently\s+Asked\s+Questions(?:\s*\([^)]*\))?|FAQ\x27?s?)(?:\s*[—\-:]\s*[^<]*)?\s*(?:</(?:strong|b|span|u)>\s*)*</\1>',
+      caseSensitive: false,
+    );
+    final htmlMatch = faqHeadingHtml.firstMatch(raw);
+    if (htmlMatch != null) {
+      return (
+        description: raw.substring(0, htmlMatch.start).trim(),
+        faq: raw.substring(htmlMatch.end).trim(),
+      );
+    }
+    final faqHeadingPlain = RegExp(
+      r'^\s*(?:Frequently\s+Asked\s+Questions(?:\s*\([^)]*\))?|FAQ\x27?s?)(?:\s*[—\-:]\s*.*)?\s*$',
+      caseSensitive: false,
+      multiLine: true,
+    );
+    final plainMatch = faqHeadingPlain.firstMatch(raw);
+    if (plainMatch != null) {
+      return (
+        description: raw.substring(0, plainMatch.start).trim(),
+        faq: raw.substring(plainMatch.end).trim(),
+      );
+    }
+    return (description: raw.trim(), faq: '');
+  }
+
+  Widget _buildFaqSection(String rawFaq, {required bool isMobile}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (!isMobile) ...[
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGreen,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.quiz_outlined, size: 16, color: AppColors.primaryDarkGreen),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Frequently Asked Questions (FAQs)',
+                  style: GoogleFonts.mukta(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
+        _buildRichDescription(rawFaq, isMobile: isMobile, collapsible: false),
       ],
     );
   }
@@ -2058,7 +2149,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
   }
 
-  Widget _buildRichDescription(String rawContent, {required bool isMobile}) {
+  Widget _buildRichDescription(String rawContent, {required bool isMobile, bool collapsible = true}) {
     final cleaned = _cleanAndDecodeHtml(rawContent);
     final isHtml = cleaned.contains('<') && cleaned.contains('>');
     // Match seller_hub AppHtmlEditor preview typography 1-to-1
@@ -2235,6 +2326,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
             },
           )
         : _renderPlainText(_decodePlainTextEntities(cleaned), isMobile: isMobile);
+
+    if (!collapsible) {
+      return descriptionContent;
+    }
 
     // 3 lines on mobile (~63px at 14px * 1.5 line height), ~4.5 lines on desktop
     final double collapsedHeight = isMobile ? 64.0 : 96.0;
