@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
@@ -511,57 +512,47 @@ class MobileNavigationDrawer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 30,
-                      height: 30,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(7),
+                        borderRadius: BorderRadius.circular(9),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 4,
-                            offset: const Offset(0, 1),
+                            color: Colors.black.withValues(alpha: 0.14),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.all(3),
-                      child: Image.asset(
-                        'assets/images/ebs_logo.png',
+                      child: SvgPicture.asset(
+                        'assets/images/ebs_logo.svg',
+                        height: 36,
                         fit: BoxFit.contain,
-                        filterQuality: FilterQuality.medium,
-                        isAntiAlias: true,
-                        errorBuilder: (_, _, _) => const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 18),
+                        errorBuilder: (_, _, _) => Text(
+                          'EBS Krishi Dukaan',
+                          style: GoogleFonts.mukta(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'EBS BioCrop',
-                            style: GoogleFonts.mukta(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          Text(
-                            'Direct Farmer Store • Authentic Inputs',
-                            style: GoogleFonts.mukta(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xFFBBF7D0),
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                    const SizedBox(height: 6),
+                    Text(
+                      'Direct Farmer Store • Authentic Inputs',
+                      style: GoogleFonts.mukta(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFBBF7D0),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

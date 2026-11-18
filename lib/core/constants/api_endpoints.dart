@@ -35,5 +35,6 @@ class ApiEndpoints {
   static const String checkoutInitiatePayment = '/api/v1/checkout/initiate-payment';
   static const String checkoutConfirmOrder = '/api/v1/checkout/confirm-order';
   static const String fastrrCheckoutToken = '/api/v1/fastrr/checkout/token';
+  static const String fastrrCheckoutConfirm = '/api/v1/fastrr/checkout/confirm';
   static String checkoutTrack(String orderId) => '/api/v1/checkout/track/$orderId';
 }

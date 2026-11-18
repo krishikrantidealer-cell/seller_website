@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 
@@ -105,7 +106,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
@@ -608,8 +609,8 @@ class _MainNavHeaderState extends State<MainNavHeader> {
   }
 
   Widget _buildLogo({bool isCompact = false, bool isSmallMobile = false}) {
-    final double logoHeight = isSmallMobile ? 46 : (isCompact ? 56 : 66);
-    final double maxLogoWidth = isSmallMobile ? 175 : (isCompact ? 215 : 255);
+    final double logoHeight = isSmallMobile ? 48 : (isCompact ? 58 : 70);
+    final double maxLogoWidth = isSmallMobile ? 185 : (isCompact ? 225 : 265);
 
     return Tooltip(
       message: 'Ebs Krishi Dukaan',
@@ -623,13 +624,11 @@ class _MainNavHeaderState extends State<MainNavHeader> {
           padding: EdgeInsets.symmetric(vertical: 2, horizontal: isSmallMobile ? 0 : 4),
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxLogoWidth),
-            child: Image.asset(
-              'assets/images/ebs_logo.png',
+            child: SvgPicture.asset(
+              'assets/images/ebs_logo.svg',
               height: logoHeight,
               fit: BoxFit.contain,
-              filterQuality: FilterQuality.medium,
-              isAntiAlias: true,
-            errorBuilder: (_, _, _) => FittedBox(
+              errorBuilder: (_, _, _) => FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Container(
@@ -645,7 +644,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     const Icon(Icons.eco_rounded, color: Colors.white, size: 20),
                     const SizedBox(width: 6),
                     Text(
-                      'BioCrop',
+                      'EBS Krishi Dukaan',
                       style: GoogleFonts.mukta(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

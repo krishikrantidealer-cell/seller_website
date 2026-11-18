@@ -36,6 +36,8 @@ class ProductDetailView extends StatefulWidget {
 class _ProductDetailViewState extends State<ProductDetailView> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _tabsScrollController = ScrollController();
+  late ProductItem _liveProduct;
+  ProductItem get _product => _liveProduct;
   late ProductVariant _selectedVariant;
   int _activeTabIndex = 0;
   int _selectedImageIndex = 0;
@@ -63,15 +65,16 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       final total = _reviews.fold<int>(0, (sum, item) => sum + item.rating);
       return total / _reviews.length;
     }
-    return widget.product.rating;
+    return _product.rating;
   }
 
   int get _totalReviewsCount =>
-      _reviews.isNotEmpty ? _reviews.length : widget.product.reviewsCount;
+      _reviews.isNotEmpty ? _reviews.length : _product.reviewsCount;
 
   @override
   void initState() {
     super.initState();
+    _liveProduct = widget.product;
     _selectedVariant = widget.product.defaultVariant;
     _initReviews();
     ProductController.instance.addListener(_onCatalogUpdated);
@@ -126,7 +129,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final bloc = productBloc ?? context.read<ProductBloc?>();
     final hasLiveCatalog = ProductController.instance.hasLoadedFromApi ||
         (bloc != null && bloc.state.products.isNotEmpty);
-    if (!hasLiveCatalog) return widget.product.isAvailable;
+    if (!hasLiveCatalog) return _product.isAvailable;
 
     final liveProducts = (bloc != null &&
             (bloc.state.products.isNotEmpty || ProductController.instance.hasLoadedFromApi))
@@ -134,11 +137,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         : ProductController.instance.products;
 
     for (final p in liveProducts) {
-      if (p.id == widget.product.id) {
+      if (p.id == _product.id) {
         return p.isAvailable;
       }
     }
-    return widget.product.isAvailable;
+    return _product.isAvailable;
   }
 
   void _onAddToCart() {
@@ -152,12 +155,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       );
       return;
     }
-    CartController.instance.addItem(widget.product, _selectedVariant, 1);
+    CartController.instance.addItem(_product, _selectedVariant, 1);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Added 1 x ${widget.product.title} (${_selectedVariant.label}) to cart!',
+          'Added 1 x ${_product.title} (${_selectedVariant.label}) to cart!',
           style: GoogleFonts.mukta(color: Colors.white, fontWeight: FontWeight.w500),
         ),
         backgroundColor: AppColors.primaryDarkGreen,
@@ -184,14 +187,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       );
       return;
     }
-    final qty = CartController.instance.getQuantity(widget.product.id, _selectedVariant.id);
+    final qty = CartController.instance.getQuantity(_product.id, _selectedVariant.id);
     final buyQty = qty > 0 ? qty : 1;
 
     final items = [
       {
-        'id': widget.product.id,
+        'id': _product.id,
         'variantId': _selectedVariant.id,
-        'name': widget.product.title,
+        'name': _product.title,
         'variant': _selectedVariant.label,
         'price': _selectedVariant.displayRate,
         'quantity': buyQty,
@@ -231,15 +234,27 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final isMobileScreen = screenWidth < 700;
 
     final productBloc = context.watch<ProductBloc?>();
-    final isProductAvailable = _isProductCurrentlyAvailable(productBloc);
     final allProducts = productBloc?.state.products.isNotEmpty == true
         ? productBloc!.state.products
         : ProductController.instance.products;
+    final matchedLive = allProducts
+        .where((p) => p.id == _product.id)
+        .firstOrNull;
+    _liveProduct = matchedLive ?? widget.product;
+    if (_liveProduct.variants.isNotEmpty) {
+      final matchingVariant = _liveProduct.variants
+          .where((v) => v.id == _selectedVariant.id)
+          .firstOrNull;
+      _selectedVariant = matchingVariant ?? _liveProduct.defaultVariant;
+    } else {
+      _selectedVariant = _liveProduct.defaultVariant;
+    }
+    final isProductAvailable = _isProductCurrentlyAvailable(productBloc);
     final categoryMatches = allProducts
-        .where((p) => p.id != widget.product.id && p.category.toLowerCase() == widget.product.category.toLowerCase())
+        .where((p) => p.id != _product.id && p.category.toLowerCase() == _product.category.toLowerCase())
         .toList();
     final otherProducts = allProducts
-        .where((p) => p.id != widget.product.id && !categoryMatches.contains(p))
+        .where((p) => p.id != _product.id && !categoryMatches.contains(p))
         .toList();
     final similarProducts = [...categoryMatches, ...otherProducts].take(6).toList();
 
@@ -247,7 +262,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF9FAFB),
       drawer: MobileNavigationDrawer(
-        selectedCategoryId: widget.product.categoryId ?? 'all',
+        selectedCategoryId: _product.categoryId ?? 'all',
         onCategorySelected: (_, _) {
           Navigator.of(context).popUntil((route) => route.isFirst);
         },
@@ -521,14 +536,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
                     const SizedBox(width: 6),
                     Text(
-                      widget.product.category,
+                      _product.category,
                       style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textSecondary),
                     ),
                     const SizedBox(width: 6),
                     const Icon(Icons.chevron_right_rounded, size: 15, color: AppColors.textMuted),
                     const SizedBox(width: 6),
                     Text(
-                      widget.product.title,
+                      _product.title,
                       style: GoogleFonts.mukta(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -552,7 +567,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     // Deduplicate images so that identical URLs / sizes don't create duplicate thumbnails
     final List<String> distinctImages = [];
     final Set<String> seenImageKeys = {};
-    for (final raw in widget.product.imageUrls) {
+    for (final raw in _product.imageUrls) {
       final trimmed = raw.trim();
       if (trimmed.isEmpty) continue;
       final key = trimmed.contains('?') ? trimmed.split('?').first : trimmed;
@@ -561,8 +576,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         distinctImages.add(trimmed);
       }
     }
-    if (distinctImages.isEmpty && widget.product.imageUrl.trim().isNotEmpty) {
-      distinctImages.add(widget.product.imageUrl.trim());
+    if (distinctImages.isEmpty && _product.imageUrl.trim().isNotEmpty) {
+      distinctImages.add(_product.imageUrl.trim());
     }
 
     return Column(
@@ -594,7 +609,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     imageUrl: distinctImages.isNotEmpty &&
                             _selectedImageIndex < distinctImages.length
                         ? distinctImages[_selectedImageIndex]
-                        : widget.product.imageUrl,
+                        : _product.imageUrl,
                     fallbackUrls: distinctImages,
                     fit: BoxFit.contain,
                     fallbackIcon: Icons.agriculture_rounded,
@@ -657,12 +672,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 child: AnimatedBuilder(
                   animation: WishlistController.instance,
                   builder: (context, _) {
-                    final isLiked = WishlistController.instance.isLiked(widget.product.id);
+                    final isLiked = WishlistController.instance.isLiked(_product.id);
                     return Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {
-                          final added = WishlistController.instance.toggleWishlist(widget.product);
+                          final added = WishlistController.instance.toggleWishlist(_product);
                           ScaffoldMessenger.of(context).hideCurrentSnackBar();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -908,7 +923,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  widget.product.category.toUpperCase(),
+                  _product.category.toUpperCase(),
                   style: GoogleFonts.mukta(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
@@ -924,7 +939,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      'Brand: ${widget.product.brandName.isNotEmpty ? widget.product.brandName : widget.product.vendor}',
+                      'Brand: ${_product.brandName.isNotEmpty ? _product.brandName : _product.vendor}',
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.mukta(
                         fontSize: 11.5,
@@ -942,7 +957,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           // Main Product Title
           Text(
-            widget.product.title,
+            _product.title,
             style: GoogleFonts.mukta(
               fontSize: isMobile ? 17 : 21,
               fontWeight: FontWeight.w700,
@@ -955,14 +970,14 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
           // Technical Name / Active Formula (clickable to search matching products)
           InkWell(
-            onTap: widget.product.technicalName.trim().isEmpty
+            onTap: _product.technicalName.trim().isEmpty
                 ? null
                 : () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => TechnicalSearchView(
-                          initialQuery: widget.product.technicalName.trim(),
+                          initialQuery: _product.technicalName.trim(),
                         ),
                       ),
                     );
@@ -979,7 +994,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                 children: [
                   Flexible(
                     child: Text(
-                      'Active Composition: ${widget.product.technicalName}',
+                      'Active Composition: ${_product.technicalName}',
                       style: GoogleFonts.mukta(
                         fontSize: isMobile ? 11 : 12,
                         fontWeight: FontWeight.w600,
@@ -1164,27 +1179,30 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           // Variant Cards Grid (Clean & Professional)
           LayoutBuilder(
             builder: (context, constraints) {
-              const spacing = 10.0;
+              final spacing = isMobile ? 8.0 : 10.0;
               final columns = constraints.maxWidth >= 540 ? 3 : 2;
               final cardWidth = (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
               return Wrap(
                 spacing: spacing,
                 runSpacing: spacing,
-                children: widget.product.variants.map((v) {
+                children: _product.variants.map((v) {
                   final isSelected = v.id == _selectedVariant.id;
 
                   return SizedBox(
                     width: cardWidth,
                     child: InkWell(
                       onTap: () => _onVariantSelected(v),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 160),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 10 : 14,
+                          vertical: isMobile ? 8 : 12,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected ? const Color(0xFFF2FBF6) : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(isMobile ? 10 : 12),
                           border: Border.all(
                             color: isSelected ? AppColors.primaryGreen : const Color(0xFFE2E8F0),
                             width: isSelected ? 1.8 : 1.0,
@@ -1204,28 +1222,25 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 2),
-                                  child: Icon(
-                                    isSelected
-                                        ? Icons.check_circle_rounded
-                                        : Icons.radio_button_unchecked_rounded,
-                                    size: 16,
-                                    color: isSelected
-                                        ? AppColors.primaryGreen
-                                        : const Color(0xFFCBD5E1),
-                                  ),
+                                Icon(
+                                  isSelected
+                                      ? Icons.check_circle_rounded
+                                      : Icons.radio_button_unchecked_rounded,
+                                  size: isMobile ? 14 : 16,
+                                  color: isSelected
+                                      ? AppColors.primaryGreen
+                                      : const Color(0xFFCBD5E1),
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: isMobile ? 5 : 6),
                                 Expanded(
                                   child: Text(
                                     v.label,
-                                    maxLines: 2,
+                                    maxLines: isMobile ? 1 : 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.mukta(
-                                      fontSize: isMobile ? 13.5 : 14.5,
+                                      fontSize: isMobile ? 11.5 : 14.5,
                                       fontWeight: FontWeight.w700,
                                       color: isSelected
                                           ? AppColors.primaryDarkGreen
@@ -1236,7 +1251,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 6),
+                            SizedBox(height: isMobile ? 4 : 6),
                             Wrap(
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 6,
@@ -1244,7 +1259,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                 Text(
                                   '₹${v.displayRate.toStringAsFixed(0)}',
                                   style: GoogleFonts.mukta(
-                                    fontSize: isMobile ? 15 : 16,
+                                    fontSize: isMobile ? 13.5 : 16,
                                     fontWeight: FontWeight.w800,
                                     color: isSelected
                                         ? AppColors.primaryDarkGreen
@@ -1255,7 +1270,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                                   Text(
                                     '₹${v.printedMrp.toStringAsFixed(0)}',
                                     style: GoogleFonts.mukta(
-                                      fontSize: 12,
+                                      fontSize: isMobile ? 10.5 : 12,
                                       color: AppColors.textMuted,
                                       decoration: TextDecoration.lineThrough,
                                     ),
@@ -1418,8 +1433,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     return AnimatedBuilder(
       animation: CartController.instance,
       builder: (context, _) {
-        final cartKey = '${widget.product.id}_${_selectedVariant.id}';
-        final qty = CartController.instance.getQuantity(widget.product.id, _selectedVariant.id);
+        final cartKey = '${_product.id}_${_selectedVariant.id}';
+        final qty = CartController.instance.getQuantity(_product.id, _selectedVariant.id);
 
         if (qty <= 0) {
           // State 1: "Add to Cart" Button
@@ -1861,7 +1876,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
 
   /// Authentic Product Details: Real Description from MongoDB + Verified Specifications Table
   Widget _buildProductDescriptionAndSpecs({required bool isMobile}) {
-    final rawDescription = widget.product.description?.trim() ?? '';
+    final rawDescription = _product.description?.trim() ?? '';
 
     final descriptionSection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1907,7 +1922,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             child: Text(
-              'Authentic product formulation provided by ${widget.product.vendor}. For technical dosage guidelines, contact EBS Agronomy Helpline at ${AppConstants.orderCallNumber}.',
+              'Authentic product formulation provided by ${_product.vendor}. For technical dosage guidelines, contact EBS Agronomy Helpline at ${AppConstants.orderCallNumber}.',
               style: GoogleFonts.mukta(
                 fontSize: isMobile ? 12 : 13,
                 color: AppColors.textSecondary,
@@ -2221,8 +2236,8 @@ class _ProductDetailViewState extends State<ProductDetailView> {
           )
         : _renderPlainText(_decodePlainTextEntities(cleaned), isMobile: isMobile);
 
-    // Standard 4 lines of Poppins 13/13.5 with 1.5 line height = ~80-92px
-    final double collapsedHeight = isMobile ? 88.0 : 96.0;
+    // 3 lines on mobile (~63px at 14px * 1.5 line height), ~4.5 lines on desktop
+    final double collapsedHeight = isMobile ? 64.0 : 96.0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2247,7 +2262,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      height: 42,
+                      height: isMobile ? 28.0 : 42.0,
                       child: IgnorePointer(
                         child: Container(
                           decoration: BoxDecoration(
@@ -2729,38 +2744,38 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   Widget _buildProductSpecificationsTable({required bool isMobile}) {
     final specs = <MapEntry<String, String>>[];
 
-    specs.add(MapEntry('Product Name', widget.product.title));
-    if (widget.product.technicalName.isNotEmpty &&
-        widget.product.technicalName != widget.product.title) {
-      specs.add(MapEntry('Active Ingredient / Formula', widget.product.technicalName));
+    specs.add(MapEntry('Product Name', _product.title));
+    if (_product.technicalName.isNotEmpty &&
+        _product.technicalName != _product.title) {
+      specs.add(MapEntry('Active Ingredient / Formula', _product.technicalName));
     }
-    final displayBrand = widget.product.brandName.isNotEmpty
-        ? widget.product.brandName
-        : widget.product.vendor;
+    final displayBrand = _product.brandName.isNotEmpty
+        ? _product.brandName
+        : _product.vendor;
     if (displayBrand.isNotEmpty) {
       specs.add(MapEntry('Brand / Manufacturer', displayBrand));
     }
-    if (widget.product.category.isNotEmpty) {
-      specs.add(MapEntry('Category', widget.product.category));
+    if (_product.category.isNotEmpty) {
+      specs.add(MapEntry('Category', _product.category));
     }
-    if (widget.product.sku != null && widget.product.sku!.trim().isNotEmpty) {
-      specs.add(MapEntry('SKU Code', widget.product.sku!.trim()));
+    if (_product.sku != null && _product.sku!.trim().isNotEmpty) {
+      specs.add(MapEntry('SKU Code', _product.sku!.trim()));
     }
-    if (widget.product.hsnCode != null && widget.product.hsnCode!.trim().isNotEmpty) {
-      specs.add(MapEntry('HSN Code', widget.product.hsnCode!.trim()));
+    if (_product.hsnCode != null && _product.hsnCode!.trim().isNotEmpty) {
+      specs.add(MapEntry('HSN Code', _product.hsnCode!.trim()));
     }
-    if (widget.product.variants.isNotEmpty) {
-      final packSizes = widget.product.variants.map((v) => v.label).join(', ');
+    if (_product.variants.isNotEmpty) {
+      final packSizes = _product.variants.map((v) => v.label).join(', ');
       specs.add(MapEntry('Available Pack Sizes', packSizes));
-    } else if (widget.product.packSize.isNotEmpty) {
-      specs.add(MapEntry('Pack Size', widget.product.packSize));
+    } else if (_product.packSize.isNotEmpty) {
+      specs.add(MapEntry('Pack Size', _product.packSize));
     }
-    if (widget.product.productWeight != null && widget.product.productWeight! > 0) {
-      final unit = widget.product.productWeightUnit ?? 'kg';
-      specs.add(MapEntry('Net Weight', '${widget.product.productWeight} $unit'));
+    if (_product.productWeight != null && _product.productWeight! > 0) {
+      final unit = _product.productWeightUnit ?? 'kg';
+      specs.add(MapEntry('Net Weight', '${_product.productWeight} $unit'));
     }
-    if (widget.product.refundPolicy != null && widget.product.refundPolicy!.trim().isNotEmpty) {
-      specs.add(MapEntry('Return & Replacement Policy', widget.product.refundPolicy!.trim()));
+    if (_product.refundPolicy != null && _product.refundPolicy!.trim().isNotEmpty) {
+      specs.add(MapEntry('Return & Replacement Policy', _product.refundPolicy!.trim()));
     } else {
       specs.add(const MapEntry('Return & Replacement Policy', 'Standard 7-day replacement for damaged or incorrect deliveries'));
     }
@@ -3774,7 +3789,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
       ),
       (
         title: 'Package Authenticity & Seal Check',
-        url: widget.product.imageUrl,
+        url: _product.imageUrl,
       ),
     ];
 
@@ -3933,21 +3948,21 @@ class _ProductDetailViewState extends State<ProductDetailView> {
         duration: '0:45 min',
         size: '16.8 MB',
         thumb: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600&auto=format&fit=crop&q=80',
-        file: '${widget.product.title.split(' ').first.toLowerCase()}_field_demonstration.mp4',
+        file: '${_product.title.split(' ').first.toLowerCase()}_field_demonstration.mp4',
       ),
       (
         title: 'Tank-Mix & Foliar Application Trial',
         duration: '1:12 min',
         size: '22.4 MB',
         thumb: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=80',
-        file: '${widget.product.title.split(' ').first.toLowerCase()}_tankmix_trial.mp4',
+        file: '${_product.title.split(' ').first.toLowerCase()}_tankmix_trial.mp4',
       ),
       (
         title: 'Pre & Post Knockdown Trial Results',
         duration: '0:35 min',
         size: '12.1 MB',
         thumb: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80',
-        file: '${widget.product.title.split(' ').first.toLowerCase()}_efficacy_trial.mp4',
+        file: '${_product.title.split(' ').first.toLowerCase()}_efficacy_trial.mp4',
       ),
     ];
 
@@ -4630,7 +4645,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'More in ${widget.product.category}',
+                      'More in ${_product.category}',
                       style: GoogleFonts.mukta(
                         fontSize: isMobile ? 12.5 : 13.5,
                         color: AppColors.textSecondary,
@@ -4690,12 +4705,12 @@ class _ProductDetailViewState extends State<ProductDetailView> {
               mainAxisSpacing = 12;
             } else if (constraints.maxWidth < 1520) {
               crossAxisCount = 5;
-              childAspectRatio = 0.76;
+              childAspectRatio = 0.65;
               crossAxisSpacing = 14;
               mainAxisSpacing = 14;
             } else {
               crossAxisCount = 6;
-              childAspectRatio = 0.78;
+              childAspectRatio = 0.66;
               crossAxisSpacing = 16;
               mainAxisSpacing = 16;
             }

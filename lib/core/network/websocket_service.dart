@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../constants/api_endpoints.dart';
@@ -20,9 +21,12 @@ class WebSocketService {
   bool _isConnected = false;
   bool _isConnecting = false;
   bool _isPublicChannel = false;
+  bool _manualDisconnect = false;
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
+  DateTime? _lastMessageAt;
   int _retryCount = 0;
+  final math.Random _random = math.Random();
 
   final _productUpdatesController = StreamController<Map<String, dynamic>>.broadcast();
   final _categoryUpdatesController = StreamController<Map<String, dynamic>>.broadcast();
@@ -73,6 +77,7 @@ class WebSocketService {
       disconnect();
     }
 
+    _manualDisconnect = false;
     _isConnecting = true;
 
     try {
@@ -89,6 +94,7 @@ class WebSocketService {
 
       _subscription = _channel!.stream.listen(
         (message) {
+          _lastMessageAt = DateTime.now();
           if (!_isConnected) {
             _isConnected = true;
             _isConnecting = false;
@@ -155,13 +161,22 @@ class WebSocketService {
 
   void _startHeartbeat() {
     _heartbeatTimer?.cancel();
+    _lastMessageAt ??= DateTime.now();
     _heartbeatTimer = Timer.periodic(const Duration(seconds: 15), (_) {
-      if (_isConnected) {
-        _send({
-          'type': 'PING',
-          'timestamp': DateTime.now().toIso8601String(),
-        });
+      if (!_isConnected) return;
+      final last = _lastMessageAt;
+      if (last != null && DateTime.now().difference(last) > const Duration(seconds: 35)) {
+        debugPrint('[SellerWebsite WS] Heartbeat timeout (>35s without PONG/frames); reconnecting.');
+        try {
+          _channel?.sink.close();
+        } catch (_) {}
+        _handleDisconnect();
+        return;
       }
+      _send({
+        'type': 'PING',
+        'timestamp': DateTime.now().toIso8601String(),
+      });
     });
   }
 
@@ -233,16 +248,18 @@ class WebSocketService {
     _subscription?.cancel();
 
     _reconnectTimer?.cancel();
-    if (!_isTestEnvironment && enabled) {
-      final delaySeconds = (1 << _retryCount.clamp(0, 4)) * 2; // 2s, 4s, 8s, 16s, 32s
+    if (!_manualDisconnect && !_isTestEnvironment && enabled) {
+      final baseMs = (1 << _retryCount.clamp(0, 4)) * 2000; // 2s, 4s, 8s, 16s, 32s
+      final jitterMs = _random.nextInt(1000);
       _retryCount++;
-      _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
+      _reconnectTimer = Timer(Duration(milliseconds: baseMs + jitterMs), () {
         connect();
       });
     }
   }
 
   void disconnect() {
+    _manualDisconnect = true;
     _heartbeatTimer?.cancel();
     _reconnectTimer?.cancel();
     _subscription?.cancel();

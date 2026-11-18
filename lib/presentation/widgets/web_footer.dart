@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_constants.dart';
@@ -308,35 +309,49 @@ class WebFooter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 22),
-            const SizedBox(width: 8),
-            Expanded(
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'EBS ',
-                      style: GoogleFonts.mukta(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryCrimson,
-                      ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: SvgPicture.asset(
+              'assets/images/ebs_logo.svg',
+              height: 44,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.eco_rounded, color: AppColors.primaryGreen, size: 22),
+                  const SizedBox(width: 8),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'EBS ',
+                          style: GoogleFonts.mukta(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryCrimson,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Krishi Dukaan',
+                          style: GoogleFonts.mukta(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: 'Krishi Dukaan',
-                      style: GoogleFonts.mukta(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
         const SizedBox(height: 10),
         Text(

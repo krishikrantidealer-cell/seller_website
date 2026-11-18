@@ -92,12 +92,57 @@ class WebFastrrCheckoutGateway implements FastrrCheckoutGateway {
       }
 
       final successCallback = ((JSString responseJson) {
-        if (!completer.isCompleted) {
-          completer.complete(FastrrCheckoutResult(
-            success: true,
-            rawResponse: responseJson.toDart,
-          ));
-        }
+        final raw = responseJson.toDart;
+        unawaited(() async {
+          String? orderId;
+          try {
+            final parsed = jsonDecode(raw);
+            final Map<String, dynamic> confirmPayload =
+                parsed is Map ? Map<String, dynamic>.from(parsed) : <String, dynamic>{};
+            orderId = (confirmPayload['order_id'] ??
+                    confirmPayload['orderId'] ??
+                    confirmPayload['fastrr_order_id'] ??
+                    confirmPayload['id'])
+                ?.toString();
+            if (confirmPayload['items'] == null && confirmPayload['line_items'] == null) {
+              confirmPayload['items'] = items
+                  .map((e) => {
+                        'productId': e['productId'] ?? e['id'] ?? '',
+                        if (e['variantId'] != null) 'variantId': e['variantId'],
+                        'quantity': e['quantity'] ?? 1,
+                      })
+                  .toList();
+            }
+            if (customerPhone != null &&
+                customerPhone.isNotEmpty &&
+                confirmPayload['phone'] == null) {
+              confirmPayload['phone'] = customerPhone;
+            }
+            if (customerName != null &&
+                customerName.isNotEmpty &&
+                confirmPayload['customer_name'] == null) {
+              confirmPayload['customer_name'] = customerName;
+            }
+            if (orderId != null && orderId.isNotEmpty) {
+              await http
+                  .post(
+                    Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.fastrrCheckoutConfirm}'),
+                    headers: const {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json',
+                    },
+                    body: jsonEncode(confirmPayload),
+                  )
+                  .timeout(const Duration(seconds: 10));
+            }
+          } catch (_) {}
+          if (!completer.isCompleted) {
+            completer.complete(FastrrCheckoutResult(
+              success: true,
+              rawResponse: raw,
+            ));
+          }
+        }());
       }).toJS;
 
       final dismissCallback = (() {

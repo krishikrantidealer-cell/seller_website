@@ -180,6 +180,7 @@ class ProductItem {
   final int reviewsCount;
   final String category;
   final String? categoryId;
+  final List<String> subCategoryIds;
   final String? rootCategoryId;
   final String packSize;
   final List<String> assignedCollections;
@@ -210,6 +211,7 @@ class ProductItem {
     this.reviewsCount = 42,
     required this.category,
     this.categoryId,
+    this.subCategoryIds = const [],
     this.rootCategoryId,
     required this.packSize,
     this.assignedCollections = const [],
@@ -432,6 +434,11 @@ class ProductItem {
       reviewsCount: reviewsCount,
       category: categoryName,
       categoryId: rawCategoryId,
+      subCategoryIds: (json['subCategoryIds'] as List?)
+              ?.map((e) => e.toString().trim())
+              .where((e) => e.isNotEmpty)
+              .toList() ??
+          const [],
       rootCategoryId: rootCategoryId,
       packSize: packSize,
       assignedCollections: collections,
@@ -938,9 +945,13 @@ class CategoryItem {
       }
     }
 
-    // 2. Check by backend categoryId across Level 0, Level 1, and Level 2
-    final pCatId = product.categoryId?.trim().toLowerCase() ?? '';
-    if (pCatId.isNotEmpty) {
+    // 2. Check by backend categoryId / subCategoryIds across Level 0, Level 1, and Level 2
+    final pCatIds = <String>{
+      if (product.categoryId != null && product.categoryId!.trim().isNotEmpty)
+        product.categoryId!.trim().toLowerCase(),
+      ...product.subCategoryIds.map((e) => e.trim().toLowerCase()).where((e) => e.isNotEmpty),
+    };
+    for (final pCatId in pCatIds) {
       if (pCatId == cId || pCatId == cSlug || (cBackendId.isNotEmpty && pCatId == cBackendId)) {
         return true;
       }
@@ -997,7 +1008,11 @@ class CategoryItem {
     final target = subcategory.trim().toLowerCase();
     if (target.isEmpty) return true;
 
-    final pCatId = product.categoryId?.trim().toLowerCase() ?? '';
+    final pCatIds = <String>{
+      if (product.categoryId != null && product.categoryId!.trim().isNotEmpty)
+        product.categoryId!.trim().toLowerCase(),
+      ...product.subCategoryIds.map((e) => e.trim().toLowerCase()).where((e) => e.isNotEmpty),
+    };
 
     for (final group in groups) {
       final gName = group.name.trim().toLowerCase();
@@ -1006,7 +1021,7 @@ class CategoryItem {
 
       // If filtering by this Level 1 group
       if (target == gName || (gId.isNotEmpty && target == gId) || (gSlug.isNotEmpty && target == gSlug)) {
-        if (pCatId.isNotEmpty) {
+        for (final pCatId in pCatIds) {
           if ((gId.isNotEmpty && pCatId == gId) || (gSlug.isNotEmpty && pCatId == gSlug)) {
             return true;
           }
@@ -1032,7 +1047,7 @@ class CategoryItem {
         final sId = subItem.id.trim().toLowerCase();
         final sSlug = subItem.slug.trim().toLowerCase();
         if (target == sName || (sId.isNotEmpty && target == sId) || (sSlug.isNotEmpty && target == sSlug)) {
-          if (pCatId.isNotEmpty && (pCatId == sId || (sSlug.isNotEmpty && pCatId == sSlug))) {
+          if (pCatIds.any((id) => id == sId || (sSlug.isNotEmpty && id == sSlug))) {
             return true;
           }
         }

@@ -97,8 +97,8 @@ class _ProductCardState extends State<ProductCard> {
                             Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
-                                  horizontal: isCompact ? 6 : 10,
-                                  vertical: isCompact ? 4 : 8,
+                                  horizontal: isCompact ? 3 : 5,
+                                  vertical: isCompact ? 2 : 4,
                                 ),
                                 child: AppProductImage(
                                   imageUrl: widget.product.imageUrl,
