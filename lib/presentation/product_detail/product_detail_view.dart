@@ -2324,6 +2324,19 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     var s = text.replaceAll(RegExp(r'<!--[\s\S]*?-->'), '');
     s = s.replaceAll(RegExp(r'<script[\s\S]*?</script>', caseSensitive: false), '');
     s = s.replaceAll(RegExp(r'<style[\s\S]*?</style>', caseSensitive: false), '');
+    // Strip redundant leading "Product Description" headings/paragraphs copied from external pages,
+    // since the storefront card/accordion already renders the section heading.
+    final leadingHeadingHtml = RegExp(
+      r'^\s*(?:<(?:p|div|h[1-6]|strong|b|span)(?:\s[^>]*)?>\s*)*(?:Product\s+Description)\s*:?\s*(?:</(?:p|div|h[1-6]|strong|b|span)>\s*|<br\s*/?>\s*)+',
+      caseSensitive: false,
+    );
+    while (leadingHeadingHtml.hasMatch(s)) {
+      s = s.replaceFirst(leadingHeadingHtml, '');
+    }
+    s = s.replaceFirst(
+      RegExp(r'^(?:\s*Product\s+Description\s*:?\s*(?:\r?\n|$))+', caseSensitive: false),
+      '',
+    );
     return s.trim();
   }
 
