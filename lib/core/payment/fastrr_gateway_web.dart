@@ -5,6 +5,7 @@ import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
 import 'package:http/http.dart' as http;
 import '../constants/api_endpoints.dart';
+import '../storage/token_storage.dart';
 import 'fastrr_checkout_gateway.dart';
 
 FastrrCheckoutGateway createFastrrGateway() => WebFastrrCheckoutGateway();
@@ -21,8 +22,16 @@ class WebFastrrCheckoutGateway implements FastrrCheckoutGateway {
     final completer = Completer<FastrrCheckoutResult>();
 
     String? checkoutToken;
+    String? confirmToken;
     String? apiKey;
     String? storeUrl;
+    final authToken = await TokenStorage().getAccessToken();
+    final reqHeaders = <String, String>{
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (authToken != null && authToken.isNotEmpty)
+        'Authorization': 'Bearer $authToken',
+    };
     try {
       final tokenUri = Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.fastrrCheckoutToken}');
       final tokenReqItems = items.map((e) => {
@@ -34,7 +43,7 @@ class WebFastrrCheckoutGateway implements FastrrCheckoutGateway {
       final tokenResp = await http
           .post(
             tokenUri,
-            headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            headers: reqHeaders,
             body: jsonEncode({
               'items': tokenReqItems,
               if (Uri.base.hasAuthority &&
@@ -54,6 +63,7 @@ class WebFastrrCheckoutGateway implements FastrrCheckoutGateway {
       final data = decoded['data'];
       if (data is Map) {
         checkoutToken = data['token']?.toString();
+        confirmToken = data['confirmToken']?.toString();
         apiKey = data['apiKey']?.toString();
         storeUrl = data['storeUrl']?.toString();
       }
@@ -123,14 +133,15 @@ class WebFastrrCheckoutGateway implements FastrrCheckoutGateway {
                 confirmPayload['customer_name'] == null) {
               confirmPayload['customer_name'] = customerName;
             }
+            if (confirmToken != null && confirmToken.isNotEmpty) {
+              confirmPayload['confirmToken'] = confirmToken;
+              confirmPayload['fastrrToken'] = checkoutToken;
+            }
             if (orderId != null && orderId.isNotEmpty) {
               await http
                   .post(
                     Uri.parse('${ApiEndpoints.baseUrl}${ApiEndpoints.fastrrCheckoutConfirm}'),
-                    headers: const {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json',
-                    },
+                    headers: reqHeaders,
                     body: jsonEncode(confirmPayload),
                   )
                   .timeout(const Duration(seconds: 10));

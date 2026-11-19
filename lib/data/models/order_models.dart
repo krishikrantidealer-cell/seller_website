@@ -1,29 +1,90 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../core/constants/api_endpoints.dart';
+import '../../core/di/injection_container.dart';
+import '../../core/network/websocket_service.dart';
 import 'catalog_models.dart';
 
-/// Status of an agricultural order
+/// Status of an agricultural order (aligned with backend & Delhivery One lifecycle)
 enum OrderStatus {
+  pending,
   confirmed,
+  packed,
   processing,
+  shipped,
   inTransit,
   outForDelivery,
   delivered,
+  rtoInitiated,
+  rtoInTransit,
+  rtoDelivered,
   cancelled,
 }
 
 extension OrderStatusExtension on OrderStatus {
+  static OrderStatus fromBackend(String? raw) {
+    switch ((raw ?? '').trim().toUpperCase()) {
+      case 'PENDING':
+      case 'PENDING_PAYMENT':
+        return OrderStatus.pending;
+      case 'CONFIRMED':
+      case 'AWAITING_SELLER_RESPONSE':
+      case 'ACCEPTED':
+        return OrderStatus.confirmed;
+      case 'PACKED':
+        return OrderStatus.packed;
+      case 'PROCESSING':
+        return OrderStatus.processing;
+      case 'SHIPPED':
+      case 'DISPATCHED':
+        return OrderStatus.shipped;
+      case 'IN_TRANSIT':
+      case 'IN TRANSIT':
+        return OrderStatus.inTransit;
+      case 'OUT_FOR_DELIVERY':
+        return OrderStatus.outForDelivery;
+      case 'DELIVERED':
+        return OrderStatus.delivered;
+      case 'RTO_INITIATED':
+        return OrderStatus.rtoInitiated;
+      case 'RTO_IN_TRANSIT':
+        return OrderStatus.rtoInTransit;
+      case 'RTO_DELIVERED':
+      case 'RETURNED':
+        return OrderStatus.rtoDelivered;
+      case 'CANCELLED':
+      case 'CANCELLED_BY_CUSTOMER':
+      case 'CANCELLED_BY_SYSTEM':
+        return OrderStatus.cancelled;
+      default:
+        return OrderStatus.pending;
+    }
+  }
+
   String get displayName {
     switch (this) {
+      case OrderStatus.pending:
+        return 'Pending Confirmation';
       case OrderStatus.confirmed:
         return 'Order Confirmed';
+      case OrderStatus.packed:
+        return 'Packed & Label Ready';
       case OrderStatus.processing:
         return 'Packed & Quality Checked';
+      case OrderStatus.shipped:
+        return 'Shipped';
       case OrderStatus.inTransit:
         return 'In Transit';
       case OrderStatus.outForDelivery:
         return 'Out for Delivery';
       case OrderStatus.delivered:
         return 'Delivered';
+      case OrderStatus.rtoInitiated:
+        return 'RTO Initiated';
+      case OrderStatus.rtoInTransit:
+        return 'RTO In Transit';
+      case OrderStatus.rtoDelivered:
+        return 'Returned to Origin';
       case OrderStatus.cancelled:
         return 'Cancelled';
     }
@@ -31,16 +92,24 @@ extension OrderStatusExtension on OrderStatus {
 
   Color get color {
     switch (this) {
+      case OrderStatus.pending:
+        return const Color(0xFFD97706); // Amber
       case OrderStatus.confirmed:
         return const Color(0xFF2563EB); // Blue
+      case OrderStatus.packed:
       case OrderStatus.processing:
-        return const Color(0xFFD97706); // Amber
+        return const Color(0xFF0891B2); // Cyan
+      case OrderStatus.shipped:
       case OrderStatus.inTransit:
         return const Color(0xFF7C3AED); // Purple
       case OrderStatus.outForDelivery:
         return const Color(0xFF0284C7); // Sky Blue
       case OrderStatus.delivered:
         return const Color(0xFF16A34A); // Green
+      case OrderStatus.rtoInitiated:
+      case OrderStatus.rtoInTransit:
+      case OrderStatus.rtoDelivered:
+        return const Color(0xFFEA580C); // Deep Orange
       case OrderStatus.cancelled:
         return const Color(0xFFDC2626); // Crimson
     }
@@ -48,16 +117,24 @@ extension OrderStatusExtension on OrderStatus {
 
   Color get backgroundColor {
     switch (this) {
+      case OrderStatus.pending:
+        return const Color(0xFFFFFBEB);
       case OrderStatus.confirmed:
         return const Color(0xFFEFF6FF);
+      case OrderStatus.packed:
       case OrderStatus.processing:
-        return const Color(0xFFFFFBEB);
+        return const Color(0xFFECFEFF);
+      case OrderStatus.shipped:
       case OrderStatus.inTransit:
         return const Color(0xFFF5F3FF);
       case OrderStatus.outForDelivery:
         return const Color(0xFFF0F9FF);
       case OrderStatus.delivered:
         return const Color(0xFFF0FDF4);
+      case OrderStatus.rtoInitiated:
+      case OrderStatus.rtoInTransit:
+      case OrderStatus.rtoDelivered:
+        return const Color(0xFFFFF7ED);
       case OrderStatus.cancelled:
         return const Color(0xFFFEF2F2);
     }
@@ -65,16 +142,24 @@ extension OrderStatusExtension on OrderStatus {
 
   IconData get icon {
     switch (this) {
+      case OrderStatus.pending:
+        return Icons.hourglass_top_rounded;
       case OrderStatus.confirmed:
         return Icons.check_circle_outline_rounded;
+      case OrderStatus.packed:
       case OrderStatus.processing:
         return Icons.inventory_2_outlined;
+      case OrderStatus.shipped:
       case OrderStatus.inTransit:
         return Icons.local_shipping_outlined;
       case OrderStatus.outForDelivery:
         return Icons.directions_bike_rounded;
       case OrderStatus.delivered:
         return Icons.task_alt_rounded;
+      case OrderStatus.rtoInitiated:
+      case OrderStatus.rtoInTransit:
+      case OrderStatus.rtoDelivered:
+        return Icons.assignment_return_outlined;
       case OrderStatus.cancelled:
         return Icons.cancel_outlined;
     }
@@ -164,6 +249,112 @@ class OrderModel {
   });
 
   int get totalItemCount => items.fold(0, (sum, i) => sum + i.quantity);
+
+  factory OrderModel.fromBackendJson(Map<String, dynamic> json) {
+    final orderNumber = (json['orderNumber'] ?? json['id'] ?? '').toString();
+    final placedAtRaw = json['placedAt'] ?? json['createdAt'];
+    DateTime orderDate = DateTime.now();
+    if (placedAtRaw is String) {
+      orderDate = DateTime.tryParse(placedAtRaw) ?? DateTime.now();
+    } else if (placedAtRaw is List && placedAtRaw.length >= 3) {
+      orderDate = DateTime(
+        (placedAtRaw[0] as num).toInt(),
+        (placedAtRaw[1] as num).toInt(),
+        (placedAtRaw[2] as num).toInt(),
+        placedAtRaw.length > 3 ? (placedAtRaw[3] as num).toInt() : 0,
+        placedAtRaw.length > 4 ? (placedAtRaw[4] as num).toInt() : 0,
+      );
+    }
+
+    final status = OrderStatusExtension.fromBackend(json['overallStatus']?.toString());
+    final rawItems = (json['items'] is List) ? (json['items'] as List) : const [];
+    final items = <OrderItemRecord>[];
+    for (final raw in rawItems) {
+      if (raw is! Map) continue;
+      final snap = raw['productSnapshot'] is Map ? Map<String, dynamic>.from(raw['productSnapshot'] as Map) : const <String, dynamic>{};
+      final title = (snap['title'] ?? raw['title'] ?? 'Agricultural Product').toString();
+      final variantLabel = (snap['variantLabel'] ?? raw['variantLabel'] ?? 'Standard').toString();
+      final qty = (raw['quantity'] is num) ? (raw['quantity'] as num).toInt() : 1;
+      final unitPrice = (raw['unitPrice'] is num) ? (raw['unitPrice'] as num).toDouble() : 0.0;
+      final imageUrl = (snap['imageUrl'] ?? '').toString();
+      final prod = ProductItem(
+        id: (raw['productId'] ?? '').toString(),
+        title: title,
+        technicalName: (snap['technicalName'] ?? '').toString(),
+        vendor: (snap['sellerName'] ?? '').toString(),
+        imageUrl: imageUrl,
+        displayRate: unitPrice,
+        printedMrp: unitPrice,
+        category: (snap['category'] ?? '').toString(),
+        packSize: variantLabel,
+      );
+      final variant = ProductVariant(
+        id: (raw['variantId'] ?? '').toString(),
+        label: variantLabel,
+        displayRate: unitPrice,
+        printedMrp: unitPrice,
+      );
+      items.add(OrderItemRecord(product: prod, variant: variant, quantity: qty, unitPrice: unitPrice));
+    }
+
+    final financial = json['financialSummary'] is Map ? Map<String, dynamic>.from(json['financialSummary'] as Map) : const <String, dynamic>{};
+    final payment = json['payment'] is Map ? Map<String, dynamic>.from(json['payment'] as Map) : const <String, dynamic>{};
+    final addr = json['shippingAddress'] is Map ? Map<String, dynamic>.from(json['shippingAddress'] as Map) : const <String, dynamic>{};
+    final fuls = json['sellerFulfillments'] is List ? json['sellerFulfillments'] as List : const [];
+    Map<String, dynamic> shipment = const {};
+    if (fuls.isNotEmpty && fuls.first is Map) {
+      final ships = (fuls.first as Map)['shipments'];
+      if (ships is List && ships.isNotEmpty && ships.first is Map) {
+        shipment = Map<String, dynamic>.from(ships.first as Map);
+      }
+    }
+
+    final totalAmount = (financial['currentOrderTotal'] is num)
+        ? (financial['currentOrderTotal'] as num).toDouble()
+        : items.fold(0.0, (s, i) => s + i.totalPrice);
+    final shippingFee = (financial['shippingCharge'] is num) ? (financial['shippingCharge'] as num).toDouble() : 0.0;
+    final payStatus = (payment['status'] ?? '').toString().toUpperCase();
+    final addrParts = [
+      addr['villageArea'],
+      addr['cityTehsil'],
+      addr['state'],
+      addr['pincode'],
+    ].where((e) => e != null && e.toString().trim().isNotEmpty).map((e) => e.toString().trim()).join(', ');
+
+    final rawScans = shipment['trackingEvents'] is List ? shipment['trackingEvents'] as List : const [];
+    final checkpoints = rawScans.whereType<Map>().map((s) {
+      return TrackingCheckpoint(
+        title: (s['status'] ?? 'Shipment Update').toString(),
+        description: (s['instructions'] ?? s['status'] ?? '').toString(),
+        date: '',
+        time: '',
+        location: (s['location'] ?? '').toString(),
+        isCompleted: true,
+        isCurrent: false,
+      );
+    }).toList();
+
+    return OrderModel(
+      id: orderNumber,
+      orderDate: orderDate,
+      status: status,
+      items: items,
+      subtotal: (totalAmount - shippingFee).clamp(0.0, double.infinity),
+      shippingFee: shippingFee,
+      totalAmount: totalAmount,
+      paymentMethod: (payment['paymentType'] ?? 'PREPAID').toString(),
+      isPaid: payStatus == 'CAPTURED' || payStatus == 'PAID',
+      deliveryAddress: addrParts.isEmpty ? 'Registered Farm Address' : addrParts,
+      recipientName: (addr['name'] ?? 'Customer').toString(),
+      recipientPhone: (addr['phoneNumber'] ?? '').toString(),
+      courierName: (shipment['carrier'] ?? 'Delhivery One').toString(),
+      awbNumber: (shipment['trackingNumber'] ?? '').toString(),
+      estimatedDelivery: status == OrderStatus.delivered
+          ? 'Delivered'
+          : (status == OrderStatus.rtoDelivered ? 'Returned to Origin' : '3–5 Business Days'),
+      trackingHistory: checkpoints,
+    );
+  }
 
   static List<OrderModel> get sampleOrders {
     final prods = ProductItem.sampleProducts;
@@ -365,11 +556,53 @@ class OrdersController extends ChangeNotifier {
   static final OrdersController instance = OrdersController._internal();
   OrdersController._internal() {
     _orders = [];
+    _wsSub = WebSocketService().orderUpdates.listen((_) {
+      fetchOrders();
+    });
   }
 
   late List<OrderModel> _orders;
-  String _selectedFilter = 'all'; // 'all', 'active', 'delivered', 'cancelled'
+  String _selectedFilter = 'all'; // 'all', 'active', 'delivered', 'rto', 'cancelled'
   String _searchQuery = '';
+  bool _isLoading = false;
+  String? _errorMessage;
+  StreamSubscription<Map<String, dynamic>>? _wsSub;
+
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+
+  Future<void> fetchOrders() async {
+    if (_isLoading) return;
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final res = await InjectionContainer.instance.apiClient.get(
+        ApiEndpoints.orders,
+        queryParameters: {'page': 0, 'size': 50},
+        requiresAuth: true,
+      );
+      final data = res['data'];
+      final rawList = (data is Map && data['content'] is List)
+          ? data['content'] as List
+          : (data is List ? data : const []);
+      _orders = rawList
+          .whereType<Map>()
+          .map((m) => OrderModel.fromBackendJson(Map<String, dynamic>.from(m)))
+          .toList();
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clear() {
+    _orders = [];
+    _errorMessage = null;
+    notifyListeners();
+  }
 
   void resetForTest() {
     _orders = OrderModel.sampleOrders;
@@ -378,17 +611,31 @@ class OrdersController extends ChangeNotifier {
     notifyListeners();
   }
 
+  @override
+  void dispose() {
+    _wsSub?.cancel();
+    super.dispose();
+  }
+
   List<OrderModel> get allOrders => _orders;
   String get selectedFilter => _selectedFilter;
   String get searchQuery => _searchQuery;
 
   int get totalOrderCount => _orders.length;
   int get activeOrderCount => _orders.where((o) =>
+      o.status == OrderStatus.pending ||
       o.status == OrderStatus.confirmed ||
+      o.status == OrderStatus.packed ||
       o.status == OrderStatus.processing ||
+      o.status == OrderStatus.shipped ||
       o.status == OrderStatus.inTransit ||
       o.status == OrderStatus.outForDelivery).length;
   int get deliveredOrderCount => _orders.where((o) => o.status == OrderStatus.delivered).length;
+  int get rtoOrderCount => _orders.where((o) =>
+      o.status == OrderStatus.rtoInitiated ||
+      o.status == OrderStatus.rtoInTransit ||
+      o.status == OrderStatus.rtoDelivered).length;
+  int get cancelledOrderCount => _orders.where((o) => o.status == OrderStatus.cancelled).length;
 
   void setFilter(String filter) {
     _selectedFilter = filter;
@@ -403,14 +650,23 @@ class OrdersController extends ChangeNotifier {
   List<OrderModel> get filteredOrders {
     return _orders.where((order) {
       if (_selectedFilter == 'active') {
-        if (order.status != OrderStatus.confirmed &&
+        if (order.status != OrderStatus.pending &&
+            order.status != OrderStatus.confirmed &&
+            order.status != OrderStatus.packed &&
             order.status != OrderStatus.processing &&
+            order.status != OrderStatus.shipped &&
             order.status != OrderStatus.inTransit &&
             order.status != OrderStatus.outForDelivery) {
           return false;
         }
       } else if (_selectedFilter == 'delivered') {
         if (order.status != OrderStatus.delivered) return false;
+      } else if (_selectedFilter == 'rto') {
+        if (order.status != OrderStatus.rtoInitiated &&
+            order.status != OrderStatus.rtoInTransit &&
+            order.status != OrderStatus.rtoDelivered) {
+          return false;
+        }
       } else if (_selectedFilter == 'cancelled') {
         if (order.status != OrderStatus.cancelled) return false;
       }

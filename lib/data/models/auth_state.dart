@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/api_endpoints.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/api_exception.dart';
+import '../../core/network/websocket_service.dart';
 import '../../core/storage/token_storage.dart';
+import 'order_models.dart';
 
 /// User representation for authenticated farmers/customers
 class UserModel {
@@ -151,12 +155,15 @@ class AuthController extends ChangeNotifier {
         final userId = await _tokenStorage.getUserId();
         final role = await _tokenStorage.getRole();
         if (phone != null && phone.isNotEmpty) {
-          _currentUser = UserModel(
-            phoneNumber: phone,
-            userId: userId,
-            role: role,
-            location: 'Karnal, Haryana',
-          );
+          final savedProfile = await _loadSavedProfile(phone);
+          _currentUser = savedProfile != null
+              ? savedProfile.copyWith(userId: userId, role: role, phoneNumber: phone)
+              : UserModel(
+                  phoneNumber: phone,
+                  userId: userId,
+                  role: role,
+                  location: 'Karnal, Haryana',
+                );
           notifyListeners();
         }
       }
@@ -258,6 +265,8 @@ class AuthController extends ChangeNotifier {
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
+      WebSocketService().connect(forceReconnect: true);
+      OrdersController.instance.fetchOrders();
       return true;
     }
 
@@ -301,6 +310,8 @@ class AuthController extends ChangeNotifier {
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
+      WebSocketService().connect(forceReconnect: true);
+      OrdersController.instance.fetchOrders();
       return true;
     } on ApiException catch (e) {
       _errorMessage = e.message;
@@ -363,7 +374,61 @@ class AuthController extends ChangeNotifier {
           ? '$district, $state'
           : current.location,
     );
+    _saveProfileLocally(_currentUser!);
     notifyListeners();
+  }
+
+  Future<void> _saveProfileLocally(UserModel user) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = 'seller_website_profile_v1_${user.phoneNumber}';
+      await prefs.setString(key, jsonEncode({
+        'name': user.name,
+        'alternatePhone': user.alternatePhone,
+        'email': user.email,
+        'addressLine1': user.addressLine1,
+        'villageOrTown': user.villageOrTown,
+        'talukaOrTehsil': user.talukaOrTehsil,
+        'district': user.district,
+        'state': user.state,
+        'pinCode': user.pinCode,
+        'addressType': user.addressType,
+        'farmerType': user.farmerType,
+        'primaryCrops': user.primaryCrops,
+        'landholdingAcres': user.landholdingAcres,
+        'location': user.location,
+      }));
+    } catch (_) {}
+  }
+
+  Future<UserModel?> _loadSavedProfile(String phone) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('seller_website_profile_v1_$phone');
+      if (raw == null || raw.isEmpty) return null;
+      final m = jsonDecode(raw);
+      if (m is! Map) return null;
+      return UserModel(
+        phoneNumber: phone,
+        name: m['name']?.toString(),
+        alternatePhone: m['alternatePhone']?.toString(),
+        email: m['email']?.toString(),
+        addressLine1: m['addressLine1']?.toString(),
+        villageOrTown: m['villageOrTown']?.toString(),
+        talukaOrTehsil: m['talukaOrTehsil']?.toString(),
+        district: m['district']?.toString(),
+        state: m['state']?.toString(),
+        pinCode: m['pinCode']?.toString(),
+        addressType: m['addressType']?.toString() ?? 'Farm / Field',
+        farmerType: m['farmerType']?.toString() ?? 'Individual Farmer',
+        primaryCrops: m['primaryCrops']?.toString(),
+        landholdingAcres: m['landholdingAcres']?.toString(),
+        location: m['location']?.toString() ?? 'Karnal, Haryana',
+        isProfileComplete: true,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   /// For testing: set user directly
@@ -378,6 +443,8 @@ class AuthController extends ChangeNotifier {
     _pendingPhone = null;
     _errorMessage = null;
     notifyListeners();
+    WebSocketService().disconnect();
+    OrdersController.instance.clear();
     try {
       _tokenStorage.clearSession();
     } catch (_) {}

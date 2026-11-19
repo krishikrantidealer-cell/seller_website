@@ -14,6 +14,7 @@ import '../../logic/product/product_bloc.dart';
 import '../../logic/product/product_event.dart';
 import '../../logic/product/product_state.dart';
 import '../widgets/app_product_image.dart';
+import '../widgets/category_icon_badge.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
@@ -698,27 +699,18 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                if (category.categoryImageUrl != null &&
-                    category.categoryImageUrl!.trim().isNotEmpty) ...[
-                  AppProductImage(
-                    imageUrl: category.categoryImageUrl!,
-                    width: isMobile ? 22 : 28,
-                    height: isMobile ? 22 : 28,
-                    fit: BoxFit.cover,
+                if (CategoryIconBadge.hasAnyIcon(
+                  categoryImageUrl: category.categoryImageUrl,
+                  iconUrl: category.iconUrl,
+                  iconEmoji: category.icon,
+                )) ...[
+                  CategoryIconBadge(
+                    categoryImageUrl: category.categoryImageUrl,
+                    iconUrl: category.iconUrl,
+                    iconEmoji: category.icon,
+                    size: isMobile ? 22 : 26,
+                    emojiSize: isMobile ? 13 : 16,
                     borderRadius: 6,
-                  ),
-                  const SizedBox(width: 8),
-                ] else if (category.icon.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDF4),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      category.icon,
-                      style: TextStyle(fontSize: isMobile ? 13 : 16),
-                    ),
                   ),
                   const SizedBox(width: 8),
                 ],

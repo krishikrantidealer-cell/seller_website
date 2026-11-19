@@ -13,6 +13,7 @@ class ApiCategoryRecord {
   final int level;
   final int sortOrder;
   final bool isActive;
+  final String? iconUrl;
   final String? bannerImage;
   final String? cataloguePdf;
   final String? categoryImageUrl;
@@ -26,6 +27,7 @@ class ApiCategoryRecord {
     required this.level,
     required this.sortOrder,
     required this.isActive,
+    this.iconUrl,
     this.bannerImage,
     this.cataloguePdf,
     this.categoryImageUrl,
@@ -55,6 +57,7 @@ class ApiCategoryRecord {
           ? (json['sortOrder'] as num).toInt()
           : int.tryParse('${json['sortOrder'] ?? json['displayOrder'] ?? 0}') ?? 0,
       isActive: json['isActive'] != false,
+      iconUrl: json['iconUrl']?.toString(),
       bannerImage: json['bannerImage']?.toString(),
       cataloguePdf: json['cataloguePdf']?.toString(),
       categoryImageUrl: json['categoryImageUrl']?.toString(),
@@ -71,6 +74,7 @@ class ApiCategoryRecord {
       'level': level,
       'sortOrder': sortOrder,
       'isActive': isActive,
+      'iconUrl': iconUrl,
       'bannerImage': bannerImage,
       'cataloguePdf': cataloguePdf,
       'categoryImageUrl': categoryImageUrl,
@@ -257,6 +261,7 @@ class CategoryController extends ChangeNotifier {
                 id: l2.id,
                 name: l2.name,
                 slug: l2.slug,
+                iconUrl: l2.iconUrl,
                 categoryImageUrl: l2.categoryImageUrl,
                 sortOrder: l2.sortOrder,
               ),
@@ -269,6 +274,7 @@ class CategoryController extends ChangeNotifier {
             slug: l1.slug,
             name: l1.name,
             icon: null,
+            iconUrl: l1.iconUrl,
             categoryImageUrl: l1.categoryImageUrl,
             sortOrder: l1.sortOrder,
             subcategories: subItems.map((s) => s.name).toList(),
@@ -284,6 +290,7 @@ class CategoryController extends ChangeNotifier {
           slug: l0.slug,
           name: l0.name,
           icon: '',
+          iconUrl: l0.iconUrl,
           categoryImageUrl: l0.categoryImageUrl,
           bannerImage: l0.bannerImage,
           bannerTitle: l0.bannerTitle,

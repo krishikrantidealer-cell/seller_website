@@ -823,6 +823,7 @@ class CategorySubItem {
   final String id;
   final String name;
   final String slug;
+  final String? iconUrl;
   final String? categoryImageUrl;
   final int sortOrder;
 
@@ -830,6 +831,7 @@ class CategorySubItem {
     required this.id,
     required this.name,
     this.slug = '',
+    this.iconUrl,
     this.categoryImageUrl,
     this.sortOrder = 0,
   });
@@ -840,6 +842,7 @@ class CategoryGroup {
   final String? slug;
   final String name;
   final String? icon;
+  final String? iconUrl;
   final String? categoryImageUrl;
   final int sortOrder;
   final List<String> subcategories;
@@ -850,6 +853,7 @@ class CategoryGroup {
     this.slug,
     required this.name,
     this.icon,
+    this.iconUrl,
     this.categoryImageUrl,
     this.sortOrder = 0,
     required this.subcategories,
@@ -863,6 +867,7 @@ class CategoryItem {
   final String slug;
   final String name;
   final String icon;
+  final String? iconUrl;
   final String? categoryImageUrl;
   final String? bannerImage;
   final String? bannerTitle;
@@ -876,6 +881,7 @@ class CategoryItem {
     String? slug,
     required this.name,
     required this.icon,
+    this.iconUrl,
     this.categoryImageUrl,
     this.bannerImage,
     this.bannerTitle,

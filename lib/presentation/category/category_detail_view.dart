@@ -12,6 +12,7 @@ import '../../logic/product/product_bloc.dart';
 import '../../logic/product/product_event.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/main_nav_header.dart';
+import '../widgets/category_icon_badge.dart';
 import '../widgets/category_ribbon.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/mobile_navigation_drawer.dart';
@@ -488,6 +489,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         _buildPill(
           label: isMobile ? 'All' : 'All in ${activeCat.name}',
           iconEmoji: activeCat.icon,
+          iconUrl: activeCat.iconUrl,
+          categoryImageUrl: activeCat.categoryImageUrl,
           isSelected: _selectedSubcategory == null,
           isMobile: isMobile,
           onTap: () {
@@ -503,6 +506,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
             _buildPill(
               label: group.name,
               iconEmoji: group.icon,
+              iconUrl: group.iconUrl,
+              categoryImageUrl: group.categoryImageUrl,
               isSelected: isGroupSelected,
               isMobile: isMobile,
               onTap: () {
@@ -575,6 +580,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         return _buildPill(
           label: cat.name,
           iconEmoji: cat.icon,
+          iconUrl: cat.iconUrl,
+          categoryImageUrl: cat.categoryImageUrl,
           isSelected: _selectedCategory == cat.id,
           isMobile: isMobile,
           onTap: () {
@@ -598,6 +605,8 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
   Widget _buildPill({
     required String label,
     String? iconEmoji,
+    String? iconUrl,
+    String? categoryImageUrl,
     required bool isSelected,
     required VoidCallback onTap,
     bool isMobile = false,
@@ -631,8 +640,19 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (iconEmoji != null && iconEmoji.isNotEmpty) ...[
-              Text(iconEmoji, style: TextStyle(fontSize: isMobile ? 12 : 13)),
+            if (CategoryIconBadge.hasAnyIcon(
+              categoryImageUrl: categoryImageUrl,
+              iconUrl: iconUrl,
+              iconEmoji: iconEmoji,
+            )) ...[
+              CategoryIconBadge(
+                categoryImageUrl: categoryImageUrl,
+                iconUrl: iconUrl,
+                iconEmoji: iconEmoji,
+                size: isMobile ? 14 : 16,
+                emojiSize: isMobile ? 12 : 13,
+                borderRadius: 4,
+              ),
               SizedBox(width: isMobile ? 4 : 6),
             ] else if (isSelected) ...[
               Icon(Icons.check_circle_rounded, size: isMobile ? 12 : 14, color: Colors.white),

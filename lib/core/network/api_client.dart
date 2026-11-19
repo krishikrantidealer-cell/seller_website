@@ -11,6 +11,7 @@ class ApiClient {
   final TokenStorage _tokenStorage;
   final String _baseUrl;
   final Duration _timeout;
+  Completer<bool>? _refreshCompleter;
 
   ApiClient({
     http.Client? client,
@@ -61,6 +62,71 @@ class ApiClient {
     return headers;
   }
 
+  Future<bool> _refreshAccessToken() async {
+    if (_refreshCompleter != null) {
+      return _refreshCompleter!.future;
+    }
+    _refreshCompleter = Completer<bool>();
+    try {
+      final refreshToken = await _tokenStorage.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        _refreshCompleter!.complete(false);
+        return false;
+      }
+      final uri = _buildUri(ApiEndpoints.refreshToken);
+      final response = await _client
+          .post(
+            uri,
+            headers: const {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            body: jsonEncode({'refreshToken': refreshToken}),
+          )
+          .timeout(_timeout);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final decoded = jsonDecode(response.body);
+        final data = decoded is Map ? (decoded['data'] ?? decoded) : null;
+        if (data is Map) {
+          final newAccess = (data['accessToken'] ?? data['token'])?.toString();
+          final newRefresh = data['refreshToken']?.toString() ?? refreshToken;
+          if (newAccess != null && newAccess.isNotEmpty) {
+            await _tokenStorage.saveSession(
+              accessToken: newAccess,
+              refreshToken: newRefresh,
+              userId: (await _tokenStorage.getUserId()) ?? '',
+              role: (await _tokenStorage.getRole()) ?? 'ROLE_CUSTOMER',
+              phoneNumber: await _tokenStorage.getPhoneNumber(),
+            );
+            _refreshCompleter!.complete(true);
+            return true;
+          }
+        }
+      }
+      await _tokenStorage.clearSession();
+      _refreshCompleter!.complete(false);
+      return false;
+    } catch (_) {
+      _refreshCompleter!.complete(false);
+      return false;
+    } finally {
+      _refreshCompleter = null;
+    }
+  }
+
+  Future<http.Response> _sendWithAuthRetry(
+    Future<http.Response> Function(Map<String, String> headers) send,
+    bool requiresAuth,
+  ) async {
+    final headers = await _buildHeaders(requiresAuth: requiresAuth);
+    final response = await send(headers);
+    if (response.statusCode == 401 && requiresAuth) {
+      final refreshed = await _refreshAccessToken();
+      if (refreshed) {
+        final newHeaders = await _buildHeaders(requiresAuth: requiresAuth);
+        return await send(newHeaders);
+      }
+    }
+    return response;
+  }
+
   Future<Map<String, dynamic>> get(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -68,9 +134,10 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(path, queryParameters);
-      final headers = await _buildHeaders(requiresAuth: requiresAuth);
-
-      final response = await _client.get(uri, headers: headers).timeout(_timeout);
+      final response = await _sendWithAuthRetry(
+        (headers) => _client.get(uri, headers: headers).timeout(_timeout),
+        requiresAuth,
+      );
       return _processResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(
@@ -100,15 +167,16 @@ class ApiClient {
   }) async {
     try {
       final uri = _buildUri(path);
-      final headers = await _buildHeaders(requiresAuth: requiresAuth);
-
-      final response = await _client
-          .post(
-            uri,
-            headers: headers,
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(_timeout);
+      final response = await _sendWithAuthRetry(
+        (headers) => _client
+            .post(
+              uri,
+              headers: headers,
+              body: body != null ? jsonEncode(body) : null,
+            )
+            .timeout(_timeout),
+        requiresAuth,
+      );
 
       return _processResponse(response);
     } on SocketException catch (e) {

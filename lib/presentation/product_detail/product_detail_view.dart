@@ -144,12 +144,18 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     return _product.isAvailable;
   }
 
+  bool _isSelectedVariantAvailable() {
+    if (!_isProductCurrentlyAvailable()) return false;
+    return _selectedVariant.inStock &&
+        (_selectedVariant.stock == null || _selectedVariant.stock! > 0);
+  }
+
   void _onAddToCart() {
-    if (!_isProductCurrentlyAvailable()) {
+    if (!_isSelectedVariantAvailable()) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('This product is currently unavailable.'),
+          content: Text('This product or selected pack size is currently out of stock.'),
           backgroundColor: Color(0xFFDC2626),
         ),
       );
@@ -177,11 +183,11 @@ class _ProductDetailViewState extends State<ProductDetailView> {
   }
 
   void _onBuyNow() async {
-    if (!_isProductCurrentlyAvailable()) {
+    if (!_isSelectedVariantAvailable()) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('This product is currently unavailable.'),
+          content: Text('This product or selected pack size is currently out of stock.'),
           backgroundColor: Color(0xFFDC2626),
         ),
       );
@@ -208,6 +214,10 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
 
     if (result.success) {
+      final key = '${_product.id}_${_selectedVariant.id}';
+      if (CartController.instance.getQuantity(_product.id, _selectedVariant.id) > 0) {
+        CartController.instance.removeItem(key);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

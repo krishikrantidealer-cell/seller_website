@@ -13,6 +13,12 @@ import '../widgets/main_nav_header.dart';
 import '../widgets/top_info_bar.dart';
 import '../widgets/web_footer.dart';
 
+String _orderMonthName(int month) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  if (month < 1 || month > 12) return 'Jan';
+  return months[month - 1];
+}
+
 /// Comprehensive Order Detail screen displaying shipment tracking stepper,
 /// itemized product breakdown, farm depot delivery address, invoice, and re-order actions.
 class OrderDetailView extends StatefulWidget {
@@ -184,7 +190,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                         children: [
                           Text('Date of Order:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
                           Text(
-                            '${order.orderDate.day} Oct ${order.orderDate.year}',
+                            '${order.orderDate.day} ${_orderMonthName(order.orderDate.month)} ${order.orderDate.year}',
                             style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ],
@@ -720,7 +726,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                     ),
                   ),
                   Text(
-                    '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
+                    '• Placed on ${order.orderDate.day} ${_orderMonthName(order.orderDate.month)} ${order.orderDate.year}',
                     style: GoogleFonts.mukta(fontSize: isMobile ? 11 : 12.5, color: AppColors.textMuted),
                   ),
                 ],
@@ -895,7 +901,11 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                       ),
                       InkWell(
                         onTap: () async {
-                          final uri = Uri.parse('https://shiprocket.co/tracking/${order.awbNumber}');
+                          final isDelhivery = order.courierName.toLowerCase().contains('delhivery');
+                          final trackUrl = isDelhivery
+                              ? 'https://www.delhivery.com/track-v2/package/${order.awbNumber}'
+                              : 'https://shiprocket.co/tracking/${order.awbNumber}';
+                          final uri = Uri.parse(trackUrl);
                           if (await canLaunchUrl(uri)) {
                             await launchUrl(uri);
                           }
@@ -906,7 +916,9 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                             const Icon(Icons.open_in_new_rounded, size: 13, color: Color(0xFF2563EB)),
                             const SizedBox(width: 4),
                             Text(
-                              'Track on Shiprocket',
+                              order.courierName.toLowerCase().contains('delhivery')
+                                  ? 'Track on Delhivery'
+                                  : 'Track Shipment',
                               style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2563EB)),
                             ),
                           ],

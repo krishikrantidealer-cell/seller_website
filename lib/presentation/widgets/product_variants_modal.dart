@@ -725,15 +725,38 @@ class _VariantsList extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 3),
-                Row(
-                  children: [
-                    const Icon(Icons.check_circle_outline_rounded, size: 12, color: AppColors.primaryGreen),
-                    const SizedBox(width: 4),
-                    Text(
-                      'In Stock • Ships in 24 hrs',
-                      style: GoogleFonts.mukta(fontSize: 10, color: AppColors.textMuted),
-                    ),
-                  ],
+                Builder(
+                  builder: (context) {
+                    final isVariantInStock = product.isAvailable &&
+                        variant.inStock &&
+                        (variant.stock == null || variant.stock! > 0);
+                    return Row(
+                      children: [
+                        Icon(
+                          isVariantInStock
+                              ? Icons.check_circle_outline_rounded
+                              : Icons.cancel_outlined,
+                          size: 12,
+                          color: isVariantInStock
+                              ? AppColors.primaryGreen
+                              : const Color(0xFFDC2626),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isVariantInStock
+                              ? 'In Stock • Ships in 24 hrs'
+                              : 'Out of Stock',
+                          style: GoogleFonts.mukta(
+                            fontSize: 10,
+                            fontWeight: isVariantInStock ? FontWeight.w400 : FontWeight.w700,
+                            color: isVariantInStock
+                                ? AppColors.textMuted
+                                : const Color(0xFFDC2626),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -741,8 +764,29 @@ class _VariantsList extends StatelessWidget {
 
           const SizedBox(width: 12),
 
-          // Interactive Action: Quantity Stepper if in cart, or "+ Add" button
-          if (isInCart)
+          // Interactive Action: Quantity Stepper if in cart, "+ Add", or disabled "Out of Stock"
+          if (!product.isAvailable ||
+              !variant.inStock ||
+              (variant.stock != null && variant.stock! <= 0))
+            Container(
+              height: 36,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Text(
+                'Out of Stock',
+                style: GoogleFonts.mukta(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF94A3B8),
+                ),
+              ),
+            )
+          else if (isInCart)
             Container(
               height: 36,
               decoration: BoxDecoration(

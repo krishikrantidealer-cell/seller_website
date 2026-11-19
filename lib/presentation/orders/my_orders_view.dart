@@ -34,6 +34,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
   void initState() {
     super.initState();
     _searchController = TextEditingController(text: OrdersController.instance.searchQuery);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      OrdersController.instance.fetchOrders();
+    });
 
     if (widget.initialOrderId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -177,7 +180,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                         children: [
                           Text('Date of Order:', style: GoogleFonts.mukta(fontSize: 12, color: AppColors.textMuted)),
                           Text(
-                            '${order.orderDate.day} Oct ${order.orderDate.year}',
+                            '${order.orderDate.day} ${_monthName(order.orderDate.month)} ${order.orderDate.year}',
                             style: GoogleFonts.mukta(fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ],
@@ -914,9 +917,13 @@ class _MyOrdersViewState extends State<MyOrdersView> {
         children: [
           _buildFilterChip(ctrl, 'all', 'All Orders (${ctrl.totalOrderCount})', isMobile),
           SizedBox(width: isMobile ? 6 : 8),
-          _buildFilterChip(ctrl, 'active', 'In Transit & Active (${ctrl.activeOrderCount})', isMobile),
+          _buildFilterChip(ctrl, 'active', 'Active & In Transit (${ctrl.activeOrderCount})', isMobile),
           SizedBox(width: isMobile ? 6 : 8),
           _buildFilterChip(ctrl, 'delivered', 'Delivered (${ctrl.deliveredOrderCount})', isMobile),
+          SizedBox(width: isMobile ? 6 : 8),
+          _buildFilterChip(ctrl, 'rto', 'RTO / Return (${ctrl.rtoOrderCount})', isMobile),
+          SizedBox(width: isMobile ? 6 : 8),
+          _buildFilterChip(ctrl, 'cancelled', 'Cancelled (${ctrl.cancelledOrderCount})', isMobile),
         ],
       ),
     );
@@ -1068,7 +1075,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                             ),
                           ),
                           Text(
-                            '• Placed on ${order.orderDate.day} Oct ${order.orderDate.year}',
+                            '• Placed on ${order.orderDate.day} ${_monthName(order.orderDate.month)} ${order.orderDate.year}',
                             style: GoogleFonts.mukta(fontSize: isMobile ? 10.5 : 11.5, color: AppColors.textMuted),
                           ),
                         ],
@@ -1427,5 +1434,11 @@ class _OrdersFilterHeaderDelegate extends SliverPersistentHeaderDelegate {
         oldDelegate.sidePadding != sidePadding ||
         oldDelegate.child != child;
   }
+}
+
+String _monthName(int month) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  if (month < 1 || month > 12) return 'Jan';
+  return months[month - 1];
 }
 

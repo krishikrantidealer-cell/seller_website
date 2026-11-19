@@ -9,7 +9,7 @@ import '../../data/models/catalog_models.dart';
 import '../../data/services/category_api_service.dart';
 import '../../logic/category/category_bloc.dart';
 import '../../logic/category/category_state.dart';
-import 'app_product_image.dart';
+import 'category_icon_badge.dart';
 
 class CategoryRibbon extends StatefulWidget {
   /// Global callback to cleanly dismiss any active category hover dropdown overlay (e.g. on page scroll).
@@ -520,18 +520,19 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (activeCat != null && !isAllSelected) ...[
-                                if (activeCat.categoryImageUrl != null &&
-                                    activeCat.categoryImageUrl!.trim().isNotEmpty) ...[
-                                  AppProductImage(
-                                    imageUrl: activeCat.categoryImageUrl!,
-                                    width: 16,
-                                    height: 16,
-                                    fit: BoxFit.cover,
+                                if (CategoryIconBadge.hasAnyIcon(
+                                  categoryImageUrl: activeCat.categoryImageUrl,
+                                  iconUrl: activeCat.iconUrl,
+                                  iconEmoji: activeCat.icon,
+                                )) ...[
+                                  CategoryIconBadge(
+                                    categoryImageUrl: activeCat.categoryImageUrl,
+                                    iconUrl: activeCat.iconUrl,
+                                    iconEmoji: activeCat.icon,
+                                    size: 16,
+                                    emojiSize: 14,
                                     borderRadius: 4,
                                   ),
-                                  const SizedBox(width: 6),
-                                ] else if (activeCat.icon.isNotEmpty) ...[
-                                  Text(activeCat.icon, style: const TextStyle(fontSize: 14)),
                                   const SizedBox(width: 6),
                                 ],
                                 Flexible(
@@ -690,18 +691,19 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (cat.categoryImageUrl != null &&
-                        cat.categoryImageUrl!.trim().isNotEmpty) ...[
-                      AppProductImage(
-                        imageUrl: cat.categoryImageUrl!,
-                        width: isUltraCompact ? 15 : 17,
-                        height: isUltraCompact ? 15 : 17,
-                        fit: BoxFit.cover,
+                    if (CategoryIconBadge.hasAnyIcon(
+                      categoryImageUrl: cat.categoryImageUrl,
+                      iconUrl: cat.iconUrl,
+                      iconEmoji: cat.icon,
+                    )) ...[
+                      CategoryIconBadge(
+                        categoryImageUrl: cat.categoryImageUrl,
+                        iconUrl: cat.iconUrl,
+                        iconEmoji: cat.icon,
+                        size: isUltraCompact ? 15 : 17,
+                        emojiSize: isUltraCompact ? 12.5 : 13.5,
                         borderRadius: 4,
                       ),
-                      SizedBox(width: iconGap),
-                    ] else if (cat.icon.isNotEmpty) ...[
-                      Text(cat.icon, style: TextStyle(fontSize: isUltraCompact ? 12.5 : 13.5)),
                       SizedBox(width: iconGap),
                     ],
                     Text(
@@ -804,18 +806,20 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                   final isCatSelected = widget.selectedCategoryId == cat.id;
 
                   return ExpansionTile(
-                    leading: (cat.categoryImageUrl != null &&
-                            cat.categoryImageUrl!.trim().isNotEmpty)
-                        ? AppProductImage(
-                            imageUrl: cat.categoryImageUrl!,
-                            width: 22,
-                            height: 22,
-                            fit: BoxFit.cover,
+                    leading: CategoryIconBadge.hasAnyIcon(
+                      categoryImageUrl: cat.categoryImageUrl,
+                      iconUrl: cat.iconUrl,
+                      iconEmoji: cat.icon,
+                    )
+                        ? CategoryIconBadge(
+                            categoryImageUrl: cat.categoryImageUrl,
+                            iconUrl: cat.iconUrl,
+                            iconEmoji: cat.icon,
+                            size: 22,
+                            emojiSize: 20,
                             borderRadius: 4,
                           )
-                        : (cat.icon.isNotEmpty
-                            ? Text(cat.icon, style: const TextStyle(fontSize: 20))
-                            : null),
+                        : null,
                     title: Text(
                       cat.name,
                       style: GoogleFonts.mukta(
@@ -846,8 +850,19 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                           (group) => ExpansionTile(
                             dense: true,
                             tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-                            leading: group.icon != null
-                                ? Text(group.icon!, style: const TextStyle(fontSize: 16))
+                            leading: CategoryIconBadge.hasAnyIcon(
+                              categoryImageUrl: group.categoryImageUrl,
+                              iconUrl: group.iconUrl,
+                              iconEmoji: group.icon,
+                            )
+                                ? CategoryIconBadge(
+                                    categoryImageUrl: group.categoryImageUrl,
+                                    iconUrl: group.iconUrl,
+                                    iconEmoji: group.icon,
+                                    size: 18,
+                                    emojiSize: 16,
+                                    borderRadius: 4,
+                                  )
                                 : null,
                             title: Text(
                               group.name,
@@ -952,18 +967,19 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
-                    if (cat.categoryImageUrl != null &&
-                        cat.categoryImageUrl!.trim().isNotEmpty) ...[
-                      AppProductImage(
-                        imageUrl: cat.categoryImageUrl!,
-                        width: 22,
-                        height: 22,
-                        fit: BoxFit.cover,
+                    if (CategoryIconBadge.hasAnyIcon(
+                      categoryImageUrl: cat.categoryImageUrl,
+                      iconUrl: cat.iconUrl,
+                      iconEmoji: cat.icon,
+                    )) ...[
+                      CategoryIconBadge(
+                        categoryImageUrl: cat.categoryImageUrl,
+                        iconUrl: cat.iconUrl,
+                        iconEmoji: cat.icon,
+                        size: 22,
+                        emojiSize: 20,
                         borderRadius: 4,
                       ),
-                      const SizedBox(width: 8),
-                    ] else if (cat.icon.isNotEmpty) ...[
-                      Text(cat.icon, style: const TextStyle(fontSize: 20)),
                       const SizedBox(width: 8),
                     ],
                     Expanded(
@@ -1000,8 +1016,19 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     if (cat.groups.isNotEmpty)
                       ...cat.groups.map(
                         (group) => ExpansionTile(
-                          leading: group.icon != null
-                              ? Text(group.icon!, style: const TextStyle(fontSize: 18))
+                          leading: CategoryIconBadge.hasAnyIcon(
+                            categoryImageUrl: group.categoryImageUrl,
+                            iconUrl: group.iconUrl,
+                            iconEmoji: group.icon,
+                          )
+                              ? CategoryIconBadge(
+                                  categoryImageUrl: group.categoryImageUrl,
+                                  iconUrl: group.iconUrl,
+                                  iconEmoji: group.icon,
+                                  size: 20,
+                                  emojiSize: 18,
+                                  borderRadius: 4,
+                                )
                               : null,
                           title: Text(
                             group.name,
@@ -1262,18 +1289,19 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                 ),
                                 child: Row(
                                   children: [
-                                    if (cat.categoryImageUrl != null &&
-                                        cat.categoryImageUrl!.trim().isNotEmpty) ...[
-                                      AppProductImage(
-                                        imageUrl: cat.categoryImageUrl!,
-                                        width: 18,
-                                        height: 18,
-                                        fit: BoxFit.cover,
+                                    if (CategoryIconBadge.hasAnyIcon(
+                                      categoryImageUrl: cat.categoryImageUrl,
+                                      iconUrl: cat.iconUrl,
+                                      iconEmoji: cat.icon,
+                                    )) ...[
+                                      CategoryIconBadge(
+                                        categoryImageUrl: cat.categoryImageUrl,
+                                        iconUrl: cat.iconUrl,
+                                        iconEmoji: cat.icon,
+                                        size: 18,
+                                        emojiSize: 15,
                                         borderRadius: 4,
                                       ),
-                                      const SizedBox(width: 8),
-                                    ] else if (cat.icon.isNotEmpty) ...[
-                                      Text(cat.icon, style: const TextStyle(fontSize: 15)),
                                       const SizedBox(width: 8),
                                     ],
                                     Expanded(
@@ -1391,8 +1419,19 @@ class _MegaMenuPopupState extends State<_MegaMenuPopup> {
                                 ),
                                 child: Row(
                                   children: [
-                                    if (group.icon != null) ...[
-                                      Text(group.icon!, style: const TextStyle(fontSize: 14)),
+                                    if (CategoryIconBadge.hasAnyIcon(
+                                      categoryImageUrl: group.categoryImageUrl,
+                                      iconUrl: group.iconUrl,
+                                      iconEmoji: group.icon,
+                                    )) ...[
+                                      CategoryIconBadge(
+                                        categoryImageUrl: group.categoryImageUrl,
+                                        iconUrl: group.iconUrl,
+                                        iconEmoji: group.icon,
+                                        size: 16,
+                                        emojiSize: 14,
+                                        borderRadius: 4,
+                                      ),
                                       const SizedBox(width: 8),
                                     ],
                                     Expanded(
@@ -1868,8 +1907,19 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                       ),
                       child: Row(
                         children: [
-                          if (group.icon != null) ...[
-                            Text(group.icon!, style: const TextStyle(fontSize: 14)),
+                          if (CategoryIconBadge.hasAnyIcon(
+                            categoryImageUrl: group.categoryImageUrl,
+                            iconUrl: group.iconUrl,
+                            iconEmoji: group.icon,
+                          )) ...[
+                            CategoryIconBadge(
+                              categoryImageUrl: group.categoryImageUrl,
+                              iconUrl: group.iconUrl,
+                              iconEmoji: group.icon,
+                              size: 16,
+                              emojiSize: 14,
+                              borderRadius: 4,
+                            ),
                             const SizedBox(width: 8),
                           ],
                           Expanded(
