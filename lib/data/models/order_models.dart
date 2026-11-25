@@ -5,7 +5,7 @@ import '../../core/di/injection_container.dart';
 import '../../core/network/websocket_service.dart';
 import 'catalog_models.dart';
 
-/// Status of an agricultural order (aligned with backend & Delhivery One lifecycle)
+/// Status of an agricultural order (aligned with backend & Velocity Shipping lifecycle)
 enum OrderStatus {
   pending,
   confirmed,
@@ -347,7 +347,7 @@ class OrderModel {
       deliveryAddress: addrParts.isEmpty ? 'Registered Farm Address' : addrParts,
       recipientName: (addr['name'] ?? 'Customer').toString(),
       recipientPhone: (addr['phoneNumber'] ?? '').toString(),
-      courierName: (shipment['carrier'] ?? 'Delhivery One').toString(),
+      courierName: (shipment['carrier'] ?? 'Velocity Shipping').toString(),
       awbNumber: (shipment['trackingNumber'] ?? '').toString(),
       estimatedDelivery: status == OrderStatus.delivered
           ? 'Delivered'
@@ -456,7 +456,7 @@ class OrderModel {
         deliveryAddress: 'Main Farm Tube-well Station, Village Nilokheri, Karnal, Haryana - 132117',
         recipientName: 'Sardar Gurpreet Singh',
         recipientPhone: '+91 98765 43210',
-        courierName: 'Delhivery Rural Express',
+        courierName: 'Velocity Shipping',
         awbNumber: 'DEL994821035',
         estimatedDelivery: 'Delivered on Oct 14, 2026',
         deliveryAgentName: 'Harpreet Verma',

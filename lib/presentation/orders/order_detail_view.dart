@@ -901,10 +901,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                       ),
                       InkWell(
                         onTap: () async {
-                          final isDelhivery = order.courierName.toLowerCase().contains('delhivery');
-                          final trackUrl = isDelhivery
-                              ? 'https://www.delhivery.com/track-v2/package/${order.awbNumber}'
-                              : 'https://shiprocket.co/tracking/${order.awbNumber}';
+                          final trackUrl = 'https://track.velocity.in/${order.awbNumber}';
                           final uri = Uri.parse(trackUrl);
                           if (await canLaunchUrl(uri)) {
                             await launchUrl(uri);
@@ -916,9 +913,7 @@ class _OrderDetailViewState extends State<OrderDetailView> {
                             const Icon(Icons.open_in_new_rounded, size: 13, color: Color(0xFF2563EB)),
                             const SizedBox(width: 4),
                             Text(
-                              order.courierName.toLowerCase().contains('delhivery')
-                                  ? 'Track on Delhivery'
-                                  : 'Track Shipment',
+                              'Track Shipment',
                               style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF2563EB)),
                             ),
                           ],
