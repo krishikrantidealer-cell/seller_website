@@ -134,7 +134,7 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         break;
     }
 
-    return list;
+    return ProductItem.sortInStockFirst(list);
   }
 
   List<String> _getCurrentSubcategories() {

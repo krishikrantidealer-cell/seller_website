@@ -6,7 +6,9 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
+import '../../data/models/auth_state.dart';
 import '../../data/models/cart_state.dart';
+import '../../data/models/recently_viewed_state.dart';
 import '../../data/models/wishlist_state.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/services/product_api_service.dart';
@@ -20,6 +22,7 @@ import '../widgets/mobile_navigation_drawer.dart';
 import '../widgets/product_card.dart';
 import '../widgets/web_footer.dart';
 import '../technical/technical_search_view.dart';
+import '../orders/my_orders_view.dart';
 
 class ProductDetailView extends StatefulWidget {
   final ProductItem product;
@@ -78,6 +81,9 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     _selectedVariant = widget.product.defaultVariant;
     _initReviews();
     ProductController.instance.addListener(_onCatalogUpdated);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      RecentlyViewedController.instance.recordView(widget.product);
+    });
   }
 
   void _onCatalogUpdated() {
@@ -214,17 +220,20 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     );
 
     if (result.success) {
-      final key = '${_product.id}_${_selectedVariant.id}';
-      if (CartController.instance.getQuantity(_product.id, _selectedVariant.id) > 0) {
-        CartController.instance.removeItem(key);
-      }
+      CartController.instance.clear();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Order placed successfully with Shiprocket Checkout!'),
-            backgroundColor: AppColors.primaryGreen,
-          ),
-        );
+        if (AuthController.instance.isLoggedIn) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const MyOrdersView()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Order placed successfully! Log in with your phone number to view it in My Orders.'),
+              backgroundColor: AppColors.primaryGreen,
+            ),
+          );
+        }
       }
     } else if (result.errorMessage != null && !result.errorMessage!.contains('dismissed')) {
       if (mounted) {
@@ -266,7 +275,7 @@ class _ProductDetailViewState extends State<ProductDetailView> {
     final otherProducts = allProducts
         .where((p) => p.id != _product.id && !categoryMatches.contains(p))
         .toList();
-    final similarProducts = [...categoryMatches, ...otherProducts].take(6).toList();
+    final similarProducts = ProductItem.sortInStockFirst([...categoryMatches, ...otherProducts]).take(6).toList();
 
     return Scaffold(
       key: _scaffoldKey,

@@ -97,6 +97,16 @@ class _AppProductImageState extends State<AppProductImage> {
       return _buildFallback();
     }
 
+    // Prevent Flutter Web HTML <img> platform views on background routes from
+    // compositing above active modal dialogs / popups.
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    if (!isCurrentRoute) {
+      return SizedBox(
+        width: widget.width,
+        height: widget.height,
+      );
+    }
+
     Widget img = Image.network(
       activeUrl,
       key: ValueKey(activeUrl),

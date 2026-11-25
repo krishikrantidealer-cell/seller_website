@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/payment/fastrr_checkout_gateway.dart';
 import '../../core/theme/app_colors.dart';
+import '../../data/models/auth_state.dart';
 import '../../data/models/cart_state.dart';
+import '../orders/my_orders_view.dart';
 import 'app_product_image.dart';
 
 class QuickCartDrawer extends StatelessWidget {
@@ -478,6 +480,8 @@ class QuickCartDrawer extends StatelessWidget {
                         'quantity': item.quantity,
                       }).toList();
 
+                      final navigator = Navigator.of(context);
+                      final messenger = ScaffoldMessenger.of(context);
                       final result = await FastrrCheckoutGateway.instance.openCheckout(
                         storeKey: '12910235',
                         items: items,
@@ -486,6 +490,21 @@ class QuickCartDrawer extends StatelessWidget {
 
                       if (result.success) {
                         cart.clear();
+                        if (navigator.canPop()) {
+                          navigator.pop();
+                        }
+                        if (AuthController.instance.isLoggedIn) {
+                          navigator.push(
+                            MaterialPageRoute(builder: (_) => const MyOrdersView()),
+                          );
+                        } else {
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Order placed successfully! Log in with your phone number to view it in My Orders.'),
+                              backgroundColor: AppColors.primaryGreen,
+                            ),
+                          );
+                        }
                       }
                     },
                     icon: const Icon(Icons.lock_rounded, size: 16),

@@ -40,18 +40,31 @@ class WebFastrrCheckoutGateway implements FastrrCheckoutGateway {
         'quantity': e['quantity'] ?? 1,
       }).toList();
 
-      final tokenResp = await http
+      final requestBody = jsonEncode({
+        'items': tokenReqItems,
+        if (Uri.base.hasAuthority &&
+            (Uri.base.host == 'localhost' || Uri.base.host == '127.0.0.1'))
+          'redirectUrl': Uri.base.origin,
+      });
+
+      var tokenResp = await http
           .post(
             tokenUri,
             headers: reqHeaders,
-            body: jsonEncode({
-              'items': tokenReqItems,
-              if (Uri.base.hasAuthority &&
-                  (Uri.base.host == 'localhost' || Uri.base.host == '127.0.0.1'))
-                'redirectUrl': Uri.base.origin,
-            }),
+            body: requestBody,
           )
           .timeout(const Duration(seconds: 12));
+
+      if (tokenResp.statusCode == 401 && reqHeaders.containsKey('Authorization')) {
+        reqHeaders.remove('Authorization');
+        tokenResp = await http
+            .post(
+              tokenUri,
+              headers: reqHeaders,
+              body: requestBody,
+            )
+            .timeout(const Duration(seconds: 12));
+      }
 
       final decoded = jsonDecode(tokenResp.body);
       if (tokenResp.statusCode < 200 || tokenResp.statusCode >= 300 || decoded is! Map) {

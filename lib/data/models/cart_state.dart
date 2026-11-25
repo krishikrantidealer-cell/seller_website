@@ -29,10 +29,15 @@ class CartController extends ChangeNotifier {
   }
 
   final Map<String, CartItem> _items = {};
+  bool _clearedExplicitly = false;
 
   Future<void> _hydrateFromStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      if (_clearedExplicitly) {
+        await prefs.remove(_storageKey);
+        return;
+      }
       final raw = prefs.getString(_storageKey);
       if (raw == null || raw.isEmpty) return;
       final decoded = jsonDecode(raw);
@@ -148,6 +153,7 @@ class CartController extends ChangeNotifier {
   }
 
   void clear() {
+    _clearedExplicitly = true;
     _items.clear();
     notifyListeners();
   }

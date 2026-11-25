@@ -119,7 +119,7 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
         break;
     }
 
-    return searched;
+    return ProductItem.sortInStockFirst(searched);
   }
 
   void _onAddToCart(ProductItem product, ProductVariant variant) {

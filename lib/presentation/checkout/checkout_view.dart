@@ -38,7 +38,7 @@ class _CheckoutViewState extends State<CheckoutView> {
   final _stateController = TextEditingController();
 
   String _paymentMethod = 'PREPAID'; // PREPAID or PARTIAL
-  double _partialAdvancePercentage = 20.0; // 10, 20, 50
+  final double _partialAdvancePercentage = 10.0;
 
   bool _isCheckingServiceability = false;
   ShiprocketServiceabilityResult? _serviceabilityResult;
@@ -875,43 +875,6 @@ class _CheckoutViewState extends State<CheckoutView> {
 
                   if (_paymentMethod == 'PARTIAL') ...[
                     const Divider(height: 20),
-                    Text(
-                      'Choose Advance Amount to Pay Now:',
-                      style: GoogleFonts.mukta(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [10.0, 20.0, 50.0].map((pct) {
-                        final isSelected = _partialAdvancePercentage == pct;
-                        final amount = total * (pct / 100.0);
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: ChoiceChip(
-                            label: Text(
-                              '${pct.toInt()}% (₹${amount.toStringAsFixed(0)})',
-                              style: GoogleFonts.mukta(
-                                fontSize: 12,
-                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                color: isSelected ? Colors.white : AppColors.textPrimary,
-                              ),
-                            ),
-                            selected: isSelected,
-                            selectedColor: const Color(0xFFD97706),
-                            backgroundColor: Colors.white,
-                            onSelected: (_) {
-                              setState(() {
-                                _partialAdvancePercentage = pct;
-                              });
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -925,17 +888,17 @@ class _CheckoutViewState extends State<CheckoutView> {
                         runSpacing: 4,
                         children: [
                           Text(
-                            'Pay Online Now: ₹${advanceDue.toStringAsFixed(0)}',
+                            'Pay 10% Advance Online Now: ₹${advanceDue.toStringAsFixed(0)}',
                             style: GoogleFonts.mukta(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF92400E),
                             ),
                           ),
                           Text(
-                            'Pay to Courier on Delivery: ₹${codBalance.toStringAsFixed(0)}',
+                            'Pay 90% on Delivery (COD): ₹${codBalance.toStringAsFixed(0)}',
                             style: GoogleFonts.mukta(
-                              fontSize: 12,
+                              fontSize: 12.5,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF92400E),
                             ),
@@ -1101,6 +1064,22 @@ class _CheckoutViewState extends State<CheckoutView> {
                 Text(
                   '₹${amountToPayNow.toStringAsFixed(0)}',
                   style: GoogleFonts.mukta(fontSize: 15, fontWeight: FontWeight.w800, color: const Color(0xFFD97706)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    'Balance on Delivery (COD)',
+                    style: GoogleFonts.mukta(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                  ),
+                ),
+                Text(
+                  '₹${(total - amountToPayNow).clamp(0, total).toStringAsFixed(0)}',
+                  style: GoogleFonts.mukta(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
                 ),
               ],
             ),

@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
+import '../../data/models/auth_state.dart';
+import '../../data/models/cart_state.dart';
 import '../../data/models/catalog_models.dart';
+import '../../data/models/recently_viewed_state.dart';
 import '../../data/services/category_api_service.dart';
 import '../../data/services/collection_api_service.dart';
 import '../../data/services/product_api_service.dart';
@@ -27,6 +30,7 @@ import '../product_detail/product_detail_view.dart';
 import '../collection/collection_detail_view.dart';
 import '../collection/sub_collection_detail_view.dart';
 import '../category/category_detail_view.dart';
+import '../orders/my_orders_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -42,11 +46,33 @@ class _HomeViewState extends State<HomeView> {
   String? _selectedSubcategory;
   String? _selectedCollectionId;
   String? _selectedSubCollectionId;
+  static bool _handledFastrrReturn = false;
   String _searchFilter = '';
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _handledFastrrReturn) return;
+      final ost = Uri.base.queryParameters['ost']?.toUpperCase() ?? '';
+      final oid = Uri.base.queryParameters['oid'] ?? '';
+      if (ost == 'SUCCESS' || (oid.isNotEmpty && ost != 'FAILED' && ost != 'CANCELLED')) {
+        _handledFastrrReturn = true;
+        CartController.instance.clear();
+        if (AuthController.instance.isLoggedIn) {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const MyOrdersView()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Order placed successfully! Log in with your phone number to view it in My Orders.'),
+              backgroundColor: AppColors.primaryGreen,
+            ),
+          );
+        }
+      }
+    });
     CategoryController.instance.addListener(_onCatalogUpdated);
     CollectionController.instance.addListener(_onCatalogUpdated);
     ProductController.instance.addListener(_onCatalogUpdated);
@@ -98,8 +124,12 @@ class _HomeViewState extends State<HomeView> {
   }
 
   List<ProductItem> _getFilteredProducts(List<ProductItem> allProducts, List<CategoryItem> categories) {
-    return allProducts.where((p) {
-      final trimmedQuery = _searchFilter.trim().toLowerCase();
+    final trimmedQuery = _searchFilter.trim().toLowerCase();
+    final isHomeBrowsing = trimmedQuery.isEmpty &&
+        _selectedCategory == 'all' &&
+        _selectedSubcategory == null;
+    final list = allProducts.where((p) {
+      if (isHomeBrowsing && !p.isInStock) return false;
       final currentCategoryItem = categories.cast<CategoryItem?>().firstWhere(
         (c) => c?.id == _selectedCategory || c?.backendId == _selectedCategory,
         orElse: () => null,
@@ -116,6 +146,7 @@ class _HomeViewState extends State<HomeView> {
       final matchesSearch = _matchesProductSearch(p, trimmedQuery);
       return matchesCategory && matchesSubcategory && matchesSearch;
     }).toList();
+    return ProductItem.sortInStockFirst(list);
   }
 
   bool _matchesProductSearch(ProductItem p, String trimmedLowerQuery) {
@@ -136,16 +167,19 @@ class _HomeViewState extends State<HomeView> {
   /// Returns products belonging to a Level 0 [category] (including its Level 1 & Level 2 descendants),
   /// respecting any active search filter on the Home screen.
   List<ProductItem> _getProductsForLevel0Category(CategoryItem category, List<ProductItem> allProducts) {
-    return allProducts.where((p) {
+    final hasSearch = _searchFilter.trim().isNotEmpty;
+    final list = allProducts.where((p) {
+      if (!hasSearch && !p.isInStock) return false;
       if (!category.matchesProduct(p)) return false;
-      if (_searchFilter.isNotEmpty) {
-        final q = _searchFilter.toLowerCase();
+      if (hasSearch) {
+        final q = _searchFilter.trim().toLowerCase();
         return p.title.toLowerCase().contains(q) ||
             p.technicalName.toLowerCase().contains(q) ||
             p.category.toLowerCase().contains(q);
       }
       return true;
     }).toList();
+    return ProductItem.sortInStockFirst(list);
   }
 
   String _getCategoryTitle(String catId) {
@@ -505,8 +539,109 @@ class _HomeViewState extends State<HomeView> {
                             else
                               _buildProductGrid(filtered, constraints, maxItems: filtered.length),
                           ]
-                          // Default Home Screen: Show Collections first, then Categories (Best Sellers will be a collection)
+                          // Default Home Screen: Show Recently Viewed, then Collections, then Categories
                           else ...[
+                            ListenableBuilder(
+                              listenable: RecentlyViewedController.instance,
+                              builder: (context, _) {
+                                if (isCatalogLoading || isCatalogError) {
+                                  return const SizedBox.shrink();
+                                }
+                                final recentProducts = RecentlyViewedController.instance
+                                    .resolveProducts(allProducts, limit: 6);
+                                if (recentProducts.isEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: isMobile ? 18 : 28),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: isMobile ? 12 : 16,
+                                          vertical: isMobile ? 10 : 12,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: isMobile ? 3.5 : 4,
+                                                  height: isMobile ? 18 : 20,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.primaryGreen,
+                                                    borderRadius: BorderRadius.circular(2),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Icon(
+                                                  Icons.history_rounded,
+                                                  size: 18,
+                                                  color: AppColors.primaryGreen,
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  'Recently Viewed',
+                                                  style: GoogleFonts.mukta(
+                                                    fontSize: isMobile ? 16 : 19,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: AppColors.textPrimary,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(
+                                                      horizontal: 8, vertical: 2),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFF0FDF4),
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    border: Border.all(
+                                                        color: const Color(0xFFBBF7D0)),
+                                                  ),
+                                                  child: Text(
+                                                    '${recentProducts.length} items',
+                                                    style: GoogleFonts.mukta(
+                                                      fontSize: 11.5,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: AppColors.primaryDarkGreen,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  RecentlyViewedController.instance.clear(),
+                                              child: Text(
+                                                'Clear',
+                                                style: GoogleFonts.mukta(
+                                                  fontSize: 12.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.textMuted,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: isMobile ? 10 : 14),
+                                      _buildProductGrid(
+                                        recentProducts,
+                                        constraints,
+                                        maxItems: 6,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                             ListenableBuilder(
                               listenable: CollectionController.instance,
                               builder: (context, _) {
@@ -1131,7 +1266,7 @@ class _HomeViewState extends State<HomeView> {
     bool isMobile,
     BoxConstraints constraints,
   ) {
-    final availableProducts = List<ProductItem>.from(allProducts);
+    final availableProducts = allProducts.where((p) => p.isInStock).toList();
     final List<Widget> widgets = [];
 
     for (final col in collections) {
@@ -1525,7 +1660,7 @@ class _HomeViewState extends State<HomeView> {
       ];
     }
 
-    final availableProducts = List<ProductItem>.from(allProducts);
+    final availableProducts = allProducts.where((p) => p.isInStock).toList();
     final activeSub = _selectedSubCollectionId == null
         ? null
         : col.subCollections.where((s) => s.id == _selectedSubCollectionId).firstOrNull;

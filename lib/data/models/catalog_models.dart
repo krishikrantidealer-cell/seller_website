@@ -223,6 +223,25 @@ class ProductItem {
     this.variants = const [],
   });
 
+  bool get isInStock {
+    if (!isAvailable) return false;
+    if (variants.isEmpty) return true;
+    return variants.any((v) => v.inStock && (v.stock == null || v.stock! > 0));
+  }
+
+  static List<ProductItem> sortInStockFirst(List<ProductItem> items) {
+    final inStock = <ProductItem>[];
+    final outOfStock = <ProductItem>[];
+    for (final item in items) {
+      if (item.isInStock) {
+        inStock.add(item);
+      } else {
+        outOfStock.add(item);
+      }
+    }
+    return [...inStock, ...outOfStock];
+  }
+
   int get discountPercent {
     if (variants.isNotEmpty) {
       return defaultVariant.discountPercent;
@@ -233,7 +252,13 @@ class ProductItem {
 
   ProductVariant get defaultVariant {
     if (variants.isNotEmpty) {
-      return variants.firstWhere((v) => v.isDefault, orElse: () => variants.first);
+      final preferred = variants.firstWhere((v) => v.isDefault, orElse: () => variants.first);
+      final preferredInStock = preferred.inStock && (preferred.stock == null || preferred.stock! > 0);
+      if (preferredInStock) return preferred;
+      return variants.firstWhere(
+        (v) => v.inStock && (v.stock == null || v.stock! > 0),
+        orElse: () => preferred,
+      );
     }
     return ProductVariant(
       id: '${id}_def',

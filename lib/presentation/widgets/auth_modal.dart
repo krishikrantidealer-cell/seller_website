@@ -442,39 +442,6 @@ class _PhoneInputViewState extends State<_PhoneInputView> {
             ),
           ],
 
-          const SizedBox(height: 12),
-
-          // Quick Demo Pill
-          InkWell(
-            onTap: () {
-              _phoneController.text = '9876543210';
-              setState(() {});
-            },
-            borderRadius: BorderRadius.circular(6),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.touch_app_rounded, size: 14, color: AppColors.primaryGreen),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Quick Test: Tap to fill demo number (9876543210)',
-                      style: GoogleFonts.mukta(fontSize: 11, color: AppColors.primaryDarkGreen, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
           const SizedBox(height: 20),
 
           // Get OTP Button
@@ -603,15 +570,6 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
         ),
       );
     }
-  }
-
-  void _fillDemoOtp() {
-    const demo = '123456';
-    for (int i = 0; i < 6; i++) {
-      _controllers[i].text = demo[i];
-    }
-    setState(() {});
-    _verify();
   }
 
   @override
@@ -781,43 +739,6 @@ class _OtpVerificationViewState extends State<_OtpVerificationView> {
               ],
             ),
           ],
-
-          const SizedBox(height: 16),
-
-          // Demo OTP Quick Action
-          Center(
-            child: InkWell(
-              onTap: _fillDemoOtp,
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.lightGreen,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.primaryGreen.withValues(alpha: 0.5)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.flash_on_rounded, size: 14, color: AppColors.primaryGreen),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        'Test Mode: Tap to auto-verify with demo OTP (123456)',
-                        style: GoogleFonts.mukta(
-                          fontSize: 11,
-                          color: AppColors.primaryDarkGreen,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
 
           const SizedBox(height: 20),
 

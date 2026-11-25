@@ -355,7 +355,7 @@ class AuthController extends ChangeNotifier {
     String? primaryCrops,
     String? landholdingAcres,
   }) {
-    final current = _currentUser ?? const UserModel(phoneNumber: '9876543210');
+    final current = _currentUser ?? const UserModel(phoneNumber: '');
     _currentUser = current.copyWith(
       name: name,
       alternatePhone: alternatePhone,

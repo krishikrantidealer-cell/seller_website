@@ -53,7 +53,10 @@
             { fallbackUrl: fallbackUrl },
             function(resp) {
               settled = true;
-              if (resp && (resp.status === 'success' || resp.order_id || resp.orderId)) {
+              var st = resp && resp.status ? String(resp.status).toLowerCase() : '';
+              var ost = resp && resp.ost ? String(resp.ost).toLowerCase() : '';
+              var hasOrderId = !!(resp && (resp.order_id || resp.orderId || (resp.data && (resp.data.order_id || resp.data.orderId))));
+              if (resp && (st === 'success' || ost === 'success' || hasOrderId)) {
                 if (onOrderSuccess) onOrderSuccess(typeof resp === 'string' ? resp : JSON.stringify(resp));
               } else {
                 if (onDismiss) onDismiss();
@@ -140,9 +143,12 @@
   </script>
 
   <script>
-    // Strip stale Fastrr redirect query params from URL on load
+    // Strip stale Fastrr redirect query params from URL on load & clear persisted cart on Fastrr success
     (function() {
       try {
+        if (window.location.search && window.location.search.indexOf('ost=SUCCESS') !== -1) {
+          localStorage.removeItem('flutter.seller_website_cart_v1');
+        }
         if (window.location.search && window.location.search.indexOf('fastrr_redirect') !== -1) {
           var cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
           window.history.replaceState(null, '', cleanUrl);

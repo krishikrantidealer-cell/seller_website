@@ -23,6 +23,7 @@ class ApiEndpoints {
   static const String technicalNames = '/api/v1/technical-names';
   static const String collections = '/api/v1/collections';
   static String collectionById(String id) => '/api/v1/collections/$id';
+  static const String banners = '/api/v1/banners';
 
   /// Customer Cart, Wishlist & Orders
   static const String cart = '/api/v1/cart';
