@@ -8,7 +8,7 @@ class ApiEndpoints {
   /// Authentication (OTP & Password)
   static const String sendOtp = '/api/v1/auth/otp/send';
   static const String verifyOtp = '/api/v1/auth/otp/verify';
-  static const String refreshToken = '/api/v1/auth/refresh';
+  static const String refreshToken = '/api/v1/auth/token/refresh';
   static const String logout = '/api/v1/auth/logout';
 
   /// Categories (Public 3-tier hierarchy: Level 0, Level 1, Level 2)
