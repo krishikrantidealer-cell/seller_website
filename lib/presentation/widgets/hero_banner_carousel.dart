@@ -145,11 +145,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 650;
         final isTablet = constraints.maxWidth < 950;
-        final bannerHeight = isMobile
-            ? 210.0
-            : isTablet
-                ? 270.0
-                : 340.0;
+        final bannerHeight = (constraints.maxWidth * 0.3125).clamp(180.0, 480.0);
 
         return SizedBox(
           width: double.infinity,
@@ -302,11 +298,14 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: banner.gradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: hasImage ? const Color(0xFFF6F7F5) : null,
+          gradient: hasImage
+              ? null
+              : LinearGradient(
+                  colors: banner.gradient,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
         ),
         child: Stack(
           children: [
@@ -316,7 +315,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                   imageUrl: banner.imageUrl,
                   width: double.infinity,
                   height: double.infinity,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   fallbackIcon: banner.icon,
                 ),
               ),
