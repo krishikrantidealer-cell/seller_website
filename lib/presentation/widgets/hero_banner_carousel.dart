@@ -145,7 +145,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
       builder: (context, constraints) {
         final isMobile = constraints.maxWidth < 650;
         final isTablet = constraints.maxWidth < 950;
-        final bannerHeight = (constraints.maxWidth * 0.3125).clamp(180.0, 480.0);
+        final bannerHeight = (constraints.maxWidth * 0.34).clamp(190.0, 500.0);
 
         return SizedBox(
           width: double.infinity,
@@ -315,7 +315,7 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
                   imageUrl: banner.imageUrl,
                   width: double.infinity,
                   height: double.infinity,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fill,
                   fallbackIcon: banner.icon,
                 ),
               ),
