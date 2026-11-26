@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/models/catalog_models.dart';
-import 'app_product_image.dart';
 import 'product_card.dart';
 
 class FarmerFavouritesSection extends StatefulWidget {
@@ -33,7 +32,6 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
 
   String _selectedCatId = 'all';
   int _pageIndex = 0;
-  ProductVariant? _featuredVariant;
   final ScrollController _pillScrollController = ScrollController();
 
   @override
@@ -65,34 +63,21 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
       return const SizedBox.shrink();
     }
 
-    final featured = products.isNotEmpty
-        ? products.first
-        : widget.allProducts.firstWhere(
-            (p) => p.isInStock,
-            orElse: () => widget.allProducts.first,
-          );
-    final featuredVariants = featured.variants.isNotEmpty
-        ? featured.variants
-        : [featured.defaultVariant];
-    final activeFeaturedVariant = (_featuredVariant != null &&
-            featuredVariants.any((v) => v.id == _featuredVariant!.id))
-        ? _featuredVariant!
-        : featured.defaultVariant;
-
-    final gridProducts = products.length > 1 ? products.sublist(1) : products;
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 1020;
-        final cardsPerPage = constraints.maxWidth >= 1220
-            ? 3
-            : (constraints.maxWidth >= 700 ? 2 : 2);
+        final cardsPerPage = constraints.maxWidth >= 1400
+            ? 6
+            : (constraints.maxWidth >= 1150
+                ? 5
+                : (constraints.maxWidth >= 880
+                    ? 4
+                    : (constraints.maxWidth >= 620 ? 3 : 2)));
         final totalPages =
-            gridProducts.isEmpty ? 1 : (gridProducts.length / cardsPerPage).ceil();
+            products.isEmpty ? 1 : (products.length / cardsPerPage).ceil();
         final safePage = _pageIndex.clamp(0, totalPages - 1);
         final start = safePage * cardsPerPage;
-        final end = (start + cardsPerPage).clamp(0, gridProducts.length);
-        final pageProducts = gridProducts.sublist(start, end);
+        final end = (start + cardsPerPage).clamp(0, products.length);
+        final pageProducts = products.sublist(start, end);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,394 +175,17 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
                 ),
               ],
             ),
-            SizedBox(height: widget.isMobile ? 14 : 20),
+            SizedBox(height: widget.isMobile ? 14 : 18),
 
-            if (isWide)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 375,
-                    height: 418,
-                    child: _buildFeaturedCard(
-                      featured,
-                      featuredVariants,
-                      activeFeaturedVariant,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: _buildRightSection(
-                      pageProducts: pageProducts,
-                      cardsPerPage: cardsPerPage,
-                      safePage: safePage,
-                      totalPages: totalPages,
-                    ),
-                  ),
-                ],
-              )
-            else ...[
-              _buildFeaturedCard(
-                featured,
-                featuredVariants,
-                activeFeaturedVariant,
-              ),
-              const SizedBox(height: 16),
-              _buildRightSection(
-                pageProducts: pageProducts,
-                cardsPerPage: cardsPerPage,
-                safePage: safePage,
-                totalPages: totalPages,
-              ),
-            ],
+            _buildRightSection(
+              pageProducts: pageProducts,
+              cardsPerPage: cardsPerPage,
+              safePage: safePage,
+              totalPages: totalPages,
+            ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildFeaturedCard(
-    ProductItem product,
-    List<ProductVariant> variants,
-    ProductVariant variant,
-  ) {
-    final savings = (variant.printedMrp - variant.displayRate).round();
-    final brand = (product.brandName.isNotEmpty
-            ? product.brandName
-            : (product.vendor.isNotEmpty ? product.vendor : 'EBS'))
-        .toUpperCase();
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [Color(0xFFD92323), Color(0xFFA61E22)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _brandRed.withValues(alpha: 0.24),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            right: -30,
-            top: 28,
-            child: Container(
-              width: 210,
-              height: 210,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.14),
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Top Pill + Info + Product Image
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Text(
-                            '✦ Featured Pick',
-                            style: GoogleFonts.mukta(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          brand,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.mukta(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                        Text(
-                          product.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.mukta(
-                            color: Colors.white,
-                            fontSize: 21,
-                            fontWeight: FontWeight.w800,
-                            height: 1.15,
-                          ),
-                        ),
-                        if (product.technicalName.isNotEmpty) ...[
-                          const SizedBox(height: 3),
-                          Text(
-                            product.technicalName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.mukta(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 10),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              Text(
-                                '₹${variant.displayRate.toStringAsFixed(0)}',
-                                style: GoogleFonts.mukta(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              if (variant.printedMrp > variant.displayRate) ...[
-                                const SizedBox(width: 7),
-                                Text(
-                                  '₹${variant.printedMrp.toStringAsFixed(0)}',
-                                  style: GoogleFonts.mukta(
-                                    color: Colors.white.withValues(alpha: 0.7),
-                                    fontSize: 13,
-                                    decoration: TextDecoration.lineThrough,
-                                  ),
-                                ),
-                              ],
-                              if (savings > 0) ...[
-                                const SizedBox(width: 7),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    'Save ₹$savings',
-                                    style: GoogleFonts.mukta(
-                                      color: _brandRed,
-                                      fontSize: 10.5,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        _featureBullet('${product.category} category'),
-                        if (product.technicalName.isNotEmpty)
-                          _featureBullet(product.technicalName),
-                        _featureBullet('Genuine quality product'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 4,
-                    child: SizedBox(
-                      height: 235,
-                      child: AppProductImage(
-                        imageUrl: product.imageUrl,
-                        fallbackUrls: product.imageUrls,
-                        fit: BoxFit.contain,
-                        fallbackIcon: Icons.agriculture_rounded,
-                        fallbackIconSize: 52,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Bottom Row: White Pack Size Selector + Explore Product Button
-              Row(
-                children: [
-                  Expanded(
-                    child: PopupMenuButton<ProductVariant>(
-                      enabled: variants.length > 1,
-                      initialValue: variant,
-                      color: Colors.white,
-                      onSelected: (v) => setState(() => _featuredVariant = v),
-                      itemBuilder: (ctx) => variants.map((v) {
-                        return PopupMenuItem<ProductVariant>(
-                          value: v,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                v.label,
-                                style: GoogleFonts.mukta(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '₹${v.displayRate.toStringAsFixed(0)}',
-                                style: GoogleFonts.mukta(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  color: _brandRed,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'PACK SIZE',
-                                    style: GoogleFonts.mukta(
-                                      fontSize: 8.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF78716C),
-                                      height: 1.1,
-                                    ),
-                                  ),
-                                  Text(
-                                    variant.label,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.mukta(
-                                      fontSize: 12.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: const Color(0xFF1C1917),
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (variants.length > 1)
-                              const Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: 18,
-                                color: Color(0xFF57534E),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: SizedBox(
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: () => widget.onProductTap(product),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: _brandRed,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Explore Product',
-                                style: GoogleFonts.mukta(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              const Icon(Icons.arrow_forward_rounded, size: 15),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _featureBullet(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        children: [
-          Icon(
-            Icons.check_circle_outline_rounded,
-            size: 14,
-            color: Colors.white.withValues(alpha: 0.85),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.mukta(
-                color: Colors.white.withValues(alpha: 0.92),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 

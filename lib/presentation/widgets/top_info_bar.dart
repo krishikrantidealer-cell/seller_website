@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/localization/language_controller.dart';
@@ -21,18 +22,43 @@ class _TopInfoBarState extends State<TopInfoBar> {
   ];
 
   int _announcementIndex = 0;
+  Timer? _autoCycleTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoCycle();
+  }
+
+  void _startAutoCycle() {
+    _autoCycleTimer?.cancel();
+    _autoCycleTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted) return;
+      setState(() {
+        _announcementIndex = (_announcementIndex + 1) % _announcements.length;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoCycleTimer?.cancel();
+    super.dispose();
+  }
 
   void _prevAnnouncement() {
     setState(() {
       _announcementIndex =
           (_announcementIndex - 1 + _announcements.length) % _announcements.length;
     });
+    _startAutoCycle();
   }
 
   void _nextAnnouncement() {
     setState(() {
       _announcementIndex = (_announcementIndex + 1) % _announcements.length;
     });
+    _startAutoCycle();
   }
 
   @override
@@ -99,14 +125,31 @@ class _TopInfoBarState extends State<TopInfoBar> {
                             Flexible(
                               child: ConstrainedBox(
                                 constraints: const BoxConstraints(maxWidth: 420),
-                                child: Text(
-                                  _announcements[_announcementIndex],
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.mukta(
-                                    color: Colors.white,
-                                    fontSize: fontSize,
-                                    fontWeight: FontWeight.w600,
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 450),
+                                  transitionBuilder: (child, anim) => FadeTransition(
+                                    opacity: anim,
+                                    child: SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(0.08, 0),
+                                        end: Offset.zero,
+                                      ).animate(anim),
+                                      child: child,
+                                    ),
+                                  ),
+                                  child: Align(
+                                    key: ValueKey(_announcementIndex),
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      _announcements[_announcementIndex],
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.mukta(
+                                        color: Colors.white,
+                                        fontSize: fontSize,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
