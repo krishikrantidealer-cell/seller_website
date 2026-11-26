@@ -103,35 +103,57 @@ class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row: "Recently Viewed" + "Clear History" + "View All ->"
+            // Header Row: "— YOUR BROWSING" + "Recently Viewed" + "Clear History" + "View All ->"
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Flexible(
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Recently ',
-                          style: GoogleFonts.mukta(
-                            fontSize: widget.isMobile ? 20 : 26,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF111827),
-                            height: 1.15,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(width: 16, height: 2, color: _brandRed),
+                          const SizedBox(width: 8),
+                          Text(
+                            'YOUR BROWSING',
+                            style: GoogleFonts.mukta(
+                              color: _brandRed,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                            ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Recently ',
+                              style: GoogleFonts.mukta(
+                                fontSize: widget.isMobile ? 22 : 28,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF111827),
+                                height: 1.15,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Viewed',
+                              style: GoogleFonts.mukta(
+                                fontSize: widget.isMobile ? 22 : 28,
+                                fontWeight: FontWeight.w800,
+                                color: _brandRed,
+                                height: 1.15,
+                              ),
+                            ),
+                          ],
                         ),
-                        TextSpan(
-                          text: 'Viewed',
-                          style: GoogleFonts.mukta(
-                            fontSize: widget.isMobile ? 20 : 26,
-                            fontWeight: FontWeight.w800,
-                            color: _brandRed,
-                            height: 1.15,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 Row(
@@ -143,7 +165,7 @@ class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: widget.isMobile ? 9 : 13,
-                          vertical: widget.isMobile ? 5 : 6,
+                          vertical: widget.isMobile ? 6 : 7,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -160,28 +182,37 @@ class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
                         ),
                       ),
                     ),
-                    SizedBox(width: widget.isMobile ? 10 : 14),
+                    SizedBox(width: widget.isMobile ? 8 : 12),
                     InkWell(
                       onTap: widget.onViewAll,
-                      borderRadius: BorderRadius.circular(6),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 4),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: widget.isMobile ? 10 : 14,
+                          vertical: widget.isMobile ? 6 : 7,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _brandRed.withValues(alpha: 0.4),
+                          ),
+                        ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'View All',
                               style: GoogleFonts.mukta(
-                                fontSize: widget.isMobile ? 12.5 : 13.5,
+                                fontSize: widget.isMobile ? 12 : 13,
                                 fontWeight: FontWeight.w700,
                                 color: _brandRed,
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 5),
                             const Icon(
                               Icons.arrow_forward_rounded,
-                              size: 16,
+                              size: 15,
                               color: _brandRed,
                             ),
                           ],

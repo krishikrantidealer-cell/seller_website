@@ -790,174 +790,156 @@ class _HomeViewState extends State<HomeView> {
     return sections;
   }
 
+  Widget _buildTwoToneSectionHeading({
+    required String eyebrow,
+    required String title,
+    required bool isMobile,
+    Widget? leadingIcon,
+    required VoidCallback onViewAll,
+  }) {
+    const brandRed = Color(0xFFC81E1E);
+    final words = title.trim().split(RegExp(r'\s+'));
+    final firstPart =
+        words.length > 1 ? '${words.sublist(0, words.length - 1).join(' ')} ' : '';
+    final lastWord = words.isNotEmpty ? words.last : title;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(width: 16, height: 2, color: brandRed),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      eyebrow.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.mukta(
+                        color: brandRed,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  if (leadingIcon != null) ...[
+                    leadingIcon,
+                    const SizedBox(width: 10),
+                  ],
+                  Flexible(
+                    child: RichText(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                        children: [
+                          if (firstPart.isNotEmpty)
+                            TextSpan(
+                              text: firstPart,
+                              style: GoogleFonts.mukta(
+                                fontSize: isMobile ? 21 : 27,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF111827),
+                                height: 1.15,
+                              ),
+                            ),
+                          TextSpan(
+                            text: lastWord,
+                            style: GoogleFonts.mukta(
+                              fontSize: isMobile ? 21 : 27,
+                              fontWeight: FontWeight.w800,
+                              color: words.length > 1
+                                  ? brandRed
+                                  : const Color(0xFF111827),
+                              height: 1.15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        InkWell(
+          onTap: onViewAll,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 10 : 14,
+              vertical: isMobile ? 6 : 7,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: brandRed.withValues(alpha: 0.4)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'View All',
+                  style: GoogleFonts.mukta(
+                    fontSize: isMobile ? 12 : 13,
+                    fontWeight: FontWeight.w700,
+                    color: brandRed,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 15,
+                  color: brandRed,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildLevel0CategoryHeader(
     CategoryItem category,
     int productCount,
     bool isMobile,
   ) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 12 : 18,
-        vertical: isMobile ? 10 : 12,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Left side: accent, icon/image, category title, count, subtitle
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  width: isMobile ? 3.5 : 4,
-                  height: isMobile ? 18 : 20,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryGreen,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                if (CategoryIconBadge.hasAnyIcon(
-                  categoryImageUrl: category.categoryImageUrl,
-                  iconUrl: category.iconUrl,
-                  iconEmoji: category.icon,
-                )) ...[
-                  CategoryIconBadge(
-                    categoryImageUrl: category.categoryImageUrl,
-                    iconUrl: category.iconUrl,
-                    iconEmoji: category.icon,
-                    size: isMobile ? 22 : 26,
-                    emojiSize: isMobile ? 13 : 16,
-                    borderRadius: 6,
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                Flexible(
-                  child: Text(
-                    category.name,
-                    style: GoogleFonts.mukta(
-                      fontSize: isMobile ? 15 : 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 6 : 9,
-                    vertical: isMobile ? 2 : 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDF4),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                    ),
-                  ),
-                  child: Text(
-                    isMobile ? '$productCount' : '$productCount Products',
-                    style: GoogleFonts.mukta(
-                      fontSize: isMobile ? 10.5 : 11.5,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryDarkGreen,
-                    ),
-                  ),
-                ),
-                if (!isMobile) ...[
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      category.groups.isNotEmpty
-                          ? '• ${category.groups.length} Subcategories • 100% Genuine EBS Agricultural Inputs'
-                          : '• 100% Genuine Lab Tested EBS Agricultural Inputs',
-                      style: GoogleFonts.mukta(
-                        fontSize: 12.5,
-                        color: AppColors.textSecondary,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          // Right corner: Pinned See All Button
-          _buildCategorySeeAllButton(
-            categoryId: category.id,
-            isMobile: isMobile,
-          ),
-        ],
-      ),
+    final hasIcon = CategoryIconBadge.hasAnyIcon(
+      categoryImageUrl: category.categoryImageUrl,
+      iconUrl: category.iconUrl,
+      iconEmoji: category.icon,
     );
-  }
-
-  Widget _buildCategorySeeAllButton({
-    required String categoryId,
-    required bool isMobile,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _openCategoryDetail(categoryId, null),
-        borderRadius: BorderRadius.circular(20),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primaryGreen, AppColors.primaryDarkGreen],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 11 : 15,
-            vertical: isMobile ? 5 : 7,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'See All',
-                style: GoogleFonts.mukta(
-                  fontSize: isMobile ? 11 : 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  size: isMobile ? 10 : 12,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return _buildTwoToneSectionHeading(
+      eyebrow: category.groups.isNotEmpty
+          ? '$productCount PRODUCTS • ${category.groups.length} SUBCATEGORIES'
+          : '$productCount PRODUCTS',
+      title: category.name,
+      isMobile: isMobile,
+      leadingIcon: hasIcon
+          ? CategoryIconBadge(
+              categoryImageUrl: category.categoryImageUrl,
+              iconUrl: category.iconUrl,
+              iconEmoji: category.icon,
+              size: isMobile ? 24 : 28,
+              emojiSize: isMobile ? 14 : 16,
+              borderRadius: 6,
+            )
+          : null,
+      onViewAll: () => _openCategoryDetail(category.id, null),
     );
   }
 
@@ -1284,152 +1266,29 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: isMobile ? 3.5 : 4,
-                            height: isMobile ? 18 : 20,
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryGreen,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (col.image != null && col.image!.trim().isNotEmpty) ...[
-                            AppProductImage(
-                              imageUrl: col.image!,
-                              width: isMobile ? 22 : 28,
-                              height: isMobile ? 22 : 28,
-                              fit: BoxFit.cover,
-                              borderRadius: 6,
-                            ),
-                            const SizedBox(width: 8),
-                          ],
-                          Flexible(
-                            child: Text(
-                              col.name,
-                              style: GoogleFonts.mukta(
-                                fontSize: isMobile ? 15 : 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isMobile ? 6 : 9,
-                              vertical: isMobile ? 2 : 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF0FDF4),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                              ),
-                            ),
-                            child: Text(
-                              isMobile ? '$totalCount' : '$totalCount Products',
-                              style: GoogleFonts.mukta(
-                                fontSize: isMobile ? 10.5 : 11.5,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryDarkGreen,
-                              ),
-                            ),
-                          ),
-                          if (!isMobile) ...[
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                col.subCollections.isNotEmpty
-                                    ? '• ${col.subCollections.length} Sub-Collections${col.description.isNotEmpty ? ' • ${col.description}' : ''}'
-                                    : (col.description.isNotEmpty
-                                        ? '• ${col.description}'
-                                        : '• 100% Genuine EBS Agricultural Inputs'),
-                                style: GoogleFonts.mukta(
-                                  fontSize: 12.5,
-                                  color: AppColors.textSecondary,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ],
+                _buildTwoToneSectionHeading(
+                  eyebrow: col.subCollections.isNotEmpty
+                      ? 'COLLECTION • ${col.subCollections.length} SUB-COLLECTIONS • $totalCount PRODUCTS'
+                      : 'COLLECTION • $totalCount PRODUCTS',
+                  title: col.name,
+                  isMobile: isMobile,
+                  leadingIcon: (col.image != null && col.image!.trim().isNotEmpty)
+                      ? AppProductImage(
+                          imageUrl: col.image!,
+                          width: isMobile ? 24 : 28,
+                          height: isMobile ? 24 : 28,
+                          fit: BoxFit.cover,
+                          borderRadius: 6,
+                        )
+                      : null,
+                  onViewAll: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CollectionDetailView(collection: col),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CollectionDetailView(collection: col),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(20),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                AppColors.primaryGreen,
-                                AppColors.primaryDarkGreen,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primaryGreen.withValues(alpha: 0.25),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isMobile ? 10 : 14,
-                            vertical: isMobile ? 5 : 7,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'See All',
-                                style: GoogleFonts.mukta(
-                                  fontSize: isMobile ? 11 : 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: isMobile ? 10 : 12,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
                 if (visibleSubs.isNotEmpty) ...[
                   Padding(
