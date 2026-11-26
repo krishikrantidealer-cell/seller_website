@@ -30,36 +30,16 @@ class FarmerFavouritesSection extends StatefulWidget {
 class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
   static const Color _brandRed = Color(0xFFC81E1E);
 
-  String _selectedCatId = 'all';
   int _pageIndex = 0;
-  final ScrollController _pillScrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _pillScrollController.dispose();
-    super.dispose();
-  }
 
   List<ProductItem> _filteredProducts() {
-    final inStock = widget.allProducts.where((p) => p.isInStock).toList();
-    if (_selectedCatId == 'all') return inStock;
-    final cat = widget.categories.cast<CategoryItem?>().firstWhere(
-          (c) => c?.id == _selectedCatId,
-          orElse: () => null,
-        );
-    final catName = cat?.name.toLowerCase() ?? '';
-    return inStock.where((p) {
-      if (p.category.toLowerCase() == catName) return true;
-      if (p.categoryId == _selectedCatId) return true;
-      if (cat?.backendId != null && p.categoryId == cat!.backendId) return true;
-      return false;
-    }).toList();
+    return widget.allProducts.where((p) => p.isInStock).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final products = _filteredProducts();
-    if (products.isEmpty && _selectedCatId == 'all') {
+    if (products.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -198,26 +178,7 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Category Filter Pills Bar
-        SizedBox(
-          height: 36,
-          child: ListView(
-            controller: _pillScrollController,
-            scrollDirection: Axis.horizontal,
-            children: [
-              _buildCategoryPill('all', 'All Products'),
-              ...widget.categories.map(
-                (c) => Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: _buildCategoryPill(c.id, c.name),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-
-        // 3-Column Product Cards
+        // Product Cards Row
         if (pageProducts.isEmpty)
           Container(
             height: 330,
@@ -310,36 +271,6 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildCategoryPill(String id, String label) {
-    final isSelected = _selectedCatId == id;
-    return InkWell(
-      onTap: () => setState(() {
-        _selectedCatId = id;
-        _pageIndex = 0;
-      }),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF18181B) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF18181B) : const Color(0xFFE5E7EB),
-          ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.mukta(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w700,
-            color: isSelected ? Colors.white : const Color(0xFF1C1917),
-          ),
-        ),
-      ),
     );
   }
 

@@ -388,31 +388,33 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: TextField(
-                              controller: _searchController,
-                              onChanged: _handleSearchChanged,
-                              onSubmitted: _handleSearchSubmitted,
-                              textAlignVertical: TextAlignVertical.center,
-                              style: GoogleFonts.mukta(
-                                color: AppColors.textPrimary,
-                                fontSize: 13.5,
-                              ),
-                              decoration: InputDecoration(
-                                isDense: true,
-                                filled: true,
-                                fillColor: Colors.white,
-                                hoverColor: Colors.white,
-                                hintText:
-                                    'Search products, crops, brands or crop problems...',
-                                hintStyle: GoogleFonts.mukta(
-                                  color: const Color(0xFF78716C),
-                                  fontSize: 13.5,
+                            child: Center(
+                              child: TextField(
+                                controller: _searchController,
+                                onChanged: _handleSearchChanged,
+                                onSubmitted: _handleSearchSubmitted,
+                                textAlignVertical: TextAlignVertical.center,
+                                style: GoogleFonts.mukta(
+                                  color: AppColors.textPrimary,
+                                  fontSize: 14,
+                                  height: 1.25,
                                 ),
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
+                                decoration: InputDecoration(
+                                  isCollapsed: true,
+                                  filled: false,
+                                  hintText:
+                                      'Search products, crops, brands or crop problems...',
+                                  hintStyle: GoogleFonts.mukta(
+                                    color: const Color(0xFF78716C),
+                                    fontSize: 13.5,
+                                    height: 1.25,
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
                               ),
                             ),
                           ),
