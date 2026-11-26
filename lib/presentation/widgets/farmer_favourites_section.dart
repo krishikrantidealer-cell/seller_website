@@ -24,40 +24,88 @@ class FarmerFavouritesSection extends StatefulWidget {
   });
 
   @override
-  State<FarmerFavouritesSection> createState() => _FarmerFavouritesSectionState();
+  State<FarmerFavouritesSection> createState() =>
+      _FarmerFavouritesSectionState();
 }
 
 class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
   static const Color _brandRed = Color(0xFFC81E1E);
+  final ScrollController _scrollController = ScrollController();
+  bool _canScrollLeft = false;
+  bool _canScrollRight = false;
 
-  int _pageIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_updateScrollArrows);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollArrows());
+  }
 
-  List<ProductItem> _filteredProducts() {
-    return widget.allProducts.where((p) => p.isInStock).toList();
+  @override
+  void didUpdateWidget(covariant FarmerFavouritesSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.allProducts.length != widget.allProducts.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollArrows());
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_updateScrollArrows);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _updateScrollArrows() {
+    if (!mounted || !_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    final canLeft = pos.pixels > 4;
+    final canRight =
+        pos.maxScrollExtent > 4 && pos.pixels < pos.maxScrollExtent - 4;
+    if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
+      setState(() {
+        _canScrollLeft = canLeft;
+        _canScrollRight = canRight;
+      });
+    }
+  }
+
+  void _scrollBy(double delta) {
+    if (!_scrollController.hasClients) return;
+    final target = (_scrollController.offset + delta).clamp(
+      0.0,
+      _scrollController.position.maxScrollExtent,
+    );
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final products = _filteredProducts();
+    final products = widget.allProducts.where((p) => p.isInStock).toList();
     if (products.isEmpty) {
       return const SizedBox.shrink();
     }
 
+    final cardHeight = widget.isMobile ? 320.0 : 375.0;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cardsPerPage = constraints.maxWidth >= 1400
+        final availableW = constraints.maxWidth;
+        final visibleCount = availableW >= 1280
             ? 6
-            : (constraints.maxWidth >= 1150
+            : (availableW >= 1000
                 ? 5
-                : (constraints.maxWidth >= 880
+                : (availableW >= 760
                     ? 4
-                    : (constraints.maxWidth >= 620 ? 3 : 2)));
-        final totalPages =
-            products.isEmpty ? 1 : (products.length / cardsPerPage).ceil();
-        final safePage = _pageIndex.clamp(0, totalPages - 1);
-        final start = safePage * cardsPerPage;
-        final end = (start + cardsPerPage).clamp(0, products.length);
-        final pageProducts = products.sublist(start, end);
+                    : (availableW >= 520 ? 3 : 2)));
+        final gap = widget.isMobile ? 10.0 : 14.0;
+        final cardWidth =
+            ((availableW - (gap * (visibleCount - 1))) / visibleCount)
+                .clamp(155.0, 290.0);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,11 +121,7 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: 16,
-                          height: 2,
-                          color: _brandRed,
-                        ),
+                        Container(width: 16, height: 2, color: _brandRed),
                         const SizedBox(width: 8),
                         Text(
                           'BEST SELLERS',
@@ -155,13 +199,61 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
                 ),
               ],
             ),
-            SizedBox(height: widget.isMobile ? 14 : 18),
+            SizedBox(height: widget.isMobile ? 12 : 16),
 
-            _buildRightSection(
-              pageProducts: pageProducts,
-              cardsPerPage: cardsPerPage,
-              safePage: safePage,
-              totalPages: totalPages,
+            // Horizontal Carousel fitting 6 full cards on desktop with smooth < > scroll
+            SizedBox(
+              height: cardHeight,
+              child: NotificationListener<ScrollMetricsNotification>(
+                onNotification: (notification) {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _updateScrollArrows());
+                  return false;
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ListView.separated(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      itemCount: products.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(width: gap),
+                      itemBuilder: (context, index) {
+                        final product = products[index];
+                        return SizedBox(
+                          width: cardWidth,
+                          child: ProductCard(
+                            product: product,
+                            onTap: () => widget.onProductTap(product),
+                            onAddToCart: widget.onAddToCart,
+                            onBuyNow: widget.onBuyNow,
+                          ),
+                        );
+                      },
+                    ),
+                    if (!widget.isMobile && _canScrollLeft)
+                      Positioned(
+                        left: -14,
+                        top: (cardHeight - 38) / 2,
+                        child: _buildArrowButton(
+                          icon: Icons.chevron_left_rounded,
+                          onTap: () => _scrollBy(-(cardWidth + gap) * 2),
+                        ),
+                      ),
+                    if (!widget.isMobile && _canScrollRight)
+                      Positioned(
+                        right: -14,
+                        top: (cardHeight - 38) / 2,
+                        child: _buildArrowButton(
+                          icon: Icons.chevron_right_rounded,
+                          onTap: () => _scrollBy((cardWidth + gap) * 2),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ],
         );
@@ -169,135 +261,26 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
     );
   }
 
-  Widget _buildRightSection({
-    required List<ProductItem> pageProducts,
-    required int cardsPerPage,
-    required int safePage,
-    required int totalPages,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Product Cards Row
-        if (pageProducts.isEmpty)
-          Container(
-            height: 330,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFEAE6DF)),
-            ),
-            child: Text(
-              'No products in this category yet.',
-              style: GoogleFonts.mukta(
-                color: const Color(0xFF78716C),
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          )
-        else
-          SizedBox(
-            height: widget.isMobile ? 320 : 375,
-            child: Row(
-              children: List.generate(cardsPerPage, (i) {
-                if (i >= pageProducts.length) {
-                  return const Expanded(child: SizedBox.shrink());
-                }
-                final product = pageProducts[i];
-                return Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      right: i < cardsPerPage - 1 ? 14 : 0,
-                    ),
-                    child: ProductCard(
-                      product: product,
-                      onTap: () => widget.onProductTap(product),
-                      onAddToCart: widget.onAddToCart,
-                      onBuyNow: widget.onBuyNow,
-                    ),
-                  ),
-                );
-              }),
-            ),
-          ),
-        const SizedBox(height: 14),
-
-        // Bottom Pagination Bar: pill + dot + "1 / N" on left, < > arrows on right
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                ...List.generate(totalPages.clamp(1, 5), (idx) {
-                  final isActive = idx == safePage;
-                  return Container(
-                    margin: const EdgeInsets.only(right: 5),
-                    width: isActive ? 22 : 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: isActive ? _brandRed : const Color(0xFFD6D3D1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  );
-                }),
-                const SizedBox(width: 8),
-                Text(
-                  '${safePage + 1} / $totalPages',
-                  style: GoogleFonts.mukta(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF78716C),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                _circleNavButton(
-                  Icons.chevron_left_rounded,
-                  enabled: safePage > 0,
-                  onTap: () => setState(() => _pageIndex = safePage - 1),
-                ),
-                const SizedBox(width: 8),
-                _circleNavButton(
-                  Icons.chevron_right_rounded,
-                  enabled: safePage < totalPages - 1,
-                  onTap: () => setState(() => _pageIndex = safePage + 1),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _circleNavButton(
-    IconData icon, {
-    required bool enabled,
+  Widget _buildArrowButton({
+    required IconData icon,
     required VoidCallback onTap,
   }) {
     return Material(
       color: Colors.white,
       shape: const CircleBorder(),
-      elevation: enabled ? 2 : 0,
+      elevation: 3,
+      shadowColor: Colors.black.withValues(alpha: 0.16),
       child: InkWell(
-        onTap: enabled ? onTap : null,
+        onTap: onTap,
         customBorder: const CircleBorder(),
         child: Container(
-          width: 34,
-          height: 34,
+          width: 38,
+          height: 38,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: const Color(0xFFE7E5E4)),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: enabled ? const Color(0xFF1C1917) : const Color(0xFFD6D3D1),
-          ),
+          child: Icon(icon, size: 22, color: const Color(0xFF1C1917)),
         ),
       ),
     );
