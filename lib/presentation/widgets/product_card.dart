@@ -117,21 +117,20 @@ class _ProductCardState extends State<ProductCard> {
                           decoration: BoxDecoration(
                             color: _imageTint,
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFF0ECE4)),
                           ),
                           clipBehavior: Clip.antiAlias,
                           child: Stack(
+                            fit: StackFit.expand,
                             children: [
-                              Center(
-                                child: Padding(
-                                  padding: EdgeInsets.all(isCompact ? 8 : 12),
-                                  child: AppProductImage(
-                                    imageUrl: widget.product.imageUrl,
-                                    fallbackUrls: widget.product.imageUrls,
-                                    fit: BoxFit.contain,
-                                    fallbackIcon: Icons.agriculture_rounded,
-                                    fallbackIconSize: 44,
-                                  ),
-                                ),
+                              AppProductImage(
+                                imageUrl: widget.product.imageUrl,
+                                fallbackUrls: widget.product.imageUrls,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                fallbackIcon: Icons.agriculture_rounded,
+                                fallbackIconSize: 44,
                               ),
                               if (discount > 0)
                                 Positioned(
@@ -364,16 +363,19 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   Widget _buildPackSizeBox(List<ProductVariant> variants, bool isCompact) {
+    final hasMultiple = variants.length > 1;
     final box = Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
         horizontal: isCompact ? 8 : 10,
-        vertical: isCompact ? 4 : 6,
+        vertical: isCompact ? 5 : 6,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: const Color(0xFFFAF8F5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: hasMultiple ? const Color(0xFFD6CFC5) : const Color(0xFFEAE6DF),
+        ),
       ),
       child: Row(
         children: [
@@ -383,21 +385,24 @@ class _ProductCardState extends State<ProductCard> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'PACK SIZE',
+                  hasMultiple ? 'PACK SIZE • ${variants.length} OPTIONS' : 'PACK SIZE',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.mukta(
-                    fontSize: isCompact ? 8.5 : 9,
-                    fontWeight: FontWeight.w700,
+                    fontSize: isCompact ? 8 : 8.5,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
-                    color: const Color(0xFF78716C),
+                    color: hasMultiple ? _brandRed : const Color(0xFF78716C),
                     height: 1.1,
                   ),
                 ),
+                const SizedBox(height: 1),
                 Text(
                   _selectedVariant.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.mukta(
-                    fontSize: isCompact ? 11.5 : 13,
+                    fontSize: isCompact ? 11.5 : 12.5,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF1C1917),
                     height: 1.2,
@@ -406,48 +411,121 @@ class _ProductCardState extends State<ProductCard> {
               ],
             ),
           ),
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: isCompact ? 16 : 18,
-            color: const Color(0xFF57534E),
+          const SizedBox(width: 6),
+          Container(
+            width: isCompact ? 22 : 24,
+            height: isCompact ? 22 : 24,
+            decoration: BoxDecoration(
+              color: hasMultiple ? const Color(0xFFFDF2F2) : const Color(0xFFF3F0EA),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: isCompact ? 16 : 18,
+              color: hasMultiple ? _brandRed : const Color(0xFF78716C),
+            ),
           ),
         ],
       ),
     );
 
-    if (variants.length <= 1) return box;
+    if (!hasMultiple) return box;
 
     return PopupMenuButton<ProductVariant>(
       tooltip: 'Select Pack Size',
       initialValue: _selectedVariant,
+      offset: const Offset(0, 48),
+      color: Colors.white,
+      elevation: 12,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFEAE6DF)),
+      ),
       onSelected: (variant) {
         setState(() => _selectedVariant = variant);
       },
       itemBuilder: (context) => variants.map((v) {
         final isSelected = v.id == _selectedVariant.id;
+        final vDiscount = v.discountPercent;
         return PopupMenuItem<ProductVariant>(
           value: v,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                v.label,
-                style: GoogleFonts.mukta(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                  color: isSelected ? _brandRed : const Color(0xFF1C1917),
-                ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFFFDF2F2) : Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected
+                    ? _brandRed.withValues(alpha: 0.35)
+                    : Colors.transparent,
               ),
-              const SizedBox(width: 12),
-              Text(
-                '₹${v.displayRate.toStringAsFixed(0)}',
-                style: GoogleFonts.mukta(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF15803D),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isSelected
+                          ? Icons.check_circle_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      size: 16,
+                      color: isSelected ? _brandRed : const Color(0xFFA8A29E),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          v.label,
+                          style: GoogleFonts.mukta(
+                            fontSize: 13,
+                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                            color: isSelected ? _brandRed : const Color(0xFF1C1917),
+                          ),
+                        ),
+                        if (vDiscount > 0)
+                          Text(
+                            '$vDiscount% OFF',
+                            style: GoogleFonts.mukta(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF15803D),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '₹${v.displayRate.toStringAsFixed(0)}',
+                      style: GoogleFonts.mukta(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF18181B),
+                      ),
+                    ),
+                    if (v.printedMrp > v.displayRate)
+                      Text(
+                        '₹${v.printedMrp.toStringAsFixed(0)}',
+                        style: GoogleFonts.mukta(
+                          fontSize: 10.5,
+                          color: const Color(0xFF9CA3AF),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       }).toList(),

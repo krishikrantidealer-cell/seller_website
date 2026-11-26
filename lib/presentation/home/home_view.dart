@@ -249,6 +249,7 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: AppColors.primaryGreen,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 84, 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
