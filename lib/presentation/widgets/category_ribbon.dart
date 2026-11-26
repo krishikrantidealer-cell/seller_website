@@ -109,28 +109,37 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     _overlayEntry = null;
     setState(() => _activeOpenTab = 'all');
 
+    double topOffset = 152.0;
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null && box.hasSize) {
+      topOffset = box.localToGlobal(Offset(0, box.size.height)).dy;
+    }
+
     final entry = OverlayEntry(
       builder: (ctx) => Stack(
         children: [
           Positioned.fill(
-            child: CompositedTransformFollower(
-              link: _allCategoriesLink,
-              showWhenUnlinked: false,
-              offset: const Offset(0, 46),
+            top: topOffset,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _removeOverlay,
               child: Align(
-                alignment: Alignment.topLeft,
-                child: MouseRegion(
-                  hitTestBehavior: HitTestBehavior.opaque,
-                  onEnter: (_) => _cancelHide(),
-                  onExit: (_) => _scheduleHide(),
-                  child: _MegaMenuPopup(
-                    categories: categories,
-                    selectedCategoryId: widget.selectedCategoryId,
-                    selectedSubcategory: widget.selectedSubcategory,
-                    onSelect: (catId, subcat) {
-                      _removeOverlay();
-                      widget.onCategorySelected?.call(catId, subcat);
-                    },
+                alignment: Alignment.topCenter,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: MouseRegion(
+                    hitTestBehavior: HitTestBehavior.opaque,
+                    onEnter: (_) => _cancelHide(),
+                    onExit: (_) => _scheduleHide(),
+                    child: _MegaMenuPopup(
+                      categories: categories,
+                      selectedCategoryId: widget.selectedCategoryId,
+                      selectedSubcategory: widget.selectedSubcategory,
+                      onSelect: (catId, subcat) {
+                        _removeOverlay();
+                        widget.onCategorySelected?.call(catId, subcat);
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -323,8 +332,14 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                         }
                                       },
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Padding(
+                                      child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: _activeOpenTab == 'all'
+                                              ? const Color(0xFFFDF2F2)
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -1080,7 +1095,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
 /// Left pane: Major Categories (Seeds, Insecticides, etc.)
 /// Middle pane: Categories under hovered Major Category
 /// Right pane: Subcategories of hovered Category opening in the side
-class _MegaMenuPopup extends StatefulWidget {
+class _MegaMenuPopup extends StatelessWidget {
   final List<CategoryItem> categories;
   final String selectedCategoryId;
   final String? selectedSubcategory;
@@ -1094,10 +1109,200 @@ class _MegaMenuPopup extends StatefulWidget {
   });
 
   @override
-  State<_MegaMenuPopup> createState() => _MegaMenuPopupState();
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final maxH = (MediaQuery.sizeOf(context).height - 170).clamp(240.0, 480.0);
+
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        width: screenWidth,
+        constraints: BoxConstraints(maxHeight: maxH),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(
+            top: BorderSide(color: Color(0xFFF3F0EA), width: 1),
+            bottom: BorderSide(color: Color(0xFFEAE6DF), width: 1),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.10),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final colCount = constraints.maxWidth >= 1200
+                      ? 5
+                      : (constraints.maxWidth >= 900 ? 4 : 3);
+                  final spacing = 28.0;
+                  final colWidth =
+                      (constraints.maxWidth - (spacing * (colCount - 1))) / colCount;
+
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: 28,
+                    children: categories.map((cat) {
+                      final items = <String>[];
+                      if (cat.groups.isNotEmpty) {
+                        for (final g in cat.groups) {
+                          items.add(g.name);
+                        }
+                      } else {
+                        items.addAll(cat.subcategories);
+                      }
+                      final visibleItems = items.take(5).toList();
+
+                      return SizedBox(
+                        width: colWidth,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              onTap: () => onSelect(cat.id, null),
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                child: Text(
+                                  cat.name.toUpperCase(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.mukta(
+                                    color: const Color(0xFF78716C),
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            ...visibleItems.map((item) {
+                              final isSelected = selectedCategoryId == cat.id &&
+                                  selectedSubcategory == item;
+                              return _MegaMenuLink(
+                                label: item,
+                                isSelected: isSelected,
+                                onTap: () => onSelect(cat.id, item),
+                              );
+                            }),
+                            const SizedBox(height: 6),
+                            InkWell(
+                              onTap: () => onSelect(cat.id, null),
+                              borderRadius: BorderRadius.circular(4),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 3),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'View all',
+                                      style: GoogleFonts.mukta(
+                                        color: const Color(0xFFC81E1E),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 14,
+                                      color: Color(0xFFC81E1E),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _MegaMenuPopupState extends State<_MegaMenuPopup> {
+class _MegaMenuLink extends StatefulWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _MegaMenuLink({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_MegaMenuLink> createState() => _MegaMenuLinkState();
+}
+
+class _MegaMenuLinkState extends State<_MegaMenuLink> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(4),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Text(
+            widget.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.mukta(
+              fontSize: 14,
+              fontWeight: (widget.isSelected || _hovered)
+                  ? FontWeight.w700
+                  : FontWeight.w500,
+              color: (widget.isSelected || _hovered)
+                  ? const Color(0xFFC81E1E)
+                  : const Color(0xFF1C1917),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ignore: unused_element
+class _UnusedMegaMenuPlaceholder extends StatefulWidget {
+  final List<CategoryItem> categories;
+  final String selectedCategoryId;
+  final String? selectedSubcategory;
+  final void Function(String categoryId, String? subcategory) onSelect;
+
+  const _UnusedMegaMenuPlaceholder({
+    required this.categories,
+    required this.selectedCategoryId,
+    required this.selectedSubcategory,
+    required this.onSelect,
+  });
+
+  @override
+  State<_UnusedMegaMenuPlaceholder> createState() => _MegaMenuPopupState();
+}
+
+class _MegaMenuPopupState extends State<_UnusedMegaMenuPlaceholder> {
   late CategoryItem _hoveredCategory;
   CategoryGroup? _hoveredGroup;
   final ScrollController _majorScrollController = ScrollController();
