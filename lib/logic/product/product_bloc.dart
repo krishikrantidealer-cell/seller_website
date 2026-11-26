@@ -11,6 +11,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingOb
   final ProductRepository productRepository;
   final WebSocketService _webSocketService;
   StreamSubscription? _wsSubscription;
+  StreamSubscription? _collectionWsSubscription;
   VoidCallback? _controllerListener;
   Timer? _syncTimer;
 
@@ -30,8 +31,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingOb
     on<SearchProductsEvent>(_onSearchProducts);
     on<ProductsExternalUpdated>(_onProductsExternalUpdated);
 
-    // 1. Subscribe to real-time product & inventory updates from WebSocket (/ws products:* & inventory:stock_update)
+    // 1. Subscribe to real-time product, inventory & collection updates from WebSocket
     _wsSubscription = _webSocketService.productUpdates.listen((_) {
+      if (!isClosed) {
+        add(const FetchProducts(isRefresh: true, isBackground: true));
+      }
+    });
+    _collectionWsSubscription = _webSocketService.collectionUpdates.listen((_) {
       if (!isClosed) {
         add(const FetchProducts(isRefresh: true, isBackground: true));
       }
@@ -69,6 +75,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> with WidgetsBindingOb
   @override
   Future<void> close() {
     _wsSubscription?.cancel();
+    _collectionWsSubscription?.cancel();
     _syncTimer?.cancel();
     if (!_isTestEnvironment) {
       WidgetsBinding.instance.removeObserver(this);

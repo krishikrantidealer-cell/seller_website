@@ -101,7 +101,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
 
   @override
   Future<List<ProductItem>> getProducts() {
-    return _fetchAllPages(ApiEndpoints.products);
+    return _fetchAllPages(
+      ApiEndpoints.products,
+      extraQuery: {'_t': '${DateTime.now().millisecondsSinceEpoch}'},
+    );
   }
 
   @override
