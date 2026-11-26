@@ -271,7 +271,7 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
           )
         else
           SizedBox(
-            height: widget.isMobile ? 310 : 334,
+            height: widget.isMobile ? 320 : 375,
             child: Row(
               children: List.generate(cardsPerPage, (i) {
                 if (i >= pageProducts.length) {

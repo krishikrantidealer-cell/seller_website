@@ -711,12 +711,12 @@ class _HomeViewState extends State<HomeView> {
       mainAxisSpacing = 12;
     } else if (constraints.maxWidth < 1520) {
       crossAxisCount = 5;
-      childAspectRatio = 0.65;
+      childAspectRatio = 0.68;
       crossAxisSpacing = 14;
       mainAxisSpacing = 14;
     } else {
       crossAxisCount = 6;
-      childAspectRatio = 0.66;
+      childAspectRatio = 0.70;
       crossAxisSpacing = 16;
       mainAxisSpacing = 16;
     }

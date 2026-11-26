@@ -83,7 +83,7 @@ class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
 
   @override
   Widget build(BuildContext context) {
-    final cardHeight = widget.isMobile ? 315.0 : 365.0;
+    final cardHeight = widget.isMobile ? 320.0 : 375.0;
 
     return LayoutBuilder(
       builder: (context, constraints) {
