@@ -252,9 +252,10 @@ class _ContinuousMarquee extends StatefulWidget {
 class _ContinuousMarqueeState extends State<_ContinuousMarquee>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _firstItemKey = GlobalKey();
   late final Ticker _ticker;
   Duration _lastElapsed = Duration.zero;
-  static const double _pixelsPerSecond = 48.0;
+  static const double _pixelsPerSecond = 45.0;
 
   @override
   void initState() {
@@ -268,14 +269,14 @@ class _ContinuousMarqueeState extends State<_ContinuousMarquee>
       _lastElapsed = elapsed;
       if (dt <= 0 || dt > 0.2) return;
 
-      final maxExtent = _scrollController.position.maxScrollExtent;
-      if (maxExtent <= 0) return;
-      final halfExtent = maxExtent / 2;
-      if (halfExtent <= 0) return;
+      final box =
+          _firstItemKey.currentContext?.findRenderObject() as RenderBox?;
+      final itemWidth = (box != null && box.hasSize) ? box.size.width : 0.0;
+      if (itemWidth <= 0) return;
 
       var next = _scrollController.offset + (_pixelsPerSecond * dt);
-      if (next >= halfExtent) {
-        next -= halfExtent;
+      if (next >= itemWidth) {
+        next -= itemWidth;
       }
       _scrollController.jumpTo(next);
     });
@@ -305,7 +306,7 @@ class _ContinuousMarqueeState extends State<_ContinuousMarquee>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(widget.text, style: style),
+            Text(widget.text, key: _firstItemKey, style: style),
             Text(widget.text, style: style),
             Text(widget.text, style: style),
           ],
