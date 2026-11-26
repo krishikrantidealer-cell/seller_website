@@ -131,6 +131,12 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
         break;
       case 'featured':
       default:
+        final catKey = _selectedCategory;
+        list.sort((a, b) {
+          final ao = (catKey != 'all' ? a.categorySortOrders[catKey] : null) ?? a.displayOrder;
+          final bo = (catKey != 'all' ? b.categorySortOrders[catKey] : null) ?? b.displayOrder;
+          return ao.compareTo(bo);
+        });
         break;
     }
 

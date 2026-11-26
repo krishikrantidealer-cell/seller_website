@@ -186,6 +186,9 @@ class ProductItem {
   final List<String> assignedCollections;
   final bool isAvailable;
   final bool isBestSeller;
+  final int displayOrder;
+  final Map<String, int> categorySortOrders;
+  final Map<String, int> collectionSortOrders;
   final String? refundPolicy;
   final double? productWeight;
   final String? productWeightUnit;
@@ -217,6 +220,9 @@ class ProductItem {
     this.assignedCollections = const [],
     this.isAvailable = true,
     this.isBestSeller = false,
+    this.displayOrder = 999999,
+    this.categorySortOrders = const {},
+    this.collectionSortOrders = const {},
     this.refundPolicy,
     this.productWeight,
     this.productWeightUnit,
@@ -227,6 +233,15 @@ class ProductItem {
     if (!isAvailable) return false;
     if (variants.isEmpty) return true;
     return variants.any((v) => v.inStock && (v.stock == null || v.stock! > 0));
+  }
+
+  static Map<String, int> _parseSortMap(dynamic raw) {
+    if (raw is! Map) return const {};
+    final out = <String, int>{};
+    raw.forEach((k, v) {
+      if (k != null && v is num) out[k.toString()] = v.toInt();
+    });
+    return out;
   }
 
   static List<ProductItem> sortInStockFirst(List<ProductItem> items) {
@@ -469,6 +484,9 @@ class ProductItem {
       assignedCollections: collections,
       isAvailable: json['isAvailable'] != false,
       isBestSeller: isFeatured,
+      displayOrder: json['displayOrder'] is num ? (json['displayOrder'] as num).toInt() : 999999,
+      categorySortOrders: _parseSortMap(json['categorySortOrders']),
+      collectionSortOrders: _parseSortMap(json['collectionSortOrders']),
       refundPolicy: json['refundPolicy']?.toString(),
       productWeight: json['productWeight'] is num ? (json['productWeight'] as num).toDouble() : null,
       productWeightUnit: json['productWeightUnit']?.toString(),
