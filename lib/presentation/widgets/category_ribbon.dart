@@ -1171,16 +1171,38 @@ class _MegaMenuPopup extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 2),
-                                child: Text(
-                                  cat.name.toUpperCase(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.mukta(
-                                    color: const Color(0xFF78716C),
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.8,
-                                  ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (CategoryIconBadge.hasAnyIcon(
+                                      categoryImageUrl: cat.categoryImageUrl,
+                                      iconUrl: cat.iconUrl,
+                                      iconEmoji: cat.icon,
+                                    )) ...[
+                                      CategoryIconBadge(
+                                        categoryImageUrl: cat.categoryImageUrl,
+                                        iconUrl: cat.iconUrl,
+                                        iconEmoji: cat.icon,
+                                        size: 18,
+                                        emojiSize: 14,
+                                        borderRadius: 4,
+                                      ),
+                                      const SizedBox(width: 7),
+                                    ],
+                                    Flexible(
+                                      child: Text(
+                                        cat.name.toUpperCase(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.mukta(
+                                          color: const Color(0xFF78716C),
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.8,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
