@@ -604,33 +604,6 @@ class _HomeViewState extends State<HomeView> {
                                 );
                               },
                             ),
-                            if (!isCatalogLoading &&
-                                !isCatalogError &&
-                                allProducts.isNotEmpty)
-                              Padding(
-                                padding: EdgeInsets.only(bottom: isMobile ? 22 : 34),
-                                child: FarmerFavouritesSection(
-                                  allProducts: allProducts,
-                                  categories: categories,
-                                  isMobile: isMobile,
-                                  onViewAll: () {
-                                    if (categories.isNotEmpty) {
-                                      _openCategoryDetail(categories.first.id, null);
-                                    }
-                                  },
-                                  onProductTap: (product) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            ProductDetailView(product: product),
-                                      ),
-                                    );
-                                  },
-                                  onAddToCart: (p, v) => _onAddToCart(p, v),
-                                  onBuyNow: (p, v) => _onBuyNow(p, v),
-                                ),
-                              ),
                             ListenableBuilder(
                               listenable: CollectionController.instance,
                               builder: (context, _) {
@@ -641,14 +614,84 @@ class _HomeViewState extends State<HomeView> {
                                     collections.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
+
+                                StoreCollection? bestSellerCol;
+                                for (final c in collections) {
+                                  if (_isBestSellerCollection(c)) {
+                                    bestSellerCol = c;
+                                    break;
+                                  }
+                                }
+
+                                final bestSellerProducts = bestSellerCol == null
+                                    ? const <ProductItem>[]
+                                    : ProductItem.sortInStockFirst(
+                                        allProducts
+                                            .where((p) =>
+                                                p.isInStock &&
+                                                bestSellerCol!.matchesProduct(p))
+                                            .toList()
+                                          ..sort((a, b) {
+                                            final ao = a.collectionSortOrders[
+                                                    bestSellerCol!.id] ??
+                                                a.displayOrder;
+                                            final bo = b.collectionSortOrders[
+                                                    bestSellerCol.id] ??
+                                                b.displayOrder;
+                                            return ao.compareTo(bo);
+                                          }),
+                                      );
+
+                                final remainingCollections = collections
+                                    .where((c) => c.id != bestSellerCol?.id)
+                                    .toList();
+
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: _buildCollectionsSections(
-                                    collections,
-                                    allProducts,
-                                    isMobile,
-                                    constraints,
-                                  ),
+                                  children: [
+                                    if (bestSellerCol != null &&
+                                        bestSellerProducts.isNotEmpty)
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            bottom: isMobile ? 22 : 34),
+                                        child: FarmerFavouritesSection(
+                                          allProducts: bestSellerProducts,
+                                          categories: categories,
+                                          isMobile: isMobile,
+                                          onViewAll: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    CollectionDetailView(
+                                                  collection: bestSellerCol!,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onProductTap: (product) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    ProductDetailView(
+                                                        product: product),
+                                              ),
+                                            );
+                                          },
+                                          onAddToCart: (p, v) =>
+                                              _onAddToCart(p, v),
+                                          onBuyNow: (p, v) => _onBuyNow(p, v),
+                                        ),
+                                      ),
+                                    if (remainingCollections.isNotEmpty)
+                                      ..._buildCollectionsSections(
+                                        remainingCollections,
+                                        allProducts,
+                                        isMobile,
+                                        constraints,
+                                      ),
+                                  ],
                                 );
                               },
                             ),
@@ -1229,6 +1272,14 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
     );
+  }
+
+  bool _isBestSellerCollection(StoreCollection col) {
+    final key = '${col.name} ${col.slug}'.toLowerCase();
+    return key.contains('best seller') ||
+        key.contains('bestseller') ||
+        key.contains('farmer favourite') ||
+        key.contains('farmer favorite');
   }
 
   List<Widget> _buildCollectionsSections(
