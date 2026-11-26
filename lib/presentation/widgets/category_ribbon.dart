@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
@@ -21,7 +23,8 @@ class CategoryRibbon extends StatefulWidget {
 
   final String selectedCategoryId;
   final String? selectedSubcategory;
-  final void Function(String categoryId, String? subcategory)? onCategorySelected;
+  final void Function(String categoryId, String? subcategory)?
+  onCategorySelected;
 
   const CategoryRibbon({
     super.key,
@@ -213,7 +216,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     Overlay.of(context).insert(entry);
   }
 
-  void _showOffersDropdown(BuildContext context, List<CategoryItem> categories) {
+  void _showOffersDropdown(
+    BuildContext context,
+    List<CategoryItem> categories,
+  ) {
     _cancelHide();
     if (_activeOpenTab == 'offers' && _overlayEntry != null) return;
 
@@ -267,7 +273,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 onTap: () {
                                   _removeOverlay();
                                   if (categories.isNotEmpty) {
-                                    widget.onCategorySelected?.call(categories.first.id, null);
+                                    widget.onCategorySelected?.call(
+                                      categories.first.id,
+                                      null,
+                                    );
                                   }
                                 },
                               ),
@@ -277,9 +286,15 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 onTap: () {
                                   _removeOverlay();
                                   if (categories.length > 1) {
-                                    widget.onCategorySelected?.call(categories[1].id, null);
+                                    widget.onCategorySelected?.call(
+                                      categories[1].id,
+                                      null,
+                                    );
                                   } else if (categories.isNotEmpty) {
-                                    widget.onCategorySelected?.call(categories.first.id, null);
+                                    widget.onCategorySelected?.call(
+                                      categories.first.id,
+                                      null,
+                                    );
                                   }
                                 },
                               ),
@@ -289,7 +304,8 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 onTap: () {
                                   _removeOverlay();
                                   MainNavHeader.globalSearchNotifier.value = '';
-                                  Navigator.of(context).popUntil((r) => r.isFirst);
+                                  Navigator.of(context)
+                                      .popUntil((r) => r.isFirst);
                                 },
                               ),
                             ],
@@ -311,7 +327,11 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   }
 
   // ignore: unused_element
-  void _showCategoryDropdown(BuildContext context, CategoryItem cat, LayerLink link) {
+  void _showCategoryDropdown(
+    BuildContext context,
+    CategoryItem cat,
+    LayerLink link,
+  ) {
     _cancelHide();
     if (_activeOpenTab == cat.id && _overlayEntry != null) return;
 
@@ -387,379 +407,454 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     return ListenableBuilder(
       listenable: CategoryController.instance,
       builder: (context, _) {
-        return _buildRibbonContent(context, CategoryController.instance.categories);
+        return _buildRibbonContent(
+          context,
+          CategoryController.instance.categories,
+        );
       },
     );
   }
 
-  Widget _buildRibbonContent(BuildContext context, List<CategoryItem> categories) {
+  Widget _buildRibbonContent(
+    BuildContext context,
+    List<CategoryItem> categories,
+  ) {
     for (final cat in categories) {
       _categoryLinks.putIfAbsent(cat.id, () => LayerLink());
     }
 
     return LayoutBuilder(
-          builder: (context, constraints) {
-            final screenWidth = MediaQuery.sizeOf(context).width;
-            final isMobile = constraints.maxWidth < 768 || screenWidth < 768;
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.sizeOf(context).width;
+        final isMobile = constraints.maxWidth < 768 || screenWidth < 768;
 
-            if (isMobile) {
-              return _buildMobileMenuBar(context, categories);
-            }
+        if (isMobile) {
+          return _buildMobileMenuBar(context, categories);
+        }
 
-            // Check scroll bounds on layout build so arrow buttons react immediately
-            WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
+        // Check scroll bounds on layout build so arrow buttons react immediately
+        WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
 
-            final isHomeActive = widget.selectedCategoryId == 'all';
-            final brandCounts = <String, int>{};
-            final brandImages = <String, List<String>>{};
-            for (final p in ProductController.instance.products) {
-              final b = p.brandName.trim().isNotEmpty
-                  ? p.brandName.trim()
-                  : p.vendor.trim();
-              if (b.isNotEmpty) {
-                brandCounts[b] = (brandCounts[b] ?? 0) + 1;
-                if (p.imageUrl.trim().isNotEmpty) {
-                  brandImages.putIfAbsent(b, () => []).add(p.imageUrl.trim());
-                }
-              }
-            }
-            final brands = brandCounts.keys.toList()
-              ..sort((a, b) {
-                final cmp = (brandCounts[b] ?? 0).compareTo(brandCounts[a] ?? 0);
-                return cmp != 0 ? cmp : a.compareTo(b);
-              });
+        final isHomeActive = widget.selectedCategoryId == 'all';
+        // Brands = actual sellers on the marketplace (grouped by sellerId / seller name).
+        // Our own brand (EBS) is shown separately in the featured card, so it's excluded here.
+        final brandCounts = <String, int>{};
+        final brandImages = <String, List<String>>{};
+        final sellerDisplayName = <String, String>{};
+        for (final p in ProductController.instance.products) {
+          final name = p.vendor.trim();
+          if (name.isEmpty) continue;
+          final key = (p.sellerId != null && p.sellerId!.trim().isNotEmpty)
+              ? p.sellerId!.trim()
+              : name.toLowerCase();
+          final display = sellerDisplayName.putIfAbsent(key, () => name);
+          if (display.toLowerCase().contains('ebs')) continue;
+          brandCounts[display] = (brandCounts[display] ?? 0) + 1;
+          if (p.imageUrl.trim().isNotEmpty) {
+            brandImages.putIfAbsent(display, () => []).add(p.imageUrl.trim());
+          }
+        }
+        final brands = brandCounts.keys.toList()
+          ..sort((a, b) {
+            final cmp = (brandCounts[b] ?? 0).compareTo(brandCounts[a] ?? 0);
+            return cmp != 0 ? cmp : a.compareTo(b);
+          });
 
-            return Container(
-              width: double.infinity,
-              height: 46,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  top: BorderSide(color: Color(0xFFF3F0EA), width: 1),
-                  bottom: BorderSide(color: Color(0xFFEAE6DF), width: 1),
-                ),
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1680),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Left Navigation Links
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                // Home Pill
-                                InkWell(
+        return Container(
+          width: double.infinity,
+          height: 46,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: Color(0xFFF3F0EA), width: 1),
+              bottom: BorderSide(color: Color(0xFFEAE6DF), width: 1),
+            ),
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Left Navigation Links
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            // Home Pill
+                            InkWell(
+                              onTap: () {
+                                _removeOverlay();
+                                MainNavHeader.globalSearchNotifier.value = '';
+                                Navigator.of(context)
+                                    .popUntil((r) => r.isFirst);
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isHomeActive
+                                      ? const Color(0xFFFDF2F2)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'Home',
+                                  style: GoogleFonts.mukta(
+                                    color: isHomeActive
+                                        ? const Color(0xFFC81E1E)
+                                        : const Color(0xFF1C1917),
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Shop Products (with Mega Menu on hover/tap)
+                            CompositedTransformTarget(
+                              link: _allCategoriesLink,
+                              child: MouseRegion(
+                                hitTestBehavior: HitTestBehavior.opaque,
+                                onEnter: (_) {
+                                  if (!isMobile)
+                                    _showMegaMenu(context, categories);
+                                },
+                                onExit: (_) {
+                                  if (!isMobile) _scheduleHide();
+                                },
+                                child: InkWell(
                                   onTap: () {
-                                    _removeOverlay();
-                                    MainNavHeader.globalSearchNotifier.value = '';
-                                    Navigator.of(context).popUntil((r) => r.isFirst);
+                                    if (_overlayEntry != null &&
+                                        _activeOpenTab == 'all') {
+                                      _removeOverlay();
+                                    } else {
+                                      _showMegaMenu(context, categories);
+                                    }
                                   },
                                   borderRadius: BorderRadius.circular(8),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isHomeActive ? const Color(0xFFFDF2F2) : Colors.transparent,
+                                      color: _activeOpenTab == 'all'
+                                          ? const Color(0xFFFDF2F2)
+                                          : Colors.transparent,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: Text(
-                                      'Home',
-                                      style: GoogleFonts.mukta(
-                                        color: isHomeActive
-                                            ? const Color(0xFFC81E1E)
-                                            : const Color(0xFF1C1917),
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Shop Products',
+                                          style: GoogleFonts.mukta(
+                                            color: _activeOpenTab == 'all'
+                                                ? const Color(0xFFC81E1E)
+                                                : const Color(0xFF1C1917),
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        AnimatedRotation(
+                                          turns: _activeOpenTab == 'all'
+                                              ? 0.5
+                                              : 0.0,
+                                          duration: const Duration(
+                                            milliseconds: 180,
+                                          ),
+                                          child: Icon(
+                                            Icons.keyboard_arrow_down_rounded,
+                                            color: _activeOpenTab == 'all'
+                                                ? const Color(0xFFC81E1E)
+                                                : const Color(0xFF57534E),
+                                            size: 17,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
 
-                                // Shop Products (with Mega Menu on hover/tap)
-                                CompositedTransformTarget(
-                                  link: _allCategoriesLink,
-                                  child: MouseRegion(
-                                    hitTestBehavior: HitTestBehavior.opaque,
-                                    onEnter: (_) {
-                                      if (!isMobile) _showMegaMenu(context, categories);
-                                    },
-                                    onExit: (_) {
-                                      if (!isMobile) _scheduleHide();
-                                    },
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (_overlayEntry != null && _activeOpenTab == 'all') {
-                                          _removeOverlay();
-                                        } else {
-                                          _showMegaMenu(context, categories);
-                                        }
-                                      },
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: _activeOpenTab == 'all'
-                                              ? const Color(0xFFFDF2F2)
-                                              : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'Shop Products',
-                                              style: GoogleFonts.mukta(
-                                                color: _activeOpenTab == 'all'
-                                                    ? const Color(0xFFC81E1E)
-                                                    : const Color(0xFF1C1917),
-                                                fontSize: 13.5,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            AnimatedRotation(
-                                              turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
-                                              duration: const Duration(milliseconds: 180),
-                                              child: Icon(
-                                                Icons.keyboard_arrow_down_rounded,
-                                                color: _activeOpenTab == 'all'
-                                                    ? const Color(0xFFC81E1E)
-                                                    : const Color(0xFF57534E),
-                                                size: 17,
-                                              ),
-                                            ),
-                                          ],
+                            // Brands Mega Menu
+                            MouseRegion(
+                              hitTestBehavior: HitTestBehavior.opaque,
+                              onEnter: (_) {
+                                if (!isMobile) {
+                                  _showBrandsMegaMenu(
+                                    context,
+                                    brands,
+                                    brandCounts,
+                                    brandImages,
+                                  );
+                                }
+                              },
+                              onExit: (_) {
+                                if (!isMobile) _scheduleHide();
+                              },
+                              child: InkWell(
+                                onTap: () {
+                                  if (_overlayEntry != null &&
+                                      _activeOpenTab == 'brands') {
+                                    _removeOverlay();
+                                  } else {
+                                    _showBrandsMegaMenu(
+                                      context,
+                                      brands,
+                                      brandCounts,
+                                      brandImages,
+                                    );
+                                  }
+                                },
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _activeOpenTab == 'brands'
+                                        ? const Color(0xFFFDF2F2)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Brands',
+                                        style: GoogleFonts.mukta(
+                                          color: _activeOpenTab == 'brands'
+                                              ? const Color(0xFFC81E1E)
+                                              : const Color(0xFF1C1917),
+                                          fontSize: 13.5,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 4),
+                                      AnimatedRotation(
+                                        turns: _activeOpenTab == 'brands'
+                                            ? 0.5
+                                            : 0.0,
+                                        duration: const Duration(
+                                          milliseconds: 180,
+                                        ),
+                                        child: Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          color: _activeOpenTab == 'brands'
+                                              ? const Color(0xFFC81E1E)
+                                              : const Color(0xFF57534E),
+                                          size: 17,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
 
-                                // Brands Mega Menu
-                                MouseRegion(
-                                  hitTestBehavior: HitTestBehavior.opaque,
-                                  onEnter: (_) {
-                                    if (!isMobile) {
-                                      _showBrandsMegaMenu(context, brands, brandCounts, brandImages);
+                            // Bulk Deals
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const BeAPartnerView(),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                child: Text(
+                                  'Bulk Deals',
+                                  style: GoogleFonts.mukta(
+                                    color: const Color(0xFF1C1917),
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Offers Dropdown
+                            CompositedTransformTarget(
+                              link: _offersLink,
+                              child: MouseRegion(
+                                hitTestBehavior: HitTestBehavior.opaque,
+                                onEnter: (_) {
+                                  if (!isMobile)
+                                    _showOffersDropdown(context, categories);
+                                },
+                                onExit: (_) {
+                                  if (!isMobile) _scheduleHide();
+                                },
+                                child: InkWell(
+                                  onTap: () {
+                                    if (_overlayEntry != null &&
+                                        _activeOpenTab == 'offers') {
+                                      _removeOverlay();
+                                    } else {
+                                      _showOffersDropdown(context, categories);
                                     }
                                   },
-                                  onExit: (_) {
-                                    if (!isMobile) _scheduleHide();
-                                  },
-                                  child: InkWell(
-                                    onTap: () {
-                                      if (_overlayEntry != null && _activeOpenTab == 'brands') {
-                                        _removeOverlay();
-                                      } else {
-                                        _showBrandsMegaMenu(context, brands, brandCounts, brandImages);
-                                      }
-                                    },
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: _activeOpenTab == 'brands'
-                                            ? const Color(0xFFFDF2F2)
-                                            : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Brands',
-                                            style: GoogleFonts.mukta(
-                                              color: _activeOpenTab == 'brands'
-                                                  ? const Color(0xFFC81E1E)
-                                                  : const Color(0xFF1C1917),
-                                              fontSize: 13.5,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          AnimatedRotation(
-                                            turns: _activeOpenTab == 'brands' ? 0.5 : 0.0,
-                                            duration: const Duration(milliseconds: 180),
-                                            child: Icon(
-                                              Icons.keyboard_arrow_down_rounded,
-                                              color: _activeOpenTab == 'brands'
-                                                  ? const Color(0xFFC81E1E)
-                                                  : const Color(0xFF57534E),
-                                              size: 17,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-
-                                // Bulk Deals
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const BeAPartnerView()),
-                                    );
-                                  },
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    child: Text(
-                                      'Bulk Deals',
-                                      style: GoogleFonts.mukta(
-                                        color: const Color(0xFF1C1917),
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-
-                                // Offers Dropdown
-                                CompositedTransformTarget(
-                                  link: _offersLink,
-                                  child: MouseRegion(
-                                    hitTestBehavior: HitTestBehavior.opaque,
-                                    onEnter: (_) {
-                                      if (!isMobile) _showOffersDropdown(context, categories);
-                                    },
-                                    onExit: (_) {
-                                      if (!isMobile) _scheduleHide();
-                                    },
-                                    child: InkWell(
-                                      onTap: () {
-                                        if (_overlayEntry != null && _activeOpenTab == 'offers') {
-                                          _removeOverlay();
-                                        } else {
-                                          _showOffersDropdown(context, categories);
-                                        }
-                                      },
+                                    decoration: BoxDecoration(
+                                      color: _activeOpenTab == 'offers'
+                                          ? const Color(0xFFFDF2F2)
+                                          : Colors.transparent,
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: _activeOpenTab == 'offers'
-                                              ? const Color(0xFFFDF2F2)
-                                              : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Offers',
+                                          style: GoogleFonts.mukta(
+                                            color: _activeOpenTab == 'offers'
+                                                ? const Color(0xFFC81E1E)
+                                                : const Color(0xFF1C1917),
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'Offers',
-                                              style: GoogleFonts.mukta(
-                                                color: _activeOpenTab == 'offers'
-                                                    ? const Color(0xFFC81E1E)
-                                                    : const Color(0xFF1C1917),
-                                                fontSize: 13.5,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            AnimatedRotation(
-                                              turns: _activeOpenTab == 'offers' ? 0.5 : 0.0,
-                                              duration: const Duration(milliseconds: 180),
-                                              child: Icon(
-                                                Icons.keyboard_arrow_down_rounded,
-                                                color: _activeOpenTab == 'offers'
-                                                    ? const Color(0xFFC81E1E)
-                                                    : const Color(0xFF57534E),
-                                                size: 17,
-                                              ),
-                                            ),
-                                          ],
+                                        const SizedBox(width: 4),
+                                        AnimatedRotation(
+                                          turns: _activeOpenTab == 'offers'
+                                              ? 0.5
+                                              : 0.0,
+                                          duration: const Duration(
+                                            milliseconds: 180,
+                                          ),
+                                          child: Icon(
+                                            Icons.keyboard_arrow_down_rounded,
+                                            color: _activeOpenTab == 'offers'
+                                                ? const Color(0xFFC81E1E)
+                                                : const Color(0xFF57534E),
+                                            size: 17,
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
 
-                                // About Us
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => const SellWithUsView()),
-                                    );
-                                  },
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    child: Text(
-                                      'About Us',
-                                      style: GoogleFonts.mukta(
-                                        color: const Color(0xFF1C1917),
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
+                            // About Us
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const SellWithUsView(),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                child: Text(
+                                  'About Us',
+                                  style: GoogleFonts.mukta(
+                                    color: const Color(0xFF1C1917),
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                              ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Right Expert Support Helpline
+                    if (screenWidth >= 900)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.phone_in_talk_outlined,
+                            size: 16,
+                            color: Color(0xFF15803D),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Expert support',
+                            style: GoogleFonts.mukta(
+                              color: const Color(0xFF15803D),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        ),
-
-                        // Right Expert Support Helpline
-                        if (screenWidth >= 900)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.phone_in_talk_outlined,
-                                size: 16,
-                                color: Color(0xFF15803D),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Expert support',
-                                style: GoogleFonts.mukta(
-                                  color: const Color(0xFF15803D),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                AppConstants.helplineNumber,
-                                style: GoogleFonts.mukta(
-                                  color: const Color(0xFF57534E),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(width: 8),
+                          Text(
+                            AppConstants.helplineNumber,
+                            style: GoogleFonts.mukta(
+                              color: const Color(0xFF57534E),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                      ],
-                    ),
-                  ),
+                        ],
+                      ),
+                  ],
                 ),
               ),
-            );
-          },
+            ),
+          ),
         );
+      },
+    );
   }
 
   /// Dedicated Mobile Category Menu Bar (clean non-scrolling full menu bar)
-  Widget _buildMobileMenuBar(BuildContext context, List<CategoryItem> categories) {
+  Widget _buildMobileMenuBar(
+    BuildContext context,
+    List<CategoryItem> categories,
+  ) {
     final isAllSelected = widget.selectedCategoryId == 'all';
     final activeCat = categories.cast<CategoryItem?>().firstWhere(
       (c) => c?.id == widget.selectedCategoryId,
       orElse: () => categories.cast<CategoryItem?>().firstWhere(
-        (c) => c?.name.toLowerCase() == widget.selectedCategoryId.toLowerCase() ||
-               c?.groups.any((g) => g.name.toLowerCase() == widget.selectedCategoryId.toLowerCase() || widget.selectedCategoryId.toLowerCase().contains(g.name.toLowerCase())) == true,
+        (c) =>
+            c?.name.toLowerCase() == widget.selectedCategoryId.toLowerCase() ||
+            c?.groups.any(
+                  (g) =>
+                      g.name.toLowerCase() ==
+                          widget.selectedCategoryId.toLowerCase() ||
+                      widget.selectedCategoryId.toLowerCase().contains(
+                        g.name.toLowerCase(),
+                      ),
+                ) ==
+                true,
         orElse: () => null,
       ),
     );
@@ -792,13 +887,19 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                           : AppColors.primaryDarkGreen,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: isAllSelected ? 0.35 : 0.6),
+                        color: Colors.white.withValues(
+                          alpha: isAllSelected ? 0.35 : 0.6,
+                        ),
                         width: 1,
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.menu_rounded, color: Colors.white, size: 18),
+                        const Icon(
+                          Icons.menu_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Row(
@@ -811,7 +912,8 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                   iconEmoji: activeCat.icon,
                                 )) ...[
                                   CategoryIconBadge(
-                                    categoryImageUrl: activeCat.categoryImageUrl,
+                                    categoryImageUrl:
+                                        activeCat.categoryImageUrl,
                                     iconUrl: activeCat.iconUrl,
                                     iconEmoji: activeCat.icon,
                                     size: 16,
@@ -857,7 +959,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                             },
                             borderRadius: BorderRadius.circular(10),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(10),
@@ -874,7 +979,11 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                     ),
                                   ),
                                   const SizedBox(width: 2),
-                                  const Icon(Icons.close_rounded, color: Colors.white, size: 12),
+                                  const Icon(
+                                    Icons.close_rounded,
+                                    color: Colors.white,
+                                    size: 12,
+                                  ),
                                 ],
                               ),
                             ),
@@ -882,7 +991,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                           const SizedBox(width: 6),
                         ],
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2.5,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(6),
@@ -899,7 +1011,11 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 ),
                               ),
                               const SizedBox(width: 2),
-                              const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 14),
+                              const Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
                             ],
                           ),
                         ),
@@ -925,7 +1041,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   }
 
   /// Mobile Bottom Sheet for ALL CATEGORIES
-  void _showMobileCategoriesSheet(BuildContext context, List<CategoryItem> categories) {
+  void _showMobileCategoriesSheet(
+    BuildContext context,
+    List<CategoryItem> categories,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -951,7 +1070,11 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               child: Row(
                 children: [
-                  const Icon(Icons.grid_view_rounded, color: AppColors.primaryGreen, size: 20),
+                  const Icon(
+                    Icons.grid_view_rounded,
+                    color: AppColors.primaryGreen,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'All Product Categories',
@@ -971,13 +1094,23 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(Icons.storefront_rounded, color: AppColors.primaryGreen),
+              leading: const Icon(
+                Icons.storefront_rounded,
+                color: AppColors.primaryGreen,
+              ),
               title: Text(
                 'Show All Products',
-                style: GoogleFonts.mukta(fontWeight: FontWeight.w600, fontSize: 14),
+                style: GoogleFonts.mukta(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
               trailing: widget.selectedCategoryId == 'all'
-                  ? const Icon(Icons.check_circle, color: AppColors.primaryGreen, size: 20)
+                  ? const Icon(
+                      Icons.check_circle,
+                      color: AppColors.primaryGreen,
+                      size: 20,
+                    )
                   : null,
               onTap: () {
                 Navigator.pop(ctx);
@@ -994,11 +1127,12 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                   final isCatSelected = widget.selectedCategoryId == cat.id;
 
                   return ExpansionTile(
-                    leading: CategoryIconBadge.hasAnyIcon(
-                      categoryImageUrl: cat.categoryImageUrl,
-                      iconUrl: cat.iconUrl,
-                      iconEmoji: cat.icon,
-                    )
+                    leading:
+                        CategoryIconBadge.hasAnyIcon(
+                          categoryImageUrl: cat.categoryImageUrl,
+                          iconUrl: cat.iconUrl,
+                          iconEmoji: cat.icon,
+                        )
                         ? CategoryIconBadge(
                             categoryImageUrl: cat.categoryImageUrl,
                             iconUrl: cat.iconUrl,
@@ -1011,15 +1145,21 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     title: Text(
                       cat.name,
                       style: GoogleFonts.mukta(
-                        fontWeight: isCatSelected ? FontWeight.w700 : FontWeight.w600,
+                        fontWeight: isCatSelected
+                            ? FontWeight.w700
+                            : FontWeight.w600,
                         fontSize: 14,
-                        color: isCatSelected ? AppColors.primaryDarkGreen : AppColors.textPrimary,
+                        color: isCatSelected
+                            ? AppColors.primaryDarkGreen
+                            : AppColors.textPrimary,
                       ),
                     ),
                     children: [
                       ListTile(
                         dense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 32),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                        ),
                         title: Text(
                           'All in ${cat.name}',
                           style: GoogleFonts.mukta(
@@ -1037,12 +1177,15 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                         ...cat.groups.map(
                           (group) => ExpansionTile(
                             dense: true,
-                            tilePadding: const EdgeInsets.symmetric(horizontal: 24),
-                            leading: CategoryIconBadge.hasAnyIcon(
-                              categoryImageUrl: group.categoryImageUrl,
-                              iconUrl: group.iconUrl,
-                              iconEmoji: group.icon,
-                            )
+                            tilePadding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                            ),
+                            leading:
+                                CategoryIconBadge.hasAnyIcon(
+                                  categoryImageUrl: group.categoryImageUrl,
+                                  iconUrl: group.iconUrl,
+                                  iconEmoji: group.icon,
+                                )
                                 ? CategoryIconBadge(
                                     categoryImageUrl: group.categoryImageUrl,
                                     iconUrl: group.iconUrl,
@@ -1063,8 +1206,15 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                             children: [
                               ListTile(
                                 dense: true,
-                                contentPadding: const EdgeInsets.only(left: 48, right: 16),
-                                leading: const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                                contentPadding: const EdgeInsets.only(
+                                  left: 48,
+                                  right: 16,
+                                ),
+                                leading: const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  size: 14,
+                                  color: AppColors.primaryGreen,
+                                ),
                                 title: Text(
                                   'All ${group.name}',
                                   style: GoogleFonts.mukta(
@@ -1075,20 +1225,38 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 ),
                                 onTap: () {
                                   Navigator.pop(ctx);
-                                  widget.onCategorySelected?.call(cat.id, group.name);
+                                  widget.onCategorySelected?.call(
+                                    cat.id,
+                                    group.name,
+                                  );
                                 },
                               ),
                               ...group.subcategories.map(
                                 (sub) => ListTile(
                                   dense: true,
-                                  contentPadding: const EdgeInsets.only(left: 48, right: 16),
-                                  title: Text(sub, style: GoogleFonts.mukta(fontSize: 12.5)),
-                                  trailing: (isCatSelected && widget.selectedSubcategory == sub)
-                                      ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                  contentPadding: const EdgeInsets.only(
+                                    left: 48,
+                                    right: 16,
+                                  ),
+                                  title: Text(
+                                    sub,
+                                    style: GoogleFonts.mukta(fontSize: 12.5),
+                                  ),
+                                  trailing:
+                                      (isCatSelected &&
+                                          widget.selectedSubcategory == sub)
+                                      ? const Icon(
+                                          Icons.check,
+                                          size: 16,
+                                          color: AppColors.primaryCrimson,
+                                        )
                                       : null,
                                   onTap: () {
                                     Navigator.pop(ctx);
-                                    widget.onCategorySelected?.call(cat.id, sub);
+                                    widget.onCategorySelected?.call(
+                                      cat.id,
+                                      sub,
+                                    );
                                   },
                                 ),
                               ),
@@ -1099,10 +1267,21 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                         ...cat.subcategories.map(
                           (sub) => ListTile(
                             dense: true,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 32),
-                            title: Text(sub, style: GoogleFonts.mukta(fontSize: 13)),
-                            trailing: (isCatSelected && widget.selectedSubcategory == sub)
-                                ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                            ),
+                            title: Text(
+                              sub,
+                              style: GoogleFonts.mukta(fontSize: 13),
+                            ),
+                            trailing:
+                                (isCatSelected &&
+                                    widget.selectedSubcategory == sub)
+                                ? const Icon(
+                                    Icons.check,
+                                    size: 16,
+                                    color: AppColors.primaryCrimson,
+                                  )
                                 : null,
                             onTap: () {
                               Navigator.pop(ctx);
@@ -1153,7 +1332,10 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     if (CategoryIconBadge.hasAnyIcon(
@@ -1191,8 +1373,17 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(Icons.check_circle_outline, color: AppColors.primaryGreen),
-                title: Text('All in ${cat.name}', style: GoogleFonts.mukta(fontWeight: FontWeight.w600, fontSize: 13.5)),
+                leading: const Icon(
+                  Icons.check_circle_outline,
+                  color: AppColors.primaryGreen,
+                ),
+                title: Text(
+                  'All in ${cat.name}',
+                  style: GoogleFonts.mukta(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13.5,
+                  ),
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   widget.onCategorySelected?.call(cat.id, null);
@@ -1205,11 +1396,12 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     if (cat.groups.isNotEmpty)
                       ...cat.groups.map(
                         (group) => ExpansionTile(
-                          leading: CategoryIconBadge.hasAnyIcon(
-                            categoryImageUrl: group.categoryImageUrl,
-                            iconUrl: group.iconUrl,
-                            iconEmoji: group.icon,
-                          )
+                          leading:
+                              CategoryIconBadge.hasAnyIcon(
+                                categoryImageUrl: group.categoryImageUrl,
+                                iconUrl: group.iconUrl,
+                                iconEmoji: group.icon,
+                              )
                               ? CategoryIconBadge(
                                   categoryImageUrl: group.categoryImageUrl,
                                   iconUrl: group.iconUrl,
@@ -1221,17 +1413,29 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                               : null,
                           title: Text(
                             group.name,
-                            style: GoogleFonts.mukta(fontSize: 13.5, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.mukta(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                           subtitle: Text(
                             '${group.subcategories.length} subcategories',
-                            style: GoogleFonts.mukta(fontSize: 11, color: AppColors.textMuted),
+                            style: GoogleFonts.mukta(
+                              fontSize: 11,
+                              color: AppColors.textMuted,
+                            ),
                           ),
                           children: [
                             ListTile(
                               dense: true,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 24),
-                              leading: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryGreen),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                              ),
+                              leading: const Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 16,
+                                color: AppColors.primaryGreen,
+                              ),
                               title: Text(
                                 'View All ${group.name}',
                                 style: GoogleFonts.mukta(
@@ -1242,17 +1446,35 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                               ),
                               onTap: () {
                                 Navigator.pop(ctx);
-                                widget.onCategorySelected?.call(cat.id, group.name);
+                                widget.onCategorySelected?.call(
+                                  cat.id,
+                                  group.name,
+                                );
                               },
                             ),
                             ...group.subcategories.map(
                               (sub) => ListTile(
                                 dense: true,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 28),
-                                leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 16, color: AppColors.textMuted),
-                                title: Text(sub, style: GoogleFonts.mukta(fontSize: 12.5)),
-                                trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
-                                    ? const Icon(Icons.check, size: 16, color: AppColors.primaryCrimson)
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 28,
+                                ),
+                                leading: const Icon(
+                                  Icons.subdirectory_arrow_right_rounded,
+                                  size: 16,
+                                  color: AppColors.textMuted,
+                                ),
+                                title: Text(
+                                  sub,
+                                  style: GoogleFonts.mukta(fontSize: 12.5),
+                                ),
+                                trailing:
+                                    (widget.selectedCategoryId == cat.id &&
+                                        widget.selectedSubcategory == sub)
+                                    ? const Icon(
+                                        Icons.check,
+                                        size: 16,
+                                        color: AppColors.primaryCrimson,
+                                      )
                                     : null,
                                 onTap: () {
                                   Navigator.pop(ctx);
@@ -1266,10 +1488,23 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     else
                       ...cat.subcategories.map(
                         (sub) => ListTile(
-                          leading: const Icon(Icons.subdirectory_arrow_right_rounded, size: 18, color: AppColors.textMuted),
-                          title: Text(sub, style: GoogleFonts.mukta(fontSize: 13)),
-                          trailing: (widget.selectedCategoryId == cat.id && widget.selectedSubcategory == sub)
-                              ? const Icon(Icons.check, size: 18, color: AppColors.primaryCrimson)
+                          leading: const Icon(
+                            Icons.subdirectory_arrow_right_rounded,
+                            size: 18,
+                            color: AppColors.textMuted,
+                          ),
+                          title: Text(
+                            sub,
+                            style: GoogleFonts.mukta(fontSize: 13),
+                          ),
+                          trailing:
+                              (widget.selectedCategoryId == cat.id &&
+                                  widget.selectedSubcategory == sub)
+                              ? const Icon(
+                                  Icons.check,
+                                  size: 18,
+                                  color: AppColors.primaryCrimson,
+                                )
                               : null,
                           onTap: () {
                             Navigator.pop(ctx);
@@ -1341,7 +1576,8 @@ class _MegaMenuPopup extends StatelessWidget {
                       : (constraints.maxWidth >= 900 ? 4 : 3);
                   final spacing = 28.0;
                   final colWidth =
-                      (constraints.maxWidth - (spacing * (colCount - 1))) / colCount;
+                      (constraints.maxWidth - (spacing * (colCount - 1))) /
+                      colCount;
 
                   return Wrap(
                     spacing: spacing,
@@ -1367,7 +1603,9 @@ class _MegaMenuPopup extends StatelessWidget {
                               onTap: () => onSelect(cat.id, null),
                               borderRadius: BorderRadius.circular(4),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 2,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -1405,7 +1643,8 @@ class _MegaMenuPopup extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
                             ...visibleItems.map((item) {
-                              final isSelected = selectedCategoryId == cat.id &&
+                              final isSelected =
+                                  selectedCategoryId == cat.id &&
                                   selectedSubcategory == item;
                               return _MegaMenuLink(
                                 label: item,
@@ -1418,7 +1657,9 @@ class _MegaMenuPopup extends StatelessWidget {
                               onTap: () => onSelect(cat.id, null),
                               borderRadius: BorderRadius.circular(4),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 3,
+                                ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -1496,7 +1737,9 @@ class _OffersMenuItemState extends State<_OffersMenuItem> {
                 style: GoogleFonts.mukta(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: _hovered ? const Color(0xFFC81E1E) : const Color(0xFF1C1917),
+                  color: _hovered
+                      ? const Color(0xFFC81E1E)
+                      : const Color(0xFF1C1917),
                   height: 1.2,
                 ),
               ),
@@ -1575,260 +1818,260 @@ class _BrandsMegaMenuPopup extends StatelessWidget {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1680),
-              child: brands.isEmpty
-                  ? Text(
-                      'No brands available',
-                      style: GoogleFonts.mukta(
-                        color: const Color(0xFF78716C),
-                        fontSize: 13.5,
-                      ),
-                    )
-                  : LayoutBuilder(
-                      builder: (context, constraints) {
-                        final topBrands = brands.take(6).toList();
-                        final featuredBrand = brands.first;
-                        final featuredProducts = ProductController.instance.products
-                            .where((p) {
-                              final b = p.brandName.trim().isNotEmpty
-                                  ? p.brandName.trim()
-                                  : p.vendor.trim();
-                              return b.toLowerCase() ==
-                                  featuredBrand.toLowerCase();
-                            })
-                            .toList();
-                        final featuredNames = featuredProducts
-                            .take(3)
-                            .map((p) => p.title.split('(').first.trim())
-                            .join(' • ');
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final topBrands = brands;
+                  const featuredBrand = 'EBS Essential Bio Crop Science';
+                  final featuredProducts = ProductController.instance.products
+                      .where(
+                        (p) =>
+                            p.vendor.toLowerCase().contains('ebs') ||
+                            p.brandName.toLowerCase().contains('ebs'),
+                      )
+                      .toList();
+                  final featuredNames = featuredProducts
+                      .take(3)
+                      .map((p) => p.title.split('(').first.trim())
+                      .join(' • ');
 
-                        return Row(
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left Column: Intro + View all brands button
+                      SizedBox(
+                        width: 230,
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Left Column: Intro + View all brands button
-                            SizedBox(
-                              width: 230,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'BRANDS',
-                                    style: GoogleFonts.mukta(
-                                      color: const Color(0xFFC81E1E),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 1.0,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'Shop by\nbrand',
-                                    style: GoogleFonts.mukta(
-                                      color: const Color(0xFF111827),
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.12,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    'Explore crop-care ranges from the brands available on EBS Krishi Dukaan.',
-                                    style: GoogleFonts.mukta(
-                                      color: const Color(0xFF57534E),
-                                      fontSize: 13,
-                                      height: 1.35,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 18),
-                                  InkWell(
-                                    onTap: () => onSelectBrand(''),
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 9,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: const Color(0xFF1C1917),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'View all brands',
-                                            style: GoogleFonts.mukta(
-                                              color: const Color(0xFF1C1917),
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          const Icon(
-                                            Icons.arrow_forward_rounded,
-                                            size: 15,
-                                            color: Color(0xFF1C1917),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            Text(
+                              'BRANDS',
+                              style: GoogleFonts.mukta(
+                                color: const Color(0xFFC81E1E),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.0,
                               ),
                             ),
-                            const SizedBox(width: 24),
-
-                            // Middle 3x2 Grid of Brand Cards
-                            Expanded(
-                              child: LayoutBuilder(
-                                builder: (context, gridCons) {
-                                  final cols = gridCons.maxWidth >= 560 ? 3 : 2;
-                                  const gap = 14.0;
-                                  final cardW =
-                                      (gridCons.maxWidth - (gap * (cols - 1))) /
-                                          cols;
-                                  return Wrap(
-                                    spacing: gap,
-                                    runSpacing: gap,
-                                    children: topBrands.map((brand) {
-                                      final count = brandCounts[brand] ?? 0;
-                                      final initials = brand
-                                          .split(RegExp(r'\s+'))
-                                          .where((w) => w.isNotEmpty)
-                                          .take(2)
-                                          .map((w) => w[0].toUpperCase())
-                                          .join();
-                                      return _BrandGridCard(
-                                        width: cardW,
-                                        brand: brand,
-                                        initials: initials.isEmpty ? 'EB' : initials,
-                                        imageUrls: brandImages[brand] ?? const [],
-                                        subtitle: '$count ${count == 1 ? 'product' : 'products'}',
-                                        onTap: () => onSelectBrand(brand),
-                                      );
-                                    }).toList(),
-                                  );
-                                },
+                            const SizedBox(height: 6),
+                            Text(
+                              'Shop by\nbrand',
+                              style: GoogleFonts.mukta(
+                                color: const Color(0xFF111827),
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                                height: 1.12,
                               ),
                             ),
-
-                            if (constraints.maxWidth >= 980) ...[
-                              const SizedBox(width: 24),
-                              // Right Featured Brand Card
-                              Container(
-                                width: 295,
-                                padding: const EdgeInsets.all(20),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Explore crop-care ranges from the brands available on EBS Krishi Dukaan.',
+                              style: GoogleFonts.mukta(
+                                color: const Color(0xFF57534E),
+                                fontSize: 13,
+                                height: 1.35,
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            InkWell(
+                              onTap: () => onSelectBrand(''),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 9,
+                                ),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(18),
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFFFDF2F2), Color(0xFFFBE5E5)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: const Color(0xFFF5D0D0),
+                                    color: const Color(0xFF1C1917),
                                   ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
+                                    Text(
+                                      'View all brands',
+                                      style: GoogleFonts.mukta(
+                                        color: const Color(0xFF1C1917),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 15,
+                                      color: Color(0xFF1C1917),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+
+                      // Middle 3x2 Grid of Brand Cards
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, gridCons) {
+                            final cols = gridCons.maxWidth >= 560 ? 3 : 2;
+                            const gap = 14.0;
+                            final cardW =
+                                (gridCons.maxWidth - (gap * (cols - 1))) / cols;
+                            if (topBrands.isEmpty) {
+                              return Text(
+                                'More sellers coming soon.',
+                                style: GoogleFonts.mukta(
+                                  color: const Color(0xFF78716C),
+                                  fontSize: 13.5,
+                                ),
+                              );
+                            }
+                            return Wrap(
+                              spacing: gap,
+                              runSpacing: gap,
+                              children: topBrands.map((brand) {
+                                final count = brandCounts[brand] ?? 0;
+                                final initials = brand
+                                    .split(RegExp(r'\s+'))
+                                    .where((w) => w.isNotEmpty)
+                                    .take(2)
+                                    .map((w) => w[0].toUpperCase())
+                                    .join();
+                                return _BrandGridCard(
+                                  width: cardW,
+                                  brand: brand,
+                                  initials: initials.isEmpty ? 'EB' : initials,
+                                  imageUrls: brandImages[brand] ?? const [],
+                                  subtitle:
+                                      '$count ${count == 1 ? 'product' : 'products'}',
+                                  onTap: () => onSelectBrand(brand),
+                                );
+                              }).toList(),
+                            );
+                          },
+                        ),
+                      ),
+
+                      if (constraints.maxWidth >= 980) ...[
+                        const SizedBox(width: 24),
+                        // Right Featured Brand Card
+                        Container(
+                          width: 295,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFDF2F2), Color(0xFFFBE5E5)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            border: Border.all(color: const Color(0xFFF5D0D0)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  featuredBrand,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.mukta(
+                                    color: const Color(0xFFC81E1E),
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              Text(
+                                'FEATURED BRAND',
+                                style: GoogleFonts.mukta(
+                                  color: const Color(0xFFC81E1E),
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '$featuredBrand crop-care range',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.mukta(
+                                  color: const Color(0xFF111827),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.15,
+                                ),
+                              ),
+                              if (featuredNames.isNotEmpty) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  featuredNames,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.mukta(
+                                    color: const Color(0xFF57534E),
+                                    fontSize: 12,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 18),
+                              ElevatedButton(
+                                onPressed: () => onSelectBrand(featuredBrand),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFC81E1E),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
                                       child: Text(
-                                        featuredBrand,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                        'Shop Brand',
                                         style: GoogleFonts.mukta(
-                                          color: const Color(0xFFC81E1E),
-                                          fontSize: 11.5,
-                                          fontWeight: FontWeight.w800,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 14),
-                                    Text(
-                                      'FEATURED BRAND',
-                                      style: GoogleFonts.mukta(
-                                        color: const Color(0xFFC81E1E),
-                                        fontSize: 10.5,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 0.8,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '$featuredBrand crop-care range',
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.mukta(
-                                        color: const Color(0xFF111827),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w800,
-                                        height: 1.15,
-                                      ),
-                                    ),
-                                    if (featuredNames.isNotEmpty) ...[
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        featuredNames,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.mukta(
-                                          color: const Color(0xFF57534E),
-                                          fontSize: 12,
-                                          height: 1.3,
-                                        ),
-                                      ),
-                                    ],
-                                    const SizedBox(height: 18),
-                                    ElevatedButton(
-                                      onPressed: () => onSelectBrand(featuredBrand),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFC81E1E),
-                                        foregroundColor: Colors.white,
-                                        elevation: 0,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 10,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              'Shop Brand',
-                                              style: GoogleFonts.mukta(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          const Icon(Icons.arrow_forward_rounded, size: 15),
-                                        ],
-                                      ),
+                                    const SizedBox(width: 6),
+                                    const Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 15,
                                     ),
                                   ],
                                 ),
                               ),
                             ],
-                          ],
-                        );
-                      },
-                    ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -1898,7 +2141,10 @@ class _BrandGridCardState extends State<_BrandGridCard> {
                 height: 68,
                 width: double.infinity,
                 color: const Color(0xFFF6F2EA),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 alignment: Alignment.center,
                 child: widget.imageUrls.isNotEmpty
                     ? Row(
@@ -1906,7 +2152,9 @@ class _BrandGridCardState extends State<_BrandGridCard> {
                         children: widget.imageUrls.take(3).map((url) {
                           return Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                              ),
                               child: AppProductImage(
                                 imageUrl: url,
                                 fit: BoxFit.contain,
@@ -1937,7 +2185,10 @@ class _BrandGridCardState extends State<_BrandGridCard> {
                       ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -2039,7 +2290,11 @@ class _MegaMenuPopupState extends State<_UnusedMegaMenuPlaceholder> {
   void initState() {
     super.initState();
     if (widget.categories.isEmpty) {
-      _hoveredCategory = const CategoryItem(id: 'all', name: 'All Products', icon: '');
+      _hoveredCategory = const CategoryItem(
+        id: 'all',
+        name: 'All Products',
+        icon: '',
+      );
       _hoveredGroup = null;
       return;
     }
@@ -2086,7 +2341,8 @@ class _MegaMenuPopupState extends State<_UnusedMegaMenuPlaceholder> {
   @override
   Widget build(BuildContext context) {
     final groups = _hoveredCategory.groups;
-    final activeGroup = _hoveredGroup ?? (groups.isNotEmpty ? groups.first : null);
+    final activeGroup =
+        _hoveredGroup ?? (groups.isNotEmpty ? groups.first : null);
 
     return NotificationListener<ScrollNotification>(
       onNotification: (_) => true,
@@ -2109,372 +2365,454 @@ class _MegaMenuPopupState extends State<_UnusedMegaMenuPlaceholder> {
           ),
           clipBehavior: Clip.antiAlias,
           child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Left Column: Major Categories
-            Container(
-              width: 220,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8FAFC),
-                border: Border(right: BorderSide(color: AppColors.border, width: 1)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Master "All Products" link
-                  InkWell(
-                    onTap: () => widget.onSelect('all', null),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      color: widget.selectedCategoryId == 'all' ? AppColors.softRose : Colors.white,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.storefront_rounded, size: 18, color: AppColors.primaryCrimson),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'All Products',
-                              style: GoogleFonts.mukta(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primaryCrimson,
-                              ),
-                            ),
-                          ),
-                          const Icon(Icons.chevron_right, size: 16, color: AppColors.primaryCrimson),
-                        ],
-                      ),
-                    ),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Left Column: Major Categories
+              Container(
+                width: 220,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF8FAFC),
+                  border: Border(
+                    right: BorderSide(color: AppColors.border, width: 1),
                   ),
-                  const Divider(height: 1, color: AppColors.border),
-
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
-                    child: Text(
-                      'MAJOR CATEGORIES',
-                      style: GoogleFonts.mukta(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textMuted,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
-
-                  // Major Categories List
-                  Expanded(
-                    child: RawScrollbar(
-                      controller: _majorScrollController,
-                      thumbVisibility: true,
-                      thickness: 4.5,
-                      radius: const Radius.circular(8),
-                      thumbColor: AppColors.primaryGreen.withValues(alpha: 0.35),
-                      child: ListView.builder(
-                        controller: _majorScrollController,
-                        physics: const ClampingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemCount: widget.categories.length,
-                        itemBuilder: (ctx, idx) {
-                          final cat = widget.categories[idx];
-                          final isHovered = _hoveredCategory.id == cat.id;
-                          final isSelected = widget.selectedCategoryId == cat.id;
-
-                          return MouseRegion(
-                            onEnter: (_) => _onHoverCategory(cat),
-                            child: InkWell(
-                              onTap: () => widget.onSelect(cat.id, null),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                                decoration: BoxDecoration(
-                                  color: isHovered
-                                      ? Colors.white
-                                      : (isSelected ? AppColors.lightGreen : Colors.transparent),
-                                  border: isHovered
-                                      ? const Border(
-                                          left: BorderSide(color: AppColors.primaryGreen, width: 3.5),
-                                        )
-                                      : null,
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (CategoryIconBadge.hasAnyIcon(
-                                      categoryImageUrl: cat.categoryImageUrl,
-                                      iconUrl: cat.iconUrl,
-                                      iconEmoji: cat.icon,
-                                    )) ...[
-                                      CategoryIconBadge(
-                                        categoryImageUrl: cat.categoryImageUrl,
-                                        iconUrl: cat.iconUrl,
-                                        iconEmoji: cat.icon,
-                                        size: 18,
-                                        emojiSize: 15,
-                                        borderRadius: 4,
-                                      ),
-                                      const SizedBox(width: 8),
-                                    ],
-                                    Expanded(
-                                      child: Text(
-                                        cat.name,
-                                        style: GoogleFonts.mukta(
-                                          fontSize: 12.5,
-                                          fontWeight: (isHovered || isSelected)
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
-                                          color: (isHovered || isSelected)
-                                              ? AppColors.primaryDarkGreen
-                                              : AppColors.textPrimary,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.chevron_right_rounded,
-                                      size: 16,
-                                      color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Middle Column: Categories under hovered Major Category
-            Container(
-              width: 220,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFAFAFA),
-                border: Border(right: BorderSide(color: AppColors.border, width: 1)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // View all in hovered major category
-                  InkWell(
-                    onTap: () => widget.onSelect(_hoveredCategory.id, null),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      color: Colors.white,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'All ${_hoveredCategory.name}',
-                              style: GoogleFonts.mukta(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.primaryDarkGreen,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const Divider(height: 1, color: AppColors.border),
-
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
-                    child: Text(
-                      'CATEGORIES',
-                      style: GoogleFonts.mukta(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textMuted,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ),
-
-                  // Categories list
-                  Expanded(
-                    child: RawScrollbar(
-                      controller: _categoriesScrollController,
-                      thumbVisibility: true,
-                      thickness: 4.5,
-                      radius: const Radius.circular(8),
-                      thumbColor: AppColors.primaryGreen.withValues(alpha: 0.35),
-                      child: ListView.builder(
-                        controller: _categoriesScrollController,
-                        physics: const ClampingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemCount: groups.length,
-                        itemBuilder: (ctx, idx) {
-                          final group = groups[idx];
-                          final isHovered = activeGroup?.name == group.name;
-
-                          return MouseRegion(
-                            onEnter: (_) => _onHoverGroup(group),
-                            child: InkWell(
-                              onTap: () => widget.onSelect(_hoveredCategory.id, group.name),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                                decoration: BoxDecoration(
-                                  color: isHovered ? Colors.white : Colors.transparent,
-                                  border: isHovered
-                                      ? const Border(
-                                          left: BorderSide(color: AppColors.primaryGreen, width: 3.5),
-                                        )
-                                      : null,
-                                ),
-                                child: Row(
-                                  children: [
-                                    if (CategoryIconBadge.hasAnyIcon(
-                                      categoryImageUrl: group.categoryImageUrl,
-                                      iconUrl: group.iconUrl,
-                                      iconEmoji: group.icon,
-                                    )) ...[
-                                      CategoryIconBadge(
-                                        categoryImageUrl: group.categoryImageUrl,
-                                        iconUrl: group.iconUrl,
-                                        iconEmoji: group.icon,
-                                        size: 16,
-                                        emojiSize: 14,
-                                        borderRadius: 4,
-                                      ),
-                                      const SizedBox(width: 8),
-                                    ],
-                                    Expanded(
-                                      child: Text(
-                                        group.name,
-                                        style: GoogleFonts.mukta(
-                                          fontSize: 12,
-                                          fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
-                                          color: isHovered ? AppColors.primaryDarkGreen : AppColors.textPrimary,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.chevron_right_rounded,
-                                      size: 15,
-                                      color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Right Column: Subcategories opening in the side
-            Expanded(
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(16),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (activeGroup != null) ...[
-                      Row(
-                        children: [
-                          if (activeGroup.icon != null) ...[
-                            Text(activeGroup.icon!, style: const TextStyle(fontSize: 18)),
+                    // Master "All Products" link
+                    InkWell(
+                      onTap: () => widget.onSelect('all', null),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        color: widget.selectedCategoryId == 'all'
+                            ? AppColors.softRose
+                            : Colors.white,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.storefront_rounded,
+                              size: 18,
+                              color: AppColors.primaryCrimson,
+                            ),
                             const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'All Products',
+                                style: GoogleFonts.mukta(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryCrimson,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.chevron_right,
+                              size: 16,
+                              color: AppColors.primaryCrimson,
+                            ),
                           ],
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  activeGroup.name,
-                                  style: GoogleFonts.mukta(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  '${activeGroup.subcategories.length} Subcategories',
-                                  style: GoogleFonts.mukta(
-                                    fontSize: 11,
-                                    color: AppColors.textMuted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => widget.onSelect(_hoveredCategory.id, activeGroup.name),
-                            style: TextButton.styleFrom(
-                              foregroundColor: AppColors.primaryGreen,
-                              backgroundColor: const Color(0xFFF0FDF4),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                            ),
-                            child: Text(
-                              'View All',
-                              style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(height: 1),
-                      const SizedBox(height: 8),
-
-                      // Subcategories List
-                      Expanded(
-                        child: RawScrollbar(
-                          controller: _subcategoriesScrollController,
-                          thumbVisibility: true,
-                          thickness: 4.5,
-                          radius: const Radius.circular(8),
-                          thumbColor: AppColors.primaryGreen.withValues(alpha: 0.35),
-                          child: ListView.separated(
-                            controller: _subcategoriesScrollController,
-                            physics: const ClampingScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            itemCount: activeGroup.subcategories.length,
-                            separatorBuilder: (_, _) => const SizedBox(height: 4),
-                            itemBuilder: (ctx, idx) {
-                              final sub = activeGroup.subcategories[idx];
-                              final isSubSelected = widget.selectedCategoryId == _hoveredCategory.id &&
-                                  widget.selectedSubcategory == sub;
-
-                              return _SubcategoryHoverItem(
-                                title: sub,
-                                isSelected: isSubSelected,
-                                onTap: () => widget.onSelect(_hoveredCategory.id, sub),
-                              );
-                            },
-                          ),
                         ),
                       ),
-                    ] else
-                      Center(
-                        child: Text(
-                          'No subcategories available',
-                          style: GoogleFonts.mukta(color: AppColors.textMuted),
+                    ),
+                    const Divider(height: 1, color: AppColors.border),
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+                      child: Text(
+                        'MAJOR CATEGORIES',
+                        style: GoogleFonts.mukta(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textMuted,
+                          letterSpacing: 0.8,
                         ),
                       ),
+                    ),
+
+                    // Major Categories List
+                    Expanded(
+                      child: RawScrollbar(
+                        controller: _majorScrollController,
+                        thumbVisibility: true,
+                        thickness: 4.5,
+                        radius: const Radius.circular(8),
+                        thumbColor: AppColors.primaryGreen.withValues(
+                          alpha: 0.35,
+                        ),
+                        child: ListView.builder(
+                          controller: _majorScrollController,
+                          physics: const ClampingScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: widget.categories.length,
+                          itemBuilder: (ctx, idx) {
+                            final cat = widget.categories[idx];
+                            final isHovered = _hoveredCategory.id == cat.id;
+                            final isSelected =
+                                widget.selectedCategoryId == cat.id;
+
+                            return MouseRegion(
+                              onEnter: (_) => _onHoverCategory(cat),
+                              child: InkWell(
+                                onTap: () => widget.onSelect(cat.id, null),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 9,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isHovered
+                                        ? Colors.white
+                                        : (isSelected
+                                              ? AppColors.lightGreen
+                                              : Colors.transparent),
+                                    border: isHovered
+                                        ? const Border(
+                                            left: BorderSide(
+                                              color: AppColors.primaryGreen,
+                                              width: 3.5,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      if (CategoryIconBadge.hasAnyIcon(
+                                        categoryImageUrl: cat.categoryImageUrl,
+                                        iconUrl: cat.iconUrl,
+                                        iconEmoji: cat.icon,
+                                      )) ...[
+                                        CategoryIconBadge(
+                                          categoryImageUrl:
+                                              cat.categoryImageUrl,
+                                          iconUrl: cat.iconUrl,
+                                          iconEmoji: cat.icon,
+                                          size: 18,
+                                          emojiSize: 15,
+                                          borderRadius: 4,
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      Expanded(
+                                        child: Text(
+                                          cat.name,
+                                          style: GoogleFonts.mukta(
+                                            fontSize: 12.5,
+                                            fontWeight:
+                                                (isHovered || isSelected)
+                                                ? FontWeight.w700
+                                                : FontWeight.w500,
+                                            color: (isHovered || isSelected)
+                                                ? AppColors.primaryDarkGreen
+                                                : AppColors.textPrimary,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.chevron_right_rounded,
+                                        size: 16,
+                                        color: isHovered
+                                            ? AppColors.primaryGreen
+                                            : Colors.grey.shade400,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-          ],
+
+              // Middle Column: Categories under hovered Major Category
+              Container(
+                width: 220,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFAFAFA),
+                  border: Border(
+                    right: BorderSide(color: AppColors.border, width: 1),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // View all in hovered major category
+                    InkWell(
+                      onTap: () => widget.onSelect(_hoveredCategory.id, null),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        color: Colors.white,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'All ${_hoveredCategory.name}',
+                                style: GoogleFonts.mukta(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryDarkGreen,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 14,
+                              color: AppColors.primaryGreen,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1, color: AppColors.border),
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 4),
+                      child: Text(
+                        'CATEGORIES',
+                        style: GoogleFonts.mukta(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textMuted,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+
+                    // Categories list
+                    Expanded(
+                      child: RawScrollbar(
+                        controller: _categoriesScrollController,
+                        thumbVisibility: true,
+                        thickness: 4.5,
+                        radius: const Radius.circular(8),
+                        thumbColor: AppColors.primaryGreen.withValues(
+                          alpha: 0.35,
+                        ),
+                        child: ListView.builder(
+                          controller: _categoriesScrollController,
+                          physics: const ClampingScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: groups.length,
+                          itemBuilder: (ctx, idx) {
+                            final group = groups[idx];
+                            final isHovered = activeGroup?.name == group.name;
+
+                            return MouseRegion(
+                              onEnter: (_) => _onHoverGroup(group),
+                              child: InkWell(
+                                onTap: () => widget.onSelect(
+                                  _hoveredCategory.id,
+                                  group.name,
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 9,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isHovered
+                                        ? Colors.white
+                                        : Colors.transparent,
+                                    border: isHovered
+                                        ? const Border(
+                                            left: BorderSide(
+                                              color: AppColors.primaryGreen,
+                                              width: 3.5,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      if (CategoryIconBadge.hasAnyIcon(
+                                        categoryImageUrl:
+                                            group.categoryImageUrl,
+                                        iconUrl: group.iconUrl,
+                                        iconEmoji: group.icon,
+                                      )) ...[
+                                        CategoryIconBadge(
+                                          categoryImageUrl:
+                                              group.categoryImageUrl,
+                                          iconUrl: group.iconUrl,
+                                          iconEmoji: group.icon,
+                                          size: 16,
+                                          emojiSize: 14,
+                                          borderRadius: 4,
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      Expanded(
+                                        child: Text(
+                                          group.name,
+                                          style: GoogleFonts.mukta(
+                                            fontSize: 12,
+                                            fontWeight: isHovered
+                                                ? FontWeight.w700
+                                                : FontWeight.w500,
+                                            color: isHovered
+                                                ? AppColors.primaryDarkGreen
+                                                : AppColors.textPrimary,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.chevron_right_rounded,
+                                        size: 15,
+                                        color: isHovered
+                                            ? AppColors.primaryGreen
+                                            : Colors.grey.shade400,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Right Column: Subcategories opening in the side
+              Expanded(
+                child: Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (activeGroup != null) ...[
+                        Row(
+                          children: [
+                            if (activeGroup.icon != null) ...[
+                              Text(
+                                activeGroup.icon!,
+                                style: const TextStyle(fontSize: 18),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activeGroup.name,
+                                    style: GoogleFonts.mukta(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    '${activeGroup.subcategories.length} Subcategories',
+                                    style: GoogleFonts.mukta(
+                                      fontSize: 11,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => widget.onSelect(
+                                _hoveredCategory.id,
+                                activeGroup.name,
+                              ),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.primaryGreen,
+                                backgroundColor: const Color(0xFFF0FDF4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                              child: Text(
+                                'View All',
+                                style: GoogleFonts.mukta(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        const Divider(height: 1),
+                        const SizedBox(height: 8),
+
+                        // Subcategories List
+                        Expanded(
+                          child: RawScrollbar(
+                            controller: _subcategoriesScrollController,
+                            thumbVisibility: true,
+                            thickness: 4.5,
+                            radius: const Radius.circular(8),
+                            thumbColor: AppColors.primaryGreen.withValues(
+                              alpha: 0.35,
+                            ),
+                            child: ListView.separated(
+                              controller: _subcategoriesScrollController,
+                              physics: const ClampingScrollPhysics(),
+                              padding: EdgeInsets.zero,
+                              itemCount: activeGroup.subcategories.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 4),
+                              itemBuilder: (ctx, idx) {
+                                final sub = activeGroup.subcategories[idx];
+                                final isSubSelected =
+                                    widget.selectedCategoryId ==
+                                        _hoveredCategory.id &&
+                                    widget.selectedSubcategory == sub;
+
+                                return _SubcategoryHoverItem(
+                                  title: sub,
+                                  isSelected: isSubSelected,
+                                  onTap: () =>
+                                      widget.onSelect(_hoveredCategory.id, sub),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ] else
+                        Center(
+                          child: Text(
+                            'No subcategories available',
+                            style: GoogleFonts.mukta(
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 /// Hoverable Subcategory List Item
@@ -2514,7 +2852,9 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
             border: Border.all(
               color: widget.isSelected
                   ? AppColors.primaryCrimson
-                  : (_isHovered ? AppColors.primaryGreen.withValues(alpha: 0.3) : Colors.transparent),
+                  : (_isHovered
+                        ? AppColors.primaryGreen.withValues(alpha: 0.3)
+                        : Colors.transparent),
             ),
           ),
           child: Row(
@@ -2524,7 +2864,9 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
                 size: 15,
                 color: widget.isSelected
                     ? AppColors.primaryCrimson
-                    : (_isHovered ? AppColors.primaryGreen : AppColors.textMuted),
+                    : (_isHovered
+                          ? AppColors.primaryGreen
+                          : AppColors.textMuted),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -2537,14 +2879,24 @@ class _SubcategoryHoverItemState extends State<_SubcategoryHoverItem> {
                         : FontWeight.w400,
                     color: widget.isSelected
                         ? AppColors.primaryCrimson
-                        : (_isHovered ? AppColors.primaryDarkGreen : AppColors.textPrimary),
+                        : (_isHovered
+                              ? AppColors.primaryDarkGreen
+                              : AppColors.textPrimary),
                   ),
                 ),
               ),
               if (widget.isSelected)
-                const Icon(Icons.check, size: 15, color: AppColors.primaryCrimson)
+                const Icon(
+                  Icons.check,
+                  size: 15,
+                  color: AppColors.primaryCrimson,
+                )
               else if (_isHovered)
-                const Icon(Icons.chevron_right, size: 15, color: AppColors.primaryGreen),
+                const Icon(
+                  Icons.chevron_right,
+                  size: 15,
+                  color: AppColors.primaryGreen,
+                ),
             ],
           ),
         ),
@@ -2612,7 +2964,10 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
     final double popupWidth = groups.isNotEmpty ? 540.0 : 320.0;
     final double popupHeight = groups.isNotEmpty
         ? 430.0
-        : ((widget.category.subcategories.length * 38.0 + 55.0).clamp(160.0, 430.0));
+        : ((widget.category.subcategories.length * 38.0 + 55.0).clamp(
+            160.0,
+            430.0,
+          ));
 
     return NotificationListener<ScrollNotification>(
       onNotification: (_) => true,
@@ -2642,14 +2997,22 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                     InkWell(
                       onTap: () => widget.onSelect(widget.category.id, null),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        color: (widget.isSelected && widget.selectedSubcategory == null)
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        color:
+                            (widget.isSelected &&
+                                widget.selectedSubcategory == null)
                             ? AppColors.softRose
                             : const Color(0xFFF9FAFB),
                         child: Row(
                           children: [
                             if (widget.category.icon.isNotEmpty) ...[
-                              Text(widget.category.icon, style: const TextStyle(fontSize: 16)),
+                              Text(
+                                widget.category.icon,
+                                style: const TextStyle(fontSize: 16),
+                              ),
                               const SizedBox(width: 10),
                             ],
                             Expanded(
@@ -2658,13 +3021,19 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                                 style: GoogleFonts.mukta(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  color: (widget.isSelected && widget.selectedSubcategory == null)
+                                  color:
+                                      (widget.isSelected &&
+                                          widget.selectedSubcategory == null)
                                       ? AppColors.primaryCrimson
                                       : AppColors.primaryDarkGreen,
                                 ),
                               ),
                             ),
-                            const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 14,
+                              color: AppColors.primaryGreen,
+                            ),
                           ],
                         ),
                       ),
@@ -2676,17 +3045,27 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                         thumbVisibility: true,
                         thickness: 4.5,
                         radius: const Radius.circular(8),
-                        thumbColor: AppColors.primaryGreen.withValues(alpha: 0.35),
+                        thumbColor: AppColors.primaryGreen.withValues(
+                          alpha: 0.35,
+                        ),
                         child: ListView(
                           controller: _subcategoriesScrollController,
-                          physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
-                          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                          physics: const AlwaysScrollableScrollPhysics(
+                            parent: ClampingScrollPhysics(),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 8,
+                          ),
                           children: widget.category.subcategories.map((sub) {
-                            final isSubSelected = widget.isSelected && widget.selectedSubcategory == sub;
+                            final isSubSelected =
+                                widget.isSelected &&
+                                widget.selectedSubcategory == sub;
                             return _SubcategoryHoverItem(
                               title: sub,
                               isSelected: isSubSelected,
-                              onTap: () => widget.onSelect(widget.category.id, sub),
+                              onTap: () =>
+                                  widget.onSelect(widget.category.id, sub),
                             );
                           }).toList(),
                         ),
@@ -2702,7 +3081,9 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                       width: 220,
                       decoration: const BoxDecoration(
                         color: Color(0xFFF8FAFC),
-                        border: Border(right: BorderSide(color: AppColors.border, width: 1)),
+                        border: Border(
+                          right: BorderSide(color: AppColors.border, width: 1),
+                        ),
                       ),
                       child: _buildCategoriesColumn(groups, activeGroup),
                     ),
@@ -2744,7 +3125,10 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               child: Row(
                 children: [
                   if (widget.category.icon.isNotEmpty) ...[
-                    Text(widget.category.icon, style: const TextStyle(fontSize: 16)),
+                    Text(
+                      widget.category.icon,
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     const SizedBox(width: 8),
                   ],
                   Expanded(
@@ -2753,14 +3137,20 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                       style: GoogleFonts.mukta(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: (widget.isSelected && widget.selectedSubcategory == null)
+                        color:
+                            (widget.isSelected &&
+                                widget.selectedSubcategory == null)
                             ? AppColors.primaryCrimson
                             : AppColors.primaryDarkGreen,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primaryGreen),
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 14,
+                    color: AppColors.primaryGreen,
+                  ),
                 ],
               ),
             ),
@@ -2792,7 +3182,9 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
             thumbColor: AppColors.primaryGreen.withValues(alpha: 0.35),
             child: ListView.builder(
               controller: _categoriesScrollController,
-              physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: ClampingScrollPhysics(),
+              ),
               padding: EdgeInsets.zero,
               itemCount: groups.length,
               itemBuilder: (ctx, idx) {
@@ -2802,14 +3194,21 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                 return MouseRegion(
                   onEnter: (_) => _onHoverGroup(group),
                   child: InkWell(
-                    onTap: () => widget.onSelect(widget.category.id, group.name),
+                    onTap: () =>
+                        widget.onSelect(widget.category.id, group.name),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: isHovered ? Colors.white : Colors.transparent,
                         border: isHovered
                             ? const Border(
-                                left: BorderSide(color: AppColors.primaryGreen, width: 3.5),
+                                left: BorderSide(
+                                  color: AppColors.primaryGreen,
+                                  width: 3.5,
+                                ),
                               )
                             : null,
                       ),
@@ -2835,7 +3234,9 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                               group.name,
                               style: GoogleFonts.mukta(
                                 fontSize: 12.5,
-                                fontWeight: isHovered ? FontWeight.w700 : FontWeight.w500,
+                                fontWeight: isHovered
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
                                 color: isHovered
                                     ? AppColors.primaryDarkGreen
                                     : AppColors.textPrimary,
@@ -2847,7 +3248,9 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                             Icon(
                               Icons.chevron_right_rounded,
                               size: 16,
-                              color: isHovered ? AppColors.primaryGreen : Colors.grey.shade400,
+                              color: isHovered
+                                  ? AppColors.primaryGreen
+                                  : Colors.grey.shade400,
                             ),
                         ],
                       ),
@@ -2876,7 +3279,11 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                   color: Color(0xFFF0FDF4),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.grid_view_rounded, size: 28, color: AppColors.primaryGreen),
+                child: const Icon(
+                  Icons.grid_view_rounded,
+                  size: 28,
+                  color: AppColors.primaryGreen,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -2903,13 +3310,21 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
                 icon: const Icon(Icons.arrow_forward_rounded, size: 14),
                 label: Text(
                   'View All Products',
-                  style: GoogleFonts.mukta(fontSize: 11.5, fontWeight: FontWeight.w600),
+                  style: GoogleFonts.mukta(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   elevation: 0,
                 ),
               ),
@@ -2926,7 +3341,11 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.category_outlined, size: 36, color: AppColors.textMuted),
+              const Icon(
+                Icons.category_outlined,
+                size: 36,
+                color: AppColors.textMuted,
+              ),
               const SizedBox(height: 8),
               Text(
                 'Explore all ${activeGroup.name} products',
@@ -2939,14 +3358,20 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               ),
               const SizedBox(height: 10),
               ElevatedButton.icon(
-                onPressed: () => widget.onSelect(widget.category.id, activeGroup.name),
+                onPressed: () =>
+                    widget.onSelect(widget.category.id, activeGroup.name),
                 icon: const Icon(Icons.arrow_forward_rounded, size: 14),
                 label: const Text('View Category Products'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryGreen,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   elevation: 0,
                 ),
               ),
@@ -2990,18 +3415,27 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
               ),
             ),
             TextButton(
-              onPressed: () => widget.onSelect(widget.category.id, activeGroup.name),
+              onPressed: () =>
+                  widget.onSelect(widget.category.id, activeGroup.name),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryGreen,
                 backgroundColor: const Color(0xFFF0FDF4),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
               ),
               child: Text(
                 'View All',
-                style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.w700),
+                style: GoogleFonts.mukta(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ],
@@ -3020,13 +3454,16 @@ class _SingleCategoryPopupState extends State<_SingleCategoryPopup> {
             thumbColor: AppColors.primaryGreen.withValues(alpha: 0.35),
             child: ListView.separated(
               controller: _subcategoriesScrollController,
-              physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: ClampingScrollPhysics(),
+              ),
               padding: EdgeInsets.zero,
               itemCount: activeGroup.subcategories.length,
               separatorBuilder: (_, _) => const SizedBox(height: 4),
               itemBuilder: (ctx, idx) {
                 final sub = activeGroup.subcategories[idx];
-                final isSubSelected = widget.isSelected && widget.selectedSubcategory == sub;
+                final isSubSelected =
+                    widget.isSelected && widget.selectedSubcategory == sub;
 
                 return _SubcategoryHoverItem(
                   title: sub,
