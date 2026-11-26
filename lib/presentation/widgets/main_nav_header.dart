@@ -357,135 +357,146 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                 children: [
                   // Brand Logo
                   _buildLogo(),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 24),
 
-                  // Search Bar + Search by Technical Name
+                  // Search Bar
                   Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, searchConstraints) {
-                        final isCompactBtn = searchConstraints.maxWidth < 300;
-
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 46,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppColors.border),
+                    child: Container(
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFAF7F2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFEAE6DF)),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 14),
+                          const Icon(
+                            Icons.search_rounded,
+                            color: Color(0xFF78716C),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: _handleSearchChanged,
+                              onSubmitted: _handleSearchSubmitted,
+                              textAlignVertical: TextAlignVertical.center,
+                              style: GoogleFonts.mukta(
+                                color: AppColors.textPrimary,
+                                fontSize: 13.5,
+                              ),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                hintText:
+                                    'Search products, crops, brands or crop problems...',
+                                hintStyle: GoogleFonts.mukta(
+                                  color: const Color(0xFF78716C),
+                                  fontSize: 13.5,
                                 ),
-                                child: TextField(
-                                  controller: _searchController,
-                                  onChanged: _handleSearchChanged,
-                                  onSubmitted: _handleSearchSubmitted,
-                                  textAlignVertical: TextAlignVertical.center,
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ),
+                          if (_searchController.text.isNotEmpty)
+                            IconButton(
+                              style: IconButton.styleFrom(
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                minimumSize: const Size(28, 36),
+                                padding: EdgeInsets.zero,
+                              ),
+                              icon: const Icon(
+                                Icons.close_rounded,
+                                color: AppColors.textMuted,
+                                size: 18,
+                              ),
+                              tooltip: 'Clear search',
+                              onPressed: _clearSearch,
+                            ),
+                          Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: SizedBox(
+                              height: 40,
+                              child: ElevatedButton(
+                                onPressed: () =>
+                                    _handleSearchSubmitted(_searchController.text),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFC81E1E),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 22),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Search',
                                   style: GoogleFonts.mukta(
-                                    color: AppColors.textPrimary,
                                     fontSize: 13.5,
-                                  ),
-                                  decoration: InputDecoration(
-                                    isDense: true,
-                                    hintText: 'Search for seeds, pesticides, fertilizers...',
-                                    hintStyle: GoogleFonts.mukta(
-                                      color: AppColors.textMuted,
-                                      fontSize: 13,
-                                    ),
-                                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 20),
-                                    prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 46),
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.zero,
-                                    suffixIconConstraints: BoxConstraints(
-                                      minWidth: _searchController.text.isNotEmpty ? 76 : 40,
-                                      minHeight: 46,
-                                    ),
-                                    suffixIcon: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        if (_searchController.text.isNotEmpty)
-                                          IconButton(
-                                            style: IconButton.styleFrom(
-                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              minimumSize: const Size(28, 36),
-                                              padding: EdgeInsets.zero,
-                                            ),
-                                            icon: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 18),
-                                            tooltip: 'Clear search',
-                                            onPressed: _clearSearch,
-                                          ),
-                                        Container(
-                                          margin: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.primaryCrimson,
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: IconButton(
-                                            style: IconButton.styleFrom(
-                                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              minimumSize: const Size(36, 36),
-                                              padding: EdgeInsets.zero,
-                                            ),
-                                            icon: const Icon(Icons.search, color: Colors.white, size: 18),
-                                            onPressed: () {
-                                              widget.onSearch?.call(_searchController.text);
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            // Search by Technical Name Button
-                            ElevatedButton.icon(
-                              onPressed: _openTechnicalSearch,
-                              icon: const Icon(Icons.science_outlined, size: 17),
-                              label: Text(
-                                isCompactBtn ? 'Technical' : 'Search by Technical',
-                                style: GoogleFonts.mukta(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12.5,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryGreen,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: isCompactBtn ? 10 : 14,
-                                  vertical: 13,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 28),
 
-                  // Right Navigation Actions
+                  // Right Navigation Actions: Account, Wishlist, Cart
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Track Order
-                      _actionItem(
-                        icon: Icons.local_shipping_outlined,
-                        label: 'Track Order',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const MyOrdersView()),
+                      // Account
+                      AnimatedBuilder(
+                        animation: AuthController.instance,
+                        builder: (context, _) {
+                          final auth = AuthController.instance;
+                          if (auth.isLoggedIn) {
+                            return _buildProfileDropdown(
+                              context,
+                              auth,
+                              isMobile: false,
+                            );
+                          }
+                          return InkWell(
+                            onTap: () => showAuthModal(context),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.person_outline_rounded,
+                                    color: Color(0xFF1C1917),
+                                    size: 22,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Account',
+                                    style: GoogleFonts.mukta(
+                                      color: const Color(0xFF1C1917),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 11.5,
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           );
                         },
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 10),
 
                       // Wishlist
                       AnimatedBuilder(
@@ -496,32 +507,49 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const WishlistView()),
+                                MaterialPageRoute(
+                                    builder: (_) => const WishlistView()),
                               );
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                              child: Row(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  if (count > 0)
-                                    Badge(
-                                      label: Text(
-                                        count.toString(),
-                                        style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.bold),
-                                      ),
-                                      backgroundColor: AppColors.primaryCrimson,
-                                      child: const Icon(Icons.favorite_rounded, color: AppColors.primaryCrimson, size: 24),
-                                    )
-                                  else
-                                    const Icon(Icons.favorite_border_rounded, color: AppColors.textPrimary, size: 24),
-                                  const SizedBox(width: 6),
+                                  count > 0
+                                      ? Badge(
+                                          label: Text(
+                                            count.toString(),
+                                            style: GoogleFonts.mukta(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          backgroundColor:
+                                              const Color(0xFFC81E1E),
+                                          child: const Icon(
+                                            Icons.favorite_rounded,
+                                            color: Color(0xFFC81E1E),
+                                            size: 22,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.favorite_border_rounded,
+                                          color: Color(0xFF1C1917),
+                                          size: 22,
+                                        ),
+                                  const SizedBox(height: 2),
                                   Text(
                                     'Wishlist',
                                     style: GoogleFonts.mukta(
-                                      color: count > 0 ? AppColors.primaryCrimson : AppColors.textPrimary,
+                                      color: count > 0
+                                          ? const Color(0xFFC81E1E)
+                                          : const Color(0xFF1C1917),
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 13.5,
+                                      fontSize: 11.5,
+                                      height: 1.1,
                                     ),
                                   ),
                                 ],
@@ -530,69 +558,51 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                           );
                         },
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 10),
 
                       // Cart
                       AnimatedBuilder(
                         animation: CartController.instance,
                         builder: (context, _) {
-                          final count = widget.cartItemCount ?? CartController.instance.totalCount;
+                          final count = widget.cartItemCount ??
+                              CartController.instance.totalCount;
                           return InkWell(
                             onTap: widget.onCartTap,
                             borderRadius: BorderRadius.circular(8),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                              child: Row(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Badge(
                                     label: Text(
                                       count.toString(),
-                                      style: GoogleFonts.mukta(fontSize: 11, fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.mukta(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                    backgroundColor: AppColors.primaryCrimson,
-                                    child: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 24),
+                                    backgroundColor: const Color(0xFFC81E1E),
+                                    child: const Icon(
+                                      Icons.shopping_bag_outlined,
+                                      color: Color(0xFF1C1917),
+                                      size: 22,
+                                    ),
                                   ),
-                                  const SizedBox(width: 6),
+                                  const SizedBox(height: 2),
                                   Text(
                                     'Cart',
                                     style: GoogleFonts.mukta(
-                                      color: AppColors.textPrimary,
+                                      color: const Color(0xFF1C1917),
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 13.5,
+                                      fontSize: 11.5,
+                                      height: 1.1,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 16),
-
-                      // My Account / Phone + OTP Login
-                      AnimatedBuilder(
-                        animation: AuthController.instance,
-                        builder: (context, _) {
-                          final auth = AuthController.instance;
-                          if (auth.isLoggedIn) {
-                            return _buildProfileDropdown(context, auth, isMobile: false);
-                          }
-
-                          return OutlinedButton.icon(
-                            onPressed: () => showAuthModal(context),
-                            icon: const Icon(Icons.person_outline_rounded, size: 18, color: AppColors.primaryGreen),
-                            label: Text(
-                              'Login / My Account',
-                              style: GoogleFonts.mukta(
-                                color: AppColors.primaryGreen,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                              ),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.primaryGreen, width: 1.5),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
                           );
                         },
@@ -657,34 +667,6 @@ class _MainNavHeaderState extends State<MainNavHeader> {
             ),
           ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _actionItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.textPrimary, size: 22),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: GoogleFonts.mukta(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
-                fontSize: 13,
-              ),
-            ),
-          ],
         ),
       ),
     );

@@ -1,15 +1,18 @@
 import 'dart:async';
-import 'dart:math' as math;
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/models/catalog_models.dart';
 import '../../data/services/category_api_service.dart';
+import '../../data/services/product_api_service.dart';
 import '../../logic/category/category_bloc.dart';
 import '../../logic/category/category_state.dart';
+import '../be_a_partner/be_a_partner_view.dart';
+import '../sell_with_us/sell_with_us_view.dart';
 import 'category_icon_badge.dart';
+import 'main_nav_header.dart';
 
 class CategoryRibbon extends StatefulWidget {
   /// Global callback to cleanly dismiss any active category hover dropdown overlay (e.g. on page scroll).
@@ -141,6 +144,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     Overlay.of(context).insert(entry);
   }
 
+  // ignore: unused_element
   void _showCategoryDropdown(BuildContext context, CategoryItem cat, LayerLink link) {
     _cancelHide();
     if (_activeOpenTab == cat.id && _overlayEntry != null) return;
@@ -239,226 +243,295 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
             // Check scroll bounds on layout build so arrow buttons react immediately
             WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
 
-            final isCompact = screenWidth < 1650;
-            final isLaptop = screenWidth < 1480;
-            final isUltraCompact = screenWidth < 1320;
-            final double allCatHPadding = isUltraCompact ? 8.0 : (isLaptop ? 9.5 : (isCompact ? 11.0 : 13.0));
-            final double allCatFontSize = isUltraCompact ? 11.0 : (isLaptop ? 11.5 : (isCompact ? 12.0 : 12.5));
+            final isHomeActive = widget.selectedCategoryId == 'all';
+            final brands = ProductController.instance.products
+                .map((p) => p.brandName.trim())
+                .where((b) => b.isNotEmpty)
+                .toSet()
+                .toList()
+              ..sort();
 
             return Container(
               width: double.infinity,
-              color: AppColors.primaryGreen,
-              height: 48,
+              height: 46,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                  top: BorderSide(color: Color(0xFFF3F0EA), width: 1),
+                  bottom: BorderSide(color: Color(0xFFEAE6DF), width: 1),
+                ),
+              ),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1680),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 8),
-
-                      // Master "ALL CATEGORIES" Tab with hover mega-menu on desktop (pinned at left)
-                      CompositedTransformTarget(
-                        link: _allCategoriesLink,
-                        child: MouseRegion(
-                          hitTestBehavior: HitTestBehavior.opaque,
-                          onEnter: (_) {
-                            if (!isMobile) _showMegaMenu(context, categories);
-                          },
-                          onExit: (_) {
-                            if (!isMobile) _scheduleHide();
-                          },
-                          child: InkWell(
-                            onTap: () {
-                              if (isMobile) {
-                                _openMobileMenu(context, categories);
-                              } else {
-                                if (_overlayEntry != null && _activeOpenTab == 'all') {
-                                  _removeOverlay();
-                                } else {
-                                  _showMegaMenu(context, categories);
-                                }
-                              }
-                            },
-                            child: Container(
-                              height: 48,
-                              padding: EdgeInsets.symmetric(horizontal: allCatHPadding),
-                              decoration: BoxDecoration(
-                                color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
-                                    ? AppColors.primaryDarkGreen
-                                    : Colors.white.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: (_activeOpenTab == 'all' || widget.selectedCategoryId == 'all')
-                                      ? Colors.white
-                                      : Colors.white.withValues(alpha: 0.2),
-                                  width: 1,
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.grid_view_rounded, color: Colors.white, size: 16),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'ALL CATEGORIES',
-                                    style: GoogleFonts.mukta(
-                                      color: Colors.white,
-                                      fontSize: allCatFontSize,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  AnimatedRotation(
-                                    turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
-                                    duration: const Duration(milliseconds: 180),
-                                    child: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white, size: 16),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(width: 4),
-                      Container(
-                        height: 24,
-                        width: 1,
-                        color: Colors.white.withValues(alpha: 0.25),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                      ),
-                      const SizedBox(width: 2),
-
-                      // Left scroll arrow button for laptop/narrow screens
-                      if (_canScrollLeft)
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              _removeOverlay();
-                              _scrollController.animateTo(
-                                math.max(0.0, _scrollController.offset - 240),
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              height: 32,
-                              width: 26,
-                              margin: const EdgeInsets.only(right: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.22),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 20),
-                            ),
-                          ),
-                        ),
-
-                      // Scrollable category tabs with responsive padding & sizing
-                      Expanded(
-                        child: NotificationListener<ScrollMetricsNotification>(
-                          onNotification: (notification) {
-                            final max = notification.metrics.maxScrollExtent;
-                            final offset = notification.metrics.pixels;
-                            final canLeft = offset > 4;
-                            final canRight = max > 8 && offset < max - 4;
-                            if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) {
-                                  setState(() {
-                                    _canScrollLeft = canLeft;
-                                    _canScrollRight = canRight;
-                                  });
-                                }
-                              });
-                            }
-                            return false;
-                          },
-                          child: NotificationListener<ScrollNotification>(
-                            onNotification: (notification) {
-                              _checkScroll();
-                              if (notification is UserScrollNotification) {
-                                _removeOverlay();
-                              }
-                              return false;
-                            },
-                            child: Listener(
-                              onPointerSignal: (pointerSignal) {
-                                if (pointerSignal is PointerScrollEvent) {
-                                  final delta = pointerSignal.scrollDelta.dy != 0
-                                      ? pointerSignal.scrollDelta.dy
-                                      : pointerSignal.scrollDelta.dx;
-                                  if (delta != 0 && _scrollController.hasClients) {
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Left Navigation Links
+                        Expanded(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                // Home Pill
+                                InkWell(
+                                  onTap: () {
                                     _removeOverlay();
-                                    final newOffset = (_scrollController.offset + delta).clamp(
-                                      0.0,
-                                      _scrollController.position.maxScrollExtent,
-                                    );
-                                    _scrollController.jumpTo(newOffset);
-                                  }
-                                }
-                              },
-                              child: SingleChildScrollView(
-                                controller: _scrollController,
-                                scrollDirection: Axis.horizontal,
-                                physics: const ClampingScrollPhysics(),
-                                child: Row(
-                                  children: [
-                                    ...categories.map(
-                                      (cat) => _buildCategoryTab(
-                                        context,
-                                        cat,
-                                        isMobile,
-                                        isCompact: isCompact,
-                                        isLaptop: isLaptop,
-                                        isUltraCompact: isUltraCompact,
+                                    MainNavHeader.globalSearchNotifier.value = '';
+                                    Navigator.of(context).popUntil((r) => r.isFirst);
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: isHomeActive ? const Color(0xFFFDF2F2) : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'Home',
+                                      style: GoogleFonts.mukta(
+                                        color: isHomeActive
+                                            ? const Color(0xFFC81E1E)
+                                            : const Color(0xFF1C1917),
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w700,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 8),
+
+                                // Shop Products (with Mega Menu on hover/tap)
+                                CompositedTransformTarget(
+                                  link: _allCategoriesLink,
+                                  child: MouseRegion(
+                                    hitTestBehavior: HitTestBehavior.opaque,
+                                    onEnter: (_) {
+                                      if (!isMobile) _showMegaMenu(context, categories);
+                                    },
+                                    onExit: (_) {
+                                      if (!isMobile) _scheduleHide();
+                                    },
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (_overlayEntry != null && _activeOpenTab == 'all') {
+                                          _removeOverlay();
+                                        } else {
+                                          _showMegaMenu(context, categories);
+                                        }
+                                      },
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Shop Products',
+                                              style: GoogleFonts.mukta(
+                                                color: _activeOpenTab == 'all'
+                                                    ? const Color(0xFFC81E1E)
+                                                    : const Color(0xFF1C1917),
+                                                fontSize: 13.5,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            AnimatedRotation(
+                                              turns: _activeOpenTab == 'all' ? 0.5 : 0.0,
+                                              duration: const Duration(milliseconds: 180),
+                                              child: Icon(
+                                                Icons.keyboard_arrow_down_rounded,
+                                                color: _activeOpenTab == 'all'
+                                                    ? const Color(0xFFC81E1E)
+                                                    : const Color(0xFF57534E),
+                                                size: 17,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Brands Dropdown
+                                PopupMenuButton<String>(
+                                  tooltip: 'Filter by Brand',
+                                  offset: const Offset(0, 38),
+                                  color: Colors.white,
+                                  onSelected: (brand) {
+                                    MainNavHeader.globalSearchNotifier.value = brand;
+                                    Navigator.of(context).popUntil((r) => r.isFirst);
+                                  },
+                                  itemBuilder: (ctx) => brands.take(20).map((b) {
+                                    return PopupMenuItem<String>(
+                                      value: b,
+                                      child: Text(
+                                        b,
+                                        style: GoogleFonts.mukta(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFF1C1917),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Brands',
+                                          style: GoogleFonts.mukta(
+                                            color: const Color(0xFF1C1917),
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          color: Color(0xFF57534E),
+                                          size: 17,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Bulk Deals
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const BeAPartnerView()),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    child: Text(
+                                      'Bulk Deals',
+                                      style: GoogleFonts.mukta(
+                                        color: const Color(0xFF1C1917),
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Offers
+                                PopupMenuButton<String>(
+                                  tooltip: 'Browse Offers',
+                                  offset: const Offset(0, 38),
+                                  color: Colors.white,
+                                  onSelected: (catId) {
+                                    widget.onCategorySelected?.call(catId, null);
+                                  },
+                                  itemBuilder: (ctx) => categories.take(8).map((c) {
+                                    return PopupMenuItem<String>(
+                                      value: c.id,
+                                      child: Text(
+                                        'Best Deals in ${c.name}',
+                                        style: GoogleFonts.mukta(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFF1C1917),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Offers',
+                                          style: GoogleFonts.mukta(
+                                            color: const Color(0xFF1C1917),
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.keyboard_arrow_down_rounded,
+                                          color: Color(0xFF57534E),
+                                          size: 17,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // About Us
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const SellWithUsView()),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                    child: Text(
+                                      'About Us',
+                                      style: GoogleFonts.mukta(
+                                        color: const Color(0xFF1C1917),
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      ),
 
-                      // Right scroll arrow button for laptop/narrow screens
-                      if (_canScrollRight)
-                        Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              _removeOverlay();
-                              _scrollController.animateTo(
-                                math.min(
-                                  _scrollController.position.maxScrollExtent,
-                                  _scrollController.offset + 240,
-                                ),
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              height: 32,
-                              width: 26,
-                              margin: const EdgeInsets.only(left: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.22),
-                                borderRadius: BorderRadius.circular(16),
+                        // Right Expert Support Helpline
+                        if (screenWidth >= 900)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.phone_in_talk_outlined,
+                                size: 16,
+                                color: Color(0xFF15803D),
                               ),
-                              child: const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
-                            ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Expert support',
+                                style: GoogleFonts.mukta(
+                                  color: const Color(0xFF15803D),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                AppConstants.helplineNumber,
+                                style: GoogleFonts.mukta(
+                                  color: const Color(0xFF57534E),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-
-                      const SizedBox(width: 6),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -637,103 +710,6 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     } else {
       _showMobileCategoriesSheet(context, categories);
     }
-  }
-
-  Widget _buildCategoryTab(
-    BuildContext context,
-    CategoryItem cat,
-    bool isMobile, {
-    bool isCompact = false,
-    bool isLaptop = false,
-    bool isUltraCompact = false,
-  }) {
-    final link = _categoryLinks.putIfAbsent(cat.id, () => LayerLink());
-    final isCategorySelected = widget.selectedCategoryId == cat.id;
-    final isOpen = _activeOpenTab == cat.id;
-    final hasDropdown = cat.groups.isNotEmpty || cat.subcategories.isNotEmpty;
-
-    final double hPadding = isUltraCompact ? 4.5 : (isLaptop ? 5.5 : (isCompact ? 7.5 : 10.5));
-    final double fontSize = isUltraCompact ? 10.8 : (isLaptop ? 11.2 : (isCompact ? 11.8 : 12.5));
-    final double iconGap = isUltraCompact ? 2.5 : (isLaptop ? 3.0 : (isCompact ? 3.5 : 4.5));
-    final double arrowSize = isUltraCompact ? 11.5 : (isLaptop ? 12.5 : (isCompact ? 13.5 : 14.5));
-
-    return CompositedTransformTarget(
-      link: link,
-      child: Builder(
-        builder: (tabContext) {
-          return MouseRegion(
-            hitTestBehavior: HitTestBehavior.opaque,
-            onEnter: (_) {
-              if (!isMobile && hasDropdown) _showCategoryDropdown(tabContext, cat, link);
-            },
-            onExit: (_) {
-              if (!isMobile && hasDropdown) _scheduleHide();
-            },
-            child: InkWell(
-              onTap: () {
-                if (isMobile) {
-                  _showMobileCategoryOptions(context, cat);
-                } else {
-                  _removeOverlay();
-                  widget.onCategorySelected?.call(cat.id, null);
-                }
-              },
-              child: Container(
-                height: 48,
-                padding: EdgeInsets.symmetric(horizontal: hPadding),
-                decoration: BoxDecoration(
-                  color: (isOpen || isCategorySelected) ? AppColors.primaryDarkGreen : Colors.transparent,
-                  border: isCategorySelected
-                      ? const Border(bottom: BorderSide(color: Colors.white, width: 3))
-                      : null,
-                ),
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (CategoryIconBadge.hasAnyIcon(
-                      categoryImageUrl: cat.categoryImageUrl,
-                      iconUrl: cat.iconUrl,
-                      iconEmoji: cat.icon,
-                    )) ...[
-                      CategoryIconBadge(
-                        categoryImageUrl: cat.categoryImageUrl,
-                        iconUrl: cat.iconUrl,
-                        iconEmoji: cat.icon,
-                        size: isUltraCompact ? 15 : 17,
-                        emojiSize: isUltraCompact ? 12.5 : 13.5,
-                        borderRadius: 4,
-                      ),
-                      SizedBox(width: iconGap),
-                    ],
-                    Text(
-                      cat.name,
-                      style: GoogleFonts.mukta(
-                        color: Colors.white,
-                        fontSize: fontSize,
-                        fontWeight: isCategorySelected ? FontWeight.w700 : FontWeight.w500,
-                      ),
-                    ),
-                    if (hasDropdown) ...[
-                      const SizedBox(width: 2.5),
-                      AnimatedRotation(
-                        turns: isOpen ? 0.5 : 0.0,
-                        duration: const Duration(milliseconds: 180),
-                        child: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Colors.white.withValues(alpha: 0.85),
-                          size: arrowSize,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 
   /// Mobile Bottom Sheet for ALL CATEGORIES
@@ -934,6 +910,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
   }
 
   /// Mobile Bottom Sheet for a single Category
+  // ignore: unused_element
   void _showMobileCategoryOptions(BuildContext context, CategoryItem cat) {
     showModalBottomSheet(
       context: context,
