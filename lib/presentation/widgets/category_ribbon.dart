@@ -11,6 +11,7 @@ import '../../logic/category/category_bloc.dart';
 import '../../logic/category/category_state.dart';
 import '../be_a_partner/be_a_partner_view.dart';
 import '../sell_with_us/sell_with_us_view.dart';
+import 'app_product_image.dart';
 import 'category_icon_badge.dart';
 import 'main_nav_header.dart';
 
@@ -158,6 +159,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     BuildContext context,
     List<String> brands,
     Map<String, int> brandCounts,
+    Map<String, List<String>> brandImages,
   ) {
     _cancelHide();
     if (_activeOpenTab == 'brands' && _overlayEntry != null) return;
@@ -191,6 +193,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                     child: _BrandsMegaMenuPopup(
                       brands: brands,
                       brandCounts: brandCounts,
+                      brandImages: brandImages,
                       onSelectBrand: (brand) {
                         _removeOverlay();
                         MainNavHeader.globalSearchNotifier.value = brand;
@@ -408,10 +411,16 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
 
             final isHomeActive = widget.selectedCategoryId == 'all';
             final brandCounts = <String, int>{};
+            final brandImages = <String, List<String>>{};
             for (final p in ProductController.instance.products) {
-              final b = p.brandName.trim();
+              final b = p.brandName.trim().isNotEmpty
+                  ? p.brandName.trim()
+                  : p.vendor.trim();
               if (b.isNotEmpty) {
                 brandCounts[b] = (brandCounts[b] ?? 0) + 1;
+                if (p.imageUrl.trim().isNotEmpty) {
+                  brandImages.putIfAbsent(b, () => []).add(p.imageUrl.trim());
+                }
               }
             }
             final brands = brandCounts.keys.toList()
@@ -538,7 +547,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                   hitTestBehavior: HitTestBehavior.opaque,
                                   onEnter: (_) {
                                     if (!isMobile) {
-                                      _showBrandsMegaMenu(context, brands, brandCounts);
+                                      _showBrandsMegaMenu(context, brands, brandCounts, brandImages);
                                     }
                                   },
                                   onExit: (_) {
@@ -549,7 +558,7 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                       if (_overlayEntry != null && _activeOpenTab == 'brands') {
                                         _removeOverlay();
                                       } else {
-                                        _showBrandsMegaMenu(context, brands, brandCounts);
+                                        _showBrandsMegaMenu(context, brands, brandCounts, brandImages);
                                       }
                                     },
                                     borderRadius: BorderRadius.circular(8),
@@ -1527,11 +1536,13 @@ class _MegaMenuLink extends StatefulWidget {
 class _BrandsMegaMenuPopup extends StatelessWidget {
   final List<String> brands;
   final Map<String, int> brandCounts;
+  final Map<String, List<String>> brandImages;
   final ValueChanged<String> onSelectBrand;
 
   const _BrandsMegaMenuPopup({
     required this.brands,
     required this.brandCounts,
+    required this.brandImages,
     required this.onSelectBrand,
   });
 
@@ -1577,9 +1588,13 @@ class _BrandsMegaMenuPopup extends StatelessWidget {
                         final topBrands = brands.take(6).toList();
                         final featuredBrand = brands.first;
                         final featuredProducts = ProductController.instance.products
-                            .where((p) =>
-                                p.brandName.trim().toLowerCase() ==
-                                featuredBrand.toLowerCase())
+                            .where((p) {
+                              final b = p.brandName.trim().isNotEmpty
+                                  ? p.brandName.trim()
+                                  : p.vendor.trim();
+                              return b.toLowerCase() ==
+                                  featuredBrand.toLowerCase();
+                            })
                             .toList();
                         final featuredNames = featuredProducts
                             .take(3)
@@ -1689,7 +1704,8 @@ class _BrandsMegaMenuPopup extends StatelessWidget {
                                         width: cardW,
                                         brand: brand,
                                         initials: initials.isEmpty ? 'EB' : initials,
-                                        subtitle: '$count products',
+                                        imageUrls: brandImages[brand] ?? const [],
+                                        subtitle: '$count ${count == 1 ? 'product' : 'products'}',
                                         onTap: () => onSelectBrand(brand),
                                       );
                                     }).toList(),
@@ -1825,6 +1841,7 @@ class _BrandGridCard extends StatefulWidget {
   final double width;
   final String brand;
   final String initials;
+  final List<String> imageUrls;
   final String subtitle;
   final VoidCallback onTap;
 
@@ -1832,6 +1849,7 @@ class _BrandGridCard extends StatefulWidget {
     required this.width,
     required this.brand,
     required this.initials,
+    required this.imageUrls,
     required this.subtitle,
     required this.onTap,
   });
@@ -1877,28 +1895,46 @@ class _BrandGridCardState extends State<_BrandGridCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: 62,
+                height: 68,
                 width: double.infinity,
-                color: const Color(0xFFF3EFE7),
+                color: const Color(0xFFF6F2EA),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 alignment: Alignment.center,
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE5DFD5)),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    widget.initials,
-                    style: GoogleFonts.mukta(
-                      color: const Color(0xFF1C1917),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
+                child: widget.imageUrls.isNotEmpty
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: widget.imageUrls.take(3).map((url) {
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              child: AppProductImage(
+                                imageUrl: url,
+                                fit: BoxFit.contain,
+                                fallbackIcon: Icons.storefront_rounded,
+                                fallbackIconSize: 22,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      )
+                    : Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFE5DFD5)),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          widget.initials,
+                          style: GoogleFonts.mukta(
+                            color: const Color(0xFF1C1917),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/localization/language_controller.dart';
 import '../be_a_partner/be_a_partner_view.dart';
@@ -15,51 +15,8 @@ class TopInfoBar extends StatefulWidget {
 class _TopInfoBarState extends State<TopInfoBar> {
   static const Color _brandRed = Color(0xFFC81E1E);
 
-  static const List<String> _announcements = [
-    'Welcome to EBS Krishi Dukaan.',
-    'Free Delivery on Orders Above ₹500 across India.',
-    '100% Genuine Agro Products • Direct from Brands.',
-  ];
-
-  int _announcementIndex = 0;
-  Timer? _autoCycleTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startAutoCycle();
-  }
-
-  void _startAutoCycle() {
-    _autoCycleTimer?.cancel();
-    _autoCycleTimer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted) return;
-      setState(() {
-        _announcementIndex = (_announcementIndex + 1) % _announcements.length;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _autoCycleTimer?.cancel();
-    super.dispose();
-  }
-
-  void _prevAnnouncement() {
-    setState(() {
-      _announcementIndex =
-          (_announcementIndex - 1 + _announcements.length) % _announcements.length;
-    });
-    _startAutoCycle();
-  }
-
-  void _nextAnnouncement() {
-    setState(() {
-      _announcementIndex = (_announcementIndex + 1) % _announcements.length;
-    });
-    _startAutoCycle();
-  }
+  static const String _marqueeText =
+      'Welcome to EBS Krishi Dukaan.   •   Free Delivery on Orders Above ₹500 across India.   •   100% Genuine Agro Products • Direct from Brands.   •   ';
 
   @override
   Widget build(BuildContext context) {
@@ -80,26 +37,10 @@ class _TopInfoBarState extends State<TopInfoBar> {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              _circleArrow(Icons.chevron_left_rounded, _prevAnnouncement),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _announcements[_announcementIndex],
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.mukta(
-                                    color: Colors.white,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              _circleArrow(Icons.chevron_right_rounded, _nextAnnouncement),
-                            ],
+                        const Expanded(
+                          child: _ContinuousMarquee(
+                            text: _marqueeText,
+                            fontSize: 11.5,
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -115,48 +56,14 @@ class _TopInfoBarState extends State<TopInfoBar> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Left Announcement Ticker
+                      // Left Continuous Single-Line Marquee
                       Expanded(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _circleArrow(Icons.chevron_left_rounded, _prevAnnouncement),
-                            const SizedBox(width: 10),
-                            Flexible(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(maxWidth: 420),
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 450),
-                                  transitionBuilder: (child, anim) => FadeTransition(
-                                    opacity: anim,
-                                    child: SlideTransition(
-                                      position: Tween<Offset>(
-                                        begin: const Offset(0.08, 0),
-                                        end: Offset.zero,
-                                      ).animate(anim),
-                                      child: child,
-                                    ),
-                                  ),
-                                  child: Align(
-                                    key: ValueKey(_announcementIndex),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      _announcements[_announcementIndex],
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.mukta(
-                                        color: Colors.white,
-                                        fontSize: fontSize,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            _circleArrow(Icons.chevron_right_rounded, _nextAnnouncement),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: _ContinuousMarquee(
+                            text: _marqueeText,
+                            fontSize: fontSize,
+                          ),
                         ),
                       ),
 
@@ -208,22 +115,6 @@ class _TopInfoBarState extends State<TopInfoBar> {
           ),
         );
       },
-    );
-  }
-
-  Widget _circleArrow(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 22,
-        height: 22,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.16),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, size: 15, color: Colors.white),
-      ),
     );
   }
 
@@ -339,6 +230,85 @@ class _TopInfoBarState extends State<TopInfoBar> {
             fontSize: fontSize,
             fontWeight: FontWeight.w600,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ContinuousMarquee extends StatefulWidget {
+  final String text;
+  final double fontSize;
+
+  const _ContinuousMarquee({
+    required this.text,
+    required this.fontSize,
+  });
+
+  @override
+  State<_ContinuousMarquee> createState() => _ContinuousMarqueeState();
+}
+
+class _ContinuousMarqueeState extends State<_ContinuousMarquee>
+    with SingleTickerProviderStateMixin {
+  final ScrollController _scrollController = ScrollController();
+  late final Ticker _ticker;
+  Duration _lastElapsed = Duration.zero;
+  static const double _pixelsPerSecond = 48.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((elapsed) {
+      if (!mounted || !_scrollController.hasClients) {
+        _lastElapsed = elapsed;
+        return;
+      }
+      final dt = (elapsed - _lastElapsed).inMicroseconds / 1000000.0;
+      _lastElapsed = elapsed;
+      if (dt <= 0 || dt > 0.2) return;
+
+      final maxExtent = _scrollController.position.maxScrollExtent;
+      if (maxExtent <= 0) return;
+      final halfExtent = maxExtent / 2;
+      if (halfExtent <= 0) return;
+
+      var next = _scrollController.offset + (_pixelsPerSecond * dt);
+      if (next >= halfExtent) {
+        next -= halfExtent;
+      }
+      _scrollController.jumpTo(next);
+    });
+    _ticker.start();
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = GoogleFonts.mukta(
+      color: Colors.white,
+      fontSize: widget.fontSize,
+      fontWeight: FontWeight.w600,
+    );
+
+    return ClipRect(
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(widget.text, style: style),
+            Text(widget.text, style: style),
+            Text(widget.text, style: style),
+          ],
         ),
       ),
     );
