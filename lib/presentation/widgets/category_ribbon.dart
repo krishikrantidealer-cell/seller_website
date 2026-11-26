@@ -153,6 +153,62 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
     Overlay.of(context).insert(entry);
   }
 
+  void _showBrandsMegaMenu(
+    BuildContext context,
+    List<String> brands,
+    Map<String, int> brandCounts,
+  ) {
+    _cancelHide();
+    if (_activeOpenTab == 'brands' && _overlayEntry != null) return;
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() => _activeOpenTab = 'brands');
+
+    double topOffset = 152.0;
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null && box.hasSize) {
+      topOffset = box.localToGlobal(Offset(0, box.size.height)).dy;
+    }
+
+    final entry = OverlayEntry(
+      builder: (ctx) => Stack(
+        children: [
+          Positioned.fill(
+            top: topOffset,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _removeOverlay,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: MouseRegion(
+                    hitTestBehavior: HitTestBehavior.opaque,
+                    onEnter: (_) => _cancelHide(),
+                    onExit: (_) => _scheduleHide(),
+                    child: _BrandsMegaMenuPopup(
+                      brands: brands,
+                      brandCounts: brandCounts,
+                      onSelectBrand: (brand) {
+                        _removeOverlay();
+                        MainNavHeader.globalSearchNotifier.value = brand;
+                        Navigator.of(context).popUntil((r) => r.isFirst);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    _overlayEntry = entry;
+    Overlay.of(context).insert(entry);
+  }
+
   // ignore: unused_element
   void _showCategoryDropdown(BuildContext context, CategoryItem cat, LayerLink link) {
     _cancelHide();
@@ -253,12 +309,18 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
             WidgetsBinding.instance.addPostFrameCallback((_) => _checkScroll());
 
             final isHomeActive = widget.selectedCategoryId == 'all';
-            final brands = ProductController.instance.products
-                .map((p) => p.brandName.trim())
-                .where((b) => b.isNotEmpty)
-                .toSet()
-                .toList()
-              ..sort();
+            final brandCounts = <String, int>{};
+            for (final p in ProductController.instance.products) {
+              final b = p.brandName.trim();
+              if (b.isNotEmpty) {
+                brandCounts[b] = (brandCounts[b] ?? 0) + 1;
+              }
+            }
+            final brands = brandCounts.keys.toList()
+              ..sort((a, b) {
+                final cmp = (brandCounts[b] ?? 0).compareTo(brandCounts[a] ?? 0);
+                return cmp != 0 ? cmp : a.compareTo(b);
+              });
 
             return Container(
               width: double.infinity,
@@ -373,48 +435,61 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 ),
                                 const SizedBox(width: 8),
 
-                                // Brands Dropdown
-                                PopupMenuButton<String>(
-                                  tooltip: 'Filter by Brand',
-                                  offset: const Offset(0, 38),
-                                  color: Colors.white,
-                                  onSelected: (brand) {
-                                    MainNavHeader.globalSearchNotifier.value = brand;
-                                    Navigator.of(context).popUntil((r) => r.isFirst);
+                                // Brands Mega Menu
+                                MouseRegion(
+                                  hitTestBehavior: HitTestBehavior.opaque,
+                                  onEnter: (_) {
+                                    if (!isMobile) {
+                                      _showBrandsMegaMenu(context, brands, brandCounts);
+                                    }
                                   },
-                                  itemBuilder: (ctx) => brands.take(20).map((b) {
-                                    return PopupMenuItem<String>(
-                                      value: b,
-                                      child: Text(
-                                        b,
-                                        style: GoogleFonts.mukta(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF1C1917),
-                                        ),
+                                  onExit: (_) {
+                                    if (!isMobile) _scheduleHide();
+                                  },
+                                  child: InkWell(
+                                    onTap: () {
+                                      if (_overlayEntry != null && _activeOpenTab == 'brands') {
+                                        _removeOverlay();
+                                      } else {
+                                        _showBrandsMegaMenu(context, brands, brandCounts);
+                                      }
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: _activeOpenTab == 'brands'
+                                            ? const Color(0xFFFDF2F2)
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                    );
-                                  }).toList(),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Brands',
-                                          style: GoogleFonts.mukta(
-                                            color: const Color(0xFF1C1917),
-                                            fontSize: 13.5,
-                                            fontWeight: FontWeight.w700,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'Brands',
+                                            style: GoogleFonts.mukta(
+                                              color: _activeOpenTab == 'brands'
+                                                  ? const Color(0xFFC81E1E)
+                                                  : const Color(0xFF1C1917),
+                                              fontSize: 13.5,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        const Icon(
-                                          Icons.keyboard_arrow_down_rounded,
-                                          color: Color(0xFF57534E),
-                                          size: 17,
-                                        ),
-                                      ],
+                                          const SizedBox(width: 4),
+                                          AnimatedRotation(
+                                            turns: _activeOpenTab == 'brands' ? 0.5 : 0.0,
+                                            duration: const Duration(milliseconds: 180),
+                                            child: Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: _activeOpenTab == 'brands'
+                                                  ? const Color(0xFFC81E1E)
+                                                  : const Color(0xFF57534E),
+                                              size: 17,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1271,6 +1346,156 @@ class _MegaMenuLink extends StatefulWidget {
 
   @override
   State<_MegaMenuLink> createState() => _MegaMenuLinkState();
+}
+
+class _BrandsMegaMenuPopup extends StatelessWidget {
+  final List<String> brands;
+  final Map<String, int> brandCounts;
+  final ValueChanged<String> onSelectBrand;
+
+  const _BrandsMegaMenuPopup({
+    required this.brands,
+    required this.brandCounts,
+    required this.onSelectBrand,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final maxH = (MediaQuery.sizeOf(context).height - 170).clamp(220.0, 440.0);
+
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        width: screenWidth,
+        constraints: BoxConstraints(maxHeight: maxH),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(
+            top: BorderSide(color: Color(0xFFF3F0EA), width: 1),
+            bottom: BorderSide(color: Color(0xFFEAE6DF), width: 1),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.10),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1680),
+              child: brands.isEmpty
+                  ? Text(
+                      'No brands available',
+                      style: GoogleFonts.mukta(
+                        color: const Color(0xFF78716C),
+                        fontSize: 13.5,
+                      ),
+                    )
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        final colCount = constraints.maxWidth >= 1200
+                            ? 4
+                            : (constraints.maxWidth >= 850 ? 3 : 2);
+                        const perColumn = 5;
+                        final maxDisplay = brands.take(colCount * perColumn).toList();
+                        final columns = <List<String>>[];
+                        for (var i = 0; i < maxDisplay.length; i += perColumn) {
+                          columns.add(
+                            maxDisplay.sublist(
+                              i,
+                              (i + perColumn).clamp(0, maxDisplay.length),
+                            ),
+                          );
+                        }
+                        const headings = [
+                          'TOP PARTNER BRANDS',
+                          'FEATURED BRANDS',
+                          'CROP CARE BRANDS',
+                          'MORE BRANDS',
+                        ];
+                        final spacing = 28.0;
+                        final colWidth =
+                            (constraints.maxWidth - (spacing * (colCount - 1))) /
+                                colCount;
+
+                        return Wrap(
+                          spacing: spacing,
+                          runSpacing: 24,
+                          children: List.generate(columns.length, (colIdx) {
+                            final colBrands = columns[colIdx];
+                            final heading = headings[colIdx % headings.length];
+                            return SizedBox(
+                              width: colWidth,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    heading,
+                                    style: GoogleFonts.mukta(
+                                      color: const Color(0xFF78716C),
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ...colBrands.map((brand) {
+                                    final count = brandCounts[brand] ?? 0;
+                                    final label = count > 0
+                                        ? '$brand ($count)'
+                                        : brand;
+                                    return _MegaMenuLink(
+                                      label: label,
+                                      isSelected: false,
+                                      onTap: () => onSelectBrand(brand),
+                                    );
+                                  }),
+                                  const SizedBox(height: 6),
+                                  InkWell(
+                                    onTap: () => onSelectBrand(''),
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 3),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'View all brands',
+                                            style: GoogleFonts.mukta(
+                                              color: const Color(0xFFC81E1E),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          const Icon(
+                                            Icons.arrow_forward_rounded,
+                                            size: 14,
+                                            color: Color(0xFFC81E1E),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        );
+                      },
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _MegaMenuLinkState extends State<_MegaMenuLink> {
