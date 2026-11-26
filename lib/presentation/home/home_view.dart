@@ -23,6 +23,7 @@ import '../widgets/main_nav_header.dart';
 import '../widgets/category_ribbon.dart';
 import '../widgets/hero_banner_carousel.dart';
 import '../widgets/product_card.dart';
+import '../widgets/recently_viewed_section.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/mobile_navigation_drawer.dart';
 import '../widgets/web_footer.dart';
@@ -568,96 +569,35 @@ class _HomeViewState extends State<HomeView> {
                                   return const SizedBox.shrink();
                                 }
                                 final recentProducts = RecentlyViewedController.instance
-                                    .resolveProducts(allProducts, limit: 6);
+                                    .resolveProducts(allProducts, limit: 12);
                                 if (recentProducts.isEmpty) {
                                   return const SizedBox.shrink();
                                 }
                                 return Padding(
                                   padding: EdgeInsets.only(bottom: isMobile ? 18 : 28),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: isMobile ? 12 : 16,
-                                          vertical: isMobile ? 10 : 12,
+                                  child: RecentlyViewedSection(
+                                    products: recentProducts,
+                                    isMobile: isMobile,
+                                    onClearHistory: () =>
+                                        RecentlyViewedController.instance.clear(),
+                                    onViewAll: () {
+                                      setState(() {
+                                        _selectedCategory = 'all';
+                                        _selectedCollectionId = null;
+                                        _searchFilter = '';
+                                      });
+                                    },
+                                    onProductTap: (product) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              ProductDetailView(product: product),
                                         ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  width: isMobile ? 3.5 : 4,
-                                                  height: isMobile ? 18 : 20,
-                                                  decoration: BoxDecoration(
-                                                    color: AppColors.primaryGreen,
-                                                    borderRadius: BorderRadius.circular(2),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Icon(
-                                                  Icons.history_rounded,
-                                                  size: 18,
-                                                  color: AppColors.primaryGreen,
-                                                ),
-                                                const SizedBox(width: 6),
-                                                Text(
-                                                  'Recently Viewed',
-                                                  style: GoogleFonts.mukta(
-                                                    fontSize: isMobile ? 16 : 19,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: AppColors.textPrimary,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                      horizontal: 8, vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(0xFFF0FDF4),
-                                                    borderRadius: BorderRadius.circular(20),
-                                                    border: Border.all(
-                                                        color: const Color(0xFFBBF7D0)),
-                                                  ),
-                                                  child: Text(
-                                                    '${recentProducts.length} items',
-                                                    style: GoogleFonts.mukta(
-                                                      fontSize: 11.5,
-                                                      fontWeight: FontWeight.w700,
-                                                      color: AppColors.primaryDarkGreen,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            TextButton(
-                                              onPressed: () =>
-                                                  RecentlyViewedController.instance.clear(),
-                                              child: Text(
-                                                'Clear',
-                                                style: GoogleFonts.mukta(
-                                                  fontSize: 12.5,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColors.textMuted,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: isMobile ? 10 : 14),
-                                      _buildProductGrid(
-                                        recentProducts,
-                                        constraints,
-                                        maxItems: 6,
-                                      ),
-                                    ],
+                                      );
+                                    },
+                                    onAddToCart: (p, v) => _onAddToCart(p, v),
+                                    onBuyNow: (p, v) => _onBuyNow(p, v),
                                   ),
                                 );
                               },
