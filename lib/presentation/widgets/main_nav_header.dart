@@ -271,7 +271,10 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               ),
                               decoration: InputDecoration(
                                 isDense: true,
-                                hintText: 'Search seeds, pesticides, fertilizers...',
+                                filled: true,
+                                fillColor: Colors.white,
+                                hoverColor: Colors.white,
+                                hintText: 'Search products, crops, brands...',
                                 hintStyle: GoogleFonts.mukta(
                                   color: AppColors.textMuted,
                                   fontSize: 12,
@@ -364,9 +367,16 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                     child: Container(
                       height: 48,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFAF7F2),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFEAE6DF)),
+                        border: Border.all(color: const Color(0xFFE5E1DA), width: 1.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -389,6 +399,9 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                               ),
                               decoration: InputDecoration(
                                 isDense: true,
+                                filled: true,
+                                fillColor: Colors.white,
+                                hoverColor: Colors.white,
                                 hintText:
                                     'Search products, crops, brands or crop problems...',
                                 hintStyle: GoogleFonts.mukta(
@@ -398,6 +411,7 @@ class _MainNavHeaderState extends State<MainNavHeader> {
                                 border: InputBorder.none,
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
                                 contentPadding: EdgeInsets.zero,
                               ),
                             ),
