@@ -35,6 +35,7 @@ class CategoryRibbon extends StatefulWidget {
 
 class _CategoryRibbonState extends State<CategoryRibbon> {
   final LayerLink _allCategoriesLink = LayerLink();
+  final LayerLink _offersLink = LayerLink();
   final Map<String, LayerLink> _categoryLinks = {};
   final ScrollController _scrollController = ScrollController();
   bool _canScrollLeft = false;
@@ -195,6 +196,103 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                         MainNavHeader.globalSearchNotifier.value = brand;
                         Navigator.of(context).popUntil((r) => r.isFirst);
                       },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    _overlayEntry = entry;
+    Overlay.of(context).insert(entry);
+  }
+
+  void _showOffersDropdown(BuildContext context, List<CategoryItem> categories) {
+    _cancelHide();
+    if (_activeOpenTab == 'offers' && _overlayEntry != null) return;
+
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() => _activeOpenTab = 'offers');
+
+    final entry = OverlayEntry(
+      builder: (ctx) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: _removeOverlay,
+              child: CompositedTransformFollower(
+                link: _offersLink,
+                showWhenUnlinked: false,
+                offset: const Offset(0, 42),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: MouseRegion(
+                      hitTestBehavior: HitTestBehavior.opaque,
+                      onEnter: (_) => _cancelHide(),
+                      onExit: (_) => _scheduleHide(),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Container(
+                          width: 248,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFFEAE6DF)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.12),
+                                blurRadius: 24,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _OffersMenuItem(
+                                title: 'Combo Packs',
+                                subtitle: 'Bundled crop-care packs',
+                                onTap: () {
+                                  _removeOverlay();
+                                  if (categories.isNotEmpty) {
+                                    widget.onCategorySelected?.call(categories.first.id, null);
+                                  }
+                                },
+                              ),
+                              _OffersMenuItem(
+                                title: 'Seasonal Offers',
+                                subtitle: 'Current season campaigns',
+                                onTap: () {
+                                  _removeOverlay();
+                                  if (categories.length > 1) {
+                                    widget.onCategorySelected?.call(categories[1].id, null);
+                                  } else if (categories.isNotEmpty) {
+                                    widget.onCategorySelected?.call(categories.first.id, null);
+                                  }
+                                },
+                              ),
+                              _OffersMenuItem(
+                                title: 'Special Offers',
+                                subtitle: 'Promotions — terms on page',
+                                onTap: () {
+                                  _removeOverlay();
+                                  MainNavHeader.globalSearchNotifier.value = '';
+                                  Navigator.of(context).popUntil((r) => r.isFirst);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -518,47 +616,62 @@ class _CategoryRibbonState extends State<CategoryRibbon> {
                                 ),
                                 const SizedBox(width: 8),
 
-                                // Offers
-                                PopupMenuButton<String>(
-                                  tooltip: 'Browse Offers',
-                                  offset: const Offset(0, 38),
-                                  color: Colors.white,
-                                  onSelected: (catId) {
-                                    widget.onCategorySelected?.call(catId, null);
-                                  },
-                                  itemBuilder: (ctx) => categories.take(8).map((c) {
-                                    return PopupMenuItem<String>(
-                                      value: c.id,
-                                      child: Text(
-                                        'Best Deals in ${c.name}',
-                                        style: GoogleFonts.mukta(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF1C1917),
+                                // Offers Dropdown
+                                CompositedTransformTarget(
+                                  link: _offersLink,
+                                  child: MouseRegion(
+                                    hitTestBehavior: HitTestBehavior.opaque,
+                                    onEnter: (_) {
+                                      if (!isMobile) _showOffersDropdown(context, categories);
+                                    },
+                                    onExit: (_) {
+                                      if (!isMobile) _scheduleHide();
+                                    },
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (_overlayEntry != null && _activeOpenTab == 'offers') {
+                                          _removeOverlay();
+                                        } else {
+                                          _showOffersDropdown(context, categories);
+                                        }
+                                      },
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: _activeOpenTab == 'offers'
+                                              ? const Color(0xFFFDF2F2)
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Offers',
+                                              style: GoogleFonts.mukta(
+                                                color: _activeOpenTab == 'offers'
+                                                    ? const Color(0xFFC81E1E)
+                                                    : const Color(0xFF1C1917),
+                                                fontSize: 13.5,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            AnimatedRotation(
+                                              turns: _activeOpenTab == 'offers' ? 0.5 : 0.0,
+                                              duration: const Duration(milliseconds: 180),
+                                              child: Icon(
+                                                Icons.keyboard_arrow_down_rounded,
+                                                color: _activeOpenTab == 'offers'
+                                                    ? const Color(0xFFC81E1E)
+                                                    : const Color(0xFF57534E),
+                                                size: 17,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    );
-                                  }).toList(),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Offers',
-                                          style: GoogleFonts.mukta(
-                                            color: const Color(0xFF1C1917),
-                                            fontSize: 13.5,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        const Icon(
-                                          Icons.keyboard_arrow_down_rounded,
-                                          color: Color(0xFF57534E),
-                                          size: 17,
-                                        ),
-                                      ],
                                     ),
                                   ),
                                 ),
@@ -1326,6 +1439,69 @@ class _MegaMenuPopup extends StatelessWidget {
                 },
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OffersMenuItem extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _OffersMenuItem({
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  State<_OffersMenuItem> createState() => _OffersMenuItemState();
+}
+
+class _OffersMenuItemState extends State<_OffersMenuItem> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: _hovered ? const Color(0xFFFDF2F2) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.title,
+                style: GoogleFonts.mukta(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: _hovered ? const Color(0xFFC81E1E) : const Color(0xFF1C1917),
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                widget.subtitle,
+                style: GoogleFonts.mukta(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF78716C),
+                  height: 1.2,
+                ),
+              ),
+            ],
           ),
         ),
       ),

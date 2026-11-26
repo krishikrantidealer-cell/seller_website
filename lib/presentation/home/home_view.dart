@@ -24,6 +24,7 @@ import '../widgets/category_ribbon.dart';
 import '../widgets/hero_banner_carousel.dart';
 import '../widgets/product_card.dart';
 import '../widgets/recently_viewed_section.dart';
+import '../widgets/farmer_favourites_section.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/mobile_navigation_drawer.dart';
 import '../widgets/web_footer.dart';
@@ -603,6 +604,33 @@ class _HomeViewState extends State<HomeView> {
                                 );
                               },
                             ),
+                            if (!isCatalogLoading &&
+                                !isCatalogError &&
+                                allProducts.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(bottom: isMobile ? 22 : 34),
+                                child: FarmerFavouritesSection(
+                                  allProducts: allProducts,
+                                  categories: categories,
+                                  isMobile: isMobile,
+                                  onViewAll: () {
+                                    if (categories.isNotEmpty) {
+                                      _openCategoryDetail(categories.first.id, null);
+                                    }
+                                  },
+                                  onProductTap: (product) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            ProductDetailView(product: product),
+                                      ),
+                                    );
+                                  },
+                                  onAddToCart: (p, v) => _onAddToCart(p, v),
+                                  onBuyNow: (p, v) => _onBuyNow(p, v),
+                                ),
+                              ),
                             ListenableBuilder(
                               listenable: CollectionController.instance,
                               builder: (context, _) {
