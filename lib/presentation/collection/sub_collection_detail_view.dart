@@ -116,10 +116,11 @@ class _SubCollectionDetailViewState extends State<SubCollectionDetailView> {
         searched.sort((a, b) => b.rating.compareTo(a.rating));
         break;
       default:
+        final subKey = widget.subCollection.id;
         final colKey = widget.collection.id;
         searched.sort((a, b) {
-          final ao = a.collectionSortOrders[colKey] ?? a.displayOrder;
-          final bo = b.collectionSortOrders[colKey] ?? b.displayOrder;
+          final ao = a.collectionSortOrders[subKey] ?? a.collectionSortOrders[colKey] ?? a.displayOrder;
+          final bo = b.collectionSortOrders[subKey] ?? b.collectionSortOrders[colKey] ?? b.displayOrder;
           return ao.compareTo(bo);
         });
         break;
