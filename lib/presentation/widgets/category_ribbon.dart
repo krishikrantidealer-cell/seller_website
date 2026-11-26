@@ -1560,7 +1560,7 @@ class _BrandsMegaMenuPopup extends StatelessWidget {
           ],
         ),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 26),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1680),
@@ -1574,86 +1574,87 @@ class _BrandsMegaMenuPopup extends StatelessWidget {
                     )
                   : LayoutBuilder(
                       builder: (context, constraints) {
-                        final colCount = constraints.maxWidth >= 1200
-                            ? 4
-                            : (constraints.maxWidth >= 850 ? 3 : 2);
-                        const perColumn = 5;
-                        final maxDisplay = brands.take(colCount * perColumn).toList();
-                        final columns = <List<String>>[];
-                        for (var i = 0; i < maxDisplay.length; i += perColumn) {
-                          columns.add(
-                            maxDisplay.sublist(
-                              i,
-                              (i + perColumn).clamp(0, maxDisplay.length),
-                            ),
-                          );
-                        }
-                        const headings = [
-                          'TOP PARTNER BRANDS',
-                          'FEATURED BRANDS',
-                          'CROP CARE BRANDS',
-                          'MORE BRANDS',
-                        ];
-                        final spacing = 28.0;
-                        final colWidth =
-                            (constraints.maxWidth - (spacing * (colCount - 1))) /
-                                colCount;
+                        final topBrands = brands.take(6).toList();
+                        final featuredBrand = brands.first;
+                        final featuredProducts = ProductController.instance.products
+                            .where((p) =>
+                                p.brandName.trim().toLowerCase() ==
+                                featuredBrand.toLowerCase())
+                            .toList();
+                        final featuredNames = featuredProducts
+                            .take(3)
+                            .map((p) => p.title.split('(').first.trim())
+                            .join(' • ');
 
-                        return Wrap(
-                          spacing: spacing,
-                          runSpacing: 24,
-                          children: List.generate(columns.length, (colIdx) {
-                            final colBrands = columns[colIdx];
-                            final heading = headings[colIdx % headings.length];
-                            return SizedBox(
-                              width: colWidth,
+                        return Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left Column: Intro + View all brands button
+                            SizedBox(
+                              width: 230,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    heading,
+                                    'BRANDS',
                                     style: GoogleFonts.mukta(
-                                      color: const Color(0xFF78716C),
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.8,
+                                      color: const Color(0xFFC81E1E),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1.0,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Shop by\nbrand',
+                                    style: GoogleFonts.mukta(
+                                      color: const Color(0xFF111827),
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.12,
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  ...colBrands.map((brand) {
-                                    final count = brandCounts[brand] ?? 0;
-                                    final label = count > 0
-                                        ? '$brand ($count)'
-                                        : brand;
-                                    return _MegaMenuLink(
-                                      label: label,
-                                      isSelected: false,
-                                      onTap: () => onSelectBrand(brand),
-                                    );
-                                  }),
-                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Explore crop-care ranges from the brands available on EBS Krishi Dukaan.',
+                                    style: GoogleFonts.mukta(
+                                      color: const Color(0xFF57534E),
+                                      fontSize: 13,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
                                   InkWell(
                                     onTap: () => onSelectBrand(''),
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 3),
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 9,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: const Color(0xFF1C1917),
+                                        ),
+                                      ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
                                             'View all brands',
                                             style: GoogleFonts.mukta(
-                                              color: const Color(0xFFC81E1E),
+                                              color: const Color(0xFF1C1917),
                                               fontSize: 13,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
-                                          const SizedBox(width: 4),
+                                          const SizedBox(width: 6),
                                           const Icon(
                                             Icons.arrow_forward_rounded,
-                                            size: 14,
-                                            color: Color(0xFFC81E1E),
+                                            size: 15,
+                                            color: Color(0xFF1C1917),
                                           ),
                                         ],
                                       ),
@@ -1661,12 +1662,278 @@ class _BrandsMegaMenuPopup extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                            );
-                          }),
+                            ),
+                            const SizedBox(width: 24),
+
+                            // Middle 3x2 Grid of Brand Cards
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, gridCons) {
+                                  final cols = gridCons.maxWidth >= 560 ? 3 : 2;
+                                  const gap = 14.0;
+                                  final cardW =
+                                      (gridCons.maxWidth - (gap * (cols - 1))) /
+                                          cols;
+                                  return Wrap(
+                                    spacing: gap,
+                                    runSpacing: gap,
+                                    children: topBrands.map((brand) {
+                                      final count = brandCounts[brand] ?? 0;
+                                      final initials = brand
+                                          .split(RegExp(r'\s+'))
+                                          .where((w) => w.isNotEmpty)
+                                          .take(2)
+                                          .map((w) => w[0].toUpperCase())
+                                          .join();
+                                      return _BrandGridCard(
+                                        width: cardW,
+                                        brand: brand,
+                                        initials: initials.isEmpty ? 'EB' : initials,
+                                        subtitle: '$count products',
+                                        onTap: () => onSelectBrand(brand),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                            ),
+
+                            if (constraints.maxWidth >= 980) ...[
+                              const SizedBox(width: 24),
+                              // Right Featured Brand Card
+                              Container(
+                                width: 295,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFFDF2F2), Color(0xFFFBE5E5)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  border: Border.all(
+                                    color: const Color(0xFFF5D0D0),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        featuredBrand,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.mukta(
+                                          color: const Color(0xFFC81E1E),
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 14),
+                                    Text(
+                                      'FEATURED BRAND',
+                                      style: GoogleFonts.mukta(
+                                        color: const Color(0xFFC81E1E),
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.8,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '$featuredBrand crop-care range',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.mukta(
+                                        color: const Color(0xFF111827),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800,
+                                        height: 1.15,
+                                      ),
+                                    ),
+                                    if (featuredNames.isNotEmpty) ...[
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        featuredNames,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.mukta(
+                                          color: const Color(0xFF57534E),
+                                          fontSize: 12,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 18),
+                                    ElevatedButton(
+                                      onPressed: () => onSelectBrand(featuredBrand),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFFC81E1E),
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 10,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              'Shop Brand',
+                                              style: GoogleFonts.mukta(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          const Icon(Icons.arrow_forward_rounded, size: 15),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
                         );
                       },
                     ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BrandGridCard extends StatefulWidget {
+  final double width;
+  final String brand;
+  final String initials;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _BrandGridCard({
+    required this.width,
+    required this.brand,
+    required this.initials,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  State<_BrandGridCard> createState() => _BrandGridCardState();
+}
+
+class _BrandGridCardState extends State<_BrandGridCard> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          width: widget.width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _hovered
+                  ? const Color(0xFFC81E1E)
+                  : const Color(0xFFEAE6DF),
+            ),
+            boxShadow: _hovered
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 62,
+                width: double.infinity,
+                color: const Color(0xFFF3EFE7),
+                alignment: Alignment.center,
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE5DFD5)),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.initials,
+                    style: GoogleFonts.mukta(
+                      color: const Color(0xFF1C1917),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.brand,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.mukta(
+                        color: _hovered
+                            ? const Color(0xFFC81E1E)
+                            : const Color(0xFF1C1917),
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      widget.subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.mukta(
+                        color: const Color(0xFF78716C),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

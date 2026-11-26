@@ -27,7 +27,6 @@ class ProductCard extends StatefulWidget {
 class _ProductCardState extends State<ProductCard> {
   static const Color _brandRed = Color(0xFFC81E1E);
   static const Color _darkCharcoal = Color(0xFF1F2937);
-  static const Color _imageTint = Color(0xFFF6EFE6);
 
   late ProductVariant _selectedVariant;
 
@@ -115,7 +114,7 @@ class _ProductCardState extends State<ProductCard> {
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: _imageTint,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: const Color(0xFFF0ECE4)),
                           ),
@@ -123,14 +122,15 @@ class _ProductCardState extends State<ProductCard> {
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              AppProductImage(
-                                imageUrl: widget.product.imageUrl,
-                                fallbackUrls: widget.product.imageUrls,
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                                fallbackIcon: Icons.agriculture_rounded,
-                                fallbackIconSize: 44,
+                              Padding(
+                                padding: EdgeInsets.all(isCompact ? 4 : 6),
+                                child: AppProductImage(
+                                  imageUrl: widget.product.imageUrl,
+                                  fallbackUrls: widget.product.imageUrls,
+                                  fit: BoxFit.contain,
+                                  fallbackIcon: Icons.agriculture_rounded,
+                                  fallbackIconSize: 44,
+                                ),
                               ),
                               if (discount > 0)
                                 Positioned(
