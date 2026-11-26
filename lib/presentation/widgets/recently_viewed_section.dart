@@ -83,156 +83,174 @@ class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
 
   @override
   Widget build(BuildContext context) {
-    final cardWidth = widget.isMobile ? 185.0 : 230.0;
     final cardHeight = widget.isMobile ? 315.0 : 365.0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header Row: "Recently Viewed" + "Clear History" + "View All ->"
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableW = constraints.maxWidth;
+        final visibleCount = availableW >= 1280
+            ? 6
+            : (availableW >= 1000
+                ? 5
+                : (availableW >= 760
+                    ? 4
+                    : (availableW >= 520 ? 3 : 2)));
+        final gap = widget.isMobile ? 10.0 : 14.0;
+        final cardWidth =
+            ((availableW - (gap * (visibleCount - 1))) / visibleCount)
+                .clamp(155.0, 290.0);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Flexible(
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Recently ',
-                      style: GoogleFonts.mukta(
-                        fontSize: widget.isMobile ? 20 : 26,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF111827),
-                        height: 1.15,
-                      ),
-                    ),
-                    TextSpan(
-                      text: 'Viewed',
-                      style: GoogleFonts.mukta(
-                        fontSize: widget.isMobile ? 20 : 26,
-                        fontWeight: FontWeight.w800,
-                        color: _brandRed,
-                        height: 1.15,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Header Row: "Recently Viewed" + "Clear History" + "View All ->"
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                InkWell(
-                  onTap: widget.onClearHistory,
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: widget.isMobile ? 9 : 13,
-                      vertical: widget.isMobile ? 5 : 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFD6D3D1)),
-                    ),
-                    child: Text(
-                      'Clear History',
-                      style: GoogleFonts.mukta(
-                        fontSize: widget.isMobile ? 11.5 : 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1C1917),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: widget.isMobile ? 10 : 14),
-                InkWell(
-                  onTap: widget.onViewAll,
-                  borderRadius: BorderRadius.circular(6),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                Flexible(
+                  child: RichText(
+                    text: TextSpan(
                       children: [
-                        Text(
-                          'View All',
+                        TextSpan(
+                          text: 'Recently ',
                           style: GoogleFonts.mukta(
-                            fontSize: widget.isMobile ? 12.5 : 13.5,
-                            fontWeight: FontWeight.w700,
-                            color: _brandRed,
+                            fontSize: widget.isMobile ? 20 : 26,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF111827),
+                            height: 1.15,
                           ),
                         ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 16,
-                          color: _brandRed,
+                        TextSpan(
+                          text: 'Viewed',
+                          style: GoogleFonts.mukta(
+                            fontSize: widget.isMobile ? 20 : 26,
+                            fontWeight: FontWeight.w800,
+                            color: _brandRed,
+                            height: 1.15,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: widget.onClearHistory,
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: widget.isMobile ? 9 : 13,
+                          vertical: widget.isMobile ? 5 : 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFD6D3D1)),
+                        ),
+                        child: Text(
+                          'Clear History',
+                          style: GoogleFonts.mukta(
+                            fontSize: widget.isMobile ? 11.5 : 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1C1917),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: widget.isMobile ? 10 : 14),
+                    InkWell(
+                      onTap: widget.onViewAll,
+                      borderRadius: BorderRadius.circular(6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'View All',
+                              style: GoogleFonts.mukta(
+                                fontSize: widget.isMobile ? 12.5 : 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: _brandRed,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 16,
+                              color: _brandRed,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
+            ),
+            SizedBox(height: widget.isMobile ? 12 : 16),
+
+            // Horizontal Carousel with exact card width so no card is half-cut
+            SizedBox(
+              height: cardHeight,
+              child: NotificationListener<ScrollMetricsNotification>(
+                onNotification: (notification) {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _updateScrollArrows());
+                  return false;
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    ListView.separated(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      itemCount: widget.products.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(width: gap),
+                      itemBuilder: (context, index) {
+                        final product = widget.products[index];
+                        return SizedBox(
+                          width: cardWidth,
+                          child: ProductCard(
+                            product: product,
+                            onTap: () => widget.onProductTap(product),
+                            onAddToCart: widget.onAddToCart,
+                            onBuyNow: widget.onBuyNow,
+                          ),
+                        );
+                      },
+                    ),
+                    if (!widget.isMobile && _canScrollLeft)
+                      Positioned(
+                        left: -14,
+                        top: (cardHeight - 38) / 2,
+                        child: _buildArrowButton(
+                          icon: Icons.chevron_left_rounded,
+                          onTap: () => _scrollBy(-(cardWidth + gap) * 2),
+                        ),
+                      ),
+                    if (!widget.isMobile && _canScrollRight)
+                      Positioned(
+                        right: -14,
+                        top: (cardHeight - 38) / 2,
+                        child: _buildArrowButton(
+                          icon: Icons.chevron_right_rounded,
+                          onTap: () => _scrollBy((cardWidth + gap) * 2),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ],
-        ),
-        SizedBox(height: widget.isMobile ? 12 : 16),
-
-        // Horizontal Carousel with Left & Right Arrow Controls (only shown when scrollable)
-        SizedBox(
-          height: cardHeight,
-          child: NotificationListener<ScrollMetricsNotification>(
-            onNotification: (notification) {
-              WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollArrows());
-              return false;
-            },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                ListView.separated(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-                  itemCount: widget.products.length,
-                  separatorBuilder: (context, index) =>
-                      SizedBox(width: widget.isMobile ? 10 : 16),
-                  itemBuilder: (context, index) {
-                    final product = widget.products[index];
-                    return SizedBox(
-                      width: cardWidth,
-                      child: ProductCard(
-                        product: product,
-                        onTap: () => widget.onProductTap(product),
-                        onAddToCart: widget.onAddToCart,
-                        onBuyNow: widget.onBuyNow,
-                      ),
-                    );
-                  },
-                ),
-                if (!widget.isMobile && _canScrollLeft)
-                  Positioned(
-                    left: -14,
-                    top: (cardHeight - 38) / 2,
-                    child: _buildArrowButton(
-                      icon: Icons.chevron_left_rounded,
-                      onTap: () => _scrollBy(-(cardWidth + 16) * 2),
-                    ),
-                  ),
-                if (!widget.isMobile && _canScrollRight)
-                  Positioned(
-                    right: -14,
-                    top: (cardHeight - 38) / 2,
-                    child: _buildArrowButton(
-                      icon: Icons.chevron_right_rounded,
-                      onTap: () => _scrollBy((cardWidth + 16) * 2),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
