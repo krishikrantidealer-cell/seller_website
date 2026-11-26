@@ -146,6 +146,20 @@ class _HomeViewState extends State<HomeView> {
       final matchesSearch = _matchesProductSearch(p, trimmedQuery);
       return matchesCategory && matchesSubcategory && matchesSearch;
     }).toList();
+    if (_selectedCategory != 'all') {
+      final currentCat = categories.cast<CategoryItem?>().firstWhere(
+        (c) => c?.id == _selectedCategory || c?.backendId == _selectedCategory,
+        orElse: () => null,
+      );
+      final backendKey = currentCat?.backendId ?? _selectedCategory;
+      list.sort((a, b) {
+        final ao = a.categorySortOrders[backendKey] ?? a.categorySortOrders[_selectedCategory] ?? a.displayOrder;
+        final bo = b.categorySortOrders[backendKey] ?? b.categorySortOrders[_selectedCategory] ?? b.displayOrder;
+        return ao.compareTo(bo);
+      });
+    } else {
+      list.sort((a, b) => a.displayOrder.compareTo(b.displayOrder));
+    }
     return ProductItem.sortInStockFirst(list);
   }
 
@@ -179,6 +193,12 @@ class _HomeViewState extends State<HomeView> {
       }
       return true;
     }).toList();
+    final backendKey = category.backendId ?? category.id;
+    list.sort((a, b) {
+      final ao = a.categorySortOrders[backendKey] ?? a.categorySortOrders[category.id] ?? a.displayOrder;
+      final bo = b.categorySortOrders[backendKey] ?? b.categorySortOrders[category.id] ?? b.displayOrder;
+      return ao.compareTo(bo);
+    });
     return ProductItem.sortInStockFirst(list);
   }
 

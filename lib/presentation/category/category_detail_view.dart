@@ -132,9 +132,10 @@ class _CategoryDetailViewState extends State<CategoryDetailView> {
       case 'featured':
       default:
         final catKey = _selectedCategory;
+        final backendKey = currentCategoryItem?.backendId ?? catKey;
         list.sort((a, b) {
-          final ao = (catKey != 'all' ? a.categorySortOrders[catKey] : null) ?? a.displayOrder;
-          final bo = (catKey != 'all' ? b.categorySortOrders[catKey] : null) ?? b.displayOrder;
+          final ao = (catKey != 'all' ? (a.categorySortOrders[backendKey] ?? a.categorySortOrders[catKey]) : null) ?? a.displayOrder;
+          final bo = (catKey != 'all' ? (b.categorySortOrders[backendKey] ?? b.categorySortOrders[catKey]) : null) ?? b.displayOrder;
           return ao.compareTo(bo);
         });
         break;
