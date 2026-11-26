@@ -201,49 +201,16 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
         // Category Filter Pills Bar
         SizedBox(
           height: 36,
-          child: Row(
+          child: ListView(
+            controller: _pillScrollController,
+            scrollDirection: Axis.horizontal,
             children: [
-              _smallScrollChevron(
-                Icons.chevron_left_rounded,
-                () {
-                  if (_pillScrollController.hasClients) {
-                    _pillScrollController.animateTo(
-                      (_pillScrollController.offset - 180)
-                          .clamp(0.0, _pillScrollController.position.maxScrollExtent),
-                      duration: const Duration(milliseconds: 240),
-                      curve: Curves.easeOut,
-                    );
-                  }
-                },
-              ),
-              Expanded(
-                child: ListView(
-                  controller: _pillScrollController,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  children: [
-                    _buildCategoryPill('all', 'All Products'),
-                    ...widget.categories.map(
-                      (c) => Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: _buildCategoryPill(c.id, c.name),
-                      ),
-                    ),
-                  ],
+              _buildCategoryPill('all', 'All Products'),
+              ...widget.categories.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: _buildCategoryPill(c.id, c.name),
                 ),
-              ),
-              _smallScrollChevron(
-                Icons.chevron_right_rounded,
-                () {
-                  if (_pillScrollController.hasClients) {
-                    _pillScrollController.animateTo(
-                      (_pillScrollController.offset + 180)
-                          .clamp(0.0, _pillScrollController.position.maxScrollExtent),
-                      duration: const Duration(milliseconds: 240),
-                      curve: Curves.easeOut,
-                    );
-                  }
-                },
               ),
             ],
           ),
@@ -372,17 +339,6 @@ class _FarmerFavouritesSectionState extends State<FarmerFavouritesSection> {
             color: isSelected ? Colors.white : const Color(0xFF1C1917),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _smallScrollChevron(IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Icon(icon, size: 18, color: const Color(0xFF57534E)),
       ),
     );
   }
