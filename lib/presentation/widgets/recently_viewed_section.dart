@@ -30,11 +30,42 @@ class RecentlyViewedSection extends StatefulWidget {
 class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
   static const Color _brandRed = Color(0xFFC81E1E);
   final ScrollController _scrollController = ScrollController();
+  bool _canScrollLeft = false;
+  bool _canScrollRight = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_updateScrollArrows);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollArrows());
+  }
+
+  @override
+  void didUpdateWidget(covariant RecentlyViewedSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.products.length != widget.products.length) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollArrows());
+    }
+  }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_updateScrollArrows);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _updateScrollArrows() {
+    if (!mounted || !_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    final canLeft = pos.pixels > 4;
+    final canRight = pos.maxScrollExtent > 4 && pos.pixels < pos.maxScrollExtent - 4;
+    if (canLeft != _canScrollLeft || canRight != _canScrollRight) {
+      setState(() {
+        _canScrollLeft = canLeft;
+        _canScrollRight = canRight;
+      });
+    }
   }
 
   void _scrollBy(double delta) {
@@ -148,50 +179,57 @@ class _RecentlyViewedSectionState extends State<RecentlyViewedSection> {
         ),
         SizedBox(height: widget.isMobile ? 12 : 16),
 
-        // Horizontal Carousel with Left & Right Arrow Controls
+        // Horizontal Carousel with Left & Right Arrow Controls (only shown when scrollable)
         SizedBox(
           height: cardHeight,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              ListView.separated(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-                itemCount: widget.products.length,
-                separatorBuilder: (context, index) => SizedBox(width: widget.isMobile ? 10 : 16),
-                itemBuilder: (context, index) {
-                  final product = widget.products[index];
-                  return SizedBox(
-                    width: cardWidth,
-                    child: ProductCard(
-                      product: product,
-                      onTap: () => widget.onProductTap(product),
-                      onAddToCart: widget.onAddToCart,
-                      onBuyNow: widget.onBuyNow,
+          child: NotificationListener<ScrollMetricsNotification>(
+            onNotification: (notification) {
+              WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollArrows());
+              return false;
+            },
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ListView.separated(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                  itemCount: widget.products.length,
+                  separatorBuilder: (context, index) =>
+                      SizedBox(width: widget.isMobile ? 10 : 16),
+                  itemBuilder: (context, index) {
+                    final product = widget.products[index];
+                    return SizedBox(
+                      width: cardWidth,
+                      child: ProductCard(
+                        product: product,
+                        onTap: () => widget.onProductTap(product),
+                        onAddToCart: widget.onAddToCart,
+                        onBuyNow: widget.onBuyNow,
+                      ),
+                    );
+                  },
+                ),
+                if (!widget.isMobile && _canScrollLeft)
+                  Positioned(
+                    left: -14,
+                    top: (cardHeight - 38) / 2,
+                    child: _buildArrowButton(
+                      icon: Icons.chevron_left_rounded,
+                      onTap: () => _scrollBy(-(cardWidth + 16) * 2),
                     ),
-                  );
-                },
-              ),
-              if (!widget.isMobile && widget.products.length > 2) ...[
-                Positioned(
-                  left: -14,
-                  top: (cardHeight - 38) / 2,
-                  child: _buildArrowButton(
-                    icon: Icons.chevron_left_rounded,
-                    onTap: () => _scrollBy(-(cardWidth + 16) * 2),
                   ),
-                ),
-                Positioned(
-                  right: -14,
-                  top: (cardHeight - 38) / 2,
-                  child: _buildArrowButton(
-                    icon: Icons.chevron_right_rounded,
-                    onTap: () => _scrollBy((cardWidth + 16) * 2),
+                if (!widget.isMobile && _canScrollRight)
+                  Positioned(
+                    right: -14,
+                    top: (cardHeight - 38) / 2,
+                    child: _buildArrowButton(
+                      icon: Icons.chevron_right_rounded,
+                      onTap: () => _scrollBy((cardWidth + 16) * 2),
+                    ),
                   ),
-                ),
               ],
-            ],
+            ),
           ),
         ),
       ],
