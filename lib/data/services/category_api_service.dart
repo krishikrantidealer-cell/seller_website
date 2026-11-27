@@ -13,6 +13,7 @@ class ApiCategoryRecord {
   final int level;
   final int sortOrder;
   final bool isActive;
+  final bool isFeatured;
   final String? iconUrl;
   final String? bannerImage;
   final String? cataloguePdf;
@@ -27,6 +28,7 @@ class ApiCategoryRecord {
     required this.level,
     required this.sortOrder,
     required this.isActive,
+    this.isFeatured = false,
     this.iconUrl,
     this.bannerImage,
     this.cataloguePdf,
@@ -57,6 +59,7 @@ class ApiCategoryRecord {
           ? (json['sortOrder'] as num).toInt()
           : int.tryParse('${json['sortOrder'] ?? json['displayOrder'] ?? 0}') ?? 0,
       isActive: json['isActive'] != false,
+      isFeatured: json['isFeatured'] == true,
       iconUrl: json['iconUrl']?.toString(),
       bannerImage: json['bannerImage']?.toString(),
       cataloguePdf: json['cataloguePdf']?.toString(),
@@ -74,6 +77,7 @@ class ApiCategoryRecord {
       'level': level,
       'sortOrder': sortOrder,
       'isActive': isActive,
+      'isFeatured': isFeatured,
       'iconUrl': iconUrl,
       'bannerImage': bannerImage,
       'cataloguePdf': cataloguePdf,
@@ -277,6 +281,7 @@ class CategoryController extends ChangeNotifier {
             iconUrl: l1.iconUrl,
             categoryImageUrl: l1.categoryImageUrl,
             sortOrder: l1.sortOrder,
+            isFeatured: l1.isFeatured,
             subcategories: subItems.map((s) => s.name).toList(),
             subcategoryItems: subItems,
           ),

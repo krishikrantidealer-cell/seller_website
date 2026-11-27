@@ -893,6 +893,7 @@ class CategoryGroup {
   final String? iconUrl;
   final String? categoryImageUrl;
   final int sortOrder;
+  final bool isFeatured;
   final List<String> subcategories;
   final List<CategorySubItem> subcategoryItems;
 
@@ -904,6 +905,7 @@ class CategoryGroup {
     this.iconUrl,
     this.categoryImageUrl,
     this.sortOrder = 0,
+    this.isFeatured = false,
     required this.subcategories,
     this.subcategoryItems = const [],
   });

@@ -25,6 +25,7 @@ import '../widgets/hero_banner_carousel.dart';
 import '../widgets/product_card.dart';
 import '../widgets/recently_viewed_section.dart';
 import '../widgets/farmer_favourites_section.dart';
+import '../widgets/shop_by_subcategory_section.dart';
 import '../widgets/cart_drawer.dart';
 import '../widgets/mobile_navigation_drawer.dart';
 import '../widgets/web_footer.dart';
@@ -696,6 +697,30 @@ class _HomeViewState extends State<HomeView> {
                               },
                             ),
                           ],
+
+                          // Shop Products by Sub-Category Bento Section
+                          if (!isCatalogLoading &&
+                              !isCatalogError &&
+                              _selectedCategory == 'all' &&
+                              _selectedCollectionId == null &&
+                              _searchFilter.isEmpty &&
+                              categories.isNotEmpty)
+                            Padding(
+                              padding: EdgeInsets.only(bottom: isMobile ? 22 : 34),
+                              child: ShopBySubcategorySection(
+                                categories: categories,
+                                allProducts: allProducts,
+                                isMobile: isMobile,
+                                onSelectSubcategory: (catId, subcat) {
+                                  _openCategoryDetail(catId, subcat);
+                                },
+                                onViewAllCategories: () {
+                                  if (categories.isNotEmpty) {
+                                    _openCategoryDetail(categories.first.id, null);
+                                  }
+                                },
+                              ),
+                            ),
 
                           // Level 0 Major Category Sections rendered one by one
                           if (!isCatalogLoading &&
