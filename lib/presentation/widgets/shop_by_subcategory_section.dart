@@ -143,7 +143,21 @@ class _ShopBySubcategorySectionState extends State<ShopBySubcategorySection>
       for (var i = 0; i < allEntries.length; i++)
         if (i != chosenFeaturedIdx) allEntries[i],
     ];
-    final visibleOthers = others.take(5).toList();
+    // Prioritize sub-categories explicitly marked showOnHome (ordered by sortOrder),
+    // then fill any remaining slots up to 5 with sub-categories that have products.
+    final pinned = others.where((e) => e.group.showOnHome).toList()
+      ..sort((a, b) => a.group.sortOrder.compareTo(b.group.sortOrder));
+    final unpinnedWithProducts = others
+        .where((e) => !e.group.showOnHome && e.products.isNotEmpty)
+        .toList();
+    final unpinnedEmpty = others
+        .where((e) => !e.group.showOnHome && e.products.isEmpty)
+        .toList();
+    final visibleOthers = [
+      ...pinned,
+      ...unpinnedWithProducts,
+      ...unpinnedEmpty,
+    ].take(5).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
